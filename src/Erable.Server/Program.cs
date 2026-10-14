@@ -1,6 +1,3 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using Erable.Server.Cli;
 
-app.MapGet("/api/info", () => "Erable");
-
-await app.RunAsync().ConfigureAwait(false);
+return await ErableCli.RunAsync(args).ConfigureAwait(false);

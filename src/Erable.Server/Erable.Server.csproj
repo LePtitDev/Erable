@@ -5,6 +5,20 @@
     <RootNamespace>Erable.Server</RootNamespace>
   </PropertyGroup>
 
+  <!-- /_test endpoints exist only outside Release builds (CLAUDE.md §6.12). -->
+  <PropertyGroup Condition="'$(Configuration)' != 'Release'">
+    <DefineConstants>$(DefineConstants);ERABLE_TEST_ENDPOINTS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <!-- Built SPA (pnpm -C src/web build) served from wwwroot/ next to the binary. -->
+  <ItemGroup Condition="Exists('..\web\dist\index.html')">
+    <Content Include="..\web\dist\**" Exclude="..\web\dist\**\*.map" LinkBase="wwwroot" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Erable.Core\Erable.Core.csproj" />
     <ProjectReference Include="..\Erable.Storage\Erable.Storage.csproj" />

@@ -1,0 +1,48 @@
+using System.CommandLine;
+using Erable.Server.Hosting;
+
+namespace Erable.Server.Cli;
+
+/// <summary>Command line of the <c>erable</c> executable.</summary>
+public static class ErableCli
+{
+    public const int DefaultPort = 5080;
+
+    public static Task<int> RunAsync(string[] args)
+    {
+        var folder = new Argument<DirectoryInfo>("folder")
+        {
+            Description = "Data folder containing the projects to serve.",
+        };
+        var port = new Option<int>("--port")
+        {
+            Description = "TCP port to listen on (0 = random).",
+            DefaultValueFactory = _ => DefaultPort,
+        };
+        var address = new Option<string>("--address")
+        {
+            Description = "IP address to listen on. Defaults to loopback until accounts exist (M4).",
+            DefaultValueFactory = _ => "127.0.0.1",
+        };
+
+        var serve = new Command("serve", "Serve projects over HTTP.") { folder, port, address };
+        serve.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var options = new ErableHostOptions
+            {
+                Mode = HostMode.Server,
+                DataDirectory = parseResult.GetRequiredValue(folder).FullName,
+                Port = parseResult.GetValue(port),
+                Address = parseResult.GetRequiredValue(address),
+                TestMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1",
+            };
+            await using var app = ErableHost.Build(options);
+            await app.StartAsync(cancellationToken).ConfigureAwait(false);
+            await app.WaitForShutdownAsync(cancellationToken).ConfigureAwait(false);
+            return 0;
+        });
+
+        var root = new RootCommand("Erable, a structured wiki.") { serve };
+        return root.Parse(args).InvokeAsync();
+    }
+}
