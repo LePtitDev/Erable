@@ -156,16 +156,13 @@ Erable/
 
 ## 9. Commandes
 
-> À compléter par les tâches `M0-01`, `M0-02`, `M0-09` dès qu'elles existent. Tant qu'une commande n'est pas listée ici, la découvrir dans le dépôt plutôt que l'inventer.
+> Tenu à jour par les tâches. Tant qu'une commande n'est pas listée ici, la découvrir dans le dépôt plutôt que l'inventer.
 
 ```bash
+# .NET (SDK 10, tests sur Microsoft.Testing.Platform : `--solution` obligatoire)
 dotnet build Erable.sln
-dotnet test Erable.sln
-pnpm -C src/web install
-pnpm -C src/web dev
-pnpm -C src/web test
-pnpm -C src/web lint
-pnpm -C src/web e2e
+dotnet test --solution Erable.sln
+dotnet test --project tests/Erable.Core.Tests          # un seul projet
 ```
 
 Environnement de développement principal : Windows (PowerShell). Le code doit rester portable (chemins via `Path.Combine`, pas de séparateur en dur, fins de ligne gérées par `.gitattributes`).

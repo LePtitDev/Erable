@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <AssemblyName>erable</AssemblyName>
+    <RootNamespace>Erable.Server</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Erable.Core\Erable.Core.csproj" />
+    <ProjectReference Include="..\Erable.Storage\Erable.Storage.csproj" />
+  </ItemGroup>
+
+</Project>

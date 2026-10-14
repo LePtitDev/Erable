@@ -1,0 +1,33 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+*.received.*
+artifacts/
+publish/
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.pnpm-store/
+src/web/playwright-report/
+src/web/test-results/
+src/web/blob-report/
+
+# Erable data (reference projects under spec/ are versioned)
+*.db
+*.db-shm
+*.db-wal
+!spec/**/*.db
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db

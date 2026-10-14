@@ -16,7 +16,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 ### M0 — Squelette
 | ID | Tâche | Dépend de | Statut |
 |---|---|---|---|
-| [M0-01](M0-01-dotnet-solution.md) | Solution .NET, projets, analyseurs | — | todo |
+| [M0-01](M0-01-dotnet-solution.md) | Solution .NET, projets, analyseurs | — | review |
 | [M0-02](M0-02-web-scaffolding.md) | SPA React/TS : outillage | — | todo |
 | [M0-03](M0-03-server-host.md) | Hôte serveur, `/api/info`, service de la SPA | M0-01, M0-02 | todo |
 | [M0-04](M0-04-openapi-client.md) | OpenAPI, client TS généré, contrôles de dérive | M0-03 | todo |

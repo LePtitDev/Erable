@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Erable.Core\Erable.Core.csproj" />
+  </ItemGroup>
+
+</Project>
