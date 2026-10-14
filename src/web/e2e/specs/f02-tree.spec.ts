@@ -1,5 +1,6 @@
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
+import { EditorPage } from "../pages/EditorPage";
 import { TreePanel } from "../pages/TreePanel";
 import { t } from "../support/i18n";
 
@@ -16,7 +17,13 @@ test.describe("F02 · Explorer", () => {
 
     await expect(tree.item("Lame de givre")).toBeVisible();
     expect(await tree.childrenOf("Objets")).toEqual(["Lame de givre"]);
-    await expect(page).toHaveURL(/\/e\/[0-9A-F]{16}\?edit=true$/);
+    await expect(page).toHaveURL(/\/e\/[0-9A-F]{16}\?edit=true/);
+    // The page opens in the editor, its title selected (ready to be retyped).
+    const title = new EditorPage(page).title;
+    await expect(title).toBeFocused();
+    expect(
+      await title.evaluate((input: HTMLInputElement) => [input.selectionStart, input.selectionEnd]),
+    ).toEqual([0, "Lame de givre".length]);
   });
 
   test("E2E-02-02 · Rename a referenced page @pr", async ({ page, reference }) => {

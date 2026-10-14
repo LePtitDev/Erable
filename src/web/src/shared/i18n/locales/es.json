@@ -284,5 +284,36 @@
     "title": "Adjuntos",
     "empty": "Ningún adjunto.",
     "downloadNamed": "Descargar {{name}}"
+  },
+  "editor": {
+    "title": "Título de la página",
+    "content": "Contenido Markdown",
+    "placeholder": "Escriba aquí… Teclee [[ para insertar una referencia.",
+    "save": "Guardar",
+    "saveShortcut": "Ctrl S",
+    "toolbar": "Formato",
+    "heading": "Título",
+    "bold": "Negrita",
+    "italic": "Cursiva",
+    "list": "Lista",
+    "code": "Código",
+    "reference": "Referencia",
+    "attachment": "Adjunto",
+    "rawIds": "Mostrar los ID sin procesar",
+    "insertHint": "Insertar:",
+    "draftSaved": "Borrador guardado · {{when}}",
+    "draftFound": "Existe un borrador sin guardar ({{when}}).",
+    "restore": "Restaurar",
+    "ignore": "Ignorar",
+    "cancelTitle": "¿Descartar los cambios?",
+    "cancelDescription": "La página volverá a su contenido guardado y se eliminará el borrador.",
+    "keepEditing": "Seguir editando",
+    "discard": "Descartar",
+    "leaveTitle": "Cambios sin guardar",
+    "leaveDescription": "¿Guardar la página antes de salir?",
+    "conflict": "La página se ha modificado en otro lugar desde que se abrió. Copie sus cambios y recargue la página antes de guardar."
+  },
+  "time": {
+    "justNow": "ahora mismo"
   }
 }

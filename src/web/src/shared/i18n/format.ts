@@ -18,7 +18,10 @@ const units: [Intl.RelativeTimeFormatUnit, number][] = [
 ];
 
 /** Date and number formatting in the interface language, through `Intl`. */
-export function createFormatters(language: string, clock: Clock) {
+/** Below this many seconds, a date is « à l'instant » (E2E-05-01) rather than « il y a 3 s ». */
+const justNowSeconds = 45;
+
+export function createFormatters(language: string, clock: Clock, justNow?: string) {
   const locale = language === pseudoLanguage ? referenceLanguage : language;
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
   const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
@@ -33,6 +36,7 @@ export function createFormatters(language: string, clock: Clock) {
     /** « il y a 2 h », « hier », « dans 3 j » */
     relative: (value: Date) => {
       const seconds = Math.round((value.getTime() - clock().getTime()) / 1000);
+      if (justNow !== undefined && Math.abs(seconds) < justNowSeconds) return justNow;
       const [unit, size] = units.find(([, s]) => Math.abs(seconds) >= s) ?? ["second", 1];
       return relative.format(Math.round(seconds / size), unit);
     },
@@ -64,7 +68,10 @@ export function createFormatters(language: string, clock: Clock) {
 export type Formatters = ReturnType<typeof createFormatters>;
 
 export function useFormatters(): Formatters {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const clock = useContext(ClockContext);
-  return useMemo(() => createFormatters(i18n.language, clock), [i18n.language, clock]);
+  return useMemo(
+    () => createFormatters(i18n.language, clock, t("time.justNow")),
+    [i18n.language, clock, t],
+  );
 }

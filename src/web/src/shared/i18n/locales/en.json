@@ -280,5 +280,36 @@
     "title": "Attachments",
     "empty": "No attachment.",
     "downloadNamed": "Download {{name}}"
+  },
+  "editor": {
+    "title": "Page title",
+    "content": "Markdown content",
+    "placeholder": "Write here… Type [[ to insert a reference.",
+    "save": "Save",
+    "saveShortcut": "Ctrl S",
+    "toolbar": "Formatting",
+    "heading": "Heading",
+    "bold": "Bold",
+    "italic": "Italic",
+    "list": "List",
+    "code": "Code",
+    "reference": "Reference",
+    "attachment": "Attachment",
+    "rawIds": "Show raw IDs",
+    "insertHint": "Insert:",
+    "draftSaved": "Draft saved · {{when}}",
+    "draftFound": "An unsaved draft exists ({{when}}).",
+    "restore": "Restore",
+    "ignore": "Ignore",
+    "cancelTitle": "Discard the changes?",
+    "cancelDescription": "The page will go back to its saved content and the draft will be deleted.",
+    "keepEditing": "Keep editing",
+    "discard": "Discard",
+    "leaveTitle": "Unsaved changes",
+    "leaveDescription": "Save the page before leaving it?",
+    "conflict": "The page was changed elsewhere since it was opened. Copy your changes, then reload the page before saving."
+  },
+  "time": {
+    "justNow": "just now"
   }
 }

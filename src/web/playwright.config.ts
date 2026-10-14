@@ -24,9 +24,11 @@ export default defineConfig({
     video: "retain-on-failure",
     screenshot: "only-on-failure",
   },
+  // Timing measurements (@perf) are meaningless under a full parallel run: they run alone, `pnpm e2e:perf`.
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] }, grepInvert: /@perf/ },
+    { name: "webkit", use: { ...devices["Desktop Safari"] }, grepInvert: /@perf/ },
+    { name: "perf", use: { ...devices["Desktop Chrome"] }, grep: /@perf/ },
   ],
   webServer: {
     command: `node e2e/support/start-backend.mjs --port ${port}`,

@@ -104,7 +104,8 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
 
   // Reveal the element shown in the work area: its ancestors open, its line selected.
   useEffect(() => {
-    if (currentId === null || !index.byId.has(currentId)) return;
+    // Wait for the stored state: written before it arrives, the reveal would be overwritten by it.
+    if (!state.loaded || currentId === null || !index.byId.has(currentId)) return;
     const closed = ancestorsOf(index, currentId).filter((a) => !expanded.has(a.id));
     if (closed.length > 0) {
       setExpanded((set) => {
@@ -113,7 +114,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
     }
     // Only when the element changes, not when the user collapses an ancestor afterwards.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentId, index]);
+  }, [currentId, index, state.loaded]);
 
   const rows = useMemo(
     () => withCreateRow(visibleRows(index, expanded, filter), editing, index),
@@ -207,7 +208,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
             void navigate({
               to: "/p/$projectId/e/$elementId",
               params: { projectId, elementId: created.id },
-              search: { edit: true },
+              search: { edit: true, focus: "title" },
             });
           }
         },
@@ -317,9 +318,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
 
   const onDragOver = (event: DragEvent<HTMLElement>, node: TreeNodeItem) => {
     if (drag === null) return;
-    const box = event.currentTarget.getBoundingClientRect();
-    const ratio = box.height > 0 ? (event.clientY - box.top) / box.height : 0.5;
-    const position: DropPosition = ratio < 0.25 ? "before" : ratio > 0.75 ? "after" : "inside";
+    const position = positionOf(event);
     const destination = dropDestination(index, drag.id, node.id, position);
     const allowed =
       destination !== null && checkMove(index, drag.id, destination.parentId) === null;
@@ -335,12 +334,13 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
     }
   };
 
-  const onDrop = (event: DragEvent, node: TreeNodeItem) => {
+  const onDrop = (event: DragEvent<HTMLElement>, node: TreeNodeItem) => {
     event.preventDefault();
     const current = drag;
     setDrag(null);
     if (current === null) return;
-    const destination = dropDestination(index, current.id, node.id, current.position);
+    // From the drop event itself: the state of the last dragover may not be rendered yet.
+    const destination = dropDestination(index, current.id, node.id, positionOf(event));
     if (destination !== null && checkMove(index, current.id, destination.parentId) === null) {
       move(current.id, destination.parentId, destination.index);
     }
@@ -597,6 +597,13 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
       />
     </div>
   );
+}
+
+/** Top quarter, middle, bottom quarter of the line under the pointer: before, inside, after. */
+function positionOf(event: DragEvent<HTMLElement>): DropPosition {
+  const box = event.currentTarget.getBoundingClientRect();
+  const ratio = box.height > 0 ? (event.clientY - box.top) / box.height : 0.5;
+  return ratio < 0.25 ? "before" : ratio > 0.75 ? "after" : "inside";
 }
 
 /** Pseudo ID of the line where a new element is named. */

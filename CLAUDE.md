@@ -189,6 +189,7 @@ pnpm -C src/web api:generate     # exporte l'OpenAPI (dotnet) puis régénère s
 pnpm -C src/web api:check        # CI : échoue si openapi.json ou schema.ts sont périmés
 pnpm -C src/web e2e              # Playwright Chromium + WebKit contre le vrai backend (build SPA + erable serve, ERABLE_TEST_MODE=1)
 pnpm -C src/web e2e:pr           # seulement les tests @pr
+pnpm -C src/web e2e:perf         # mesures de temps (@perf), seules, un worker (exclues des autres projets)
 pnpm -C src/web e2e:trace        # traçabilité E2E-* ↔ tests ; `-- --enforce M1` échoue s'il manque un scénario ≤ M1
 pnpm -C src/web exec playwright install chromium webkit   # une fois par machine
 

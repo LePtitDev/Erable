@@ -46,6 +46,7 @@ public static class ProjectEndpoints
         me.MapPut("/recent-projects/{projectId}/last-element", RecordLastElement).WithName("RecordLastElement");
         me.MapGet("/ui-state/{key}", GetUiState).WithName("GetUiState");
         me.MapPut("/ui-state/{key}", PutUiState).WithName("PutUiState");
+        me.MapDelete("/ui-state/{key}", DeleteUiState).WithName("DeleteUiState");
         return api;
     }
 
@@ -359,6 +360,17 @@ public static class ProjectEndpoints
         }
 
         profile.Write(UiStateKey.FileOf(key), value);
+        return TypedResults.NoContent();
+    }
+
+    private static Results<NoContent, ProblemHttpResult> DeleteUiState(string key, UserProfile profile)
+    {
+        if (!UiStateKey.IsValid(key))
+        {
+            return Problems.Problem(StatusCodes.Status400BadRequest, "request.invalidKey", "Keys: 1 to 100 letters, digits, '.', '-' or '_'.");
+        }
+
+        profile.Delete(UiStateKey.FileOf(key));
         return TypedResults.NoContent();
     }
 

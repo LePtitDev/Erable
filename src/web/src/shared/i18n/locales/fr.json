@@ -284,5 +284,36 @@
     "title": "Pièces jointes",
     "empty": "Aucune pièce jointe.",
     "downloadNamed": "Télécharger {{name}}"
+  },
+  "editor": {
+    "title": "Titre de la page",
+    "content": "Contenu Markdown",
+    "placeholder": "Écrivez ici… Tapez [[ pour insérer une référence.",
+    "save": "Enregistrer",
+    "saveShortcut": "Ctrl S",
+    "toolbar": "Mise en forme",
+    "heading": "Titre",
+    "bold": "Gras",
+    "italic": "Italique",
+    "list": "Liste",
+    "code": "Code",
+    "reference": "Référence",
+    "attachment": "Pièce jointe",
+    "rawIds": "Afficher les ID bruts",
+    "insertHint": "Insérer :",
+    "draftSaved": "Brouillon enregistré · {{when}}",
+    "draftFound": "Un brouillon non enregistré existe ({{when}}).",
+    "restore": "Restaurer",
+    "ignore": "Ignorer",
+    "cancelTitle": "Annuler les modifications ?",
+    "cancelDescription": "La page reviendra à son contenu enregistré et le brouillon sera supprimé.",
+    "keepEditing": "Continuer l’édition",
+    "discard": "Abandonner",
+    "leaveTitle": "Modifications non enregistrées",
+    "leaveDescription": "Enregistrer la page avant de la quitter ?",
+    "conflict": "La page a été modifiée ailleurs depuis son ouverture. Copiez vos changements, puis rechargez la page avant d’enregistrer."
+  },
+  "time": {
+    "justNow": "à l’instant"
   }
 }

@@ -46,3 +46,33 @@ export function resolveQuery(projectId: ElementId, ids: readonly ElementId[]) {
 export function attachmentUrl(projectId: ElementId, id: ElementId): string {
   return `/api/v1/projects/${projectId}/attachments/${id}`;
 }
+
+/** Markdown and revision of a page, for the editor (the revision goes back in `If-Match`). */
+export function pageContentQuery(projectId: ElementId, id: ElementId) {
+  return queryOptions({
+    queryKey: queryKeys.pageContent(projectId, id),
+    queryFn: ({ signal }) =>
+      unwrap(
+        api.GET("/api/v1/projects/{projectId}/pages/{id}/content", {
+          params: { path: { projectId, id } },
+          signal,
+        }),
+      ),
+    staleTime: 0,
+  });
+}
+
+/** Saves the Markdown of a page if it is still at `revision` (optimistic concurrency; 409 otherwise). */
+export function savePageContent(
+  projectId: ElementId,
+  id: ElementId,
+  markdown: string,
+  revision: number,
+) {
+  return unwrap(
+    api.PUT("/api/v1/projects/{projectId}/pages/{id}/content", {
+      params: { path: { projectId, id }, header: { "If-Match": `"${String(revision)}"` } },
+      body: { markdown },
+    }),
+  );
+}

@@ -42,7 +42,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-09](M1-09-app-shell.md) | Coque de l'application et routage | M1-08 | review |
 | [M1-10](M1-10-explorer-tree.md) | Explorateur (arbre) | M1-09 | review |
 | [M1-11](M1-11-page-view.md) | Lecture d'une page | M1-09 | review |
-| [M1-12](M1-12-page-editor.md) | Éditeur CodeMirror | M1-11 | todo |
+| [M1-12](M1-12-page-editor.md) | Éditeur CodeMirror | M1-11 | review |
 | [M1-13](M1-13-insert-palette.md) | Palette d'insertion `[[` | M1-12 | todo |
 | [M1-14](M1-14-attachments-ui.md) | Pièces jointes (interface) | M1-12, M1-06 | todo |
 | [M1-15](M1-15-preferences.md) | Préférences : langue et thème | M1-08 | todo |
@@ -122,7 +122,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-06** | Critère M0 « l'app **s'installe** sur les 3 OS » alors que Velopack est prévu en M5. | M0 : artefacts `dotnet publish` autonomes (archive) + fumée ; installeur et mise à jour en M5. | ✅ Tranché en M0-11 : archives `.zip` / `.tar.gz` |
 | **P-07** | Filtres de recherche sur valeurs **héritées** (F10.R3) : résoudre l'héritage à la volée par `WITH RECURSIVE` sur 10 000 pages risque de dépasser le budget de 100 ms. | Table dérivée `resolved_property_values` maintenue à l'écriture (comme `refs`), reconstruite par `doctor`. | M2-03 |
 | **P-08** | `projectId` dans `erable.json` : format non précisé. | Même format que `ElementId` (16 hexa), pour la cohérence des URL `/p/:projectId/…`. | ✅ Tranché en M1-03 : recommandation retenue |
-| **P-09** | Le mockup d'édition affiche encore « Alt+Espace » et « fusionnés en direct », écartés par §A-11.3 et §A-8.3. | Les documents priment ; le mockup sert pour la mise en page, pas pour ces libellés. | M1-12 |
+| **P-09** | Le mockup d'édition affiche encore « Alt+Espace » et « fusionnés en direct », écartés par §A-11.3 et §A-8.3. | Les documents priment ; le mockup sert pour la mise en page, pas pour ces libellés. | ✅ Tranché en M1-12 : libellés des documents retenus (Ctrl+Espace, « fusionnés à l'enregistrement » en M4) |
 | **P-10** | La stratégie de test est ambitieuse pour le début du projet (Stryker, NBomber, captures visuelles, fumée 3 OS dès M0). | Garder le plan, mais n'activer un outil qu'au jalon prévu en §T-16 et accepter de reporter les outils « nightly » si le coût de maintenance dépasse le bénéfice observé. | ✅ Appliqué en M0-09 : seul l'outillage M0 est installé |
 | **P-11** | pnpm 7 installé localement, version ancienne. | Fixer `packageManager: pnpm@10.x` dans `package.json` et utiliser Corepack. | ✅ Tranché en M0-02 : `pnpm@10.34.6` (pnpm 12 n'est pas lançable par le Corepack 0.33 livré avec Node 22) |
 | **P-12** | Titres des tests e2e en français dans features §1.3, alors que le code est en anglais. | Titre anglais précédé de l'ID (`E2E-05-03 · Insert a link via the palette`) ; la vérification de traçabilité ne porte que sur l'ID. Déjà inscrit dans `CLAUDE.md`. | ✅ Tranché en M0-09 (features §1.1 et §1.3 corrigés) |

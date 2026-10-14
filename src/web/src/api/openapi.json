@@ -844,6 +844,27 @@
             "description": "No Content"
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "DeleteUiState",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     }
   },

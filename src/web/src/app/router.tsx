@@ -53,9 +53,11 @@ export const elementRoute = createRoute({
     parse: (raw) => ({ elementId: idParam(raw.elementId) }),
     stringify: (params) => ({ elementId: params.elementId ?? "" }),
   },
-  /** `?edit=true` opens a page in the editor (a page just created, E2E-02-01). */
-  validateSearch: (search: Record<string, unknown>): { edit?: boolean } =>
-    search["edit"] === true || search["edit"] === "true" ? { edit: true } : {},
+  /** `?edit=true` opens a page in the editor; `&focus=title` selects its title (a page just created, E2E-02-01). */
+  validateSearch: (search: Record<string, unknown>): { edit?: boolean; focus?: "title" } => ({
+    ...(search["edit"] === true || search["edit"] === "true" ? { edit: true } : {}),
+    ...(search["focus"] === "title" ? { focus: "title" as const } : {}),
+  }),
   component: ElementRoute,
 });
 

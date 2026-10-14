@@ -85,7 +85,7 @@ test.describe("F04 · Reading a page", () => {
     await expect(section.getByRole("link")).toHaveText(["PDialogues", "PInventaire"]);
     await section.getByRole("button", { name: t("page.newSubPage") }).click();
 
-    await expect(page).toHaveURL(/\?edit=true$/);
+    await expect(page).toHaveURL(/\?edit=true/);
     expect(await new TreePanel(page).childrenOf("Ilsa Varenne")).toContain(
       t("page.newSubPageName"),
     );
@@ -144,7 +144,7 @@ test.describe("F03 · Stable identifiers", () => {
 test.describe("perf · page opening", () => {
   test.use({ fakeClock: false });
 
-  test("perf · Opening a page takes less than 200 ms (indicative, budget M3-06) @pr", async ({
+  test("perf · Opening a page takes less than 200 ms (indicative, budget M3-06) @perf", async ({
     page,
     reference,
   }) => {

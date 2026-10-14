@@ -128,7 +128,7 @@ export interface paths {
     get: operations["GetUiState"];
     put: operations["PutUiState"];
     post?: never;
-    delete?: never;
+    delete: operations["DeleteUiState"];
     options?: never;
     head?: never;
     patch?: never;
@@ -751,6 +751,26 @@ export interface operations {
         "application/json": components["schemas"]["JsonNode"];
       };
     };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  DeleteUiState: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
     responses: {
       /** @description No Content */
       204: {

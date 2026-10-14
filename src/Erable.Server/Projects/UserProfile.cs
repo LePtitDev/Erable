@@ -109,6 +109,9 @@ public sealed class UserProfile
         File.Move(temporary, path, overwrite: true);
     }
 
+    /// <summary>Deletes a profile document; nothing happens when it does not exist.</summary>
+    public void Delete(string name) => File.Delete(Path.Combine(_directory, name));
+
     private static bool SameFolder(string a, string b) =>
         string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar),
             OperatingSystem.IsLinux() ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);

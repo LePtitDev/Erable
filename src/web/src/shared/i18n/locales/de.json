@@ -280,5 +280,36 @@
     "title": "Anhänge",
     "empty": "Kein Anhang.",
     "downloadNamed": "{{name}} herunterladen"
+  },
+  "editor": {
+    "title": "Seitentitel",
+    "content": "Markdown-Inhalt",
+    "placeholder": "Hier schreiben… [[ tippen, um eine Referenz einzufügen.",
+    "save": "Speichern",
+    "saveShortcut": "Strg S",
+    "toolbar": "Formatierung",
+    "heading": "Überschrift",
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "list": "Liste",
+    "code": "Code",
+    "reference": "Referenz",
+    "attachment": "Anhang",
+    "rawIds": "Rohe IDs anzeigen",
+    "insertHint": "Einfügen:",
+    "draftSaved": "Entwurf gespeichert · {{when}}",
+    "draftFound": "Ein nicht gespeicherter Entwurf ist vorhanden ({{when}}).",
+    "restore": "Wiederherstellen",
+    "ignore": "Ignorieren",
+    "cancelTitle": "Änderungen verwerfen?",
+    "cancelDescription": "Die Seite kehrt zu ihrem gespeicherten Inhalt zurück und der Entwurf wird gelöscht.",
+    "keepEditing": "Weiter bearbeiten",
+    "discard": "Verwerfen",
+    "leaveTitle": "Nicht gespeicherte Änderungen",
+    "leaveDescription": "Die Seite vor dem Verlassen speichern?",
+    "conflict": "Die Seite wurde seit dem Öffnen anderswo geändert. Kopieren Sie Ihre Änderungen und laden Sie die Seite vor dem Speichern neu."
+  },
+  "time": {
+    "justNow": "gerade eben"
   }
 }

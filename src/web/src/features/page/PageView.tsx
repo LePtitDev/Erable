@@ -210,7 +210,7 @@ function SubPages({
                   void navigate({
                     to: "/p/$projectId/e/$elementId",
                     params: { projectId, elementId: created.id },
-                    search: { edit: true },
+                    search: { edit: true, focus: "title" },
                   });
                 },
               },

@@ -1,0 +1,438 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useBlocker, useNavigate } from "@tanstack/react-router";
+import { Bold, Code, FileText, Heading, Italic, List, Paperclip } from "lucide-react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
+import { useTranslation } from "react-i18next";
+import { api, unwrap } from "../../shared/api/client";
+import { errorCode, errorMessage } from "../../shared/api/errors";
+import { queryKeys } from "../../shared/api/keys";
+import { pageContentQuery, resolveQuery, savePageContent } from "../../shared/api/pages";
+import type { ElementDetails } from "../../shared/api/tree";
+import { ClockContext, useFormatters } from "../../shared/i18n/format";
+import { parseElementId, type ElementId } from "../../shared/ids/elementId";
+import { Button } from "../../shared/ui/Button";
+import { Dialog } from "../../shared/ui/Dialog";
+import { insertText, setHeading, toggleInline } from "../editor/formatting";
+import { MarkdownEditor, type MarkdownEditorHandle } from "../editor/MarkdownEditor";
+import type { PillTarget } from "../editor/pills";
+import { usePageDraft } from "../editor/usePageDraft";
+import { Breadcrumb } from "../../shared/ui/Breadcrumb";
+import { useShellStore } from "../project/shellStore";
+import styles from "./PageEditor.module.css";
+
+interface PageEditorProps {
+  readonly projectId: ElementId;
+  readonly element: ElementDetails;
+  /** Focus and select the title (a page just created, E2E-02-01). */
+  readonly focusTitle: boolean;
+}
+
+/** Editing a page (F05, mockup « Page — édition »). Loads the content, then hands it to {@link EditorScreen}. */
+export function PageEditor({ projectId, element, focusTitle }: PageEditorProps) {
+  const { t } = useTranslation();
+  const content = useQuery(pageContentQuery(projectId, element.id));
+  const now = useContext(ClockContext);
+  const draft = usePageDraft(projectId, element.id, now);
+  if (!content.isSuccess || !draft.loaded) return <p aria-busy="true">{t("common.loading")}</p>;
+  return (
+    <EditorScreen
+      key={element.id}
+      projectId={projectId}
+      element={element}
+      focusTitle={focusTitle}
+      saved={content.data.markdown}
+      revision={content.data.revision}
+      draft={draft}
+    />
+  );
+}
+
+/** Accessible shortcut of « Enregistrer » (key names of the ARIA specification, not displayed). */
+const saveKeys = "Control+S";
+const idPattern = /\[\[([0-9A-Fa-f]{16})/g;
+
+function EditorScreen({
+  projectId,
+  element,
+  focusTitle,
+  saved: initialSaved,
+  revision: initialRevision,
+  draft,
+}: PageEditorProps & {
+  readonly saved: string;
+  readonly revision: number;
+  readonly draft: ReturnType<typeof usePageDraft>;
+}) {
+  const { t } = useTranslation();
+  const format = useFormatters();
+  const client = useQueryClient();
+  const navigate = useNavigate();
+  const editor = useRef<MarkdownEditorHandle>(null);
+  const setMode = useShellStore((s) => s.setMode);
+  const setCursor = useShellStore((s) => s.setCursor);
+
+  const [saved, setSaved] = useState({
+    markdown: initialSaved,
+    revision: initialRevision,
+    name: element.name,
+  });
+  const [doc, setDoc] = useState(initialSaved);
+  const [title, setTitle] = useState(element.name);
+  const [rawIds, setRawIds] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [offerDraft, setOfferDraft] = useState(
+    draft.draft !== null && draft.draft.markdown !== initialSaved,
+  );
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
+  const leaving = useRef(false);
+
+  const dirty = doc !== saved.markdown || title.trim() !== saved.name;
+
+  useEffect(() => {
+    setMode("edit");
+    return () => {
+      setMode("read");
+    };
+  }, [setMode]);
+
+  // Resolve the names of every ID of the text, in one call, refreshed when the set of IDs changes.
+  const ids = useMemo(() => {
+    const found = new Set<ElementId>();
+    for (const m of doc.matchAll(idPattern)) {
+      const id = parseElementId(m[1] ?? "");
+      if (id !== null) found.add(id);
+    }
+    return [...found];
+  }, [doc]);
+  const resolved = useQuery({
+    ...resolveQuery(projectId, ids),
+    placeholderData: (previous) => previous,
+  });
+  const targets = useMemo(() => {
+    const map = new Map<ElementId, PillTarget>();
+    for (const [id, item] of resolved.data ?? [])
+      map.set(id, { name: item.name, kind: item.kind, state: item.state });
+    return map;
+  }, [resolved.data]);
+
+  const onChange = useCallback(
+    (next: string) => {
+      setDoc(next);
+      setError(null);
+      if (next !== saved.markdown) {
+        draft.save(next, saved.revision);
+        setDraftSavedAt(new Date());
+      }
+    },
+    [draft, saved],
+  );
+
+  const finish = useCallback(() => {
+    leaving.current = true;
+    void navigate({
+      to: "/p/$projectId/e/$elementId",
+      params: { projectId, elementId: element.id },
+      search: {},
+    });
+  }, [navigate, projectId, element.id]);
+
+  /** Saves the text (If-Match), then the title; true when everything is saved. */
+  const save = useCallback(async (): Promise<boolean> => {
+    if (saving) return false;
+    setSaving(true);
+    setError(null);
+    try {
+      let revision = saved.revision;
+      if (doc !== saved.markdown) {
+        revision = (await savePageContent(projectId, element.id, doc, revision)).revision;
+      }
+      const name = title.trim();
+      if (name !== "" && name !== saved.name) {
+        revision = (
+          await unwrap(
+            api.PATCH("/api/v1/projects/{projectId}/elements/{id}", {
+              params: { path: { projectId, id: element.id } },
+              body: { name },
+            }),
+          )
+        ).revision;
+      }
+      setSaved({ markdown: doc, revision, name: name === "" ? saved.name : name });
+      await draft.discard();
+      await client.invalidateQueries({ queryKey: queryKeys.projectContent(projectId) });
+      return true;
+    } catch (e) {
+      // 409: the page changed since it was opened; the three-way merge arrives with M4-05.
+      setError(
+        errorCode(e) === "page.revisionConflict" ? t("editor.conflict") : errorMessage(t, e),
+      );
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }, [saving, saved, doc, title, projectId, element.id, draft, client, t]);
+
+  const saveAndClose = useCallback(async () => {
+    if (await save()) finish();
+  }, [save, finish]);
+
+  // F05.R5: leaving with unsaved changes asks first (in-app navigation and closing the tab).
+  const blocker = useBlocker({
+    shouldBlockFn: () => dirty && !leaving.current,
+    enableBeforeUnload: () => dirty && !leaving.current,
+    withResolver: true,
+  });
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+      event.preventDefault();
+      void saveAndClose();
+    }
+  };
+
+  const tool = (
+    label: string,
+    icon: React.ReactNode,
+    run: Parameters<MarkdownEditorHandle["run"]>[0],
+  ) => (
+    <button
+      type="button"
+      className={styles["tool"]}
+      aria-label={label}
+      title={label}
+      onMouseDown={(e) => {
+        e.preventDefault();
+      }}
+      onClick={() => {
+        editor.current?.run(run);
+      }}
+    >
+      {icon}
+    </button>
+  );
+
+  return (
+    <div className={styles["editor"]} onKeyDown={onKeyDown}>
+      <header className={styles["header"]}>
+        <Breadcrumb projectId={projectId} path={element.path} current={saved.name} />
+        <div className={styles["titleRow"]}>
+          <input
+            className={styles["title"]}
+            aria-label={t("editor.title")}
+            value={title}
+            maxLength={200}
+            autoFocus={focusTitle}
+            onFocus={(e) => {
+              if (focusTitle) e.currentTarget.select();
+            }}
+            onChange={(e) => {
+              setTitle(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                editor.current?.focus();
+              }
+            }}
+          />
+          <span className={styles["chip"]}>{t("shell.mode.edit")}</span>
+          <span className={styles["draftState"]} role="status">
+            {draftSavedAt !== null && dirty
+              ? t("editor.draftSaved", { when: format.relative(draftSavedAt) })
+              : ""}
+          </span>
+          <Button
+            onClick={() => {
+              if (dirty) setConfirmCancel(true);
+              else finish();
+            }}
+          >
+            {t("common.cancel")}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => void saveAndClose()}
+            disabled={saving}
+            aria-keyshortcuts={saveKeys}
+          >
+            {t("editor.save")}
+            <kbd className={styles["kbd"]}>{t("editor.saveShortcut")}</kbd>
+          </Button>
+        </div>
+      </header>
+
+      {offerDraft && draft.draft !== null && (
+        <div role="alert" className={styles["banner"]}>
+          <span>
+            {t("editor.draftFound", { when: format.relative(new Date(draft.draft.savedAt)) })}
+          </span>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => {
+              const markdown = draft.draft?.markdown ?? doc;
+              editor.current?.run((state) => ({
+                changes: { from: 0, to: state.doc.length, insert: markdown },
+              }));
+              setOfferDraft(false);
+            }}
+          >
+            {t("editor.restore")}
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              void draft.discard();
+              setOfferDraft(false);
+            }}
+          >
+            {t("editor.ignore")}
+          </Button>
+        </div>
+      )}
+
+      {error !== null && (
+        <p role="alert" className={styles["error"]}>
+          {error}
+        </p>
+      )}
+
+      <div role="toolbar" aria-label={t("editor.toolbar")} className={styles["toolbar"]}>
+        {tool(t("editor.heading"), <Heading aria-hidden size={16} />, (s) => setHeading(s, 2))}
+        {tool(t("editor.bold"), <Bold aria-hidden size={16} />, (s) => toggleInline(s, "**"))}
+        {tool(t("editor.italic"), <Italic aria-hidden size={16} />, (s) => toggleInline(s, "*"))}
+        {tool(t("editor.list"), <List aria-hidden size={16} />, (s) => insertText(s, "- "))}
+        {tool(t("editor.code"), <Code aria-hidden size={16} />, (s) => toggleInline(s, "`"))}
+        <span className={styles["separator"]} aria-hidden />
+        <button
+          type="button"
+          className={styles["textTool"]}
+          onMouseDown={(e) => {
+            e.preventDefault();
+          }}
+          onClick={() => {
+            editor.current?.run((s) => insertText(s, "[["));
+          }}
+        >
+          <FileText aria-hidden size={16} />
+          {t("editor.reference")}
+        </button>
+        <button type="button" className={styles["textTool"]} disabled title={t("common.soon")}>
+          <Paperclip aria-hidden size={16} />
+          {t("editor.attachment")}
+        </button>
+        <span className={styles["toolbarEnd"]}>
+          <label className={styles["rawIds"]}>
+            <input
+              type="checkbox"
+              checked={rawIds}
+              onChange={(e) => {
+                setRawIds(e.target.checked);
+              }}
+            />
+            {t("editor.rawIds")}
+          </label>
+          <span className={styles["hint"]}>
+            {t("editor.insertHint")}{" "}
+            <kbd className={styles["kbd"]}>{t("help.keys.paletteShortcut")}</kbd>
+          </span>
+        </span>
+      </div>
+
+      <section className={styles["surface"]} aria-label={t("editor.content")}>
+        <MarkdownEditor
+          ref={editor}
+          initial={initialSaved}
+          label={t("editor.content")}
+          placeholderText={t("editor.placeholder")}
+          targets={targets}
+          rawIds={rawIds}
+          onChange={onChange}
+          onCursor={(line, column) => {
+            setCursor({ line, column });
+          }}
+          onSave={() => void saveAndClose()}
+        />
+      </section>
+
+      <Dialog
+        open={confirmCancel}
+        onOpenChange={setConfirmCancel}
+        alert
+        size="sm"
+        title={t("editor.cancelTitle")}
+        description={t("editor.cancelDescription")}
+        footer={
+          <>
+            <Button
+              onClick={() => {
+                setConfirmCancel(false);
+              }}
+            >
+              {t("editor.keepEditing")}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setConfirmCancel(false);
+                void draft.discard().then(finish);
+              }}
+            >
+              {t("editor.discard")}
+            </Button>
+          </>
+        }
+      />
+
+      <Dialog
+        open={blocker.status === "blocked"}
+        onOpenChange={(open) => {
+          if (!open) blocker.reset?.();
+        }}
+        alert
+        size="sm"
+        title={t("editor.leaveTitle")}
+        description={t("editor.leaveDescription")}
+        footer={
+          <>
+            <Button onClick={() => blocker.reset?.()}>{t("common.cancel")}</Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                leaving.current = true;
+                void draft.discard().then(() => blocker.proceed?.());
+              }}
+            >
+              {t("editor.discard")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                void save().then((ok) => {
+                  if (ok) {
+                    leaving.current = true;
+                    blocker.proceed?.();
+                  } else {
+                    blocker.reset?.();
+                  }
+                });
+              }}
+            >
+              {t("editor.save")}
+            </Button>
+          </>
+        }
+      />
+    </div>
+  );
+}

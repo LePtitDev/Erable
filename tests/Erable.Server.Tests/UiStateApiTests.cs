@@ -23,6 +23,19 @@ public sealed class UiStateApiTests
     }
 
     [Fact]
+    public async Task Delete_WrittenDocument_IsGone()
+    {
+        await using var backend = await TestBackend.StartAsync();
+        using var put = await backend.Client.PutAsJsonAsync("/api/v1/me/ui-state/draft-x", new { markdown = "a" }, Ct);
+
+        using var deleted = await backend.Client.DeleteAsync(new Uri("/api/v1/me/ui-state/draft-x", UriKind.Relative), Ct);
+        using var read = await backend.Client.GetAsync(new Uri("/api/v1/me/ui-state/draft-x", UriKind.Relative), Ct);
+
+        deleted.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        read.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task Get_NeverWritten_Returns404()
     {
         await using var backend = await TestBackend.StartAsync();

@@ -160,7 +160,7 @@ describe("PageView", () => {
     await user.click(within(section).getByRole("button", { name: "Nouvelle sous-page" }));
 
     await waitFor(() => {
-      expect(router.state.location.search).toEqual({ edit: true });
+      expect(router.state.location.search).toMatchObject({ edit: true });
     });
   });
 
