@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway spike host (M0-08) on the PhotinoX fork, for comparison. Not part of Erable.sln. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PhotinoX" Version="5.3.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Erable.Server\Erable.Server.csproj" />
+  </ItemGroup>
+</Project>

@@ -23,7 +23,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M0-05](M0-05-design-tokens-theme.md) | Tokens de design et thèmes | M0-02 | review |
 | [M0-06](M0-06-i18n.md) | Internationalisation | M0-02 | review |
 | [M0-07](M0-07-desktop-shell.md) | Shell Photino et sécurité loopback | M0-03 | review |
-| [M0-08](M0-08-webview-spike.md) | Spike WebKitGTK / WKWebView | M0-07 | todo |
+| [M0-08](M0-08-webview-spike.md) | Spike WebKitGTK / WKWebView | M0-07 | review |
 | [M0-09](M0-09-test-infrastructure.md) | Infrastructure de test | M0-01, M0-02, M0-03 | todo |
 | [M0-10](M0-10-ci-pipeline.md) | Pipeline CI PR (3 OS) | M0-09 | todo |
 | [M0-11](M0-11-desktop-smoke.md) | Artefacts desktop et test de fumée | M0-07, M0-10 | todo |

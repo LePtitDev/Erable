@@ -1,0 +1,21 @@
+{
+  "name": "erable-spike-webview",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.6",
+  "scripts": {
+    "build": "vite build",
+    "media": "ffmpeg -y -loglevel error -f lavfi -i testsrc=duration=30:size=1280x720:rate=30 -c:v libx264 -b:v 3M -pix_fmt yuv420p -movflags +faststart public/sample.mp4 && ffmpeg -y -loglevel error -f lavfi -i testsrc=size=320x200 -frames:v 1 public/drop.png"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "6.5.2",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.14"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.4"
+  }
+}

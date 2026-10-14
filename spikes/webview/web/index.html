@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Erable — spike WebView</title>
+    <style>
+      body { font: 14px system-ui, sans-serif; margin: 16px; display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+      section { border: 1px solid #ccc; border-radius: 6px; padding: 8px 12px; }
+      h2 { font-size: 13px; margin: 0 0 8px; text-transform: uppercase; color: #555; }
+      .pill { background: #e4ecf6; color: #2a5c96; border-radius: 4px; padding: 0 4px; font-weight: 600; }
+      .cm-editor { border: 1px solid #ddd; min-height: 90px; }
+      ul.tree { list-style: none; padding: 0; margin: 0; }
+      ul.tree li { padding: 4px 8px; border: 1px dashed transparent; cursor: grab; }
+      ul.tree li.over { border-color: #2c6a55; background: #e1eee8; }
+      ul.tree li.forbidden { color: #b42318; }
+      #paste { min-height: 60px; border: 1px dashed #999; padding: 6px; }
+      video { width: 100%; }
+      pre { font-size: 11px; max-height: 120px; overflow: auto; background: #f4f5f2; margin: 4px 0 0; }
+    </style>
+  </head>
+  <body>
+    <section>
+      <h2>1 · CodeMirror + pastille atomique</h2>
+      <div id="editor"></div>
+    </section>
+    <section>
+      <h2>2 · Glisser-déposer dans l'arbre</h2>
+      <ul class="tree" id="tree">
+        <li draggable="true" data-id="a">Capitaine Orsen</li>
+        <li draggable="true" data-id="b">Ilsa Varenne</li>
+        <li draggable="true" data-id="c">Maître Joran</li>
+        <li class="forbidden" data-id="root-cat" data-forbidden="true">Catégories (racine interdite)</li>
+      </ul>
+      <pre id="dnd-log"></pre>
+    </section>
+    <section>
+      <h2>3 · Vidéo MP4 (requêtes Range)</h2>
+      <video id="video" src="/sample.mp4" controls preload="metadata"></video>
+    </section>
+    <section>
+      <h2>4 · Coller une image / déposer des fichiers</h2>
+      <div id="paste" contenteditable="true">Cliquer ici puis Ctrl+V, ou déposer des fichiers</div>
+      <pre id="files-log"></pre>
+    </section>
+    <section>
+      <h2>5 · Raccourcis</h2>
+      <p>Ctrl+S, Ctrl+K, Ctrl+Espace, ⌘+Maj+K</p>
+      <pre id="keys-log"></pre>
+    </section>
+    <section>
+      <h2>6 · Mesures</h2>
+      <pre id="metrics"></pre>
+    </section>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

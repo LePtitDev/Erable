@@ -1,0 +1,4 @@
+node_modules/
+dist/
+web/public/sample.mp4
+web/public/drop.png
