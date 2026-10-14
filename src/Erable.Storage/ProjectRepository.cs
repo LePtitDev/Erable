@@ -237,6 +237,25 @@ public sealed class ProjectRepository(ProjectDatabase database)
             new { Id = id.ToInt64() })?.ToRecord();
     }
 
+    /// <summary>Several attachments in one query, deleted ones included; unknown IDs are absent.</summary>
+    public IReadOnlyList<AttachmentRecord> GetAttachments(IReadOnlyCollection<ElementId> ids, SqliteConnection? connection = null)
+    {
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        var json = "[" + string.Join(',', ids.Select(i => i.ToInt64())) + "]";
+        return [.. (connection ?? owned!).Query<AttachmentRow>(
+            """
+            SELECT a.id AS Id, e.parent_id AS PageId, a.file_name AS FileName, a.mime AS Mime, a.size AS Size, a.sha256 AS Sha256
+            FROM attachments a JOIN elements e ON e.id = a.id
+            WHERE a.id IN (SELECT value FROM json_each(@Ids))
+            """,
+            new { Ids = json }).Select(r => r.ToRecord())];
+    }
+
     /// <summary>Live attachments of a page, in their order.</summary>
     public IReadOnlyList<AttachmentRecord> GetAttachments(ElementId pageId, SqliteConnection? connection = null)
     {

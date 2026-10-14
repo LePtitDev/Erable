@@ -29,6 +29,11 @@ public sealed record ErableHostOptions
     /// <summary>ASP.NET Core environment name; null uses the usual environment variables.</summary>
     public string? EnvironmentName { get; init; }
 
+    /// <summary>Maximum size of one attachment in bytes (F06.R5, docs/architecture.md §9).</summary>
+    public long MaxAttachmentSize { get; init; } = DefaultMaxAttachmentSize;
+
+    public const long DefaultMaxAttachmentSize = 256L * 1024 * 1024;
+
     /// <summary>Clock used by the whole backend; tests replace it.</summary>
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
 }

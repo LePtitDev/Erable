@@ -34,6 +34,7 @@ public static class ProjectEndpoints
         project.MapGet("/pages/{id}", GetPage).WithName("GetPage").WithTags("Pages");
         project.MapGet("/pages/{id}/content", GetPageContent).WithName("GetPageContent").WithTags("Pages");
         project.MapPut("/pages/{id}/content", SavePageContent).WithName("SavePageContent").WithTags("Pages");
+        project.MapAttachmentEndpoints();
 
         var me = api.MapGroup("/me").WithTags("Me");
         me.MapGet("/recent-projects", ListRecent).WithName("ListRecentProjects");
@@ -167,8 +168,13 @@ public static class ProjectEndpoints
         }
 
         var language = service.Project.Manifest.ContentLanguage;
-        return TypedResults.Ok(new ResolveResult([.. service.Resolve(parsed).Select(r => new ResolvedItem(
-            r.Id, r.State, r.Element?.Kind, r.Element?.Name, [.. r.Path.Select(n => PathItemOf(n, language))]))]));
+        var resolved = service.Resolve(parsed);
+        var attachments = service.Project.Repository
+            .GetAttachments([.. resolved.Where(r => r.Element?.Kind == ElementKind.Attachment).Select(r => r.Id)])
+            .ToDictionary(a => a.Id);
+        return TypedResults.Ok(new ResolveResult([.. resolved.Select(r => new ResolvedItem(
+            r.Id, r.State, r.Element?.Kind, r.Element?.Name, [.. r.Path.Select(n => PathItemOf(n, language))],
+            attachments.TryGetValue(r.Id, out var attachment) ? AttachmentItem.From(attachment) : null))]));
     }
 
     private static async Task<Results<Created<ElementDetails>, ProblemHttpResult>> CreateFolder(
@@ -223,7 +229,7 @@ public static class ProjectEndpoints
         var subPages = tree.Contains(id)
             ? tree.Children(id).Where(n => n.Kind == ElementKind.Page).Select(n => new ChildPage(n.Id, n.Name)).ToArray()
             : [];
-        var attachments = repository.GetAttachments(id).Select(a => new AttachmentItem(a.Id, a.PageId, a.FileName, a.Mime, a.Size)).ToArray();
+        var attachments = repository.GetAttachments(id).Select(AttachmentItem.From).ToArray();
         return TypedResults.Ok(new PageView(Details(found, service), content?.Markdown ?? string.Empty, subPages, attachments));
     }
 

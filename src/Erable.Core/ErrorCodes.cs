@@ -31,4 +31,7 @@ public static class ErrorCodes
 
     /// <summary>The element kind cannot be created through this operation.</summary>
     public const string KindNotCreatable = "element.kind.notCreatable";
+
+    /// <summary>The file exceeds the configured maximum attachment size (F06.R5).</summary>
+    public const string AttachmentTooLarge = "attachment.tooLarge";
 }

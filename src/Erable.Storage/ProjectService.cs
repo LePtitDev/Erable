@@ -1,5 +1,6 @@
 using Dapper;
 using Erable.Core;
+using Erable.Core.Attachments;
 using Erable.Core.Elements;
 using Erable.Core.Markdown;
 using Erable.Core.Tree;
@@ -197,6 +198,92 @@ public sealed class ProjectService(OpenedProject project, TimeProvider clock)
             InsertRevision(connection, transaction, saved, markdown, author, now);
             return Result.Success(new PageSaved(pageId, revision, now, author));
         }, cancellationToken);
+    }
+
+    // ─── Attachments ────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Attaches a file to a page (F06): the content is streamed into the blob store first (temporary file, fsync, atomic
+    /// rename), then the element and its metadata are inserted in one transaction. A refused or interrupted upload
+    /// leaves no attachment; at worst an unreferenced blob, removed by <see cref="CollectGarbageAsync"/>.
+    /// </summary>
+    public async Task<Result<AttachmentRecord>> AddAttachmentAsync(
+        ElementId pageId, string? fileName, Stream content, long maxSize, string author, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+        var name = AttachmentFileName.Normalize(fileName);
+        if (!name.IsSuccess)
+        {
+            return name.Error;
+        }
+
+        if (Repository.GetElement(pageId) is not { Kind: ElementKind.Page, DeletedAt: null })
+        {
+            return new DomainError(ErrorCodes.ElementNotFound, $"Page {pageId} does not exist.");
+        }
+
+        using var blob = await Project.Blobs.WriteAsync(content, maxSize, cancellationToken).ConfigureAwait(false);
+        if (blob is null)
+        {
+            return new DomainError(ErrorCodes.AttachmentTooLarge, $"The file exceeds the limit of {maxSize} bytes.");
+        }
+
+        var mime = MediaTypes.Detect(blob.Head.Span, name.Value);
+        return await Project.Database.WriteAsync((connection, transaction) =>
+        {
+            var tree = Repository.LoadTree(connection);
+            var id = NewUniqueId(connection, transaction);
+            var created = tree.Create(id, ElementKind.Attachment, pageId, name.Value);
+            if (!created.IsSuccess)
+            {
+                return Result.Failure<AttachmentRecord>(created.Error);
+            }
+
+            var now = clock.GetUtcNow();
+            var node = created.Value.Node;
+            var element = new Element(id, ElementKind.Attachment, pageId, node.Name, node.SortOrder, 1, now, author, now, author, null);
+            var attachment = new AttachmentRecord(id, pageId, node.Name, mime, blob.Size, blob.Sha256);
+            ProjectRepository.InsertElement(connection, transaction, element);
+            ProjectRepository.InsertAttachment(connection, transaction, attachment);
+            var snapshot = new RevisionSnapshot(id, ElementKind.Attachment, pageId, node.Name, null,
+                new AttachmentSnapshot(node.Name, mime, blob.Size, blob.Sha256));
+            ProjectRepository.InsertRevision(connection, transaction, id, 1, author, now, snapshot.Serialize(), blob.Sha256);
+            return Result.Success(attachment);
+        }, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>A live attachment and a read stream on its content; null when either is missing.</summary>
+    public (AttachmentRecord Attachment, Stream Content)? OpenAttachment(ElementId id)
+    {
+        if (Repository.GetAttachment(id) is not { } attachment || Project.Blobs.OpenRead(attachment.Sha256) is not { } stream)
+        {
+            return null;
+        }
+
+        return (attachment, stream);
+    }
+
+    /// <summary>
+    /// Deletes the blobs that neither an attachment (in the trash or not) nor a revision references (docs/architecture.md
+    /// §7.3). Runs under the write gate; blobs of uploads not yet committed are leased and kept.
+    /// </summary>
+    public Task<IReadOnlyList<string>> CollectGarbageAsync(CancellationToken cancellationToken = default) =>
+        Project.Database.WriteAsync<IReadOnlyList<string>>((connection, _) => CollectGarbage(connection), cancellationToken);
+
+    private List<string> CollectGarbage(SqliteConnection connection)
+    {
+        var referenced = Repository.GetReferencedBlobs(connection);
+        var deleted = new List<string>();
+        foreach (var sha256 in Project.Blobs.List())
+        {
+            if (!referenced.Contains(sha256) && !Project.Blobs.IsLeased(sha256))
+            {
+                Project.Blobs.Delete(sha256);
+                deleted.Add(sha256);
+            }
+        }
+
+        return deleted;
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────────

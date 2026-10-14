@@ -68,6 +68,7 @@ public static class ErableHost
         }
         builder.Services.AddSingleton(_ => new UserProfile(ProfileDirectory(options)));
         builder.Services.AddSingleton<ProjectWorkspace>();
+        builder.Services.AddSingleton<AttachmentSettings>();
         builder.Services.AddProblemDetails();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {

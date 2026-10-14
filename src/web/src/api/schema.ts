@@ -134,6 +134,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/attachments/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["DownloadAttachment"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/elements/{id}": {
     parameters: {
       query?: never;
@@ -208,6 +224,22 @@ export interface paths {
     get: operations["GetPage"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/pages/{id}/attachments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["UploadAttachment"];
     delete?: never;
     options?: never;
     head?: never;
@@ -305,7 +337,10 @@ export interface components {
       formatVersion: number;
       mode: components["schemas"]["HostMode"];
     };
+    /** @enum {string} */
+    AttachmentDisplay: "image" | "video" | "audio" | "pdf" | "file";
     AttachmentItem: {
+      display: components["schemas"]["AttachmentDisplay"];
       fileName: string;
       id: components["schemas"]["ElementId"];
       mime: string;
@@ -432,6 +467,7 @@ export interface components {
       elementId: components["schemas"]["ElementId"];
     };
     ResolvedItem: {
+      attachment?: null | components["schemas"]["AttachmentItem"];
       id: components["schemas"]["ElementId"];
       kind: null | components["schemas"]["ElementKind"];
       name: null | string;
@@ -685,6 +721,27 @@ export interface operations {
       };
     };
   };
+  DownloadAttachment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   GetElement: {
     parameters: {
       query?: never;
@@ -830,6 +887,36 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["PageView"];
         };
+      };
+    };
+  };
+  UploadAttachment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttachmentItem"];
+        };
+      };
+      /** @description Payload Too Large */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

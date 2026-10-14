@@ -17,6 +17,7 @@ public sealed class OpenedProject : IDisposable
         Database = database;
         Repository = new ProjectRepository(database);
         BlobsDirectory = Path.Combine(folder, ProjectFiles.Blobs);
+        Blobs = new DiskBlobStore(BlobsDirectory);
         _lock = projectLock;
         BackupPath = backupPath;
     }
@@ -31,6 +32,8 @@ public sealed class OpenedProject : IDisposable
     public ProjectRepository Repository { get; }
 
     public string BlobsDirectory { get; }
+
+    public DiskBlobStore Blobs { get; }
 
     /// <summary>Backup made before a migration at this opening, if any.</summary>
     public string? BackupPath { get; }

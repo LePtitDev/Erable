@@ -1,4 +1,5 @@
 using Erable.Core;
+using Erable.Core.Attachments;
 using Erable.Core.Elements;
 using Erable.Storage;
 
@@ -59,7 +60,15 @@ public sealed record CreatePageRequest(ElementId ParentId, string Name, int? Ind
 
 public sealed record ChildPage(ElementId Id, string Name);
 
-public sealed record AttachmentItem(ElementId Id, ElementId PageId, string FileName, string Mime, long Size);
+/// <summary>An attachment and how the SPA presents it (F06.R2); its content is at <c>attachments/{id}</c>.</summary>
+public sealed record AttachmentItem(ElementId Id, ElementId PageId, string FileName, string Mime, long Size, AttachmentDisplay Display)
+{
+    public static AttachmentItem From(AttachmentRecord a)
+    {
+        ArgumentNullException.ThrowIfNull(a);
+        return new(a.Id, a.PageId, a.FileName, a.Mime, a.Size, MediaTypes.DisplayOf(a.Mime));
+    }
+}
 
 /// <summary>Everything the page view needs in one call (F04).</summary>
 public sealed record PageView(
@@ -71,7 +80,9 @@ public sealed record SavePageContentRequest(string Markdown);
 
 public sealed record PageSavedResult(long Revision, DateTimeOffset UpdatedAt, string UpdatedBy);
 
-public sealed record ResolvedItem(ElementId Id, ResolvedState State, ElementKind? Kind, string? Name, IReadOnlyList<PathItem> Path);
+/// <summary>Current state of a referenced ID; <c>attachment</c> is set for attachments (embeds, F06.R2).</summary>
+public sealed record ResolvedItem(
+    ElementId Id, ResolvedState State, ElementKind? Kind, string? Name, IReadOnlyList<PathItem> Path, AttachmentItem? Attachment = null);
 
 public sealed record ResolveResult(IReadOnlyList<ResolvedItem> Items);
 

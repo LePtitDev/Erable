@@ -85,6 +85,9 @@ public sealed class ProjectWorkspace(TimeProvider clock, UserProfile profile) : 
         }
 
         var service = new ProjectService(project, clock);
+        // No upload can be running yet: leftovers of an interrupted write and unreferenced blobs go now.
+        project.Blobs.DeleteTemporaryFiles();
+        service.CollectGarbageAsync().GetAwaiter().GetResult();
         _open[project.Manifest.ProjectId] = service;
         profile.RecordOpened(project, clock.GetUtcNow());
         return service;

@@ -25,7 +25,13 @@ public static class ErableCli
             DefaultValueFactory = _ => "127.0.0.1",
         };
 
-        var serve = new Command("serve", "Serve projects over HTTP.") { folder, port, address };
+        var maxAttachment = new Option<long>("--max-attachment-mb")
+        {
+            Description = "Maximum size of one attachment, in MiB.",
+            DefaultValueFactory = _ => ErableHostOptions.DefaultMaxAttachmentSize / (1024 * 1024),
+        };
+
+        var serve = new Command("serve", "Serve projects over HTTP.") { folder, port, address, maxAttachment };
         serve.SetAction(async (parseResult, cancellationToken) =>
         {
             var options = new ErableHostOptions
@@ -34,6 +40,7 @@ public static class ErableCli
                 DataDirectory = parseResult.GetRequiredValue(folder).FullName,
                 Port = parseResult.GetValue(port),
                 Address = parseResult.GetRequiredValue(address),
+                MaxAttachmentSize = parseResult.GetValue(maxAttachment) * 1024 * 1024,
                 TestMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1",
             };
             await using var app = ErableHost.Build(options);

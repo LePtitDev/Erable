@@ -614,6 +614,78 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/pages/{id}/attachments": {
+      "post": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "UploadAttachment",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentItem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/attachments/{id}": {
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "DownloadAttachment",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/me/recent-projects": {
       "get": {
         "tags": [
@@ -720,13 +792,24 @@
           }
         }
       },
+      "AttachmentDisplay": {
+        "enum": [
+          "image",
+          "video",
+          "audio",
+          "pdf",
+          "file"
+        ],
+        "type": "string"
+      },
       "AttachmentItem": {
         "required": [
           "id",
           "pageId",
           "fileName",
           "mime",
-          "size"
+          "size",
+          "display"
         ],
         "type": "object",
         "properties": {
@@ -745,6 +828,9 @@
           "size": {
             "type": "integer",
             "format": "int64"
+          },
+          "display": {
+            "$ref": "#/components/schemas/AttachmentDisplay"
           }
         }
       },
@@ -1247,6 +1333,16 @@
             "items": {
               "$ref": "#/components/schemas/PathItem"
             }
+          },
+          "attachment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AttachmentItem"
+              }
+            ]
           }
         }
       },
@@ -1438,6 +1534,9 @@
     },
     {
       "name": "Pages"
+    },
+    {
+      "name": "Attachments"
     },
     {
       "name": "Me"

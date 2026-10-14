@@ -56,6 +56,15 @@ public static class ApiJson
         return await response.ReadAsync<ElementDetails>();
     }
 
+    /// <summary>Uploads one file as multipart/form-data, like the SPA.</summary>
+    public static async Task<HttpResponseMessage> UploadAsync(this TestBackend backend, ElementId projectId, ElementId pageId, string fileName, byte[] content)
+    {
+        ArgumentNullException.ThrowIfNull(backend);
+        using var form = new MultipartFormDataContent { { new ByteArrayContent(content), "file", fileName } };
+        return await backend.Client.PostAsync(
+            new Uri($"/api/v1/projects/{projectId}/pages/{pageId}/attachments", UriKind.Relative), form, TestContext.Current.CancellationToken);
+    }
+
     public static async Task<ElementDetails> CreateFolderAsync(this TestBackend backend, ElementId projectId, ElementId parentId, string name)
     {
         ArgumentNullException.ThrowIfNull(backend);
