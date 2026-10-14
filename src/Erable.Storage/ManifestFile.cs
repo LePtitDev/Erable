@@ -11,6 +11,8 @@ public static class ManifestFile
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
         WriteIndented = true,
+        // Same bytes on every OS (the default follows Environment.NewLine).
+        NewLine = "\n",
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
     };
 
