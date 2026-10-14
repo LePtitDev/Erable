@@ -12,11 +12,15 @@ const portIndex = process.argv.indexOf("--port");
 const port = portIndex > 0 ? process.argv[portIndex + 1] : "5181";
 
 if (!process.argv.includes("--skip-build")) {
-  execFileSync("corepack", ["pnpm", "exec", "vite", "build"], {
-    cwd: webDir,
-    stdio: "inherit",
-    shell: true,
-  });
+  // Vite's own entry point: independent of how pnpm is installed (Corepack locally, pnpm/action-setup in CI).
+  execFileSync(
+    process.execPath,
+    [join(webDir, "node_modules", "vite", "bin", "vite.js"), "build"],
+    {
+      cwd: webDir,
+      stdio: "inherit",
+    },
+  );
 }
 
 const data = mkdtempSync(join(tmpdir(), "erable-e2e-"));
