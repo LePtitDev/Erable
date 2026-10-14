@@ -34,6 +34,18 @@ const elementIdImport = `import type { ElementId } from "../shared/ids/elementId
 // gets the branded type, obtainable only through parseElementId() (docs/architecture.md §4).
 const elementIdFormat = "element-id";
 const elementIdType = ts.factory.createTypeReferenceNode("ElementId");
+const nullableElementIdType = ts.factory.createUnionTypeNode([
+  elementIdType,
+  ts.factory.createLiteralTypeNode(ts.factory.createNull()),
+]);
+
+/** `format: element-id` → `ElementId`, or `ElementId | null` when the schema also allows null. */
+function transformSchema(schema) {
+  if (schema.format !== elementIdFormat) return undefined;
+  return Array.isArray(schema.type) && schema.type.includes("null")
+    ? nullableElementIdType
+    : elementIdType;
+}
 
 function exportDocument(target) {
   execFileSync(
@@ -56,7 +68,7 @@ function exportDocument(target) {
 async function generateSchema(documentFile) {
   const ast = await openapiTS(pathToFileURL(documentFile), {
     alphabetize: true,
-    transform: (schema) => (schema.format === elementIdFormat ? elementIdType : undefined),
+    transform: transformSchema,
   });
   const prettierConfig = (await resolveConfig(schemaPath)) ?? {};
   const body = astToString(ast);

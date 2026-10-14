@@ -3,6 +3,8 @@
  * Regenerate with `pnpm -C src/web api:generate`.
  */
 
+import type { ElementId } from "../shared/ids/elementId";
+
 export interface paths {
   "/api/info": {
     parameters: {
@@ -52,6 +54,246 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/recent-projects": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListRecentProjects"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/recent-projects/{projectId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["RemoveRecentProject"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/recent-projects/{projectId}/last-element": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["RecordLastElement"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListOpenProjects"];
+    put?: never;
+    post: operations["CreateProject"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetProject"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/elements/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetElement"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["UpdateElement"];
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/elements/{id}/backlinks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetBacklinks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/folders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CreateFolder"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/pages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CreatePage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/pages/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetPage"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/pages/{id}/content": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetPageContent"];
+    put: operations["SavePageContent"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/resolve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ResolveElements"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/tree": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetTree"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/inspect": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["InspectFolder"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/open": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["OpenProject"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -63,8 +305,157 @@ export interface components {
       formatVersion: number;
       mode: components["schemas"]["HostMode"];
     };
+    AttachmentItem: {
+      fileName: string;
+      id: components["schemas"]["ElementId"];
+      mime: string;
+      pageId: components["schemas"]["ElementId"];
+      /** Format: int64 */
+      size: number;
+    };
+    BacklinkItem: {
+      /** Format: int32 */
+      count: number;
+      embedded: boolean;
+      path: components["schemas"]["PathItem"][];
+      sourceId: components["schemas"]["ElementId"];
+      sourceKind: components["schemas"]["ElementKind"];
+      sourceName: string;
+    };
+    ChildPage: {
+      id: components["schemas"]["ElementId"];
+      name: string;
+    };
+    CreateFolderRequest: {
+      /** Format: int32 */
+      index?: null | number;
+      name: string;
+      parentId: components["schemas"]["ElementId"];
+    };
+    CreatePageRequest: {
+      /** Format: int32 */
+      index?: null | number;
+      markdown?: null | string;
+      name: string;
+      parentId: components["schemas"]["ElementId"];
+    };
+    CreateProjectRequest: {
+      contentLanguage: string;
+      folder: string;
+      name: string;
+    };
+    ElementDetails: {
+      /** Format: date-time */
+      createdAt: string;
+      createdBy: string;
+      deleted: boolean;
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+      parentId: null | components["schemas"]["ElementId"];
+      path: components["schemas"]["PathItem"][];
+      /** Format: int64 */
+      revision: number;
+      /** Format: date-time */
+      updatedAt: string;
+      updatedBy: string;
+    };
+    /** Format: element-id */
+    ElementId: ElementId;
+    /** @enum {string} */
+    ElementKind:
+      "root" | "folder" | "page" | "category" | "propertyDefinition" | "linkType" | "attachment";
+    FolderInspection: {
+      /** Format: int32 */
+      formatVersion: null | number;
+      name: null | string;
+      projectId: null | components["schemas"]["ElementId"];
+      status: components["schemas"]["FolderStatus"];
+    };
+    /** @enum {string} */
+    FolderStatus: "missing" | "notAProject" | "project" | "tooNew" | "invalid";
     /** @enum {string} */
     HostMode: "desktop" | "server";
+    InspectFolderRequest: {
+      folder: string;
+    };
+    OpenProjectRequest: {
+      folder: string;
+    };
+    PageContent: {
+      markdown: string;
+      /** Format: int64 */
+      revision: number;
+    };
+    PageSavedResult: {
+      /** Format: int64 */
+      revision: number;
+      /** Format: date-time */
+      updatedAt: string;
+      updatedBy: string;
+    };
+    PageView: {
+      attachments: components["schemas"]["AttachmentItem"][];
+      element: components["schemas"]["ElementDetails"];
+      markdown: string;
+      subPages: components["schemas"]["ChildPage"][];
+    };
+    PathItem: {
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+    };
+    ProjectSummary: {
+      contentLanguage: string;
+      /** Format: date-time */
+      createdAt: string;
+      folder: string;
+      /** Format: int32 */
+      formatVersion: number;
+      id: components["schemas"]["ElementId"];
+      name: string;
+    };
+    ProjectTree: {
+      counts: components["schemas"]["RootCounts"];
+      nodes: components["schemas"]["TreeNodeItem"][];
+    };
+    RecentProjectItem: {
+      folder: string;
+      lastElementId: null | components["schemas"]["ElementId"];
+      /** Format: date-time */
+      lastOpenedAt: string;
+      name: string;
+      projectId: components["schemas"]["ElementId"];
+      status: components["schemas"]["FolderStatus"];
+    };
+    RecordLastElementRequest: {
+      elementId: components["schemas"]["ElementId"];
+    };
+    ResolvedItem: {
+      id: components["schemas"]["ElementId"];
+      kind: null | components["schemas"]["ElementKind"];
+      name: null | string;
+      path: components["schemas"]["PathItem"][];
+      state: components["schemas"]["ResolvedState"];
+    };
+    /** @enum {string} */
+    ResolvedState: "existing" | "deleted" | "unknown";
+    ResolveResult: {
+      items: components["schemas"]["ResolvedItem"][];
+    };
+    RootCounts: {
+      /** Format: int32 */
+      categories: number;
+      /** Format: int32 */
+      links: number;
+      /** Format: int32 */
+      pages: number;
+      /** Format: int32 */
+      properties: number;
+    };
+    SavePageContentRequest: {
+      markdown: string;
+    };
     SelfTestReport: {
       /** Format: double */
       readyAtMs: number;
@@ -76,6 +467,22 @@ export interface components {
       durationMs: number;
       name: string;
       ok: boolean;
+    };
+    TreeNodeItem: {
+      duplicateName: boolean;
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+      parentId: null | components["schemas"]["ElementId"];
+      /** Format: int64 */
+      sortOrder: number;
+    };
+    UpdateElementRequest: {
+      /** Format: int32 */
+      index?: null | number;
+      name?: null | string;
+      /** Format: element-id */
+      parentId?: ElementId | null;
     };
   };
   responses: never;
@@ -145,6 +552,430 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  ListRecentProjects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecentProjectItem"][];
+        };
+      };
+    };
+  };
+  RemoveRecentProject: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RecordLastElement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordLastElementRequest"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ListOpenProjects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectSummary"][];
+        };
+      };
+    };
+  };
+  CreateProject: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateProjectRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectSummary"];
+        };
+      };
+    };
+  };
+  GetProject: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectSummary"];
+        };
+      };
+    };
+  };
+  GetElement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ElementDetails"];
+        };
+      };
+    };
+  };
+  UpdateElement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateElementRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ElementDetails"];
+        };
+      };
+    };
+  };
+  GetBacklinks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BacklinkItem"][];
+        };
+      };
+    };
+  };
+  CreateFolder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateFolderRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ElementDetails"];
+        };
+      };
+    };
+  };
+  CreatePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePageRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ElementDetails"];
+        };
+      };
+    };
+  };
+  GetPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageView"];
+        };
+      };
+    };
+  };
+  GetPageContent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageContent"];
+        };
+      };
+    };
+  };
+  SavePageContent: {
+    parameters: {
+      query?: never;
+      header?: {
+        "If-Match"?: string;
+      };
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SavePageContentRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageSavedResult"];
+        };
+      };
+    };
+  };
+  ResolveElements: {
+    parameters: {
+      query: {
+        ids: string;
+      };
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ResolveResult"];
+        };
+      };
+    };
+  };
+  GetTree: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectTree"];
+        };
+      };
+    };
+  };
+  InspectFolder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InspectFolderRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FolderInspection"];
+        };
+      };
+    };
+  };
+  OpenProject: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OpenProjectRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectSummary"];
+        };
       };
     };
   };

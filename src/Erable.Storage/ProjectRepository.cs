@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 namespace Erable.Storage;
 
 /// <summary>Markdown of a page with the element revision it belongs to.</summary>
-public sealed record PageContent(ElementId PageId, string Markdown, string PlainText, long Revision);
+public sealed record StoredPageContent(ElementId PageId, string Markdown, string PlainText, long Revision);
 
 /// <summary>One row of the derived <c>refs</c> index.</summary>
 public sealed record StoredReference(ElementId SourceId, ElementId TargetId, string? Anchor, bool IsEmbed, int Position);
@@ -125,7 +125,7 @@ public sealed class ProjectRepository(ProjectDatabase database)
 
     // ─── Pages ──────────────────────────────────────────────────────────────
 
-    public PageContent? GetPageContent(ElementId pageId, SqliteConnection? connection = null)
+    public StoredPageContent? GetPageContent(ElementId pageId, SqliteConnection? connection = null)
     {
         using var owned = connection is null ? Database.OpenConnection() : null;
         var row = (connection ?? owned!).QuerySingleOrDefault<(string Markdown, string PlainText, long Revision)>(
@@ -135,7 +135,7 @@ public sealed class ProjectRepository(ProjectDatabase database)
             WHERE c.page_id = @Id
             """,
             new { Id = pageId.ToInt64() });
-        return row.Markdown is null ? null : new PageContent(pageId, row.Markdown, row.PlainText, row.Revision);
+        return row.Markdown is null ? null : new StoredPageContent(pageId, row.Markdown, row.PlainText, row.Revision);
     }
 
     public static void UpsertPageContent(

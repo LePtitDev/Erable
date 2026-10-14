@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Erable.Core;
 using Erable.Server.Api;
 using Erable.Server.Native;
+using Erable.Server.Projects;
 using Erable.Server.Security;
 using Erable.Server.Spa;
 using Microsoft.AspNetCore.Hosting.Server;
@@ -65,6 +66,8 @@ public static class ErableHost
         {
             builder.Services.AddSingleton<SelfTestChannel>();
         }
+        builder.Services.AddSingleton(_ => new UserProfile(ProfileDirectory(options)));
+        builder.Services.AddSingleton<ProjectWorkspace>();
         builder.Services.AddProblemDetails();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {
@@ -80,9 +83,12 @@ public static class ErableHost
             {
                 // ElementId is carried by a custom JsonConverter, invisible to the generator: always a string
                 // (docs/architecture.md §4). The format lets the TypeScript generator map it to the branded type.
-                if (context.JsonTypeInfo.Type == typeof(ElementId))
+                var type = context.JsonTypeInfo.Type;
+                if (type == typeof(ElementId) || type == typeof(ElementId?))
                 {
-                    schema.Type = JsonSchemaType.String;
+                    // A nullable ElementId? keeps (or gets) the null type.
+                    var nullable = type == typeof(ElementId?) || ((schema.Type ?? 0) & JsonSchemaType.Null) != 0;
+                    schema.Type = nullable ? JsonSchemaType.String | JsonSchemaType.Null : JsonSchemaType.String;
                     schema.Pattern = ElementId.Pattern;
                     schema.Format = ElementIdSchemaFormat;
                     schema.Properties?.Clear();
@@ -121,6 +127,16 @@ public static class ErableHost
         var first = addresses?.FirstOrDefault()
             ?? throw new InvalidOperationException("The host is not listening; call StartAsync first.");
         return new Uri(first);
+    }
+
+    /// <summary>
+    /// Per-user documents (recent projects, preferences…): the desktop data folder is the application profile itself;
+    /// a server keeps them in <c>&lt;data&gt;/profile</c>.
+    /// </summary>
+    private static string ProfileDirectory(ErableHostOptions options)
+    {
+        var data = options.DataDirectory ?? Path.Combine(Path.GetTempPath(), "erable-no-data");
+        return options.Mode == HostMode.Desktop ? data : Path.Combine(data, "profile");
     }
 
     private static void Validate(ErableHostOptions options)
@@ -169,7 +185,7 @@ public static class ErableHost
         app.MapInfoEndpoints();
         app.MapSessionEndpoints();
         app.MapSelfTestEndpoints();
-        app.MapGroup(ApiRoutes.V1);
+        app.MapGroup(ApiRoutes.V1).MapProjectEndpoints();
 
         if (TestEndpointsCompiled && options.TestMode)
         {
