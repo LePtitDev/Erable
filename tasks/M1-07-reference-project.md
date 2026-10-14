@@ -21,7 +21,7 @@ Disposer du monde de test unique utilisé par les tests d'intégration, les e2e,
 
 - [x] Un test e2e d'exemple réinitialise le projet et ouvre Ilsa Varenne par son ID.
 - [x] `reset` est isolé par fichier de test (exécution parallèle possible).
-- [ ] Le projet passe `erable doctor` (dès que M1-16 existe).
+- [x] Le projet passe `erable doctor` (dès que M1-16 existe).
 
 ## Points d'attention
 
@@ -41,7 +41,7 @@ Disposer du monde de test unique utilisé par les tests d'intégration, les e2e,
   - `GET /_test/blobs?projectId=` ; `POST /_test/limits` `{ maxAttachmentSize }` (E2E-06-07).
 - **Profils** : `UserProfiles` choisit le profil de la requête (un seul hors mode test) ; `UserProfile` est injecté par requête ; `ProjectWorkspace.Create/Open` reçoivent le profil.
 - **Playwright** : fixture `reference` (copie fraîche **par test** et par navigateur, plus fin que « par fichier » puisque `fullyParallel` exécute en parallèle les tests d'un même fichier), `freshProfile`, horloge du navigateur installée à la date de référence ; IDs figés dans `e2e/fixtures/chroniques.ts`. `start-backend.mjs` passe `ERABLE_TEST_FIXTURES`. Le test d'exemple passe par l'API (l'ouverture dans l'interface arrive avec M1-11).
-- Critère « passe `erable doctor` » : à cocher en M1-16.
+- Critère « passe `erable doctor` » : vérifié en M1-16.
 
 **Vérification** : `dotnet test --solution Erable.sln` (378 réussis, 3 ignorés dont le générateur) · `dotnet format --verify-no-changes` · `pnpm typecheck`, `lint`, `format:check` · `playwright test e2e/specs/m1-reference.spec.ts e2e/specs/m0-skeleton.spec.ts` (6 réussis, Chromium + WebKit).
 

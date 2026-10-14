@@ -23,6 +23,7 @@ internal static class TestEndpoints
         group.MapPost("/clock", SetClock);
         group.MapGet("/blobs", ListBlobs);
         group.MapPost("/limits", SetLimits);
+        group.MapGet("/doctor", Doctor);
     }
 
     /// <summary>
@@ -112,6 +113,12 @@ internal static class TestEndpoints
         settings.MaxSize = request.MaxAttachmentSize ?? options.MaxAttachmentSize;
         return TypedResults.NoContent();
     }
+
+    /// <summary><c>erable doctor</c> on a project open in this backend (run after each e2e test, docs/testing.md §6).</summary>
+    private static Results<Ok<DoctorReport>, ProblemHttpResult> Doctor([FromQuery] ElementId projectId, ProjectWorkspace workspace) =>
+        workspace.Find(projectId) is { } service
+            ? TypedResults.Ok(ProjectDoctor.Diagnose(service.Project, fix: false))
+            : Problems.ProjectNotOpen(projectId);
 
     private static void CopyDirectory(string source, string target)
     {

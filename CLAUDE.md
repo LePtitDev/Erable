@@ -172,7 +172,9 @@ dotnet build Erable.sln
 dotnet test --solution Erable.sln
 dotnet test --project tests/Erable.Core.Tests          # un seul projet
 dotnet test --solution Erable.sln -c Release           # vérifie aussi l'absence de /_test en Release
+dotnet test --project tests/Erable.Storage.Tests -- --filter-method "*GenerateChroniques" --explicit only   # régénère spec/projects/chroniques
 dotnet run --project src/Erable.Server -- serve <dossier> [--port 5080]   # ERABLE_TEST_MODE=1 pour /_test
+dotnet run --project src/Erable.Server -- doctor <projet> [--json] [--fix]   # intégrité d'un projet fermé (0 sain, 1 anomalies, 2 illisible)
 dotnet run --project src/Erable.Desktop                 # app desktop (après pnpm -C src/web build)
 
 # SPA (pnpm épinglé par `packageManager` : utiliser Corepack, `corepack pnpm …` si les shims ne sont pas activés)

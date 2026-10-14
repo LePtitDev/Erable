@@ -60,7 +60,14 @@ public static class ErableCli
         openApi.SetAction((parseResult, cancellationToken) =>
             OpenApiExport.RunAsync(parseResult.GetRequiredValue(output), cancellationToken));
 
-        var root = new RootCommand("Erable, a structured wiki.") { serve, openApi };
+        var project = new Argument<DirectoryInfo>("folder") { Description = "Project folder (closed: the command takes its lock)." };
+        var asJson = new Option<bool>("--json") { Description = "Machine-readable report." };
+        var fix = new Option<bool>("--fix") { Description = "Safe repairs only: rebuild derived indexes, delete unreferenced files." };
+        var doctor = new Command("doctor", "Check the integrity of a project.") { project, asJson, fix };
+        doctor.SetAction(parseResult => DoctorCommand.Run(
+            parseResult.GetRequiredValue(project).FullName, parseResult.GetValue(asJson), parseResult.GetValue(fix), parseResult.InvocationConfiguration.Output));
+
+        var root = new RootCommand("Erable, a structured wiki.") { serve, doctor, openApi };
         return root.Parse(args).InvokeAsync();
     }
 }

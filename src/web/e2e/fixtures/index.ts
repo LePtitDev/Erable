@@ -66,6 +66,12 @@ export const test = base.extend<Fixtures>({
       folder: result.folder,
       url: (elementId, anchor) => `/p/${id}/e/${elementId}${anchor ? `#${anchor}` : ""}`,
     });
+    // `erable doctor` after each test: whatever the scenario did, the project must stay sound (docs/testing.md §6).
+    const doctor = await page.request.get(`/_test/doctor?projectId=${id}`);
+    const report = (await doctor.json()) as { healthy: boolean; findings: unknown[] };
+    if (!report.healthy) {
+      throw new Error(`erable doctor found anomalies: ${JSON.stringify(report.findings)}`);
+    }
   },
   freshProfile: async ({ page, browserName }, use, testInfo) => {
     const slot = slotOf(testInfo.testId, browserName);
