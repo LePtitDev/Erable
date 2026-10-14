@@ -4,4 +4,9 @@
     <RootNamespace>Erable.Core</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Pure parsing library (no IO): extraction of references, headings and plain text (docs/markdown-syntax.md). -->
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+
 </Project>

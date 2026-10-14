@@ -1,0 +1,90 @@
+{
+  "description": "Slug algorithm of heading anchors (docs/markdown-syntax.md §3.1).",
+  "cases": [
+    {
+      "name": "accents",
+      "text": "Les années de cartographe",
+      "slug": "les-annees-de-cartographe"
+    },
+    {
+      "name": "oe ligature",
+      "text": "Cœur",
+      "slug": "coeur"
+    },
+    {
+      "name": "OE capital ligature",
+      "text": "ŒUVRE",
+      "slug": "oeuvre"
+    },
+    {
+      "name": "sharp s",
+      "text": "Straße",
+      "slug": "strasse"
+    },
+    {
+      "name": "ae and o slash",
+      "text": "Ærø",
+      "slug": "aero"
+    },
+    {
+      "name": "l stroke",
+      "text": "Łódź",
+      "slug": "lodz"
+    },
+    {
+      "name": "d stroke",
+      "text": "Đakovo",
+      "slug": "dakovo"
+    },
+    {
+      "name": "Turkish dotted I",
+      "text": "İstanbul",
+      "slug": "istanbul"
+    },
+    {
+      "name": "punctuation collapsed and trimmed",
+      "text": "  --Hello, World!--  ",
+      "slug": "hello-world"
+    },
+    {
+      "name": "digits kept",
+      "text": "1. Intro",
+      "slug": "1-intro"
+    },
+    {
+      "name": "underscore is a separator",
+      "text": "a_b",
+      "slug": "a-b"
+    },
+    {
+      "name": "empty",
+      "text": "",
+      "slug": "section"
+    },
+    {
+      "name": "punctuation only",
+      "text": "!!!",
+      "slug": "section"
+    },
+    {
+      "name": "non-Latin script",
+      "text": "Привет",
+      "slug": "section"
+    },
+    {
+      "name": "mixed script",
+      "text": "Tokyo 東京",
+      "slug": "tokyo"
+    },
+    {
+      "name": "Spanish",
+      "text": "Año nuevo, ¿qué tal?",
+      "slug": "ano-nuevo-que-tal"
+    },
+    {
+      "name": "German umlauts",
+      "text": "Über Größe",
+      "slug": "uber-grosse"
+    }
+  ]
+}

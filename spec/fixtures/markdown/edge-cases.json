@@ -1,0 +1,356 @@
+{
+  "description": "Inputs that look like references but are not, or only partly (docs/markdown-syntax.md §2.1).",
+  "cases": [
+    {
+      "name": "15 characters",
+      "md": "[[3F2A9C14E07B5D2]]",
+      "refs": []
+    },
+    {
+      "name": "17 characters",
+      "md": "[[3F2A9C14E07B5D210]]",
+      "refs": []
+    },
+    {
+      "name": "non-hex character",
+      "md": "[[3F2A9C14E07B5D2G]]",
+      "refs": []
+    },
+    {
+      "name": "zero id",
+      "md": "[[0000000000000000]]",
+      "refs": []
+    },
+    {
+      "name": "space before id",
+      "md": "[[ 3F2A9C14E07B5D21]]",
+      "refs": []
+    },
+    {
+      "name": "space after id",
+      "md": "[[3F2A9C14E07B5D21 ]]",
+      "refs": []
+    },
+    {
+      "name": "single brackets",
+      "md": "[3F2A9C14E07B5D21]",
+      "refs": []
+    },
+    {
+      "name": "missing closing bracket",
+      "md": "[[3F2A9C14E07B5D21]",
+      "refs": []
+    },
+    {
+      "name": "missing closing pair",
+      "md": "[[3F2A9C14E07B5D21|lui",
+      "refs": []
+    },
+    {
+      "name": "inline code",
+      "md": "`[[3F2A9C14E07B5D21]]`",
+      "refs": []
+    },
+    {
+      "name": "fenced code block",
+      "md": "```\n[[3F2A9C14E07B5D21]]\n```",
+      "refs": []
+    },
+    {
+      "name": "tilde fenced code block",
+      "md": "~~~md\n![[1E6AC1F0A0000002]]\n~~~",
+      "refs": []
+    },
+    {
+      "name": "indented code block",
+      "md": "    [[3F2A9C14E07B5D21]]",
+      "refs": []
+    },
+    {
+      "name": "escaped opening bracket",
+      "md": "\\[[3F2A9C14E07B5D21]]",
+      "refs": []
+    },
+    {
+      "name": "escaped bracket after exclamation",
+      "md": "!\\[[3F2A9C14E07B5D21]]",
+      "refs": []
+    },
+    {
+      "name": "empty anchor",
+      "md": "[[3F2A9C14E07B5D21#]]",
+      "refs": []
+    },
+    {
+      "name": "anchor with accent",
+      "md": "[[3F2A9C14E07B5D21#é]]",
+      "refs": []
+    },
+    {
+      "name": "anchor with space",
+      "md": "[[3F2A9C14E07B5D21#a b]]",
+      "refs": []
+    },
+    {
+      "name": "anchor then text",
+      "md": "[[3F2A9C14E07B5D21#a b|x]]",
+      "refs": []
+    },
+    {
+      "name": "embed with anchor",
+      "md": "![[1E6AC1F0A0000002#x]]",
+      "refs": []
+    },
+    {
+      "name": "line break in label",
+      "md": "[[3F2A9C14E07B5D21|a\nb]]",
+      "refs": []
+    },
+    {
+      "name": "link destination",
+      "md": "[x]([[3F2A9C14E07B5D21]])",
+      "refs": []
+    },
+    {
+      "name": "autolink",
+      "md": "<https://example.org/[[3F2A9C14E07B5D21]]>",
+      "refs": []
+    },
+    {
+      "name": "link reference definition",
+      "md": "[a]: [[3F2A9C14E07B5D21]]\n\n[a]",
+      "refs": []
+    },
+    {
+      "name": "raw HTML attack is plain text",
+      "md": "<img src=x onerror=\"window.__xss=1\">",
+      "refs": []
+    },
+    {
+      "name": "width zero not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=0}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "width too large not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=4097}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "leading zero not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=0320}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "unknown attribute not consumed",
+      "md": "![[1E6AC1F0A0000002]]{height=3}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "duplicate attribute not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=320 width=10}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "leading space in attributes not consumed",
+      "md": "![[1E6AC1F0A0000002]]{ width=320}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "trailing space in attributes not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=320 }",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "unknown align not consumed",
+      "md": "![[1E6AC1F0A0000002]]{align=middle}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "empty attributes not consumed",
+      "md": "![[1E6AC1F0A0000002]]{}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "attributes must touch the embed",
+      "md": "![[1E6AC1F0A0000002]] {width=320}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "unclosed attributes not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=320",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "two spaces between attributes",
+      "md": "![[1E6AC1F0A0000002]]{width=320  align=left}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": {
+            "width": 320,
+            "align": "left"
+          },
+          "start": 0,
+          "end": 44
+        }
+      ]
+    },
+    {
+      "name": "label of 201 characters",
+      "md": "[[3F2A9C14E07B5D21|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]]",
+      "refs": []
+    },
+    {
+      "name": "attributes longer than 64 characters not consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=320                                                  align=left}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "attributes of 63 characters consumed",
+      "md": "![[1E6AC1F0A0000002]]{width=320                                            align=left}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": {
+            "width": 320,
+            "align": "left"
+          },
+          "start": 0,
+          "end": 86
+        }
+      ]
+    },
+    {
+      "name": "bare bar in a table row splits the cell",
+      "md": "| a | b |\n|---|---|\n| [[3F2A9C14E07B5D21|c]] | d |",
+      "refs": []
+    }
+  ]
+}

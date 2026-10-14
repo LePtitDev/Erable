@@ -1,0 +1,704 @@
+{
+  "description": "References and embeds that must be found (docs/markdown-syntax.md §2). start/end are UTF-16 offsets; id is canonical.",
+  "cases": [
+    {
+      "name": "simple reference",
+      "md": "Voir [[3F2A9C14E07B5D21]].",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 5,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "name": "reference with label",
+      "md": "Voir [[3F2A9C14E07B5D21|lui]].",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "lui",
+          "embed": false,
+          "attrs": null,
+          "start": 5,
+          "end": 29
+        }
+      ]
+    },
+    {
+      "name": "reference with anchor",
+      "md": "Voir [[5B19C0E2A4D7F311#histoire]].",
+      "refs": [
+        {
+          "id": "5B19C0E2A4D7F311",
+          "anchor": "histoire",
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 5,
+          "end": 34
+        }
+      ]
+    },
+    {
+      "name": "anchor and label",
+      "md": "[[5B19C0E2A4D7F311#les-annees_2|Hautbois › Histoire]]",
+      "refs": [
+        {
+          "id": "5B19C0E2A4D7F311",
+          "anchor": "les-annees_2",
+          "label": "Hautbois › Histoire",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 53
+        }
+      ]
+    },
+    {
+      "name": "lower-case id is canonicalized",
+      "md": "[[3f2a9c14e07b5d21]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "name": "mixed-case id",
+      "md": "[[3f2A9c14E07b5D21]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "name": "embed",
+      "md": "![[1E6AC1F0A0000002]]",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "embed with caption",
+      "md": "![[1E6AC1F0A0000002|Carte du port]]",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": "Carte du port",
+          "embed": true,
+          "attrs": null,
+          "start": 0,
+          "end": 35
+        }
+      ]
+    },
+    {
+      "name": "embed with attributes",
+      "md": "![[1E6AC1F0A0000002]]{width=320 align=right}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": {
+            "width": 320,
+            "align": "right"
+          },
+          "start": 0,
+          "end": 44
+        }
+      ]
+    },
+    {
+      "name": "embed with caption and align",
+      "md": "![[1E6AC1F0A0000002|Légende]]{align=center}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": "Légende",
+          "embed": true,
+          "attrs": {
+            "width": null,
+            "align": "center"
+          },
+          "start": 0,
+          "end": 43
+        }
+      ]
+    },
+    {
+      "name": "maximum width",
+      "md": "![[1E6AC1F0A0000002]]{width=4096}",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": {
+            "width": 4096,
+            "align": null
+          },
+          "start": 0,
+          "end": 33
+        }
+      ]
+    },
+    {
+      "name": "two references in a sentence",
+      "md": "Ilsa connaît [[7A1C4E90B3F2D615]] et [[5B19C0E2A4D7F311|le port]].",
+      "refs": [
+        {
+          "id": "7A1C4E90B3F2D615",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 13,
+          "end": 33
+        },
+        {
+          "id": "5B19C0E2A4D7F311",
+          "anchor": null,
+          "label": "le port",
+          "embed": false,
+          "attrs": null,
+          "start": 37,
+          "end": 65
+        }
+      ]
+    },
+    {
+      "name": "adjacent references",
+      "md": "[[3F2A9C14E07B5D21]][[7A1C4E90B3F2D615]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 20
+        },
+        {
+          "id": "7A1C4E90B3F2D615",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 20,
+          "end": 40
+        }
+      ]
+    },
+    {
+      "name": "references in nested lists",
+      "md": "- un\n- [[3F2A9C14E07B5D21]]\n  - [[7A1C4E90B3F2D615]]\n",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 7,
+          "end": 27
+        },
+        {
+          "id": "7A1C4E90B3F2D615",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 32,
+          "end": 52
+        }
+      ]
+    },
+    {
+      "name": "reference in a block quote",
+      "md": "> Citation [[3F2A9C14E07B5D21]]\n> suite",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 11,
+          "end": 31
+        }
+      ]
+    },
+    {
+      "name": "reference in a heading",
+      "md": "## Ami de [[7A1C4E90B3F2D615|Orsen]]",
+      "refs": [
+        {
+          "id": "7A1C4E90B3F2D615",
+          "anchor": null,
+          "label": "Orsen",
+          "embed": false,
+          "attrs": null,
+          "start": 10,
+          "end": 36
+        }
+      ]
+    },
+    {
+      "name": "references in table cells",
+      "md": "| a | b |\n|---|---|\n| [[3F2A9C14E07B5D21]] | ![[1E6AC1F0A0000002]] |",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 22,
+          "end": 42
+        },
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 45,
+          "end": 66
+        }
+      ]
+    },
+    {
+      "name": "references in emphasis",
+      "md": "*[[3F2A9C14E07B5D21]]* et **[[7A1C4E90B3F2D615]]**",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 1,
+          "end": 21
+        },
+        {
+          "id": "7A1C4E90B3F2D615",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 28,
+          "end": 48
+        }
+      ]
+    },
+    {
+      "name": "label keeps pipe and hash",
+      "md": "[[3F2A9C14E07B5D21|a | b #c]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "a | b #c",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 29
+        }
+      ]
+    },
+    {
+      "name": "label keeps a lone closing bracket",
+      "md": "[[3F2A9C14E07B5D21|x]y]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "x]y",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 24
+        }
+      ]
+    },
+    {
+      "name": "label keeps an opening bracket",
+      "md": "[[3F2A9C14E07B5D21|x[y]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "x[y",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 24
+        }
+      ]
+    },
+    {
+      "name": "label is trimmed",
+      "md": "[[3F2A9C14E07B5D21|  lui  ]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "lui",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 28
+        }
+      ]
+    },
+    {
+      "name": "empty label means no label",
+      "md": "[[3F2A9C14E07B5D21|]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "blank label means no label",
+      "md": "[[3F2A9C14E07B5D21|   ]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 24
+        }
+      ]
+    },
+    {
+      "name": "label stops at the first closing pair",
+      "md": "[[3F2A9C14E07B5D21|a]] b]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "a",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 22
+        }
+      ]
+    },
+    {
+      "name": "reference inside link text",
+      "md": "[voir [[3F2A9C14E07B5D21]]](https://example.org)",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 6,
+          "end": 26
+        }
+      ]
+    },
+    {
+      "name": "reference followed by parentheses",
+      "md": "[[3F2A9C14E07B5D21]](https://example.org)",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "name": "triple brackets",
+      "md": "[[[3F2A9C14E07B5D21]]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 1,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "name": "extra closing bracket",
+      "md": "[[3F2A9C14E07B5D21]]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "name": "double exclamation",
+      "md": "!![[1E6AC1F0A0000002]]",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 1,
+          "end": 22
+        }
+      ]
+    },
+    {
+      "name": "embed inside link text",
+      "md": "[![[1E6AC1F0A0000002]]](https://example.org)",
+      "refs": [
+        {
+          "id": "1E6AC1F0A0000002",
+          "anchor": null,
+          "label": null,
+          "embed": true,
+          "attrs": null,
+          "start": 1,
+          "end": 22
+        }
+      ]
+    },
+    {
+      "name": "attributes are not consumed after a reference",
+      "md": "[[3F2A9C14E07B5D21]]{width=320}",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "name": "CRLF line endings",
+      "md": "Ligne\r\n[[3F2A9C14E07B5D21]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 7,
+          "end": 27
+        }
+      ]
+    },
+    {
+      "name": "astral characters before (UTF-16 offsets)",
+      "md": "😀 é [[3F2A9C14E07B5D21]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 5,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "name": "raw HTML is text, references inside are found",
+      "md": "<span>[[3F2A9C14E07B5D21]]</span>",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 6,
+          "end": 26
+        }
+      ]
+    },
+    {
+      "name": "indented code ignored, text after kept",
+      "md": "Texte\n\n    code [[3F2A9C14E07B5D21]]\n\nfin [[7A1C4E90B3F2D615]]",
+      "refs": [
+        {
+          "id": "7A1C4E90B3F2D615",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 42,
+          "end": 62
+        }
+      ]
+    },
+    {
+      "name": "label of 200 characters",
+      "md": "[[3F2A9C14E07B5D21|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 221
+        }
+      ]
+    },
+    {
+      "name": "escaped separator",
+      "md": "[[3F2A9C14E07B5D21\\|lui]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "lui",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "name": "escaped separator after an anchor",
+      "md": "[[5B19C0E2A4D7F311#histoire\\|Histoire]]",
+      "refs": [
+        {
+          "id": "5B19C0E2A4D7F311",
+          "anchor": "histoire",
+          "label": "Histoire",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 39
+        }
+      ]
+    },
+    {
+      "name": "escaped bar inside a label is a bar",
+      "md": "[[3F2A9C14E07B5D21|a \\| b]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "a | b",
+          "embed": false,
+          "attrs": null,
+          "start": 0,
+          "end": 27
+        }
+      ]
+    },
+    {
+      "name": "table cell with escaped separator",
+      "md": "| a | b |\n|---|---|\n| [[3F2A9C14E07B5D21\\|c]] | d |",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "c",
+          "embed": false,
+          "attrs": null,
+          "start": 22,
+          "end": 45
+        }
+      ]
+    },
+    {
+      "name": "table header with escaped separator",
+      "md": "| [[3F2A9C14E07B5D21\\|titre]] | b |\n|---|---|\n| c | d |",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "titre",
+          "embed": false,
+          "attrs": null,
+          "start": 2,
+          "end": 29
+        }
+      ]
+    },
+    {
+      "name": "bare bar outside a table",
+      "md": "a | b [[3F2A9C14E07B5D21|c]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": "c",
+          "embed": false,
+          "attrs": null,
+          "start": 6,
+          "end": 28
+        }
+      ]
+    }
+  ]
+}

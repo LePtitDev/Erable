@@ -1,0 +1,205 @@
+{
+  "description": "Headings with their text and anchor (docs/markdown-syntax.md §3).",
+  "cases": [
+    {
+      "name": "mockup headings",
+      "md": "## Présentation\n\nx\n\n## Histoire\n\n### Les années de cartographe\n\n## Rôle dans le jeu",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Présentation",
+          "anchor": "presentation"
+        },
+        {
+          "level": 2,
+          "text": "Histoire",
+          "anchor": "histoire"
+        },
+        {
+          "level": 3,
+          "text": "Les années de cartographe",
+          "anchor": "les-annees-de-cartographe"
+        },
+        {
+          "level": 2,
+          "text": "Rôle dans le jeu",
+          "anchor": "role-dans-le-jeu"
+        }
+      ]
+    },
+    {
+      "name": "explicit anchor",
+      "md": "## Histoire {#hist}",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Histoire",
+          "anchor": "hist"
+        }
+      ]
+    },
+    {
+      "name": "explicit anchor keeps case and underscore",
+      "md": "### Tome_1 {#Tome_1}",
+      "headings": [
+        {
+          "level": 3,
+          "text": "Tome_1",
+          "anchor": "Tome_1"
+        }
+      ]
+    },
+    {
+      "name": "duplicates are numbered",
+      "md": "## A\n## A\n## A",
+      "headings": [
+        {
+          "level": 2,
+          "text": "A",
+          "anchor": "a"
+        },
+        {
+          "level": 2,
+          "text": "A",
+          "anchor": "a-1"
+        },
+        {
+          "level": 2,
+          "text": "A",
+          "anchor": "a-2"
+        }
+      ]
+    },
+    {
+      "name": "explicit anchor counts for duplicates",
+      "md": "## B {#a}\n## A",
+      "headings": [
+        {
+          "level": 2,
+          "text": "B",
+          "anchor": "a"
+        },
+        {
+          "level": 2,
+          "text": "A",
+          "anchor": "a-1"
+        }
+      ]
+    },
+    {
+      "name": "reference label in heading",
+      "md": "## Ami de [[7A1C4E90B3F2D615|Orsen]]",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Ami de Orsen",
+          "anchor": "ami-de-orsen"
+        }
+      ]
+    },
+    {
+      "name": "reference without label in heading",
+      "md": "## Ami de [[7A1C4E90B3F2D615]]",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Ami de",
+          "anchor": "ami-de"
+        }
+      ]
+    },
+    {
+      "name": "setext heading",
+      "md": "Titre\n=====\n\nSous-titre\n---",
+      "headings": [
+        {
+          "level": 1,
+          "text": "Titre",
+          "anchor": "titre"
+        },
+        {
+          "level": 2,
+          "text": "Sous-titre",
+          "anchor": "sous-titre"
+        }
+      ]
+    },
+    {
+      "name": "empty heading",
+      "md": "##",
+      "headings": [
+        {
+          "level": 2,
+          "text": "",
+          "anchor": "section"
+        }
+      ]
+    },
+    {
+      "name": "invalid explicit anchor kept as text",
+      "md": "## X {#a b}",
+      "headings": [
+        {
+          "level": 2,
+          "text": "X {#a b}",
+          "anchor": "x-a-b"
+        }
+      ]
+    },
+    {
+      "name": "explicit anchor needs a space before",
+      "md": "## X{#a}",
+      "headings": [
+        {
+          "level": 2,
+          "text": "X{#a}",
+          "anchor": "x-a"
+        }
+      ]
+    },
+    {
+      "name": "ligatures",
+      "md": "## Cœur & Âme",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Cœur & Âme",
+          "anchor": "coeur-ame"
+        }
+      ]
+    },
+    {
+      "name": "emphasis in heading",
+      "md": "## Le *col* **gelé**",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Le col gelé",
+          "anchor": "le-col-gele"
+        }
+      ]
+    },
+    {
+      "name": "code in heading",
+      "md": "## Le `code` ici",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Le code ici",
+          "anchor": "le-code-ici"
+        }
+      ]
+    },
+    {
+      "name": "heading in block quote",
+      "md": "> ## Cité",
+      "headings": [
+        {
+          "level": 2,
+          "text": "Cité",
+          "anchor": "cite"
+        }
+      ]
+    }
+  ]
+}

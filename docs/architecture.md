@@ -213,7 +213,7 @@ Ancres : par défaut, un slug généré depuis le titre (renommer un titre casse
 
 ### 6.3 Deux parseurs, une spécification
 
-Le rendu se fait côté front (plugin remark). Le backend a besoin d'extraire les références et le texte brut pour l'index de recherche (extension **Markdig**). Pour éviter que les deux divergent, la grammaire des extensions est volontairement minimale et couverte par `spec/fixtures/markdown/*.json` (entrée → références attendues), exécutés par xUnit **et** Vitest.
+Le rendu se fait côté front (plugin remark). Le backend a besoin d'extraire les références et le texte brut pour l'index de recherche (extension **Markdig**). Pour éviter que les deux divergent, la grammaire des extensions est volontairement minimale, **écrite dans `docs/markdown-syntax.md`**, et couverte par `spec/fixtures/markdown/*.json` (entrée → références attendues), exécutés par xUnit **et** Vitest.
 
 ---
 

@@ -1,0 +1,90 @@
+{
+  "description": "Plain text extracted for search, compared after whitespace normalization (docs/markdown-syntax.md §4).",
+  "cases": [
+    {
+      "name": "paragraphs and emphasis",
+      "md": "Texte **gras** et *italique*.\n\nSecond paragraphe.",
+      "plain": "Texte gras et italique. Second paragraphe."
+    },
+    {
+      "name": "reference contributes its label only",
+      "md": "Voir [[3F2A9C14E07B5D21|Ilsa]] et [[7A1C4E90B3F2D615]].",
+      "plain": "Voir Ilsa et ."
+    },
+    {
+      "name": "embed contributes its caption",
+      "md": "![[1E6AC1F0A0000002|Carte du port]]{width=320}",
+      "plain": "Carte du port"
+    },
+    {
+      "name": "heading anchor suffix excluded",
+      "md": "## Histoire {#hist}\n\nTexte.",
+      "plain": "Histoire Texte."
+    },
+    {
+      "name": "table cells",
+      "md": "| a | b |\n|---|---|\n| [[3F2A9C14E07B5D21\\|c]] | d |",
+      "plain": "a b c d"
+    },
+    {
+      "name": "task list checkboxes ignored",
+      "md": "- [x] fait\n- [ ] à faire",
+      "plain": "fait à faire"
+    },
+    {
+      "name": "fenced code kept",
+      "md": "```js\nconst x = 1;\n```",
+      "plain": "const x = 1;"
+    },
+    {
+      "name": "inline code kept verbatim",
+      "md": "Code `x[[3F2A9C14E07B5D21]]` ici.",
+      "plain": "Code x[[3F2A9C14E07B5D21]] ici."
+    },
+    {
+      "name": "link text not URL",
+      "md": "[texte](https://example.org)",
+      "plain": "texte"
+    },
+    {
+      "name": "autolink keeps URL",
+      "md": "<https://example.org>",
+      "plain": "https://example.org"
+    },
+    {
+      "name": "image alt text",
+      "md": "![alt du dessin](a.png)",
+      "plain": "alt du dessin"
+    },
+    {
+      "name": "strikethrough",
+      "md": "~~barré~~ reste",
+      "plain": "barré reste"
+    },
+    {
+      "name": "raw HTML kept as text",
+      "md": "<b>gras</b>",
+      "plain": "<b>gras</b>"
+    },
+    {
+      "name": "entities decoded",
+      "md": "a &amp; b &eacute;",
+      "plain": "a & b é"
+    },
+    {
+      "name": "hard line break",
+      "md": "ligne un  \nligne deux",
+      "plain": "ligne un ligne deux"
+    },
+    {
+      "name": "block quote and list",
+      "md": "> cité\n\n1. un\n2. deux",
+      "plain": "cité un deux"
+    },
+    {
+      "name": "Col gelé three times",
+      "md": "Le col gelé. Au col gelé, le Col Gelé.",
+      "plain": "Le col gelé. Au col gelé, le Col Gelé."
+    }
+  ]
+}
