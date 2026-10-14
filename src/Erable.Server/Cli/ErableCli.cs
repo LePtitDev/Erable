@@ -42,7 +42,17 @@ public static class ErableCli
             return 0;
         });
 
-        var root = new RootCommand("Erable, a structured wiki.") { serve };
+        var output = new Option<FileInfo>("--output")
+        {
+            Description = "Destination file.",
+            Required = true,
+        };
+        var openApi = new Command("openapi", "Write the OpenAPI document (development tool).") { output };
+        openApi.Hidden = true;
+        openApi.SetAction((parseResult, cancellationToken) =>
+            OpenApiExport.RunAsync(parseResult.GetRequiredValue(output), cancellationToken));
+
+        var root = new RootCommand("Erable, a structured wiki.") { serve, openApi };
         return root.Parse(args).InvokeAsync();
     }
 }

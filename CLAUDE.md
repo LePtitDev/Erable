@@ -172,6 +172,8 @@ pnpm -C src/web test             # Vitest
 pnpm -C src/web lint             # ESLint strict-type-checked, 0 avertissement
 pnpm -C src/web typecheck
 pnpm -C src/web format:check     # Prettier
+pnpm -C src/web api:generate     # exporte l'OpenAPI (dotnet) puis régénère src/api/schema.ts
+pnpm -C src/web api:check        # CI : échoue si openapi.json ou schema.ts sont périmés
 ```
 
 Environnement de développement principal : Windows (PowerShell). Le code doit rester portable (chemins via `Path.Combine`, pas de séparateur en dur, fins de ligne gérées par `.gitattributes`).

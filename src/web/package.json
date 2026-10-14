@@ -17,11 +17,14 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "api:generate": "node scripts/api-generate.mjs",
+    "api:check": "node scripts/api-generate.mjs --check"
   },
   "dependencies": {
     "@tanstack/react-query": "5.104.2",
     "@tanstack/react-router": "1.170.44",
+    "openapi-fetch": "0.17.0",
     "radix-ui": "1.8.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -41,10 +44,20 @@
     "eslint-plugin-react-refresh": "0.5.7",
     "globals": "17.13.0",
     "jsdom": "28.1.0",
+    "msw": "3.0.3",
+    "openapi-msw": "2.1.0",
+    "openapi-typescript": "7.13.0",
     "prettier": "3.9.10",
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.2",
     "vite": "8.3.4",
     "vitest": "5.0.4"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "openapi-typescript>typescript": "6"
+      }
+    }
   }
 }

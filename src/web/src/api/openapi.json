@@ -1,0 +1,69 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Erable API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/info": {
+      "get": {
+        "tags": [
+          "erable"
+        ],
+        "operationId": "GetInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiInfo": {
+        "required": [
+          "appVersion",
+          "apiVersion",
+          "formatVersion",
+          "mode"
+        ],
+        "type": "object",
+        "properties": {
+          "appVersion": {
+            "type": "string"
+          },
+          "apiVersion": {
+            "type": "string"
+          },
+          "formatVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/HostMode"
+          }
+        }
+      },
+      "HostMode": {
+        "enum": [
+          "desktop",
+          "server"
+        ],
+        "type": "string"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "erable"
+    }
+  ]
+}

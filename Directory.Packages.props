@@ -1,6 +1,7 @@
 <Project>
   <ItemGroup>
     <!-- Runtime -->
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageVersion Include="System.CommandLine" Version="2.0.13" />
   </ItemGroup>
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi;
 
 namespace Erable.Server.Hosting;
 
@@ -44,9 +45,32 @@ public static class ErableHost
         builder.Services.AddSingleton(options);
         builder.Services.AddSingleton(options.TimeProvider);
         builder.Services.AddProblemDetails();
+        builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
+        {
+            openApi.AddDocumentTransformer((document, _, _) =>
+            {
+                document.Info.Title = "Erable API";
+                document.Info.Version = InfoEndpoints.ApiVersion;
+                // The server URL depends on the random port: keep the document stable for the snapshot and the client.
+                document.Servers?.Clear();
+                return Task.CompletedTask;
+            });
+            openApi.AddSchemaTransformer((schema, context, _) =>
+            {
+                // Enums are serialized as strings (JsonStringEnumConverter) but the generator omits their type.
+                if (context.JsonTypeInfo.Type.IsEnum && schema.Enum is { Count: > 0 })
+                {
+                    schema.Type = JsonSchemaType.String;
+                }
+
+                return Task.CompletedTask;
+            });
+        });
         builder.Services.Configure<JsonOptions>(json =>
         {
             json.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            // Numbers are numbers: the web default also accepts strings, which leaks `integer | string` into the OpenAPI schema.
+            json.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
             json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         });
 
@@ -83,6 +107,7 @@ public static class ErableHost
             },
         });
 
+        app.MapOpenApi(ApiRoutes.OpenApiPattern);
         app.MapInfoEndpoints();
         app.MapGroup(ApiRoutes.V1);
 
