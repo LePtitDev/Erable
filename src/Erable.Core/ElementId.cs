@@ -33,7 +33,13 @@ public readonly record struct ElementId : IParsable<ElementId>, ISpanParsable<El
 
     public bool IsNone => Value == 0;
 
-    /// <summary>64 random bits from a cryptographic generator, never 0 (F03.R1).</summary>
+    /// <summary>
+    /// Values below this one are reserved for well-known elements shared by every project (the four roots):
+    /// <see cref="NewRandom"/> never returns them.
+    /// </summary>
+    public const ulong FirstRandomValue = 0x10000;
+
+    /// <summary>64 random bits from a cryptographic generator, never 0 nor a reserved value (F03.R1).</summary>
     public static ElementId NewRandom()
     {
         Span<byte> bytes = stackalloc byte[sizeof(ulong)];
@@ -43,7 +49,7 @@ public readonly record struct ElementId : IParsable<ElementId>, ISpanParsable<El
             RandomNumberGenerator.Fill(bytes);
             value = BitConverter.ToUInt64(bytes);
         }
-        while (value == 0);
+        while (value < FirstRandomValue);
 
         return new ElementId(value);
     }

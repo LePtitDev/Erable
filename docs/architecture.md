@@ -122,7 +122,7 @@ Erable/
 
 Tout ce qui apparaît dans l'explorateur est un **élément** : `id`, `kind`, `parentId`, `name`, `sortOrder`, dates et auteurs de création/modification, `revision`, `deletedAt` (corbeille).
 
-L'explorateur a une racine fixe par type : **Pages, Catégories, Propriétés, Liens, (Pièces jointes)**. Sous chaque racine :
+L'explorateur a une racine fixe par type : **Pages, Catégories, Propriétés, Liens** (décision P-02 : pas de racine « Pièces jointes » ; une pièce jointe est un élément du même espace d'ID, rattaché à sa page, absent de l'explorateur et retrouvé par la palette et la recherche). Les racines ont des ID fixes communs à tous les projets (`0000000000000001` à `0000000000000004`) ; les valeurs inférieures à `0x10000` sont réservées et jamais tirées au hasard. Sous chaque racine :
 
 - des **dossiers** (éléments `Folder`) qui ne servent qu'à ranger ;
 - les éléments du type de la racine.
