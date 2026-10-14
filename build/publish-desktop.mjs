@@ -1,0 +1,56 @@
+// Publishes the self-contained desktop application for one runtime and archives it (decision P-06: plain
+// archives in M0, Velopack installer in M5-03).
+// Usage: node build/publish-desktop.mjs <rid> [--skip-web]
+//   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64
+// Output: artifacts/desktop/<rid>/Erable/ and artifacts/desktop/Erable-<rid>.(zip|tar.gz)
+import { execFileSync } from "node:child_process";
+import { existsSync, rmSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+const rids = ["win-x64", "linux-x64", "osx-arm64", "osx-x64"];
+const rid = process.argv[2];
+if (!rids.includes(rid)) {
+  console.error(`Usage: node build/publish-desktop.mjs <${rids.join("|")}> [--skip-web]`);
+  process.exit(2);
+}
+
+const root = resolve(import.meta.dirname, "..");
+const web = join(root, "src", "web");
+const outRoot = join(root, "artifacts", "desktop");
+const appDir = join(outRoot, rid, "Erable");
+const run = (file, args, cwd = root) => execFileSync(file, args, { cwd, stdio: "inherit" });
+
+if (!process.argv.includes("--skip-web")) {
+  // The SPA is copied into wwwroot/ by Erable.Server's build (linked content).
+  run(process.execPath, [join(web, "node_modules", "vite", "bin", "vite.js"), "build"], web);
+}
+if (!existsSync(join(web, "dist", "index.html"))) {
+  throw new Error("src/web/dist is missing: build the SPA first.");
+}
+
+rmSync(join(outRoot, rid), { recursive: true, force: true });
+run("dotnet", [
+  "publish",
+  join("src", "Erable.Desktop"),
+  "--configuration",
+  "Release",
+  "--runtime",
+  rid,
+  "--self-contained",
+  "true",
+  // Precompiled code: noticeably faster start (E2E-16-01 budget: 3 s).
+  "-p:PublishReadyToRun=true",
+  "--output",
+  appDir,
+]);
+if (!existsSync(join(appDir, "wwwroot", "index.html"))) {
+  throw new Error("The published application has no wwwroot/index.html.");
+}
+
+const archiveName = `Erable-${rid}.${rid.startsWith("win") ? "zip" : "tar.gz"}`;
+rmSync(join(outRoot, archiveName), { force: true });
+// Relative paths, run from the output folder. On Windows, the system bsdtar (not Git's GNU tar) writes zip with -a.
+const tar = process.platform === "win32" ? join(process.env["SystemRoot"] ?? "C:\\Windows", "System32", "tar.exe") : "tar";
+run(tar, rid.startsWith("win") ? ["-a", "-cf", archiveName, "-C", rid, "Erable"] : ["-czf", archiveName, "-C", rid, "Erable"], outRoot);
+const archive = join(outRoot, archiveName);
+console.log(`Published ${appDir}\nArchive   ${archive}`);

@@ -30,6 +30,13 @@ internal sealed class PhotinoShell : INativeBridge
         _window = null;
     }
 
+    /// <summary>Closes the window from any thread; <see cref="Run"/> then returns.</summary>
+    public void Close()
+    {
+        var window = _window;
+        window?.Invoke(window.Close);
+    }
+
     public async Task<string?> PickFolderAsync(string title, CancellationToken cancellationToken)
     {
         var window = _window ?? throw new InvalidOperationException("The window is not open.");

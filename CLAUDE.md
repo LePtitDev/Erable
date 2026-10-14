@@ -179,6 +179,11 @@ pnpm -C src/web e2e              # Playwright Chromium + WebKit contre le vrai b
 pnpm -C src/web e2e:pr           # seulement les tests @pr
 pnpm -C src/web e2e:trace        # traçabilité E2E-* ↔ tests ; `-- --enforce M1` échoue s'il manque un scénario ≤ M1
 pnpm -C src/web exec playwright install chromium webkit   # une fois par machine
+
+# Desktop
+node build/publish-desktop.mjs win-x64     # ou linux-x64, osx-arm64, osx-x64 → artifacts/desktop/
+pnpm -C src/web e2e:desktop                # Windows : E2E-16-01/02 sur le binaire publié (CDP)
+artifacts/desktop/<rid>/Erable/Erable.Desktop --self-test [--self-test-report rapport.json]   # code de sortie 0/1
 ```
 
 Environnement de développement principal : Windows (PowerShell). Le code doit rester portable (chemins via `Path.Combine`, pas de séparateur en dur, fins de ligne gérées par `.gitattributes`).

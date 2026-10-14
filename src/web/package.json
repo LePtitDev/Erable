@@ -22,7 +22,8 @@
     "api:check": "node scripts/api-generate.mjs --check",
     "e2e": "playwright test",
     "e2e:pr": "playwright test --grep @pr",
-    "e2e:trace": "node scripts/trace-e2e.mjs"
+    "e2e:trace": "node scripts/trace-e2e.mjs",
+    "e2e:desktop": "playwright test --config playwright.desktop.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/source-serif-4": "5.3.1",

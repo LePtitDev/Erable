@@ -26,7 +26,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M0-08](M0-08-webview-spike.md) | Spike WebKitGTK / WKWebView | M0-07 | review |
 | [M0-09](M0-09-test-infrastructure.md) | Infrastructure de test | M0-01, M0-02, M0-03 | review |
 | [M0-10](M0-10-ci-pipeline.md) | Pipeline CI PR (3 OS) | M0-09 | review |
-| [M0-11](M0-11-desktop-smoke.md) | Artefacts desktop et test de fumée | M0-07, M0-10 | todo |
+| [M0-11](M0-11-desktop-smoke.md) | Artefacts desktop et test de fumée | M0-07, M0-10 | review |
 
 ### M1 — Cœur local
 | ID | Tâche | Dépend de | Statut |
@@ -119,7 +119,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-03** | **Le port aléatoire du mode desktop change l'origine de la SPA à chaque lancement** (`http://127.0.0.1:<port>`) : `localStorage`/IndexedDB sont alors perdus d'un lancement à l'autre. Or F05.R4 (brouillons), F02.R5 (état déplié) et F15.R3 (thème sans flash) supposent un stockage persistant. | Ne rien stocker de durable côté navigateur : brouillons, état de l'arbre et préférences passent par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur. Le thème est injecté dans `index.html` par le backend. Alternative : schéma personnalisé Photino à origine fixe (plus fragile). | ✅ Tranché en M0-07 : recommandation retenue, décision **Q7** (§A-13) |
 | **P-04** | Verrou mono-instance (F16.R2) absent du format de projet (§A-7.1). | Fichier `erable.lock` (PID, port, jeton IPC) dans le dossier du projet, ignoré par `doctor` ; la seconde instance contacte la première pour la mettre au premier plan. | M1-03 |
 | **P-05** | Fusion à trois voies : §A-8.3 la place **côté client**, §T-4.1 la teste **dans Core** (C#). | Fusion **côté serveur dans Core** : `PUT` avec révision de base → fusion automatique si sans conflit, sinon `409` avec les blocs en conflit. Une seule implémentation, testée par propriétés, valable pour tous les clients. | M4-05 |
-| **P-06** | Critère M0 « l'app **s'installe** sur les 3 OS » alors que Velopack est prévu en M5. | M0 : artefacts `dotnet publish` autonomes (archive) + fumée ; installeur et mise à jour en M5. | M0-11 |
+| **P-06** | Critère M0 « l'app **s'installe** sur les 3 OS » alors que Velopack est prévu en M5. | M0 : artefacts `dotnet publish` autonomes (archive) + fumée ; installeur et mise à jour en M5. | ✅ Tranché en M0-11 : archives `.zip` / `.tar.gz` |
 | **P-07** | Filtres de recherche sur valeurs **héritées** (F10.R3) : résoudre l'héritage à la volée par `WITH RECURSIVE` sur 10 000 pages risque de dépasser le budget de 100 ms. | Table dérivée `resolved_property_values` maintenue à l'écriture (comme `refs`), reconstruite par `doctor`. | M2-03 |
 | **P-08** | `projectId` dans `erable.json` : format non précisé. | Même format que `ElementId` (16 hexa), pour la cohérence des URL `/p/:projectId/…`. | M1-03 |
 | **P-09** | Le mockup d'édition affiche encore « Alt+Espace » et « fusionnés en direct », écartés par §A-11.3 et §A-8.3. | Les documents priment ; le mockup sert pour la mise en page, pas pour ces libellés. | M1-12 |

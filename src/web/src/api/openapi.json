@@ -47,6 +47,29 @@
           }
         }
       }
+    },
+    "/api/self-test/report": {
+      "post": {
+        "tags": [
+          "erable"
+        ],
+        "operationId": "ReportSelfTest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfTestReport"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -81,6 +104,52 @@
           "server"
         ],
         "type": "string"
+      },
+      "SelfTestReport": {
+        "required": [
+          "steps",
+          "readyAtMs"
+        ],
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SelfTestStep"
+            }
+          },
+          "readyAtMs": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "SelfTestStep": {
+        "required": [
+          "name",
+          "ok",
+          "durationMs",
+          "detail"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "durationMs": {
+            "type": "number",
+            "format": "double"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
       }
     }
   },

@@ -19,11 +19,19 @@ describe("establishDesktopSession", () => {
     );
     history.replaceState(null, "", `/p/1?x=1#session=${token}`);
 
-    await establishDesktopSession();
+    const launch = await establishDesktopSession();
 
     expect(received).toEqual([token]);
+    expect(launch.selfTest).toBe(false);
     expect(window.location.hash).toBe("");
     expect(window.location.pathname + window.location.search).toBe("/p/1?x=1");
+  });
+
+  it("detects the self-test flag", async () => {
+    server.use(http.post("/api/session", ({ response }) => response(204).empty()));
+    history.replaceState(null, "", `/#session=${token}&selftest=1`);
+
+    expect(await establishDesktopSession()).toEqual({ selfTest: true });
   });
 
   it("does nothing without a session fragment", async () => {

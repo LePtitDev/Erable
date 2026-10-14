@@ -20,6 +20,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/self-test/report": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["ReportSelfTest"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/session": {
     parameters: {
       query?: never;
@@ -49,6 +65,18 @@ export interface components {
     };
     /** @enum {string} */
     HostMode: "desktop" | "server";
+    SelfTestReport: {
+      /** Format: double */
+      readyAtMs: number;
+      steps: components["schemas"]["SelfTestStep"][];
+    };
+    SelfTestStep: {
+      detail: null | string;
+      /** Format: double */
+      durationMs: number;
+      name: string;
+      ok: boolean;
+    };
   };
   responses: never;
   parameters: never;
@@ -75,6 +103,28 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["ApiInfo"];
         };
+      };
+    };
+  };
+  ReportSelfTest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelfTestReport"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

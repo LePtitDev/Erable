@@ -23,6 +23,9 @@ public sealed record ErableHostOptions
     /// <summary>Enables the <c>/_test</c> endpoints. Ignored by builds compiled without them (Release).</summary>
     public bool TestMode { get; init; }
 
+    /// <summary>Desktop smoke test mode (<c>--self-test</c>): enables <c>/api/self-test/report</c> (docs/testing.md §10).</summary>
+    public bool SelfTest { get; init; }
+
     /// <summary>ASP.NET Core environment name; null uses the usual environment variables.</summary>
     public string? EnvironmentName { get; init; }
 

@@ -57,6 +57,10 @@ public static class ErableHost
         builder.Services.AddSingleton(options.TimeProvider);
         builder.Services.TryAddSingleton<IThemePreferenceSource, SystemThemePreferenceSource>();
         builder.Services.TryAddSingleton<INativeBridge, UnavailableNativeBridge>();
+        if (options.SelfTest)
+        {
+            builder.Services.AddSingleton<SelfTestChannel>();
+        }
         builder.Services.AddProblemDetails();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {
@@ -149,6 +153,7 @@ public static class ErableHost
         app.MapOpenApi(ApiRoutes.OpenApiPattern);
         app.MapInfoEndpoints();
         app.MapSessionEndpoints();
+        app.MapSelfTestEndpoints();
         app.MapGroup(ApiRoutes.V1);
 
         if (TestEndpointsCompiled && options.TestMode)
