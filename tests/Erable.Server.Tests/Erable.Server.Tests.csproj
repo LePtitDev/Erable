@@ -10,6 +10,7 @@
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="Shouldly" />
     <PackageReference Include="CsCheck" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" />
   </ItemGroup>
 

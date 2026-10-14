@@ -223,13 +223,15 @@ Le rendu se fait côté front (plugin remark). Le backend a besoin d'extraire le
 
 ```
 MonWiki/
-├─ erable.json              Manifeste : formatVersion, projectId, nom, langue du contenu
+├─ erable.json              Manifeste : formatVersion, projectId (16 hexa, comme un ElementId), nom,
+│                           langue du contenu, date de création
 ├─ erable.db                SQLite (mode WAL) : éléments, contenus, révisions, index
+├─ erable.lock              Verrou mono-instance, présent tant que le projet est ouvert (F16.R2)
 └─ blobs/
    └─ 3a/7f/3a7f…e1         Pièces jointes, nommées par leur SHA-256
 ```
 
-« Ouvrir un projet comme dans un IDE » = ouvrir ce dossier. La liste des projets récents et les préférences de l'utilisateur sont dans le profil applicatif (`%APPDATA%/Erable`, `~/.config/erable`, `~/Library/Application Support/Erable`), pas dans le projet.
+« Ouvrir un projet comme dans un IDE » = ouvrir ce dossier. `formatVersion` est égal à la version du schéma (`PRAGMA user_version`) ; les migrations SQL sont embarquées et appliquées chacune dans une transaction, après une sauvegarde `erable.db.bak-<date>`. `erable.lock` est ouvert sans partage (verrou exclusif `flock` sous Linux et macOS) : le système le libère si le processus meurt, il n'y a donc jamais de verrou périmé ; il est supprimé à la fermeture. La liste des projets récents et les préférences de l'utilisateur sont dans le profil applicatif (`%APPDATA%/Erable`, `~/.config/erable`, `~/Library/Application Support/Erable`), pas dans le projet.
 
 En mode serveur, chaque projet est un dossier de ce type sous `data/projects/<projectId>/`, plus une base `data/server.db` pour les comptes et les droits.
 
@@ -272,6 +274,7 @@ search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacriti
 - **Historique** : chaque enregistrement crée une révision (instantané JSON compressé de l'élément). C'est peu coûteux sur du texte et indispensable dès qu'il y a plusieurs éditeurs (consulter, comparer, restaurer). « Récemment modifiées » découle directement de cette table.
 - **Corbeille** : suppression logique (`deleted_at`), vidée manuellement ou après N jours.
 - `remove_diacritics` : « col gele » trouve « Col gelé ».
+- **Conventions de stockage** : ID en `INTEGER` signé ; dates en texte UTC ISO 8601 à la milliseconde (`2026-10-13T08:00:00.000Z`), triables et lisibles ; types d'élément en texte (`page`, `folder`…) ; tables `STRICT`. Le propriétaire d'une pièce jointe est le parent de son élément (pas de colonne `page_id` en double) ; `revisions.blob_sha256` garde en vie le blob d'une révision de pièce jointe face au ramasse-miettes.
 
 ### 7.5 Ce que ce choix ne fait pas bien
 

@@ -1,6 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\*.sql" LogicalName="Erable.Storage.Migrations.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Erable.Core\Erable.Core.csproj" />
   </ItemGroup>
 

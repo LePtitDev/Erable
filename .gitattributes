@@ -19,3 +19,6 @@
 *.db binary
 *.zip binary
 *.gz binary
+
+# Project fixtures: blobs are content-addressed (SHA-256), never normalize them.
+spec/projects/**/blobs/** binary
