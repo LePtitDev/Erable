@@ -1,18 +1,14 @@
-import { themePreferences, useThemeStore, type ThemePreference } from "./theme";
+import { useTranslation } from "react-i18next";
+import { themePreferences, useThemeStore } from "./theme";
 import styles from "./ThemeSwitcher.module.css";
 
-const labels: Record<ThemePreference, string> = {
-  light: "Clair",
-  dark: "Sombre",
-  system: "Système",
-};
-
 export function ThemeSwitcher() {
+  const { t } = useTranslation();
   const preference = useThemeStore((s) => s.preference);
   const setPreference = useThemeStore((s) => s.setPreference);
   return (
     <fieldset className={styles["switcher"]}>
-      <legend className={styles["legend"]}>Thème</legend>
+      <legend className={styles["legend"]}>{t("preferences.theme.label")}</legend>
       {themePreferences.map((value) => (
         <label key={value} className={styles["option"]}>
           <input
@@ -24,7 +20,7 @@ export function ThemeSwitcher() {
               setPreference(value);
             }}
           />
-          {labels[value]}
+          {t(`preferences.theme.${value}`)}
         </label>
       ))}
     </fieldset>

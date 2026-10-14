@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "Erable",
+    "version": "Version {{version}} · API {{apiVersion}}",
+    "mode": {
+      "desktop": "Lokale Anwendung",
+      "server": "Server"
+    }
+  },
+  "common": {
+    "loading": "Wird geladen…",
+    "error": "Ein Fehler ist aufgetreten: {{message}}"
+  },
+  "hello": {
+    "tagline": "Ihr strukturiertes Wiki, lokal oder auf einem Server.",
+    "lastOpened": "Zuletzt geöffnet {{when}}",
+    "pages_one": "{{count, number}} Seite",
+    "pages_other": "{{count, number}} Seiten"
+  },
+  "preferences": {
+    "language": "Sprache der Oberfläche",
+    "theme": {
+      "label": "Design",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    }
+  }
+}

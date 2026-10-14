@@ -2,6 +2,7 @@
 import js from "@eslint/js";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import i18next from "eslint-plugin-i18next";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -30,6 +31,41 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["error", { allowConstantExport: true }],
+    },
+  },
+  {
+    // No hard-coded UI text in JSX: everything goes through i18n (CLAUDE.md §6.8).
+    files: ["src/**/*.tsx"],
+    ignores: ["src/**/*.test.tsx", "src/test/**", "src/dev/**"],
+    plugins: { i18next },
+    rules: {
+      "i18next/no-literal-string": [
+        "error",
+        {
+          mode: "jsx-only",
+          "jsx-attributes": {
+            exclude: [
+              "className",
+              "style",
+              "type",
+              "key",
+              "id",
+              "htmlFor",
+              "name",
+              "value",
+              "role",
+              "lang",
+              "href",
+              "to",
+              "rel",
+              "target",
+              "src",
+              "autoComplete",
+              "data-testid",
+            ],
+          },
+        },
+      ],
     },
   },
   {
