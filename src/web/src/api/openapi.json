@@ -655,6 +655,39 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/attachments": {
+      "get": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "ListAttachments",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AttachmentItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/projects/{projectId}/attachments/{id}": {
       "get": {
         "tags": [

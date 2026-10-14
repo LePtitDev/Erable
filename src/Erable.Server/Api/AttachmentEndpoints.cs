@@ -21,10 +21,18 @@ public static class AttachmentEndpoints
         project.MapPost("/pages/{id}/attachments", Upload)
             .WithName("UploadAttachment").WithTags("Attachments")
             .Produces(StatusCodes.Status413PayloadTooLarge);
+        project.MapGet("/attachments", List)
+            .WithName("ListAttachments").WithTags("Attachments");
         project.MapGet("/attachments/{id}", Download)
             .WithName("DownloadAttachment").WithTags("Attachments");
         return project;
     }
+
+    /// <summary>Every attachment of the project, for the insert palette (« Hautbois › carte_hautbois.webp »).</summary>
+    private static Results<Ok<AttachmentItem[]>, ProblemHttpResult> List(ElementId projectId, ProjectWorkspace workspace) =>
+        workspace.Find(projectId) is { } service
+            ? TypedResults.Ok(service.Project.Repository.GetAllAttachments().Select(AttachmentItem.From).ToArray())
+            : Problems.ProjectNotOpen(projectId);
 
     /// <summary>
     /// One file per request, streamed from the multipart body to the blob store without buffering (no

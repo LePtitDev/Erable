@@ -153,4 +153,19 @@ public sealed class AttachmentsApiTests
         resolved.Attachment.ShouldBe(item);
         resolved.Path[^1].Name.ShouldBe("Hautbois");
     }
+
+    [Fact]
+    public async Task List_TwoPages_ReturnsEveryAttachmentWithItsPage()
+    {
+        await using var backend = await TestBackend.StartAsync();
+        var project = await backend.CreateProjectAsync();
+        var ilsa = await backend.CreatePageAsync(project.Id, Roots.Pages.Id, "Ilsa");
+        var hautbois = await backend.CreatePageAsync(project.Id, Roots.Pages.Id, "Hautbois");
+        (await backend.UploadAsync(project.Id, ilsa.Id, "portrait.png", Png)).EnsureSuccessStatusCode();
+        (await backend.UploadAsync(project.Id, hautbois.Id, "carte.png", Png)).EnsureSuccessStatusCode();
+
+        var items = await (await backend.Client.GetAsync(Url($"/api/v1/projects/{project.Id}/attachments"), Ct)).ReadAsync<AttachmentItem[]>();
+
+        items.Select(i => (i.FileName, i.PageId)).ShouldBe([("portrait.png", ilsa.Id), ("carte.png", hautbois.Id)], ignoreOrder: true);
+    }
 }

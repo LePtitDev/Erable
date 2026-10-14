@@ -311,5 +311,40 @@
   },
   "time": {
     "justNow": "gerade eben"
+  },
+  "palette": {
+    "title": "Referenz einfügen",
+    "filter": "Vorschläge filtern",
+    "tabs": "Elementtyp",
+    "suggestions": "Vorschläge",
+    "empty": "Kein Element passt.",
+    "tab": {
+      "all": "Alle",
+      "page": "Seiten",
+      "attachment": "Anhänge",
+      "category": "Kategorien",
+      "propertyDefinition": "Eigenschaften"
+    },
+    "group": {
+      "page": "Seiten",
+      "attachment": "Anhänge",
+      "category": "Kategorien",
+      "propertyDefinition": "Eigenschaften",
+      "linkType": "Verknüpfungstypen",
+      "root": "Wurzeln",
+      "folder": "Ordner"
+    },
+    "keys": {
+      "navigate": "navigieren",
+      "enter": "Eingabe",
+      "link": "Link einfügen",
+      "shiftEnter": "Umschalt Eingabe",
+      "embed": "einbetten",
+      "tab": "Tab",
+      "nextTab": "nächster Typ"
+    },
+    "count_zero": "Kein Vorschlag",
+    "count_one": "{{count}} Vorschlag",
+    "count_other": "{{count}} Vorschläge"
   }
 }

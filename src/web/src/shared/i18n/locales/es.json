@@ -315,5 +315,41 @@
   },
   "time": {
     "justNow": "ahora mismo"
+  },
+  "palette": {
+    "title": "Insertar una referencia",
+    "filter": "Filtrar las sugerencias",
+    "tabs": "Tipo de elemento",
+    "suggestions": "Sugerencias",
+    "empty": "Ningún elemento coincide.",
+    "tab": {
+      "all": "Todo",
+      "page": "Páginas",
+      "attachment": "Adjuntos",
+      "category": "Categorías",
+      "propertyDefinition": "Propiedades"
+    },
+    "group": {
+      "page": "Páginas",
+      "attachment": "Adjuntos",
+      "category": "Categorías",
+      "propertyDefinition": "Propiedades",
+      "linkType": "Tipos de enlace",
+      "root": "Raíces",
+      "folder": "Carpetas"
+    },
+    "keys": {
+      "navigate": "navegar",
+      "enter": "Intro",
+      "link": "insertar un enlace",
+      "shiftEnter": "Mayús Intro",
+      "embed": "integrar",
+      "tab": "Tab",
+      "nextTab": "tipo siguiente"
+    },
+    "count_zero": "Ninguna sugerencia",
+    "count_one": "{{count}} sugerencia",
+    "count_many": "{{count}} sugerencias",
+    "count_other": "{{count}} sugerencias"
   }
 }

@@ -371,7 +371,7 @@ Alors        la source contient ![[<ID de carte_hautbois.webp>]]
 Et           l'aperçu affiche l'image
 
 E2E-05-05 · Filtrer la palette par type                       P1 · @pr · M1
-Quand        j'ouvre la palette et appuie deux fois sur Tab
+Quand        j'ouvre la palette et appuie trois fois sur Tab
 Alors        l'onglet « Catégories » est actif et seules des catégories sont proposées
 
 E2E-05-06 · Fermer la palette sans insérer                    P1 · @nightly · M1

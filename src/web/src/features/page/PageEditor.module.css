@@ -63,7 +63,6 @@
 .kbd {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  opacity: 0.75;
 }
 
 .banner,

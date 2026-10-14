@@ -41,4 +41,20 @@ test.describe("a11y · axe-core per screen", () => {
       await expectNoSeriousViolations(page);
     });
   }
+
+  test("a11y · Editor with the insert palette open has no serious violation @pr", async ({
+    page,
+    reference,
+  }) => {
+    await page.goto(`${reference.url("3F2A9C14E07B5D21")}?edit=true`);
+    const content = page.getByRole("textbox", { name: t("editor.content") });
+    await content.click();
+    await page.keyboard.press("Control+End");
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("[[or");
+    await expect(page.getByRole("dialog", { name: t("palette.title") })).toBeVisible();
+
+    await expectNoSeriousViolations(page);
+  });
 });

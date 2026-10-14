@@ -24,6 +24,8 @@ import { insertText, setHeading, toggleInline } from "../editor/formatting";
 import { MarkdownEditor, type MarkdownEditorHandle } from "../editor/MarkdownEditor";
 import type { PillTarget } from "../editor/pills";
 import { usePageDraft } from "../editor/usePageDraft";
+import { PalettePopup } from "../palette/PalettePopup";
+import { useInsertPalette } from "../palette/useInsertPalette";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
 import styles from "./PageEditor.module.css";
@@ -76,6 +78,7 @@ function EditorScreen({
   const client = useQueryClient();
   const navigate = useNavigate();
   const editor = useRef<MarkdownEditorHandle>(null);
+  const palette = useInsertPalette(projectId, editor);
   const setMode = useShellStore((s) => s.setMode);
   const setCursor = useShellStore((s) => s.setCursor);
 
@@ -321,7 +324,8 @@ function EditorScreen({
             e.preventDefault();
           }}
           onClick={() => {
-            editor.current?.run((s) => insertText(s, "[["));
+            // Typed like the user would: the palette opens (F05.R3).
+            editor.current?.run((s) => ({ ...insertText(s, "[["), userEvent: "input.type" }));
           }}
         >
           <FileText aria-hidden size={16} />
@@ -362,7 +366,10 @@ function EditorScreen({
             setCursor({ line, column });
           }}
           onSave={() => void saveAndClose()}
+          onUpdate={palette.onUpdate}
+          extensions={palette.extension}
         />
+        {palette.popup !== null && <PalettePopup {...palette.popup} />}
       </section>
 
       <Dialog

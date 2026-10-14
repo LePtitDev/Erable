@@ -54,3 +54,18 @@ export class EditorPage {
     return this.page.getByRole("status").filter({ hasText: prefix });
   }
 }
+
+/** The insert palette (F05.R3). */
+export class InsertPalette {
+  readonly dialog: Locator;
+  readonly options: Locator;
+
+  constructor(readonly page: Page) {
+    this.dialog = page.getByRole("dialog", { name: t("palette.title") });
+    this.options = this.dialog.getByRole("option");
+  }
+
+  tab(name: string): Locator {
+    return this.dialog.getByRole("tab", { name, exact: true });
+  }
+}

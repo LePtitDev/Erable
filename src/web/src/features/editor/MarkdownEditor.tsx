@@ -29,6 +29,8 @@ interface MarkdownEditorProps {
   readonly onChange: (doc: string) => void;
   readonly onCursor: (line: number, column: number) => void;
   readonly onSave: () => void;
+  /** Every update of the editor (the insert palette follows the cursor and the typed query). */
+  readonly onUpdate?: (view: EditorView) => void;
   /** Extensions added by other features (insert palette, attachments). */
   readonly extensions?: Extension;
 }
@@ -75,9 +77,11 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
             pills(),
             editorTheme,
             placeholder(callbacks.current.placeholderText),
+            // tabindex: focusable anyway, but axe only counts it with the attribute (scrollable-region-focusable).
             EditorView.contentAttributes.of({
               "aria-label": callbacks.current.label,
               "aria-multiline": "true",
+              tabindex: "0",
             }),
             keymap.of([
               {
@@ -93,6 +97,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
               indentWithTab,
             ]),
             EditorView.updateListener.of((update) => {
+              callbacks.current.onUpdate?.(update.view);
               if (update.docChanged) callbacks.current.onChange(update.state.doc.toString());
               if (update.selectionSet || update.docChanged) {
                 const head = update.state.selection.main.head;

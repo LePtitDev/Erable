@@ -315,5 +315,41 @@
   },
   "time": {
     "justNow": "à l’instant"
+  },
+  "palette": {
+    "title": "Insérer une référence",
+    "filter": "Filtrer les suggestions",
+    "tabs": "Type d’élément",
+    "suggestions": "Suggestions",
+    "empty": "Aucun élément ne correspond.",
+    "tab": {
+      "all": "Tout",
+      "page": "Pages",
+      "attachment": "Pièces jointes",
+      "category": "Catégories",
+      "propertyDefinition": "Propriétés"
+    },
+    "group": {
+      "page": "Pages",
+      "attachment": "Pièces jointes",
+      "category": "Catégories",
+      "propertyDefinition": "Propriétés",
+      "linkType": "Types de liens",
+      "root": "Racines",
+      "folder": "Dossiers"
+    },
+    "keys": {
+      "navigate": "naviguer",
+      "enter": "Entrée",
+      "link": "insérer un lien",
+      "shiftEnter": "Maj Entrée",
+      "embed": "intégrer",
+      "tab": "Tab",
+      "nextTab": "type suivant"
+    },
+    "count_zero": "Aucune suggestion",
+    "count_one": "{{count}} suggestion",
+    "count_many": "{{count}} suggestions",
+    "count_other": "{{count}} suggestions"
   }
 }

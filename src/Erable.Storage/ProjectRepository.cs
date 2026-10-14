@@ -256,6 +256,19 @@ public sealed class ProjectRepository(ProjectDatabase database)
             new { Ids = json }).Select(r => r.ToRecord())];
     }
 
+    /// <summary>Every live attachment of the project (insert palette): those of a deleted page are excluded.</summary>
+    public IReadOnlyList<AttachmentRecord> GetAllAttachments(SqliteConnection? connection = null)
+    {
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        return [.. (connection ?? owned!).Query<AttachmentRow>(
+            """
+            SELECT a.id AS Id, e.parent_id AS PageId, a.file_name AS FileName, a.mime AS Mime, a.size AS Size, a.sha256 AS Sha256
+            FROM attachments a JOIN elements e ON e.id = a.id JOIN elements p ON p.id = e.parent_id
+            WHERE e.deleted_at IS NULL AND p.deleted_at IS NULL
+            ORDER BY e.parent_id, e.sort_order, a.id
+            """).Select(r => r.ToRecord())];
+    }
+
     /// <summary>Live attachments of a page, in their order.</summary>
     public IReadOnlyList<AttachmentRecord> GetAttachments(ElementId pageId, SqliteConnection? connection = null)
     {

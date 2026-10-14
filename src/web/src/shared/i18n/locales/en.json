@@ -311,5 +311,40 @@
   },
   "time": {
     "justNow": "just now"
+  },
+  "palette": {
+    "title": "Insert a reference",
+    "filter": "Filter the suggestions",
+    "tabs": "Element type",
+    "suggestions": "Suggestions",
+    "empty": "No element matches.",
+    "tab": {
+      "all": "All",
+      "page": "Pages",
+      "attachment": "Attachments",
+      "category": "Categories",
+      "propertyDefinition": "Properties"
+    },
+    "group": {
+      "page": "Pages",
+      "attachment": "Attachments",
+      "category": "Categories",
+      "propertyDefinition": "Properties",
+      "linkType": "Link types",
+      "root": "Roots",
+      "folder": "Folders"
+    },
+    "keys": {
+      "navigate": "navigate",
+      "enter": "Enter",
+      "link": "insert a link",
+      "shiftEnter": "Shift Enter",
+      "embed": "embed",
+      "tab": "Tab",
+      "nextTab": "next type"
+    },
+    "count_zero": "No suggestion",
+    "count_one": "{{count}} suggestion",
+    "count_other": "{{count}} suggestions"
   }
 }
