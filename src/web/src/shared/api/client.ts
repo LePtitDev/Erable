@@ -1,5 +1,6 @@
 import createClient from "openapi-fetch";
 import type { components, paths } from "../../api/schema";
+import type { ElementId } from "../ids/elementId";
 
 export type Schemas = components["schemas"];
 export type ApiInfo = Schemas["ApiInfo"];
@@ -38,16 +39,28 @@ export const api = createClient<paths>({
 });
 
 /**
+ * openapi-fetch passes response types through `Readable<T>`, a deep mapped type that also maps the branded
+ * `ElementId` (a string intersected with an object) into a plain object type. This undoes it.
+ */
+export type Rebrand<T> = T extends { readonly __brand: "ElementId" }
+  ? ElementId
+  : T extends (infer E)[]
+    ? Rebrand<E>[]
+    : T extends object
+      ? { [K in keyof T]: Rebrand<T[K]> }
+      : T;
+
+/**
  * Awaits an `api.GET/POST/…` call and returns its data, or throws an {@link ApiError}
  * carrying the backend's ProblemDetails.
  */
 export async function unwrap<T>(
   call: Promise<{ data?: T; error?: unknown; response: Response }>,
-): Promise<T> {
+): Promise<Rebrand<T>> {
   const { data, error, response } = await call;
   if (!response.ok) {
     throw new ApiError(response.status, isProblem(error) ? error : undefined);
   }
   // Undefined only for bodiless responses (204), whose schema type is `never` or `undefined`.
-  return data as T;
+  return data as Rebrand<T>;
 }

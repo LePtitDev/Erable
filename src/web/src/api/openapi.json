@@ -976,7 +976,8 @@
       "CurrentUserInfo": {
         "required": [
           "id",
-          "name"
+          "name",
+          "defaultProjectsFolder"
         ],
         "type": "object",
         "properties": {
@@ -984,6 +985,9 @@
             "type": "string"
           },
           "name": {
+            "type": "string"
+          },
+          "defaultProjectsFolder": {
             "type": "string"
           }
         }

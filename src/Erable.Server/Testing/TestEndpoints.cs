@@ -24,6 +24,7 @@ internal static class TestEndpoints
         group.MapGet("/blobs", ListBlobs);
         group.MapPost("/limits", SetLimits);
         group.MapGet("/doctor", Doctor);
+        group.MapPost("/close", Close);
     }
 
     /// <summary>
@@ -119,6 +120,10 @@ internal static class TestEndpoints
         workspace.Find(projectId) is { } service
             ? TypedResults.Ok(ProjectDoctor.Diagnose(service.Project, fix: false))
             : Problems.ProjectNotOpen(projectId);
+
+    /// <summary>Closes a project (releases its lock), so that a test can delete or alter its folder (E2E-01-03, E2E-01-04).</summary>
+    private static Results<NoContent, ProblemHttpResult> Close([FromQuery] ElementId projectId, ProjectWorkspace workspace) =>
+        workspace.Close(projectId) ? TypedResults.NoContent() : Problems.ProjectNotOpen(projectId);
 
     private static void CopyDirectory(string source, string target)
     {

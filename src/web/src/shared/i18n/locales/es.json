@@ -9,14 +9,11 @@
   },
   "common": {
     "loading": "Cargando…",
-    "error": "Se ha producido un error: {{message}}"
-  },
-  "hello": {
-    "tagline": "Tu wiki estructurada, en local o en un servidor.",
-    "lastOpened": "Última apertura {{when}}",
-    "pages_one": "{{count, number}} página",
-    "pages_many": "{{count, number}} de páginas",
-    "pages_other": "{{count, number}} páginas"
+    "error": "Se ha producido un error: {{message}}",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "soon": "pronto",
+    "retry": "Reintentar"
   },
   "preferences": {
     "language": "Idioma de la interfaz",
@@ -25,6 +22,145 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
+    },
+    "title": "Preferencias"
+  },
+  "errors": {
+    "generic": "La operación ha fallado. Inténtelo de nuevo o consulte el registro de la aplicación.",
+    "network": "El servidor no responde. Compruebe que Erable sigue en ejecución.",
+    "project": {
+      "notAProject": "Esta carpeta no es un proyecto de Erable.",
+      "manifestInvalid": "El archivo erable.json de este proyecto no se puede leer.",
+      "formatTooNew": "Este proyecto se creó con una versión más reciente de Erable. Actualice la aplicación para abrirlo.",
+      "locked": "Este proyecto ya está abierto en otra ventana de Erable.",
+      "alreadyExists": "Esta carpeta ya contiene un proyecto.",
+      "languageInvalid": "Idioma de contenido no admitido.",
+      "inaccessible": "No se puede acceder a esta carpeta (permisos insuficientes).",
+      "duplicateId": "Otro proyecto abierto tiene el mismo identificador (¿carpeta copiada?).",
+      "notFound": "Este proyecto no está abierto."
+    },
+    "element": {
+      "name": {
+        "empty": "El nombre no puede estar vacío.",
+        "tooLong": "El nombre supera los 200 caracteres.",
+        "invalid": "El nombre contiene caracteres no permitidos."
+      },
+      "notFound": "Este elemento no existe.",
+      "kind": {
+        "notCreatable": "Este tipo de elemento aún no se puede crear."
+      }
+    },
+    "tree": {
+      "root": {
+        "immutable": "Las raíces no se pueden renombrar, mover ni eliminar."
+      },
+      "move": {
+        "crossRoot": "Un elemento permanece bajo su propia raíz.",
+        "intoDescendant": "Una página no se puede mover bajo una de sus subpáginas.",
+        "notMovable": "Un adjunto permanece con su página."
+      },
+      "parent": {
+        "invalid": "Esta ubicación no puede contener este elemento.",
+        "notFound": "La ubicación ya no existe."
+      }
+    },
+    "page": {
+      "revisionConflict": "La página ha cambiado mientras tanto. Recárguela antes de guardar."
+    },
+    "attachment": {
+      "tooLarge": "El archivo supera el tamaño máximo permitido.",
+      "multipartRequired": "Envío de archivo no válido.",
+      "fileMissing": "No se ha recibido ningún archivo."
     }
+  },
+  "home": {
+    "version": "Versión {{version}}",
+    "greeting": "Hola, {{name}}",
+    "subtitle": "Abra un wiki local o conéctese a un servidor compartido.",
+    "nav": {
+      "label": "Navegación principal",
+      "projects": "Proyectos",
+      "templates": "Plantillas de proyecto",
+      "preferences": "Preferencias",
+      "help": "Ayuda y atajos"
+    },
+    "new": {
+      "title": "Nuevo proyecto",
+      "hint": "Crear un wiki vacío",
+      "dialogTitle": "Nuevo proyecto",
+      "inFolderTitle": "Crear un proyecto en esta carpeta",
+      "inFolderDescription": "Esta carpeta aún no es un proyecto de Erable. No se escribe nada hasta que confirme.",
+      "name": "Nombre del proyecto",
+      "language": "Idioma del contenido",
+      "languageHint": "Idioma en el que se redactan las páginas. No se podrá cambiar después.",
+      "location": "Ubicación",
+      "folder": "Carpeta del proyecto: {{folder}}",
+      "create": "Crear el proyecto"
+    },
+    "open": {
+      "title": "Abrir una carpeta…",
+      "hint": "Un proyecto de Erable en este equipo (Ctrl+O)",
+      "dialogTitle": "Abrir una carpeta",
+      "dialogDescription": "Ruta de la carpeta de un proyecto de Erable.",
+      "folder": "Carpeta",
+      "submit": "Abrir",
+      "status": {
+        "missing": "Esta carpeta no existe.",
+        "tooNew": "Este proyecto usa el formato {{version}}, más reciente que esta versión de Erable. Actualice la aplicación para abrirlo; el proyecto no se ha modificado.",
+        "invalid": "El archivo erable.json de esta carpeta no se puede leer."
+      }
+    },
+    "connect": {
+      "title": "Conectarse a un servidor",
+      "hint": "Wiki alojado, edición entre varios"
+    },
+    "recent": {
+      "title": "Proyectos recientes",
+      "filter": "Filtrar los proyectos",
+      "empty": "Ningún proyecto reciente. Cree un proyecto o abra una carpeta.",
+      "local": "Local",
+      "remove": "Quitar",
+      "removeNamed": "Quitar {{name}} de los proyectos recientes",
+      "status": {
+        "project": "Disponible",
+        "missing": "No encontrado",
+        "notAProject": "No encontrado",
+        "tooNew": "Versión más reciente",
+        "invalid": "Ilegible"
+      }
+    },
+    "dropZone": "Arrastre aquí la carpeta de un proyecto para abrirla"
+  },
+  "help": {
+    "title": "Ayuda y atajos",
+    "keys": {
+      "openFolder": "Ctrl+O",
+      "save": "Ctrl+S",
+      "rename": "F2",
+      "palette": "[[",
+      "paletteShortcut": "Ctrl+Espacio",
+      "close": "Esc"
+    },
+    "shortcuts": {
+      "openFolder": "Abrir la carpeta de un proyecto",
+      "save": "Guardar la página",
+      "rename": "Renombrar el elemento seleccionado en el árbol",
+      "palette": "Insertar una referencia (paleta de inserción)",
+      "paletteShortcut": "Abrir la paleta de inserción",
+      "close": "Cerrar un diálogo o la paleta"
+    }
+  },
+  "notFound": {
+    "title": "Elemento no encontrado",
+    "description": "Este elemento no existe, o ya no existe, en este proyecto. Quizá su enlace provenga de otro proyecto.",
+    "home": "Volver al inicio",
+    "search": "Buscar en el proyecto",
+    "project": "Proyecto no encontrado",
+    "projectDescription": "Este proyecto no está abierto. Vuelva a abrirlo desde el inicio."
+  },
+  "errorScreen": {
+    "title": "Se ha producido un error inesperado",
+    "description": "La visualización ha fallado. Sus datos guardados no se ven afectados.",
+    "reload": "Recargar"
   }
 }

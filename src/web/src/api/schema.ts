@@ -396,6 +396,7 @@ export interface components {
       name: string;
     };
     CurrentUserInfo: {
+      defaultProjectsFolder: string;
       id: string;
       name: string;
     };

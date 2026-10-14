@@ -3,6 +3,9 @@ import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll } from "vitest";
 import { server } from "./msw";
 
+// jsdom has no layout: the router's scroll restoration calls window.scrollTo.
+window.scrollTo = () => undefined;
+
 beforeAll(() => {
   server.listen({ onUnhandledFrame: "error" });
 });

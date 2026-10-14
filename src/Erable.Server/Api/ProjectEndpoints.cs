@@ -2,6 +2,7 @@ using Erable.Core;
 using Erable.Core.Elements;
 using Erable.Core.Projects;
 using Erable.Core.Tree;
+using Erable.Server.Hosting;
 using Erable.Server.Projects;
 using Erable.Server.Users;
 using Erable.Storage;
@@ -284,10 +285,22 @@ public static class ProjectEndpoints
     // ─── Me ─────────────────────────────────────────────────────────────────
 
     /// <summary>The current user: « moi » in dates and authors, « Bonjour, … » on the home screen.</summary>
-    private static Ok<CurrentUserInfo> GetMe(UserDirectory users, HttpContext http)
+    private static Ok<CurrentUserInfo> GetMe(UserDirectory users, ErableHostOptions options, HttpContext http)
     {
         var id = CurrentUser.Id(http);
-        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id)));
+        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id), DefaultProjectsFolder(options)));
+    }
+
+    /// <summary>Desktop: <c>Documents/Erable</c>; server: <c>&lt;data&gt;/projects</c> (docs/architecture.md §7.1).</summary>
+    private static string DefaultProjectsFolder(ErableHostOptions options)
+    {
+        if (options.Mode == HostMode.Desktop)
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            return Path.Combine(documents.Length > 0 ? documents : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Erable");
+        }
+
+        return Path.Combine(options.DataDirectory ?? Path.GetTempPath(), "projects");
     }
 
     // ─── Recent projects ────────────────────────────────────────────────────

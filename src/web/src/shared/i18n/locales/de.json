@@ -9,13 +9,11 @@
   },
   "common": {
     "loading": "Wird geladen…",
-    "error": "Ein Fehler ist aufgetreten: {{message}}"
-  },
-  "hello": {
-    "tagline": "Ihr strukturiertes Wiki, lokal oder auf einem Server.",
-    "lastOpened": "Zuletzt geöffnet {{when}}",
-    "pages_one": "{{count, number}} Seite",
-    "pages_other": "{{count, number}} Seiten"
+    "error": "Ein Fehler ist aufgetreten: {{message}}",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "soon": "bald",
+    "retry": "Erneut versuchen"
   },
   "preferences": {
     "language": "Sprache der Oberfläche",
@@ -24,6 +22,145 @@
       "light": "Hell",
       "dark": "Dunkel",
       "system": "System"
+    },
+    "title": "Einstellungen"
+  },
+  "errors": {
+    "generic": "Der Vorgang ist fehlgeschlagen. Versuchen Sie es erneut oder prüfen Sie das Anwendungsprotokoll.",
+    "network": "Der Server antwortet nicht. Prüfen Sie, ob Erable noch läuft.",
+    "project": {
+      "notAProject": "Dieser Ordner ist kein Erable-Projekt.",
+      "manifestInvalid": "Die Datei erable.json dieses Projekts ist nicht lesbar.",
+      "formatTooNew": "Dieses Projekt wurde mit einer neueren Version von Erable erstellt. Aktualisieren Sie die Anwendung, um es zu öffnen.",
+      "locked": "Dieses Projekt ist bereits in einem anderen Erable-Fenster geöffnet.",
+      "alreadyExists": "Dieser Ordner enthält bereits ein Projekt.",
+      "languageInvalid": "Nicht unterstützte Inhaltssprache.",
+      "inaccessible": "Auf diesen Ordner kann nicht zugegriffen werden (fehlende Rechte).",
+      "duplicateId": "Ein anderes geöffnetes Projekt hat dieselbe Kennung (kopierter Ordner?).",
+      "notFound": "Dieses Projekt ist nicht geöffnet."
+    },
+    "element": {
+      "name": {
+        "empty": "Der Name darf nicht leer sein.",
+        "tooLong": "Der Name ist länger als 200 Zeichen.",
+        "invalid": "Der Name enthält unzulässige Zeichen."
+      },
+      "notFound": "Dieses Element existiert nicht.",
+      "kind": {
+        "notCreatable": "Diese Art von Element kann noch nicht erstellt werden."
+      }
+    },
+    "tree": {
+      "root": {
+        "immutable": "Wurzeln können weder umbenannt, verschoben noch gelöscht werden."
+      },
+      "move": {
+        "crossRoot": "Ein Element bleibt unter seiner eigenen Wurzel.",
+        "intoDescendant": "Eine Seite kann nicht unter eine ihrer Unterseiten verschoben werden.",
+        "notMovable": "Ein Anhang bleibt bei seiner Seite."
+      },
+      "parent": {
+        "invalid": "Dieser Ort kann dieses Element nicht enthalten.",
+        "notFound": "Der Ort existiert nicht mehr."
+      }
+    },
+    "page": {
+      "revisionConflict": "Die Seite wurde inzwischen geändert. Laden Sie sie vor dem Speichern neu."
+    },
+    "attachment": {
+      "tooLarge": "Die Datei überschreitet die maximal zulässige Größe.",
+      "multipartRequired": "Ungültiger Datei-Upload.",
+      "fileMissing": "Keine Datei empfangen."
     }
+  },
+  "home": {
+    "version": "Version {{version}}",
+    "greeting": "Hallo, {{name}}",
+    "subtitle": "Öffnen Sie ein lokales Wiki oder verbinden Sie sich mit einem gemeinsamen Server.",
+    "nav": {
+      "label": "Hauptnavigation",
+      "projects": "Projekte",
+      "templates": "Projektvorlagen",
+      "preferences": "Einstellungen",
+      "help": "Hilfe und Tastenkürzel"
+    },
+    "new": {
+      "title": "Neues Projekt",
+      "hint": "Ein leeres Wiki anlegen",
+      "dialogTitle": "Neues Projekt",
+      "inFolderTitle": "Projekt in diesem Ordner anlegen",
+      "inFolderDescription": "Dieser Ordner ist noch kein Erable-Projekt. Es wird nichts geschrieben, bevor Sie bestätigen.",
+      "name": "Projektname",
+      "language": "Inhaltssprache",
+      "languageHint": "Sprache, in der die Seiten verfasst werden. Sie kann später nicht geändert werden.",
+      "location": "Speicherort",
+      "folder": "Projektordner: {{folder}}",
+      "create": "Projekt anlegen"
+    },
+    "open": {
+      "title": "Ordner öffnen…",
+      "hint": "Ein Erable-Projekt auf diesem Rechner (Strg+O)",
+      "dialogTitle": "Ordner öffnen",
+      "dialogDescription": "Pfad des Ordners eines Erable-Projekts.",
+      "folder": "Ordner",
+      "submit": "Öffnen",
+      "status": {
+        "missing": "Dieser Ordner existiert nicht.",
+        "tooNew": "Dieses Projekt verwendet das Format {{version}}, das neuer ist als diese Version von Erable. Aktualisieren Sie die Anwendung, um es zu öffnen; das Projekt wurde nicht verändert.",
+        "invalid": "Die Datei erable.json dieses Ordners ist nicht lesbar."
+      }
+    },
+    "connect": {
+      "title": "Mit einem Server verbinden",
+      "hint": "Gehostetes Wiki, gemeinsames Bearbeiten"
+    },
+    "recent": {
+      "title": "Zuletzt verwendete Projekte",
+      "filter": "Projekte filtern",
+      "empty": "Kein zuletzt verwendetes Projekt. Legen Sie ein Projekt an oder öffnen Sie einen Ordner.",
+      "local": "Lokal",
+      "remove": "Entfernen",
+      "removeNamed": "{{name}} aus den zuletzt verwendeten Projekten entfernen",
+      "status": {
+        "project": "Verfügbar",
+        "missing": "Nicht gefunden",
+        "notAProject": "Nicht gefunden",
+        "tooNew": "Neuere Version",
+        "invalid": "Nicht lesbar"
+      }
+    },
+    "dropZone": "Ziehen Sie einen Projektordner hierher, um ihn zu öffnen"
+  },
+  "help": {
+    "title": "Hilfe und Tastenkürzel",
+    "keys": {
+      "openFolder": "Strg+O",
+      "save": "Strg+S",
+      "rename": "F2",
+      "palette": "[[",
+      "paletteShortcut": "Strg+Leertaste",
+      "close": "Esc"
+    },
+    "shortcuts": {
+      "openFolder": "Einen Projektordner öffnen",
+      "save": "Die Seite speichern",
+      "rename": "Das im Baum ausgewählte Element umbenennen",
+      "palette": "Eine Referenz einfügen (Einfügepalette)",
+      "paletteShortcut": "Die Einfügepalette öffnen",
+      "close": "Einen Dialog oder die Palette schließen"
+    }
+  },
+  "notFound": {
+    "title": "Element nicht gefunden",
+    "description": "Dieses Element existiert in diesem Projekt nicht oder nicht mehr. Der Link stammt vielleicht aus einem anderen Projekt.",
+    "home": "Zurück zur Startseite",
+    "search": "Im Projekt suchen",
+    "project": "Projekt nicht gefunden",
+    "projectDescription": "Dieses Projekt ist nicht geöffnet. Öffnen Sie es erneut über die Startseite."
+  },
+  "errorScreen": {
+    "title": "Ein unerwarteter Fehler ist aufgetreten",
+    "description": "Die Anzeige ist fehlgeschlagen. Ihre gespeicherten Daten sind nicht betroffen.",
+    "reload": "Neu laden"
   }
 }

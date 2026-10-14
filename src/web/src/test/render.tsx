@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
 import { render, type RenderOptions } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
@@ -20,4 +21,12 @@ export function renderWithProviders(ui: ReactElement, options?: RenderOptions) {
     </I18nextProvider>
   );
   return render(ui, { wrapper, ...options });
+}
+
+/** Renders the whole application at `path` (real routes, memory history). Returns the router to inspect the URL. */
+export async function renderApp(path: string) {
+  const { createAppRouter } = await import("../app/router");
+  const router = createAppRouter(createMemoryHistory({ initialEntries: [path] }));
+  const result = renderWithProviders(<RouterProvider router={router} />);
+  return { ...result, router };
 }

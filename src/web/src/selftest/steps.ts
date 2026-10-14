@@ -53,11 +53,10 @@ export const selfTestSteps: readonly SelfTestStepDefinition[] = [
     name: "home-visible",
     run: async (context) => {
       const { document, i18n } = context;
-      const name = i18n.t("app.name");
       await waitFor(
         document,
         () =>
-          document.querySelector("h1")?.textContent === name &&
+          document.body.textContent.includes(i18n.t("home.subtitle")) &&
           document.body.textContent.includes(i18n.t("app.mode.desktop")),
         "the home screen",
       );

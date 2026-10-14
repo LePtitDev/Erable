@@ -1,5 +1,5 @@
 import { test as base, type APIRequestContext } from "@playwright/test";
-import { HelloPage } from "../pages/HelloPage";
+import { HomePage } from "../pages/HomePage";
 import { referenceDate } from "./chroniques";
 
 /** A fresh copy of a reference project, private to the running test (POST /_test/reset). */
@@ -37,7 +37,7 @@ export async function resetProject(
 }
 
 interface Fixtures {
-  hello: HelloPage;
+  home: HomePage;
   /** « Chroniques d'Aube », freshly copied; the browser clock is set to the reference date. */
   reference: ReferenceProject;
   /** No project, but a fresh profile (empty recent list, default preferences); gives the slot used. */
@@ -51,8 +51,8 @@ export const test = base.extend<Fixtures>({
     await page.request.post("/_test/clock", { data: { now: null } });
     await use(page);
   },
-  hello: async ({ page }, use) => {
-    await use(new HelloPage(page));
+  home: async ({ page }, use) => {
+    await use(new HomePage(page));
   },
   reference: async ({ page, browserName }, use, testInfo) => {
     const result = await resetProject(page.request, slotOf(testInfo.testId, browserName));
@@ -68,6 +68,7 @@ export const test = base.extend<Fixtures>({
     });
     // `erable doctor` after each test: whatever the scenario did, the project must stay sound (docs/testing.md §6).
     const doctor = await page.request.get(`/_test/doctor?projectId=${id}`);
+    if (doctor.status() === 404) return; // the test closed its copy on purpose
     const report = (await doctor.json()) as { healthy: boolean; findings: unknown[] };
     if (!report.healthy) {
       throw new Error(`erable doctor found anomalies: ${JSON.stringify(report.findings)}`);

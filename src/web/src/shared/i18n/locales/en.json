@@ -9,13 +9,11 @@
   },
   "common": {
     "loading": "Loading…",
-    "error": "Something went wrong: {{message}}"
-  },
-  "hello": {
-    "tagline": "Your structured wiki, local or on a server.",
-    "lastOpened": "Last opened {{when}}",
-    "pages_one": "{{count, number}} page",
-    "pages_other": "{{count, number}} pages"
+    "error": "Something went wrong: {{message}}",
+    "cancel": "Cancel",
+    "close": "Close",
+    "soon": "soon",
+    "retry": "Retry"
   },
   "preferences": {
     "language": "Interface language",
@@ -24,6 +22,145 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "title": "Preferences"
+  },
+  "errors": {
+    "generic": "The operation failed. Try again or check the application log.",
+    "network": "The server does not respond. Check that Erable is still running.",
+    "project": {
+      "notAProject": "This folder is not an Erable project.",
+      "manifestInvalid": "The erable.json file of this project cannot be read.",
+      "formatTooNew": "This project was created by a newer version of Erable. Update the application to open it.",
+      "locked": "This project is already open in another Erable window.",
+      "alreadyExists": "This folder already contains a project.",
+      "languageInvalid": "Unsupported content language.",
+      "inaccessible": "This folder cannot be accessed (insufficient permissions).",
+      "duplicateId": "Another open project has the same identifier (copied folder?).",
+      "notFound": "This project is not open."
+    },
+    "element": {
+      "name": {
+        "empty": "The name cannot be empty.",
+        "tooLong": "The name exceeds 200 characters.",
+        "invalid": "The name contains forbidden characters."
+      },
+      "notFound": "This element does not exist.",
+      "kind": {
+        "notCreatable": "This kind of element cannot be created yet."
+      }
+    },
+    "tree": {
+      "root": {
+        "immutable": "Roots cannot be renamed, moved or deleted."
+      },
+      "move": {
+        "crossRoot": "An element stays under its own root.",
+        "intoDescendant": "A page cannot be moved under one of its sub-pages.",
+        "notMovable": "An attachment stays with its page."
+      },
+      "parent": {
+        "invalid": "This location cannot contain this element.",
+        "notFound": "The location no longer exists."
+      }
+    },
+    "page": {
+      "revisionConflict": "The page changed in the meantime. Reload it before saving."
+    },
+    "attachment": {
+      "tooLarge": "The file exceeds the maximum allowed size.",
+      "multipartRequired": "Invalid file upload.",
+      "fileMissing": "No file received."
     }
+  },
+  "home": {
+    "version": "Version {{version}}",
+    "greeting": "Hello, {{name}}",
+    "subtitle": "Open a local wiki or connect to a shared server.",
+    "nav": {
+      "label": "Main navigation",
+      "projects": "Projects",
+      "templates": "Project templates",
+      "preferences": "Preferences",
+      "help": "Help and shortcuts"
+    },
+    "new": {
+      "title": "New project",
+      "hint": "Create an empty wiki",
+      "dialogTitle": "New project",
+      "inFolderTitle": "Create a project in this folder",
+      "inFolderDescription": "This folder is not an Erable project yet. Nothing is written until you confirm.",
+      "name": "Project name",
+      "language": "Content language",
+      "languageHint": "Language the pages are written in. It cannot be changed later.",
+      "location": "Location",
+      "folder": "Project folder: {{folder}}",
+      "create": "Create project"
+    },
+    "open": {
+      "title": "Open a folder…",
+      "hint": "An Erable project on this computer (Ctrl+O)",
+      "dialogTitle": "Open a folder",
+      "dialogDescription": "Path of the folder of an Erable project.",
+      "folder": "Folder",
+      "submit": "Open",
+      "status": {
+        "missing": "This folder does not exist.",
+        "tooNew": "This project uses format {{version}}, newer than this version of Erable. Update the application to open it; the project was not modified.",
+        "invalid": "The erable.json file of this folder cannot be read."
+      }
+    },
+    "connect": {
+      "title": "Connect to a server",
+      "hint": "Hosted wiki, editing together"
+    },
+    "recent": {
+      "title": "Recent projects",
+      "filter": "Filter projects",
+      "empty": "No recent project. Create a project or open a folder.",
+      "local": "Local",
+      "remove": "Remove",
+      "removeNamed": "Remove {{name}} from recent projects",
+      "status": {
+        "project": "Available",
+        "missing": "Not found",
+        "notAProject": "Not found",
+        "tooNew": "Newer version",
+        "invalid": "Unreadable"
+      }
+    },
+    "dropZone": "Drop a project folder here to open it"
+  },
+  "help": {
+    "title": "Help and shortcuts",
+    "keys": {
+      "openFolder": "Ctrl+O",
+      "save": "Ctrl+S",
+      "rename": "F2",
+      "palette": "[[",
+      "paletteShortcut": "Ctrl+Space",
+      "close": "Esc"
+    },
+    "shortcuts": {
+      "openFolder": "Open a project folder",
+      "save": "Save the page",
+      "rename": "Rename the element selected in the tree",
+      "palette": "Insert a reference (insert palette)",
+      "paletteShortcut": "Open the insert palette",
+      "close": "Close a dialog or the palette"
+    }
+  },
+  "notFound": {
+    "title": "Element not found",
+    "description": "This element does not exist, or no longer exists, in this project. Its link may come from another project.",
+    "home": "Back to home",
+    "search": "Search the project",
+    "project": "Project not found",
+    "projectDescription": "This project is not open. Reopen it from the home screen."
+  },
+  "errorScreen": {
+    "title": "An unexpected error occurred",
+    "description": "The display failed. Your saved data is not affected.",
+    "reload": "Reload"
   }
 }
