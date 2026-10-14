@@ -2,9 +2,11 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Erable.Server.Api;
+using Erable.Server.Spa;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi;
 
@@ -44,6 +46,7 @@ public static class ErableHost
 
         builder.Services.AddSingleton(options);
         builder.Services.AddSingleton(options.TimeProvider);
+        builder.Services.TryAddSingleton<IThemePreferenceSource, SystemThemePreferenceSource>();
         builder.Services.AddProblemDetails();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {
@@ -122,10 +125,10 @@ public static class ErableHost
             app.MapFallback(prefix + "/{**path}", () => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound));
         }
 
-        app.MapFallbackToFile("index.html", new StaticFileOptions
-        {
-            OnPrepareResponse = context => context.Context.Response.Headers[HeaderNames.CacheControl] = "no-cache",
-        });
+        // The SPA shell is rendered per request (theme attribute); an explicit endpoint also takes precedence
+        // over the static file middleware for /index.html.
+        app.MapGet("/index.html", SpaIndexEndpoint.HandleAsync).ExcludeFromDescription();
+        app.MapFallback(SpaIndexEndpoint.HandleAsync);
     }
 
     private static void MapTestEndpoints(WebApplication app)

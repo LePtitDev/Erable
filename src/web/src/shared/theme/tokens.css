@@ -1,0 +1,178 @@
+/*
+ * Design tokens: the only place where literal colors are allowed (enforced by stylelint).
+ * Source: mockups/Erable — Wiki local.html (`theme(dark)` of each screen), consolidated in tasks/M0-05.
+ *
+ * Themes: `:root` is light; `data-theme="dark"` forces dark; `data-theme="system"` follows the OS live.
+ * The dark block is written twice (forced and system); tokens.test.ts checks both copies are identical.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-bg: #f4f5f2;
+  --color-surface: #fff;
+  --color-sunken: #eceee9;
+  --color-hover: #e9ece6;
+  --color-border: #dce0d8;
+  --color-border-strong: #c3c9c0;
+  --color-editor-bg: #fff;
+  --color-editor-line: #f4f7f3;
+
+  /* Text */
+  --color-text: #1a1e1b;
+  --color-text-muted: #545c56;
+  --color-text-faint: #646c66; /* mockup #737B75 fails AA (3.65–4.36:1) */
+
+  /* Accent and states */
+  --color-accent: #2c6a55;
+  --color-accent-soft: #e1eee8;
+  --color-accent-text: #1f513f;
+  --color-on-accent: #fff;
+  --color-danger: #b42318;
+  --color-danger-soft: #fcedeb;
+  --color-highlight: #fbe7b5;
+
+  /* Element kinds (badges P / C / Pr / L / attachments) */
+  --color-kind-page: #2a5c96;
+  --color-kind-page-soft: #e4ecf6;
+  --color-kind-category: #8a570c;
+  --color-kind-category-soft: #f7eedf;
+  --color-kind-property: #6a4ba8;
+  --color-kind-property-soft: #eee8f7;
+  --color-kind-link: #1a6a70;
+  --color-kind-link-soft: #dff0f0;
+  --color-kind-attachment: #8a4b5e;
+  --color-kind-attachment-soft: #f4e6ea;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgb(20 30 25 / 12%);
+  --shadow-pop: 0 18px 48px rgb(20 30 25 / 16%);
+
+  /* Typography */
+  --font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-content: "Source Serif 4 Variable", "Source Serif 4", georgia, serif;
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px; /* UI base */
+  --text-lg: 14px;
+  --text-xl: 15px;
+  --text-2xl: 18px;
+  --text-3xl: 22px;
+  --text-content: 19px; /* page body (serif) */
+  --text-h2: 26px;
+  --text-display: 34px;
+  --text-h1: 42px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --leading-tight: 1.15;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-content: 1.65;
+  --tracking-tight: -0.01em;
+  --tracking-caps: 0.06em;
+
+  /* Spacing (4 px grid, plus the 2/6/10 half-steps used by the mockup) */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Sizes */
+  --size-control-sm: 28px;
+  --size-control-md: 32px; /* minimum touch target (docs/architecture.md §3.1) */
+  --size-control-lg: 36px;
+  --size-bar: 40px;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-pill: 999px;
+
+  /* Focus */
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-accent);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #121513;
+  --color-surface: #191d1b;
+  --color-sunken: #0e100f;
+  --color-hover: #232825;
+  --color-border: #2a302c;
+  --color-border-strong: #3a423d;
+  --color-editor-bg: #151917;
+  --color-editor-line: #1b201e;
+  --color-text: #e6e9e5;
+  --color-text-muted: #a5ada7;
+  --color-text-faint: #878f89;
+  --color-accent: #6cc3a0;
+  --color-accent-soft: #1c3229;
+  --color-accent-text: #93d8bb;
+  --color-on-accent: #0e1a15;
+  --color-danger: #f28b82;
+  --color-danger-soft: #2e1a19;
+  --color-highlight: #4a3d16;
+  --color-kind-page: #8db7ea;
+  --color-kind-page-soft: #1c2838;
+  --color-kind-category: #e0a955;
+  --color-kind-category-soft: #2e2518;
+  --color-kind-property: #b49beb;
+  --color-kind-property-soft: #2a2238;
+  --color-kind-link: #6cc9ce;
+  --color-kind-link-soft: #17302f;
+  --color-kind-attachment: #e39ab0;
+  --color-kind-attachment-soft: #36212a;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 50%);
+  --shadow-pop: 0 18px 48px rgb(0 0 0 / 55%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] {
+    color-scheme: dark;
+    --color-bg: #121513;
+    --color-surface: #191d1b;
+    --color-sunken: #0e100f;
+    --color-hover: #232825;
+    --color-border: #2a302c;
+    --color-border-strong: #3a423d;
+    --color-editor-bg: #151917;
+    --color-editor-line: #1b201e;
+    --color-text: #e6e9e5;
+    --color-text-muted: #a5ada7;
+    --color-text-faint: #878f89;
+    --color-accent: #6cc3a0;
+    --color-accent-soft: #1c3229;
+    --color-accent-text: #93d8bb;
+    --color-on-accent: #0e1a15;
+    --color-danger: #f28b82;
+    --color-danger-soft: #2e1a19;
+    --color-highlight: #4a3d16;
+    --color-kind-page: #8db7ea;
+    --color-kind-page-soft: #1c2838;
+    --color-kind-category: #e0a955;
+    --color-kind-category-soft: #2e2518;
+    --color-kind-property: #b49beb;
+    --color-kind-property-soft: #2a2238;
+    --color-kind-link: #6cc9ce;
+    --color-kind-link-soft: #17302f;
+    --color-kind-attachment: #e39ab0;
+    --color-kind-attachment-soft: #36212a;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 50%);
+    --shadow-pop: 0 18px 48px rgb(0 0 0 / 55%);
+  }
+}

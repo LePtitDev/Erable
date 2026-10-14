@@ -20,7 +20,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M0-02](M0-02-web-scaffolding.md) | SPA React/TS : outillage | — | review |
 | [M0-03](M0-03-server-host.md) | Hôte serveur, `/api/info`, service de la SPA | M0-01, M0-02 | review |
 | [M0-04](M0-04-openapi-client.md) | OpenAPI, client TS généré, contrôles de dérive | M0-03 | review |
-| [M0-05](M0-05-design-tokens-theme.md) | Tokens de design et thèmes | M0-02 | todo |
+| [M0-05](M0-05-design-tokens-theme.md) | Tokens de design et thèmes | M0-02 | review |
 | [M0-06](M0-06-i18n.md) | Internationalisation | M0-02 | todo |
 | [M0-07](M0-07-desktop-shell.md) | Shell Photino et sécurité loopback | M0-03 | todo |
 | [M0-08](M0-08-webview-spike.md) | Spike WebKitGTK / WKWebView | M0-07 | todo |

@@ -1,0 +1,32 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-css-modules"],
+  "rules": {
+    "color-no-hex": true,
+    "color-named": "never",
+    "function-disallowed-list": [
+      "rgb",
+      "rgba",
+      "hsl",
+      "hsla",
+      "hwb",
+      "lab",
+      "lch",
+      "oklab",
+      "oklch",
+      "color",
+      "light-dark"
+    ],
+    "selector-class-pattern": "^[a-z][a-zA-Z0-9]*$",
+    "custom-property-pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+    "custom-property-empty-line-before": null
+  },
+  "overrides": [
+    {
+      "files": ["src/shared/theme/tokens.css"],
+      "rules": {
+        "color-no-hex": null,
+        "function-disallowed-list": null
+      }
+    }
+  ]
+}

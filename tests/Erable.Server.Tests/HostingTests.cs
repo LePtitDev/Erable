@@ -52,7 +52,21 @@ public sealed class HostingTests
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.ShouldBe("text/html");
-        (await response.Content.ReadAsStringAsync(Ct)).ShouldBe(TestBackend.IndexHtml);
+        (await response.Content.ReadAsStringAsync(Ct)).ShouldContain("<div id=\"root\">");
+        response.Headers.CacheControl?.NoCache.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData("/")]
+    [InlineData("/index.html")]
+    [InlineData("/some/client/route")]
+    public async Task Get_SpaShell_CarriesThemeBeforeFirstPaint(string path)
+    {
+        await using var backend = await TestBackend.StartAsync();
+
+        var html = await backend.Client.GetStringAsync(new Uri(path, UriKind.Relative), Ct);
+
+        html.ShouldContain("<html data-theme=\"system\">");
     }
 
     [Fact]
