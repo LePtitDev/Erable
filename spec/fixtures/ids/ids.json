@@ -1,0 +1,25 @@
+{
+  "description": "ElementId text format (docs/architecture.md §4): canonical = 16 upper-case hex characters, reading is case-insensitive, 0 is reserved. `display` is the grouped form (F03.R1).",
+  "cases": [
+    { "name": "canonical", "input": "3F2A9C14E07B5D21", "valid": true, "canonical": "3F2A9C14E07B5D21", "display": "3F2A 9C14 E07B 5D21" },
+    { "name": "lower case accepted", "input": "3f2a9c14e07b5d21", "valid": true, "canonical": "3F2A9C14E07B5D21", "display": "3F2A 9C14 E07B 5D21" },
+    { "name": "mixed case accepted", "input": "7a1C4e90B3f2D615", "valid": true, "canonical": "7A1C4E90B3F2D615", "display": "7A1C 4E90 B3F2 D615" },
+    { "name": "leading zeros kept", "input": "0000000000000001", "valid": true, "canonical": "0000000000000001", "display": "0000 0000 0000 0001" },
+    { "name": "maximum value", "input": "FFFFFFFFFFFFFFFF", "valid": true, "canonical": "FFFFFFFFFFFFFFFF", "display": "FFFF FFFF FFFF FFFF" },
+    { "name": "sign bit set (negative in SQLite)", "input": "8000000000000000", "valid": true, "canonical": "8000000000000000", "display": "8000 0000 0000 0000" },
+    { "name": "above 2^53 (lost by a JS number)", "input": "0020000000000001", "valid": true, "canonical": "0020000000000001", "display": "0020 0000 0000 0001" },
+    { "name": "zero is reserved", "input": "0000000000000000", "valid": false },
+    { "name": "15 characters", "input": "3F2A9C14E07B5D2", "valid": false },
+    { "name": "17 characters", "input": "3F2A9C14E07B5D210", "valid": false },
+    { "name": "empty", "input": "", "valid": false },
+    { "name": "display form with spaces", "input": "3F2A 9C14 E07B 5D21", "valid": false },
+    { "name": "leading space", "input": " 3F2A9C14E07B5D2", "valid": false },
+    { "name": "trailing space", "input": "3F2A9C14E07B5D2 ", "valid": false },
+    { "name": "non-hex letter", "input": "3F2A9C14E07B5D2G", "valid": false },
+    { "name": "0x prefix", "input": "0x3F2A9C14E07B5D", "valid": false },
+    { "name": "sign", "input": "-3F2A9C14E07B5D2", "valid": false },
+    { "name": "plus sign", "input": "+3F2A9C14E07B5D2", "valid": false },
+    { "name": "full-width digit", "input": "3F2A9C14E07B5D2１", "valid": false },
+    { "name": "Arabic-Indic digit", "input": "3F2A9C14E07B5D2٣", "valid": false }
+  ]
+}

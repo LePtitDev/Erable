@@ -1,8 +1,0 @@
-{
-  "description": "Infrastructure example (M0-09): proves that xUnit and Vitest run the same file. Delete once ids.json exists (M1-01).",
-  "cases": [
-    { "name": "zero", "a": 0, "b": 0, "sum": 0 },
-    { "name": "positive", "a": 2, "b": 3, "sum": 5 },
-    { "name": "negative", "a": -4, "b": 1, "sum": -3 }
-  ]
-}

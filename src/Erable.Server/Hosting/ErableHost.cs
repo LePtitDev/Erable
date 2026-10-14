@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Erable.Core;
 using Erable.Server.Api;
 using Erable.Server.Native;
 using Erable.Server.Security;
@@ -22,6 +23,9 @@ public static class ErableHost
 
     /// <summary>Minimum session token length in characters (hex: 128 bits).</summary>
     public const int MinimumTokenLength = 32;
+
+    /// <summary>OpenAPI <c>format</c> of element IDs, mapped to the branded <c>ElementId</c> type in TypeScript.</summary>
+    public const string ElementIdSchemaFormat = "element-id";
 
     /// <summary>True when the <c>/_test</c> endpoints are compiled in (never in Release builds).</summary>
     public static bool TestEndpointsCompiled =>
@@ -74,6 +78,17 @@ public static class ErableHost
             });
             openApi.AddSchemaTransformer((schema, context, _) =>
             {
+                // ElementId is carried by a custom JsonConverter, invisible to the generator: always a string
+                // (docs/architecture.md §4). The format lets the TypeScript generator map it to the branded type.
+                if (context.JsonTypeInfo.Type == typeof(ElementId))
+                {
+                    schema.Type = JsonSchemaType.String;
+                    schema.Pattern = ElementId.Pattern;
+                    schema.Format = ElementIdSchemaFormat;
+                    schema.Properties?.Clear();
+                    return Task.CompletedTask;
+                }
+
                 // Enums are serialized as strings (JsonStringEnumConverter) but the generator omits their type.
                 if (context.JsonTypeInfo.Type.IsEnum && schema.Enum is { Count: > 0 })
                 {

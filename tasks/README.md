@@ -31,7 +31,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 ### M1 — Cœur local
 | ID | Tâche | Dépend de | Statut |
 |---|---|---|---|
-| [M1-01](M1-01-element-id.md) | `ElementId` (C# + TS + fixtures) | M0-09 | todo |
+| [M1-01](M1-01-element-id.md) | `ElementId` (C# + TS + fixtures) | M0-09 | review |
 | [M1-02](M1-02-tree-domain.md) | Domaine : éléments et arbre | M1-01 | todo |
 | [M1-03](M1-03-project-storage.md) | Format de projet, SQLite, migrations | M1-02 | todo |
 | [M1-04](M1-04-markdown-references.md) | Grammaire `[[ID]]` : parseurs C# et TS | M1-01 | todo |

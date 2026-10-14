@@ -12,6 +12,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import openapiTS, { astToString } from "openapi-typescript";
 import { format, resolveConfig } from "prettier";
+import ts from "typescript";
 
 const webDir = resolve(import.meta.dirname, "..");
 const repoDir = resolve(webDir, "..", "..");
@@ -25,6 +26,14 @@ const header = `/**
  */
 
 `;
+const elementIdImport = `import type { ElementId } from "../shared/ids/elementId";
+
+`;
+
+// OpenAPI format published by the backend for element IDs (ErableHost.ElementIdSchemaFormat): every such field
+// gets the branded type, obtainable only through parseElementId() (docs/architecture.md §4).
+const elementIdFormat = "element-id";
+const elementIdType = ts.factory.createTypeReferenceNode("ElementId");
 
 function exportDocument(target) {
   execFileSync(
@@ -45,9 +54,15 @@ function exportDocument(target) {
 }
 
 async function generateSchema(documentFile) {
-  const ast = await openapiTS(pathToFileURL(documentFile), { alphabetize: true });
+  const ast = await openapiTS(pathToFileURL(documentFile), {
+    alphabetize: true,
+    transform: (schema) => (schema.format === elementIdFormat ? elementIdType : undefined),
+  });
   const prettierConfig = (await resolveConfig(schemaPath)) ?? {};
-  return format(header + astToString(ast), { ...prettierConfig, parser: "typescript" });
+  const body = astToString(ast);
+  // Imported only when used: an unused import would fail `noUnusedLocals`.
+  const imports = /\bElementId\b/.test(body) ? elementIdImport : "";
+  return format(header + imports + body, { ...prettierConfig, parser: "typescript" });
 }
 
 const readOrEmpty = (path) => {
