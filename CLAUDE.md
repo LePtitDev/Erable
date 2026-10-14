@@ -127,8 +127,6 @@ Erable/
 ├─ docs/ · mockups/ · tasks/
 ```
 
-> `docs/features.md` §1.3 écrit `web/e2e/` : il s'agit de `src/web/e2e/` (cf. `tasks/README.md`, point P-01).
-
 ---
 
 ## 8. Conventions
@@ -163,6 +161,15 @@ Erable/
 dotnet build Erable.sln
 dotnet test --solution Erable.sln
 dotnet test --project tests/Erable.Core.Tests          # un seul projet
+
+# SPA (pnpm épinglé par `packageManager` : utiliser Corepack, `corepack pnpm …` si les shims ne sont pas activés)
+pnpm -C src/web install
+pnpm -C src/web dev              # Vite sur :5173, proxy /api → http://localhost:5080
+pnpm -C src/web build            # affiche la taille gzip du bundle initial
+pnpm -C src/web test             # Vitest
+pnpm -C src/web lint             # ESLint strict-type-checked, 0 avertissement
+pnpm -C src/web typecheck
+pnpm -C src/web format:check     # Prettier
 ```
 
 Environnement de développement principal : Windows (PowerShell). Le code doit rester portable (chemins via `Path.Combine`, pas de séparateur en dur, fins de ligne gérées par `.gitattributes`).

@@ -17,7 +17,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | ID | Tâche | Dépend de | Statut |
 |---|---|---|---|
 | [M0-01](M0-01-dotnet-solution.md) | Solution .NET, projets, analyseurs | — | review |
-| [M0-02](M0-02-web-scaffolding.md) | SPA React/TS : outillage | — | todo |
+| [M0-02](M0-02-web-scaffolding.md) | SPA React/TS : outillage | — | review |
 | [M0-03](M0-03-server-host.md) | Hôte serveur, `/api/info`, service de la SPA | M0-01, M0-02 | todo |
 | [M0-04](M0-04-openapi-client.md) | OpenAPI, client TS généré, contrôles de dérive | M0-03 | todo |
 | [M0-05](M0-05-design-tokens-theme.md) | Tokens de design et thèmes | M0-02 | todo |
@@ -114,7 +114,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 
 | ID | Constat | Recommandation | À trancher dans |
 |---|---|---|---|
-| **P-01** | Emplacement de la SPA incohérent : `src/web/` (§A-3) contre `web/e2e/` (features §1.3). | `src/web/`, e2e dans `src/web/e2e/`. Corriger features §1.3. | M0-02 |
+| **P-01** | Emplacement de la SPA incohérent : `src/web/` (§A-3) contre `web/e2e/` (features §1.3). | `src/web/`, e2e dans `src/web/e2e/`. Corriger features §1.3. | ✅ Tranché en M0-02 (features §1.3 corrigé) |
 | **P-02** | Racines de l'arbre : §A-5.1 cite une racine optionnelle « (Pièces jointes) », F02.R1 en fixe quatre. | Quatre racines en v1 ; les pièces jointes restent rattachées à leur page et se trouvent via la palette et la recherche. | M1-02 |
 | **P-03** | **Le port aléatoire du mode desktop change l'origine de la SPA à chaque lancement** (`http://127.0.0.1:<port>`) : `localStorage`/IndexedDB sont alors perdus d'un lancement à l'autre. Or F05.R4 (brouillons), F02.R5 (état déplié) et F15.R3 (thème sans flash) supposent un stockage persistant. | Ne rien stocker de durable côté navigateur : brouillons, état de l'arbre et préférences passent par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur. Le thème est injecté dans `index.html` par le backend. Alternative : schéma personnalisé Photino à origine fixe (plus fragile). | M0-07 |
 | **P-04** | Verrou mono-instance (F16.R2) absent du format de projet (§A-7.1). | Fichier `erable.lock` (PID, port, jeton IPC) dans le dossier du projet, ignoré par `doctor` ; la seconde instance contacte la première pour la mettre au premier plan. | M1-03 |
@@ -124,7 +124,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-08** | `projectId` dans `erable.json` : format non précisé. | Même format que `ElementId` (16 hexa), pour la cohérence des URL `/p/:projectId/…`. | M1-03 |
 | **P-09** | Le mockup d'édition affiche encore « Alt+Espace » et « fusionnés en direct », écartés par §A-11.3 et §A-8.3. | Les documents priment ; le mockup sert pour la mise en page, pas pour ces libellés. | M1-12 |
 | **P-10** | La stratégie de test est ambitieuse pour le début du projet (Stryker, NBomber, captures visuelles, fumée 3 OS dès M0). | Garder le plan, mais n'activer un outil qu'au jalon prévu en §T-16 et accepter de reporter les outils « nightly » si le coût de maintenance dépasse le bénéfice observé. | M0-09 |
-| **P-11** | pnpm 7 installé localement, version ancienne. | Fixer `packageManager: pnpm@10.x` dans `package.json` et utiliser Corepack. | M0-02 |
+| **P-11** | pnpm 7 installé localement, version ancienne. | Fixer `packageManager: pnpm@10.x` dans `package.json` et utiliser Corepack. | ✅ Tranché en M0-02 : `pnpm@10.34.6` (pnpm 12 n'est pas lançable par le Corepack 0.33 livré avec Node 22) |
 | **P-12** | Titres des tests e2e en français dans features §1.3, alors que le code est en anglais. | Titre anglais précédé de l'ID (`E2E-05-03 · Insert a link via the palette`) ; la vérification de traçabilité ne porte que sur l'ID. Déjà inscrit dans `CLAUDE.md`. | M0-09 |
 | **P-13** | `E2E-17-02` est rattaché à M1 mais commence par `Ctrl+K`, qui relève de F10 (M3). | Rattacher `E2E-17-02` à M3 (tâche M3-02) et corriger features §F17. Alternative : une recherche par nom minimale dès M1, à partir de l'arbre chargé côté client. | M1-10 |
 

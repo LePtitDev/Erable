@@ -42,7 +42,7 @@ Alors        la palette s'ouvre avec « Capitaine Orsen » en premier
 ### 1.3 Organisation du code
 
 ```
-web/e2e/
+src/web/e2e/
 ├─ fixtures/            chargement du projet de référence, utilisateurs, horloge
 ├─ pages/               page objects : HomePage, TreePanel, PageView, EditorPage,
 │                       InsertPalette, CategoryView, PropertyView, SearchPanel…
