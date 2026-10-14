@@ -12,7 +12,7 @@
 
 - **Fonctionnalité** : `F<nn>` (ex. `F05` — Édition).
 - **Règle métier** : `F<nn>.R<n>` : un comportement attendu, vérifiable, indépendant de l'UI.
-- **Scénario** : `E2E-<nn>-<nn>` (ex. `E2E-05-03`). L'ID figure **au début du titre du test Playwright**, ce qui rend la traçabilité triviale (`grep E2E-05-03`).
+- **Scénario** : `E2E-<nn>-<nn>` (ex. `E2E-05-03`). L'ID figure **au début du titre du test Playwright**, suivi d'un titre **en anglais** (le code est en anglais), ce qui rend la traçabilité triviale (`grep E2E-05-03`). Le script `pnpm -C src/web e2e:trace` vérifie la correspondance dans les deux sens.
 - Un ID n'est jamais réutilisé. Un scénario supprimé est marqué ~~barré~~ avec la raison.
 
 ### 1.2 Format d'un scénario
@@ -53,7 +53,7 @@ src/web/e2e/
 ```
 
 ```ts
-test("E2E-05-03 · Insérer un lien via la palette @pr", async ({ editor }) => { … });
+test("E2E-05-03 · Insert a link via the palette @pr", async ({ editor }) => { … });
 ```
 
 ### 1.4 Points d'appui de test (mode test uniquement)

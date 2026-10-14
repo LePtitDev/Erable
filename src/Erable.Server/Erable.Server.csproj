@@ -3,6 +3,9 @@
   <PropertyGroup>
     <AssemblyName>erable</AssemblyName>
     <RootNamespace>Erable.Server</RootNamespace>
+    <!-- The SPA is served from wwwroot/ with plain static files. The Razor "static web assets" pipeline would
+         point Development runs at a non-existent src/Erable.Server/wwwroot. -->
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
   </PropertyGroup>
 
   <!-- /_test endpoints exist only outside Release builds (CLAUDE.md §6.12). -->

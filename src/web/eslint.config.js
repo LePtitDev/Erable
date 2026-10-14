@@ -69,7 +69,21 @@ export default tseslint.config(
     },
   },
   {
-    files: ["*.config.{js,ts}", "scripts/**/*.{js,mjs,ts}"],
+    // Playwright: wait for a state, never for a duration (docs/testing.md §9.2).
+    files: ["e2e/**/*.ts"],
+    languageOptions: { globals: { ...globals.node } },
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.property.name='waitForTimeout']",
+          message: "Use web-first assertions (expect(...).toBeVisible()) instead of fixed waits.",
+        },
+      ],
+    },
+  },
+  {
+    files: ["*.config.{js,ts}", "scripts/**/*.{js,mjs,ts}", "e2e/support/**/*.mjs"],
     languageOptions: { globals: { ...globals.node } },
   },
   {

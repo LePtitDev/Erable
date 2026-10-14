@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using Erable.Server.Api;
 using Erable.Server.Tests.Infrastructure;
+using Erable.Testing;
 
 namespace Erable.Server.Tests;
 

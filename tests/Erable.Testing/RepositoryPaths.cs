@@ -1,6 +1,6 @@
-namespace Erable.Server.Tests.Infrastructure;
+namespace Erable.Testing;
 
-internal static class RepositoryPaths
+public static class RepositoryPaths
 {
     /// <summary>Repository root, found by walking up from the test binaries to <c>Erable.sln</c>.</summary>
     public static string Root { get; } = FindRoot();

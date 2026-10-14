@@ -175,6 +175,10 @@ pnpm -C src/web typecheck
 pnpm -C src/web format:check     # Prettier
 pnpm -C src/web api:generate     # exporte l'OpenAPI (dotnet) puis régénère src/api/schema.ts
 pnpm -C src/web api:check        # CI : échoue si openapi.json ou schema.ts sont périmés
+pnpm -C src/web e2e              # Playwright Chromium + WebKit contre le vrai backend (build SPA + erable serve, ERABLE_TEST_MODE=1)
+pnpm -C src/web e2e:pr           # seulement les tests @pr
+pnpm -C src/web e2e:trace        # traçabilité E2E-* ↔ tests ; `-- --enforce M1` échoue s'il manque un scénario ≤ M1
+pnpm -C src/web exec playwright install chromium webkit   # une fois par machine
 ```
 
 Environnement de développement principal : Windows (PowerShell). Le code doit rester portable (chemins via `Path.Combine`, pas de séparateur en dur, fins de ligne gérées par `.gitattributes`).

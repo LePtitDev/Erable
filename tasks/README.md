@@ -24,7 +24,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M0-06](M0-06-i18n.md) | Internationalisation | M0-02 | review |
 | [M0-07](M0-07-desktop-shell.md) | Shell Photino et sécurité loopback | M0-03 | review |
 | [M0-08](M0-08-webview-spike.md) | Spike WebKitGTK / WKWebView | M0-07 | review |
-| [M0-09](M0-09-test-infrastructure.md) | Infrastructure de test | M0-01, M0-02, M0-03 | todo |
+| [M0-09](M0-09-test-infrastructure.md) | Infrastructure de test | M0-01, M0-02, M0-03 | review |
 | [M0-10](M0-10-ci-pipeline.md) | Pipeline CI PR (3 OS) | M0-09 | todo |
 | [M0-11](M0-11-desktop-smoke.md) | Artefacts desktop et test de fumée | M0-07, M0-10 | todo |
 
@@ -123,9 +123,9 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-07** | Filtres de recherche sur valeurs **héritées** (F10.R3) : résoudre l'héritage à la volée par `WITH RECURSIVE` sur 10 000 pages risque de dépasser le budget de 100 ms. | Table dérivée `resolved_property_values` maintenue à l'écriture (comme `refs`), reconstruite par `doctor`. | M2-03 |
 | **P-08** | `projectId` dans `erable.json` : format non précisé. | Même format que `ElementId` (16 hexa), pour la cohérence des URL `/p/:projectId/…`. | M1-03 |
 | **P-09** | Le mockup d'édition affiche encore « Alt+Espace » et « fusionnés en direct », écartés par §A-11.3 et §A-8.3. | Les documents priment ; le mockup sert pour la mise en page, pas pour ces libellés. | M1-12 |
-| **P-10** | La stratégie de test est ambitieuse pour le début du projet (Stryker, NBomber, captures visuelles, fumée 3 OS dès M0). | Garder le plan, mais n'activer un outil qu'au jalon prévu en §T-16 et accepter de reporter les outils « nightly » si le coût de maintenance dépasse le bénéfice observé. | M0-09 |
+| **P-10** | La stratégie de test est ambitieuse pour le début du projet (Stryker, NBomber, captures visuelles, fumée 3 OS dès M0). | Garder le plan, mais n'activer un outil qu'au jalon prévu en §T-16 et accepter de reporter les outils « nightly » si le coût de maintenance dépasse le bénéfice observé. | ✅ Appliqué en M0-09 : seul l'outillage M0 est installé |
 | **P-11** | pnpm 7 installé localement, version ancienne. | Fixer `packageManager: pnpm@10.x` dans `package.json` et utiliser Corepack. | ✅ Tranché en M0-02 : `pnpm@10.34.6` (pnpm 12 n'est pas lançable par le Corepack 0.33 livré avec Node 22) |
-| **P-12** | Titres des tests e2e en français dans features §1.3, alors que le code est en anglais. | Titre anglais précédé de l'ID (`E2E-05-03 · Insert a link via the palette`) ; la vérification de traçabilité ne porte que sur l'ID. Déjà inscrit dans `CLAUDE.md`. | M0-09 |
+| **P-12** | Titres des tests e2e en français dans features §1.3, alors que le code est en anglais. | Titre anglais précédé de l'ID (`E2E-05-03 · Insert a link via the palette`) ; la vérification de traçabilité ne porte que sur l'ID. Déjà inscrit dans `CLAUDE.md`. | ✅ Tranché en M0-09 (features §1.1 et §1.3 corrigés) |
 | **P-13** | `E2E-17-02` est rattaché à M1 mais commence par `Ctrl+K`, qui relève de F10 (M3). | Rattacher `E2E-17-02` à M3 (tâche M3-02) et corriger features §F17. Alternative : une recherche par nom minimale dès M1, à partir de l'arbre chargé côté client. | M1-10 |
 
 ## Propositions

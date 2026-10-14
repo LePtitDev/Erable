@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Erable.Testing\Erable.Testing.csproj" />
     <ProjectReference Include="..\..\src\Erable.Server\Erable.Server.csproj" />
   </ItemGroup>
 

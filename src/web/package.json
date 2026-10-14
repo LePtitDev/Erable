@@ -19,7 +19,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "api:generate": "node scripts/api-generate.mjs",
-    "api:check": "node scripts/api-generate.mjs --check"
+    "api:check": "node scripts/api-generate.mjs --check",
+    "e2e": "playwright test",
+    "e2e:pr": "playwright test --grep @pr",
+    "e2e:trace": "node scripts/trace-e2e.mjs"
   },
   "dependencies": {
     "@fontsource-variable/source-serif-4": "5.3.1",
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.8",

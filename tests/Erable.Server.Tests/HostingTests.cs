@@ -101,6 +101,17 @@ public sealed class HostingTests
     }
 
     [Fact]
+    public async Task Start_DevelopmentEnvironment_Succeeds()
+    {
+        // Regression: the static web assets manifest pointed to a missing src/Erable.Server/wwwroot in Development.
+        await using var backend = await TestBackend.StartAsync(o => o with { EnvironmentName = "Development" });
+
+        using var response = await backend.Client.GetAsync(new Uri("/api/info", UriKind.Relative), Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
     public async Task Start_TwoHostsInSameProcess_AreIndependent()
     {
         await using var desktop = await TestBackend.StartAsync(o => o with { Mode = HostMode.Desktop });
