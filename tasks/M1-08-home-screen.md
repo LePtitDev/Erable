@@ -20,7 +20,7 @@ Créer, ouvrir et retrouver ses projets.
 
 ## Critères d'acceptation
 
-- [ ] `E2E-01-01`, `E2E-01-02`, `E2E-01-03`, `E2E-01-04` verts.
+- [x] `E2E-01-01`, `E2E-01-02`, `E2E-01-03`, `E2E-01-04` verts.
 - [x] Écran utilisable au clavier, aucune violation axe-core grave.
 - [x] Textes traduits (fr complet, en/de/es).
 
@@ -42,7 +42,7 @@ Créer, ouvrir et retrouver ses projets.
 - **Client API** : `openapi-fetch` fait passer les réponses par `Readable<T>`, type mappé profond qui **casse le type marqué `ElementId`** (il devient un objet). `unwrap()` renvoie désormais `Rebrand<T>`, qui rétablit `ElementId`. À garder en tête pour toute réponse typée à la main.
 - **Routeur** : routes typées `/`, `/p/$projectId`, `/p/$projectId/e/$elementId` ; les ID d'URL sont validés à l'entrée (`parseElementId`) ; `createAppRouter(history)` pour les tests (`renderApp(path)`). Les écrans de projet sont des emplacements vides, remplis par M1-09.
 - **Tests** : 6 tests de composants (`HomeScreen.test.tsx` : salutation, récents, introuvable + Retirer, création, format trop récent, dossier sans manifeste) ; e2e `f01-home.spec.ts` ; `a11y.spec.ts` (axe, clair et sombre). `HelloPage` de M0 supprimée, test de fumée et self-test desktop adaptés. Point d'appui `POST /_test/close` ajouté (fermer une copie pour supprimer ou modifier son dossier).
-- **État des scénarios** : `E2E-01-03` et `E2E-01-04` verts (Chromium + WebKit). `E2E-01-01` (racines de l'explorateur) et `E2E-01-02` (page affichée) dépendent de l'explorateur et de la vue de page : ils passeront avec M1-10 et M1-11, critère coché à ce moment-là.
+- **État des scénarios** : `E2E-01-03` et `E2E-01-04` verts (Chromium + WebKit). `E2E-01-01` (racines de l'explorateur) et `E2E-01-02` (page affichée) dépendent de l'explorateur et de la vue de page : verts depuis M1-10 (Chromium + WebKit).
 
 **Vérification** : `pnpm typecheck`, `lint`, `format:check`, `test` (253), `api:check` · `dotnet test --solution Erable.sln` (404) · `playwright test f01-home a11y m0-skeleton`.
 

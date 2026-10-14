@@ -940,7 +940,7 @@ Quand        je place le focus dans l'arbre et utilise ↑ ↓ → ← Entrée F
 Alors        je parcours, déplie, replie, ouvre et renomme sans souris
 Et           le lecteur d'écran annonce les nœuds (role treeitem, aria-expanded, aria-level)
 
-E2E-17-02 · Écrire une page sans souris                       P1 · @a11y · M1
+E2E-17-02 · Écrire une page sans souris                       P1 · @a11y · M3
 Quand        j'ouvre une page avec Ctrl+K, passe en édition, insère un lien avec la palette et enregistre avec Ctrl+S
 Alors        tout le parcours se fait au clavier, avec un focus toujours visible
 
@@ -961,7 +961,7 @@ Alors        chaque écran du mockup, en clair et en sombre, ne présente aucune
 | Jalon | Ajoutés | Cumul | dont P0 (cumul) |
 |---|---|---|---|
 | M0 | E2E-16-01, 16-02 | 2 | 2 |
-| M1 | F01–F06, F15, F16 et F17, hors scénarios rattachés à un jalon ultérieur | 51 | 22 |
+| M1 | F01–F06, F15, F16 et F17, hors scénarios rattachés à un jalon ultérieur (dont E2E-17-02, décision P-13) | 50 | 22 |
 | M2 | F07, F08, F09, F12, plus E2E-01-05, 04-05, 05-12, 06-06 | 85 | 38 |
 | M3 | F10, F11, F13 | 101 | 44 |
 | M4 | F14, plus E2E-01-06, 11-03, 16-06 | 114 | 52 |

@@ -288,10 +288,14 @@ public static class ProjectEndpoints
     // ─── Me ─────────────────────────────────────────────────────────────────
 
     /// <summary>The current user: « moi » in dates and authors, « Bonjour, … » on the home screen.</summary>
-    private static Ok<CurrentUserInfo> GetMe(UserDirectory users, ErableHostOptions options, HttpContext http)
+    private static Ok<CurrentUserInfo> GetMe(UserDirectory users, ErableHostOptions options, UserProfiles profiles, HttpContext http)
     {
         var id = CurrentUser.Id(http);
-        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id), DefaultProjectsFolder(options)));
+        // An e2e test creates its projects in its own folder: tests in parallel never collide.
+        var folder = profiles.TestSlotOf(http) is { } slot
+            ? Path.Combine(options.DataDirectory ?? Path.GetTempPath(), "e2e", slot, "projects")
+            : DefaultProjectsFolder(options);
+        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id), folder));
     }
 
     /// <summary>Desktop: <c>Documents/Erable</c>; server: <c>&lt;data&gt;/projects</c> (docs/architecture.md §7.1).</summary>

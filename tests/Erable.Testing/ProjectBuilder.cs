@@ -54,29 +54,29 @@ public sealed partial class ProjectBuilder
     }
 
     /// <summary>A folder, under <paramref name="under"/> (a name) or the root of <paramref name="root"/>'s kind.</summary>
-    public ProjectBuilder WithFolder(string name, string? under = null, ElementKind root = ElementKind.Page, string? id = null) =>
-        Add(name, ElementKind.Folder, under ?? RootName(root), id, null, null);
+    public ProjectBuilder WithFolder(string name, string? under = null, ElementKind root = ElementKind.Page, string? id = null, string? key = null) =>
+        Add(name, ElementKind.Folder, under ?? RootName(root), id, null, null, key);
 
     public ProjectBuilder WithPage(string name, string? under = null, string? id = null, string? markdown = null) =>
-        Add(name, ElementKind.Page, under ?? "Pages", id, markdown, null);
+        Add(name, ElementKind.Page, under ?? "Pages", id, markdown, null, null);
 
     /// <summary>A file attached to the page <paramref name="page"/>; its name is the file name.</summary>
     public ProjectBuilder WithAttachment(string fileName, string page, byte[] content, string? id = null) =>
-        Add(fileName, ElementKind.Attachment, page, id, null, content ?? throw new ArgumentNullException(nameof(content)));
+        Add(fileName, ElementKind.Attachment, page, id, null, content ?? throw new ArgumentNullException(nameof(content)), null);
 
-    public ProjectBuilder WithCategory(string name, string? under = null, string? id = null) =>
-        Add(name, ElementKind.Category, under ?? "Catégories", id, null, null);
+    public ProjectBuilder WithCategory(string name, string? under = null, string? id = null, string? key = null) =>
+        Add(name, ElementKind.Category, under ?? "Catégories", id, null, null, key);
 
-    public ProjectBuilder WithProperty(string name, string? under = null, string? id = null) =>
-        Add(name, ElementKind.PropertyDefinition, under ?? "Propriétés", id, null, null);
+    public ProjectBuilder WithProperty(string name, string? under = null, string? id = null, string? key = null) =>
+        Add(name, ElementKind.PropertyDefinition, under ?? "Propriétés", id, null, null, key);
 
-    public ProjectBuilder WithLinkType(string name, string? under = null, string? id = null) =>
-        Add(name, ElementKind.LinkType, under ?? "Liens", id, null, null);
+    public ProjectBuilder WithLinkType(string name, string? under = null, string? id = null, string? key = null) =>
+        Add(name, ElementKind.LinkType, under ?? "Liens", id, null, null, key);
 
     /// <summary>Creation and last modification of an element already declared (defaults: the seeding time, <c>local</c>).</summary>
     public ProjectBuilder Stamped(string name, DateTimeOffset createdAt, string createdBy, DateTimeOffset? updatedAt = null, string? updatedBy = null)
     {
-        var index = _entries.FindIndex(e => e.Name == name);
+        var index = _entries.FindIndex(e => e.Key == name);
         if (index < 0)
         {
             throw new KeyNotFoundException($"No element named '{name}' in the builder.");
@@ -109,16 +109,18 @@ public sealed partial class ProjectBuilder
         return Placeholder().Replace(markdown, m => m.Groups["open"].Value + IdOf(m.Groups["name"].Value));
     }
 
-    private ProjectBuilder Add(string name, ElementKind kind, string under, string? id, string? markdown, byte[]? content)
+    /// <param name="key">Builder key of the element, when its name is not unique (two folders « Personnages »).</param>
+    private ProjectBuilder Add(string name, ElementKind kind, string under, string? id, string? markdown, byte[]? content, string? key)
     {
-        if (_ids.ContainsKey(name))
+        key ??= name;
+        if (_ids.ContainsKey(key))
         {
-            throw new ArgumentException($"Builder: '{name}' is already declared; names are the builder's keys.", nameof(name));
+            throw new ArgumentException($"Builder: '{key}' is already declared; keys (names by default) are unique.", nameof(name));
         }
 
-        var elementId = id is null ? _idFactory(name) : ElementId.Parse(id);
-        _ids[name] = elementId;
-        _entries.Add(new Entry(elementId, kind, IdOf(under), name, markdown, content, null));
+        var elementId = id is null ? _idFactory(key) : ElementId.Parse(id);
+        _ids[key] = elementId;
+        _entries.Add(new Entry(elementId, kind, IdOf(under), name, markdown, content, null) { Key = key });
         return this;
     }
 
@@ -138,5 +140,9 @@ public sealed partial class ProjectBuilder
 
     /// <summary>One declared element, in declaration order.</summary>
     public sealed record Entry(
-        ElementId Id, ElementKind Kind, ElementId ParentId, string Name, string? Markdown, byte[]? Content, Stamp? Stamp);
+        ElementId Id, ElementKind Kind, ElementId ParentId, string Name, string? Markdown, byte[]? Content, Stamp? Stamp)
+    {
+        /// <summary>Builder key (the name unless declared otherwise).</summary>
+        public string Key { get; init; } = Name;
+    }
 }

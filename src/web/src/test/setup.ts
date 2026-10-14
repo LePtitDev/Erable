@@ -5,6 +5,7 @@ import { server } from "./msw";
 
 // jsdom has no layout: the router's scroll restoration calls window.scrollTo.
 window.scrollTo = () => undefined;
+Element.prototype.scrollIntoView = () => undefined;
 
 beforeAll(() => {
   server.listen({ onUnhandledFrame: "error" });

@@ -198,7 +198,32 @@
   },
   "explorer": {
     "label": "Project explorer",
-    "title": "Explorer"
+    "title": "Explorer",
+    "filter": "Filter the tree",
+    "newPage": "New page",
+    "newSubPage": "New sub-page",
+    "newFolder": "New folder",
+    "collapseAll": "Collapse all",
+    "rename": "Rename",
+    "renameLabel": "New name",
+    "newName": {
+      "page": "Name of the new page",
+      "folder": "Name of the new folder"
+    },
+    "cut": "Move…",
+    "cutShortcut": "Ctrl+X",
+    "paste": "Move here",
+    "pasteShortcut": "Ctrl+V",
+    "cutHint": "“{{name}}” will be moved: pick the destination, then Ctrl+V (Esc to cancel).",
+    "duplicate": "Another element has this name at the same place.",
+    "recent": "Recently viewed",
+    "recentSoon": "Recently viewed elements will appear here.",
+    "refused": {
+      "root": "Roots are not moved.",
+      "crossRoot": "An element stays under its own root.",
+      "intoDescendant": "An element cannot go under one of its descendants.",
+      "invalidParent": "This location cannot contain this element."
+    }
   },
   "kinds": {
     "root": "Root",

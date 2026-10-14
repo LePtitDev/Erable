@@ -27,15 +27,11 @@ public sealed partial class UserProfiles
 
     public UserProfile Default { get; }
 
-    public UserProfile For(HttpContext? context)
-    {
-        if (_testMode && context?.Request.Cookies[TestSlotCookie] is { } slot && IsValidSlot(slot))
-        {
-            return ForTestSlot(slot);
-        }
+    public UserProfile For(HttpContext? context) => TestSlotOf(context) is { } slot ? ForTestSlot(slot) : Default;
 
-        return Default;
-    }
+    /// <summary>The e2e test slot of a request (test mode only), or null.</summary>
+    public string? TestSlotOf(HttpContext? context) =>
+        _testMode && context?.Request.Cookies[TestSlotCookie] is { } slot && IsValidSlot(slot) ? slot : null;
 
     /// <summary>Profile of an e2e test slot (test mode only).</summary>
     public UserProfile ForTestSlot(string slot)

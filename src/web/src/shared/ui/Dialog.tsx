@@ -35,7 +35,8 @@ export function Dialog({
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
     setWasOpen(open);
-    if (open) setOpener(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    if (open)
+      setOpener(document.activeElement instanceof HTMLElement ? document.activeElement : null);
   }
 
   return (

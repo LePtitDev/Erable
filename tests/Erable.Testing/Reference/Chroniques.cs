@@ -9,7 +9,7 @@ namespace Erable.Testing.Reference;
 /// The reference project « Chroniques d'Aube » (docs/features.md §2), written to <c>spec/projects/chroniques/</c> by
 /// <see cref="Write"/>. The IDs of docs/features.md §2.1 are frozen; the others are derived from the element names,
 /// so that regenerating the project after a format migration keeps every ID. Categories, properties and links join
-/// with M2.
+/// with M2 (in M1 they are bare elements of the tree).
 /// </summary>
 public static class Chroniques
 {
@@ -25,6 +25,18 @@ public static class Chroniques
     public static readonly ElementId ColGeleLieu = ElementId.Parse("8C3E1F7A90B2D446");
     public static readonly ElementId OrdreDuGivre = ElementId.Parse("9E04B6A1C8D2F570");
     public static readonly ElementId ColGeleQuete = ElementId.Parse("2D8F5A7C1B9E0463");
+
+    public static readonly ElementId Entite = ElementId.Parse("E1A0000000000001");
+    public static readonly ElementId Personnage = ElementId.Parse("E1A0000000000002");
+    public static readonly ElementId Pnj = ElementId.Parse("0D7EA95162C3B804");
+    public static readonly ElementId Niveau = ElementId.Parse("44B107E9C2A63F58");
+
+    private static readonly string[] StructureKeys =
+    [
+        "Entité", "Personnage", "Catégorie PNJ", "Marchand", "Garde", "Érudit", "Joueur", "Créature", "Catégorie Région",
+        "Quête", "Faction", "Propriétés/Personnages", "Niveau", "Rôle", "Âge", "Points de vie", "Hostile", "Monde",
+        "Propriété Région", "Réputation", "Allié de", "Situé à", "Mentor de",
+    ];
 
     /// <summary>Test clock: 13 October 2026, 10:00 Europe/Paris (docs/features.md §1.4).</summary>
     public static readonly DateTimeOffset Now = new(2026, 10, 13, 8, 0, 0, TimeSpan.Zero);
@@ -114,6 +126,38 @@ public static class Chroniques
 
         p.WithAttachment("portrait_ilsa.png", "Ilsa Varenne", Asset("portrait_ilsa.png"))
             .Stamped("portrait_ilsa.png", Date(2026, 3, 12, 11, 0), "malo");
+
+        // Structure (docs/features.md §2.1): bare elements of the tree in M1; their descriptions, values, rules and
+        // links join with M2. Categories are flat: their inheritance is a property of the category (M2), not a tree
+        // position. Keys disambiguate the names used twice (« Région », « Personnages », « PNJ »).
+        p.WithCategory("Entité", id: Entite.ToString());
+        p.WithCategory("Personnage", id: Personnage.ToString());
+        p.WithCategory("PNJ", id: Pnj.ToString(), key: "Catégorie PNJ");
+        p.WithCategory("Marchand");
+        p.WithCategory("Garde");
+        p.WithCategory("Érudit");
+        p.WithCategory("Joueur");
+        p.WithCategory("Créature");
+        p.WithCategory("Région", key: "Catégorie Région");
+        p.WithCategory("Quête");
+        p.WithCategory("Faction");
+        p.WithFolder("Personnages", under: "Propriétés", key: "Propriétés/Personnages");
+        p.WithProperty("Niveau", under: "Propriétés/Personnages", id: Niveau.ToString());
+        p.WithProperty("Rôle", under: "Propriétés/Personnages");
+        p.WithProperty("Âge", under: "Propriétés/Personnages");
+        p.WithProperty("Points de vie", under: "Propriétés/Personnages");
+        p.WithProperty("Hostile", under: "Propriétés/Personnages");
+        p.WithFolder("Monde", under: "Propriétés");
+        p.WithProperty("Région", under: "Monde", key: "Propriété Région");
+        p.WithProperty("Réputation", under: "Monde");
+        p.WithLinkType("Allié de");
+        p.WithLinkType("Situé à");
+        p.WithLinkType("Mentor de");
+        foreach (var key in StructureKeys)
+        {
+            p.Stamped(key, Date(2026, 3, 10, 9, 30), "camille");
+        }
+
         return p;
     }
 

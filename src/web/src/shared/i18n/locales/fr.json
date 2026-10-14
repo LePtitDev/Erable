@@ -202,7 +202,32 @@
   },
   "explorer": {
     "label": "Explorateur du projet",
-    "title": "Explorateur"
+    "title": "Explorateur",
+    "filter": "Filtrer l’arbre",
+    "newPage": "Nouvelle page",
+    "newSubPage": "Nouvelle sous-page",
+    "newFolder": "Nouveau dossier",
+    "collapseAll": "Tout replier",
+    "rename": "Renommer",
+    "renameLabel": "Nouveau nom",
+    "newName": {
+      "page": "Nom de la nouvelle page",
+      "folder": "Nom du nouveau dossier"
+    },
+    "cut": "Déplacer…",
+    "cutShortcut": "Ctrl+X",
+    "paste": "Déplacer ici",
+    "pasteShortcut": "Ctrl+V",
+    "cutHint": "« {{name}} » sera déplacé : choisissez la destination puis Ctrl+V (Échap pour annuler).",
+    "duplicate": "Un autre élément porte ce nom au même endroit.",
+    "recent": "Récemment consultées",
+    "recentSoon": "Les éléments consultés récemment apparaîtront ici.",
+    "refused": {
+      "root": "Les racines ne se déplacent pas.",
+      "crossRoot": "Un élément reste sous sa propre racine.",
+      "intoDescendant": "Un élément ne peut pas aller sous l’un de ses descendants.",
+      "invalidParent": "Cet emplacement ne peut pas contenir cet élément."
+    }
   },
   "kinds": {
     "root": "Racine",

@@ -40,7 +40,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-07](M1-07-reference-project.md) | Projet « Chroniques d'Aube », builders, `/_test` | M1-05, M1-06 | review |
 | [M1-08](M1-08-home-screen.md) | Écran d'accueil et projets | M1-05, M0-05, M0-06 | review |
 | [M1-09](M1-09-app-shell.md) | Coque de l'application et routage | M1-08 | review |
-| [M1-10](M1-10-explorer-tree.md) | Explorateur (arbre) | M1-09 | todo |
+| [M1-10](M1-10-explorer-tree.md) | Explorateur (arbre) | M1-09 | review |
 | [M1-11](M1-11-page-view.md) | Lecture d'une page | M1-09 | todo |
 | [M1-12](M1-12-page-editor.md) | Éditeur CodeMirror | M1-11 | todo |
 | [M1-13](M1-13-insert-palette.md) | Palette d'insertion `[[` | M1-12 | todo |
@@ -126,7 +126,9 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-10** | La stratégie de test est ambitieuse pour le début du projet (Stryker, NBomber, captures visuelles, fumée 3 OS dès M0). | Garder le plan, mais n'activer un outil qu'au jalon prévu en §T-16 et accepter de reporter les outils « nightly » si le coût de maintenance dépasse le bénéfice observé. | ✅ Appliqué en M0-09 : seul l'outillage M0 est installé |
 | **P-11** | pnpm 7 installé localement, version ancienne. | Fixer `packageManager: pnpm@10.x` dans `package.json` et utiliser Corepack. | ✅ Tranché en M0-02 : `pnpm@10.34.6` (pnpm 12 n'est pas lançable par le Corepack 0.33 livré avec Node 22) |
 | **P-12** | Titres des tests e2e en français dans features §1.3, alors que le code est en anglais. | Titre anglais précédé de l'ID (`E2E-05-03 · Insert a link via the palette`) ; la vérification de traçabilité ne porte que sur l'ID. Déjà inscrit dans `CLAUDE.md`. | ✅ Tranché en M0-09 (features §1.1 et §1.3 corrigés) |
-| **P-13** | `E2E-17-02` est rattaché à M1 mais commence par `Ctrl+K`, qui relève de F10 (M3). | Rattacher `E2E-17-02` à M3 (tâche M3-02) et corriger features §F17. Alternative : une recherche par nom minimale dès M1, à partir de l'arbre chargé côté client. | M1-10 |
+| **P-13** | `E2E-17-02` est rattaché à M1 mais commence par `Ctrl+K`, qui relève de F10 (M3). | Rattacher `E2E-17-02` à M3 (tâche M3-02) et corriger features §F17. Alternative : une recherche par nom minimale dès M1, à partir de l'arbre chargé côté client. | ✅ Tranché en M1-10 : rattaché à M3, features §F17 corrigé |
+
+| **P-14** | L'arbre de features §2.1 imbrique les catégories (Entité › Personnage › PNJ), mais le domaine (M1-02) n'autorise pas une catégorie sous une catégorie : l'héritage est un attribut (`parent_category_id`, §A-5.3). En M1, elles sont à plat sous la racine. | Garder l'arbre pour le rangement (dossiers) et montrer l'héritage dans l'écran Catégorie ; ou afficher les catégories selon leur héritage dans l'explorateur (le parent devient alors la catégorie, ce qui change F02.R2). | M2-01 |
 
 ## Propositions
 

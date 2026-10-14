@@ -11,6 +11,7 @@ import { useThemeStore } from "../../shared/theme/theme";
 import { useSystemDark } from "../../shared/theme/useSystemDark";
 import { Logo } from "../../shared/ui/Logo";
 import { PreferencesDialog } from "../home/PreferencesDialog";
+import { Explorer } from "../explorer/Explorer";
 import { NotFoundScreen } from "./ErrorScreens";
 import styles from "./ProjectShell.module.css";
 import { Splitter } from "./Splitter";
@@ -76,7 +77,7 @@ function ShellFrame({
               aria-label={t("explorer.label")}
               className={styles["explorer"]}
             >
-              <ExplorerSlot />
+              <Explorer projectId={projectId} />
             </nav>
             <Splitter
               label={t("shell.resizeExplorer")}
@@ -98,12 +99,6 @@ function ShellFrame({
       <PreferencesDialog open={preferences} onOpenChange={setPreferences} />
     </div>
   );
-}
-
-/** Replaced by the explorer tree (M1-10). */
-function ExplorerSlot() {
-  const { t } = useTranslation();
-  return <h2 className={styles["explorerTitle"]}>{t("explorer.title")}</h2>;
 }
 
 function TopBar({
