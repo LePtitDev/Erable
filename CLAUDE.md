@@ -156,6 +156,16 @@ Erable/
 
 > Tenu à jour par les tâches. Tant qu'une commande n'est pas listée ici, la découvrir dans le dépôt plutôt que l'inventer.
 
+Raccourcis (`.bat` sous Windows, `.sh` ailleurs) dans `scripts/` :
+
+```bash
+scripts/build.sh [Debug|Release]            # dépendances web, SPA, solution .NET
+scripts/run.sh [desktop|server [dossier] [port]|dev]
+scripts/test.sh [--e2e] [--desktop]         # contrôles du pipeline PR ; --desktop : publication + fumée
+```
+
+Détail des commandes :
+
 ```bash
 # .NET (SDK 10, tests sur Microsoft.Testing.Platform : `--solution` obligatoire)
 dotnet build Erable.sln
