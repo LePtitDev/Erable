@@ -54,6 +54,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetMe"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/recent-projects": {
     parameters: {
       query?: never;
@@ -379,10 +395,15 @@ export interface components {
       folder: string;
       name: string;
     };
+    CurrentUserInfo: {
+      id: string;
+      name: string;
+    };
     ElementDetails: {
       /** Format: date-time */
       createdAt: string;
       createdBy: string;
+      createdByName: string;
       deleted: boolean;
       id: components["schemas"]["ElementId"];
       kind: components["schemas"]["ElementKind"];
@@ -394,6 +415,7 @@ export interface components {
       /** Format: date-time */
       updatedAt: string;
       updatedBy: string;
+      updatedByName: string;
     };
     /** Format: element-id */
     ElementId: ElementId;
@@ -588,6 +610,26 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  GetMe: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CurrentUserInfo"];
+        };
       };
     };
   };

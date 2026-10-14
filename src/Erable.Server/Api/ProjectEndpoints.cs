@@ -3,6 +3,7 @@ using Erable.Core.Elements;
 using Erable.Core.Projects;
 using Erable.Core.Tree;
 using Erable.Server.Projects;
+using Erable.Server.Users;
 using Erable.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,7 @@ public static class ProjectEndpoints
         project.MapAttachmentEndpoints();
 
         var me = api.MapGroup("/me").WithTags("Me");
+        me.MapGet("/", GetMe).WithName("GetMe");
         me.MapGet("/recent-projects", ListRecent).WithName("ListRecentProjects");
         me.MapDelete("/recent-projects/{projectId}", RemoveRecent).WithName("RemoveRecentProject");
         me.MapPut("/recent-projects/{projectId}/last-element", RecordLastElement).WithName("RecordLastElement");
@@ -48,9 +50,10 @@ public static class ProjectEndpoints
     private static Ok<ProjectSummary[]> ListOpen(ProjectWorkspace workspace) =>
         TypedResults.Ok(workspace.OpenProjects.Select(p => Summary(p.Project)).ToArray());
 
-    private static Results<Created<ProjectSummary>, ProblemHttpResult> Create(CreateProjectRequest request, ProjectWorkspace workspace)
+    private static Results<Created<ProjectSummary>, ProblemHttpResult> Create(
+        CreateProjectRequest request, ProjectWorkspace workspace, UserProfile profile)
     {
-        var created = workspace.Create(request.Folder, request.Name, request.ContentLanguage);
+        var created = workspace.Create(request.Folder, request.Name, request.ContentLanguage, profile);
         if (!created.IsSuccess)
         {
             return Problems.From(created.Error);
@@ -60,9 +63,9 @@ public static class ProjectEndpoints
         return TypedResults.Created($"/api/v1/projects/{summary.Id}", summary);
     }
 
-    private static Results<Ok<ProjectSummary>, ProblemHttpResult> Open(OpenProjectRequest request, ProjectWorkspace workspace)
+    private static Results<Ok<ProjectSummary>, ProblemHttpResult> Open(OpenProjectRequest request, ProjectWorkspace workspace, UserProfile profile)
     {
-        var opened = workspace.Open(request.Folder);
+        var opened = workspace.Open(request.Folder, profile);
         return opened.IsSuccess ? TypedResults.Ok(Summary(opened.Value.Project)) : Problems.From(opened.Error);
     }
 
@@ -98,7 +101,7 @@ public static class ProjectEndpoints
         return TypedResults.Ok(new ProjectTree(nodes, counts));
     }
 
-    private static Results<Ok<ElementDetails>, ProblemHttpResult> GetElement(ElementId projectId, ElementId id, ProjectWorkspace workspace)
+    private static Results<Ok<ElementDetails>, ProblemHttpResult> GetElement(ElementId projectId, ElementId id, ProjectWorkspace workspace, UserDirectory users)
     {
         if (workspace.Find(projectId) is not { } service)
         {
@@ -106,12 +109,12 @@ public static class ProjectEndpoints
         }
 
         return service.GetElement(id) is { } found
-            ? TypedResults.Ok(Details(found, service))
+            ? TypedResults.Ok(Details(found, service, users))
             : Problems.ElementNotFound(id);
     }
 
     private static async Task<Results<Ok<ElementDetails>, ProblemHttpResult>> UpdateElement(
-        ElementId projectId, ElementId id, UpdateElementRequest request, ProjectWorkspace workspace, HttpContext http)
+        ElementId projectId, ElementId id, UpdateElementRequest request, ProjectWorkspace workspace, UserDirectory users, HttpContext http)
     {
         if (workspace.Find(projectId) is not { } service)
         {
@@ -120,7 +123,7 @@ public static class ProjectEndpoints
 
         var updated = await service.UpdateElementAsync(id, request.Name, request.ParentId, request.Index, CurrentUser.Id(http), http.RequestAborted)
             .ConfigureAwait(false);
-        return updated.IsSuccess ? TypedResults.Ok(Details(service.GetElement(id)!, service)) : Problems.From(updated.Error);
+        return updated.IsSuccess ? TypedResults.Ok(Details(service.GetElement(id)!, service, users)) : Problems.From(updated.Error);
     }
 
     private static Results<Ok<BacklinkItem[]>, ProblemHttpResult> GetBacklinks(ElementId projectId, ElementId id, ProjectWorkspace workspace)
@@ -178,7 +181,7 @@ public static class ProjectEndpoints
     }
 
     private static async Task<Results<Created<ElementDetails>, ProblemHttpResult>> CreateFolder(
-        ElementId projectId, CreateFolderRequest request, ProjectWorkspace workspace, HttpContext http)
+        ElementId projectId, CreateFolderRequest request, ProjectWorkspace workspace, UserDirectory users, HttpContext http)
     {
         if (workspace.Find(projectId) is not { } service)
         {
@@ -189,14 +192,14 @@ public static class ProjectEndpoints
             ElementKind.Folder, request.ParentId, request.Name, request.Index, CurrentUser.Id(http), cancellationToken: http.RequestAborted)
             .ConfigureAwait(false);
         return created.IsSuccess
-            ? TypedResults.Created($"/api/v1/projects/{projectId}/elements/{created.Value.Id}", Details(service.GetElement(created.Value.Id)!, service))
+            ? TypedResults.Created($"/api/v1/projects/{projectId}/elements/{created.Value.Id}", Details(service.GetElement(created.Value.Id)!, service, users))
             : Problems.From(created.Error);
     }
 
     // ─── Pages ──────────────────────────────────────────────────────────────
 
     private static async Task<Results<Created<ElementDetails>, ProblemHttpResult>> CreatePage(
-        ElementId projectId, CreatePageRequest request, ProjectWorkspace workspace, HttpContext http)
+        ElementId projectId, CreatePageRequest request, ProjectWorkspace workspace, UserDirectory users, HttpContext http)
     {
         if (workspace.Find(projectId) is not { } service)
         {
@@ -207,11 +210,11 @@ public static class ProjectEndpoints
             ElementKind.Page, request.ParentId, request.Name, request.Index, CurrentUser.Id(http), request.Markdown, http.RequestAborted)
             .ConfigureAwait(false);
         return created.IsSuccess
-            ? TypedResults.Created($"/api/v1/projects/{projectId}/pages/{created.Value.Id}", Details(service.GetElement(created.Value.Id)!, service))
+            ? TypedResults.Created($"/api/v1/projects/{projectId}/pages/{created.Value.Id}", Details(service.GetElement(created.Value.Id)!, service, users))
             : Problems.From(created.Error);
     }
 
-    private static Results<Ok<PageView>, ProblemHttpResult> GetPage(ElementId projectId, ElementId id, ProjectWorkspace workspace)
+    private static Results<Ok<PageView>, ProblemHttpResult> GetPage(ElementId projectId, ElementId id, ProjectWorkspace workspace, UserDirectory users)
     {
         if (workspace.Find(projectId) is not { } service)
         {
@@ -230,7 +233,7 @@ public static class ProjectEndpoints
             ? tree.Children(id).Where(n => n.Kind == ElementKind.Page).Select(n => new ChildPage(n.Id, n.Name)).ToArray()
             : [];
         var attachments = repository.GetAttachments(id).Select(AttachmentItem.From).ToArray();
-        return TypedResults.Ok(new PageView(Details(found, service), content?.Markdown ?? string.Empty, subPages, attachments));
+        return TypedResults.Ok(new PageView(Details(found, service, users), content?.Markdown ?? string.Empty, subPages, attachments));
     }
 
     private static Results<Ok<PageContent>, ProblemHttpResult> GetPageContent(
@@ -278,6 +281,15 @@ public static class ProjectEndpoints
         return TypedResults.Ok(new PageSavedResult(saved.Value.Revision, saved.Value.UpdatedAt, saved.Value.UpdatedBy));
     }
 
+    // ─── Me ─────────────────────────────────────────────────────────────────
+
+    /// <summary>The current user: « moi » in dates and authors, « Bonjour, … » on the home screen.</summary>
+    private static Ok<CurrentUserInfo> GetMe(UserDirectory users, HttpContext http)
+    {
+        var id = CurrentUser.Id(http);
+        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id)));
+    }
+
     // ─── Recent projects ────────────────────────────────────────────────────
 
     private static Ok<RecentProjectItem[]> ListRecent(UserProfile profile) =>
@@ -302,14 +314,14 @@ public static class ProjectEndpoints
         project.Manifest.ProjectId, project.Manifest.Name, project.Folder, project.Manifest.ContentLanguage,
         project.Manifest.FormatVersion, project.Manifest.CreatedAt);
 
-    private static ElementDetails Details(ElementWithPath found, ProjectService service)
+    private static ElementDetails Details(ElementWithPath found, ProjectService service, UserDirectory users)
     {
         var e = found.Element;
         var language = service.Project.Manifest.ContentLanguage;
         var name = e.Kind == ElementKind.Root && Roots.Find(e.Id) is { } root ? Roots.Label(root, language) : e.Name;
         return new ElementDetails(
             e.Id, e.Kind, e.ParentId.IsNone ? null : e.ParentId, name, e.Revision, e.CreatedAt, e.CreatedBy, e.UpdatedAt, e.UpdatedBy,
-            e.DeletedAt is not null, [.. found.Path.Select(n => PathItemOf(n, language))]);
+            e.DeletedAt is not null, [.. found.Path.Select(n => PathItemOf(n, language))], users.NameOf(e.CreatedBy), users.NameOf(e.UpdatedBy));
     }
 
     private static PathItem PathItemOf(TreeNode node, string language) => new(node.Id, node.Kind, DisplayName(node, language));

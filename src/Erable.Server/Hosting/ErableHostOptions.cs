@@ -23,6 +23,12 @@ public sealed record ErableHostOptions
     /// <summary>Enables the <c>/_test</c> endpoints. Ignored by builds compiled without them (Release).</summary>
     public bool TestMode { get; init; }
 
+    /// <summary>
+    /// <c>spec/projects</c> of the repository (test mode): reference projects copied by <c>POST /_test/reset</c> and
+    /// test users. Null outside tests.
+    /// </summary>
+    public string? FixturesDirectory { get; init; }
+
     /// <summary>Desktop smoke test mode (<c>--self-test</c>): enables <c>/api/self-test/report</c> (docs/testing.md §10).</summary>
     public bool SelfTest { get; init; }
 

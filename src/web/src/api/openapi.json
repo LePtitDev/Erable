@@ -686,6 +686,26 @@
         }
       }
     },
+    "/api/v1/me": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "GetMe",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me/recent-projects": {
       "get": {
         "tags": [
@@ -953,6 +973,21 @@
           }
         }
       },
+      "CurrentUserInfo": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "ElementDetails": {
         "required": [
           "id",
@@ -965,7 +1000,9 @@
           "updatedAt",
           "updatedBy",
           "deleted",
-          "path"
+          "path",
+          "createdByName",
+          "updatedByName"
         ],
         "type": "object",
         "properties": {
@@ -1014,6 +1051,12 @@
             "items": {
               "$ref": "#/components/schemas/PathItem"
             }
+          },
+          "createdByName": {
+            "type": "string"
+          },
+          "updatedByName": {
+            "type": "string"
           }
         }
       },

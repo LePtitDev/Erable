@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Erable.Core\Erable.Core.csproj" />
+    <ProjectReference Include="..\..\src\Erable.Storage\Erable.Storage.csproj" />
   </ItemGroup>
 
 </Project>

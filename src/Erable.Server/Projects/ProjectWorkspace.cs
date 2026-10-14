@@ -8,7 +8,7 @@ namespace Erable.Server.Projects;
 /// The projects open in this backend (desktop: the ones the user opened; server mode M1: same model, M4 brings
 /// accounts and a project registry). A project stays open, and locked, until the host stops.
 /// </summary>
-public sealed class ProjectWorkspace(TimeProvider clock, UserProfile profile) : IDisposable
+public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
 {
     private readonly ConcurrentDictionary<ElementId, ProjectService> _open = new();
     private readonly Lock _gate = new();
@@ -17,19 +17,21 @@ public sealed class ProjectWorkspace(TimeProvider clock, UserProfile profile) : 
 
     public ProjectService? Find(ElementId projectId) => _open.GetValueOrDefault(projectId);
 
-    /// <summary>Creates a project and opens it.</summary>
-    public Result<ProjectService> Create(string folder, string name, string contentLanguage)
+    /// <summary>Creates a project, opens it and puts it first in the recent projects of <paramref name="profile"/>.</summary>
+    public Result<ProjectService> Create(string folder, string name, string contentLanguage, UserProfile profile)
     {
+        ArgumentNullException.ThrowIfNull(profile);
         lock (_gate)
         {
             var created = ProjectStore.Create(folder, name, contentLanguage, clock);
-            return created.IsSuccess ? Register(created.Value) : created.Error;
+            return created.IsSuccess ? Register(created.Value, profile) : created.Error;
         }
     }
 
     /// <summary>Opens a project, or returns it when this backend already has it open.</summary>
-    public Result<ProjectService> Open(string folder)
+    public Result<ProjectService> Open(string folder, UserProfile profile)
     {
+        ArgumentNullException.ThrowIfNull(profile);
         lock (_gate)
         {
             var full = Path.GetFullPath(folder);
@@ -41,7 +43,7 @@ public sealed class ProjectWorkspace(TimeProvider clock, UserProfile profile) : 
             }
 
             var opened = ProjectStore.Open(full, clock);
-            return opened.IsSuccess ? Register(opened.Value) : opened.Error;
+            return opened.IsSuccess ? Register(opened.Value, profile) : opened.Error;
         }
     }
 
@@ -73,7 +75,7 @@ public sealed class ProjectWorkspace(TimeProvider clock, UserProfile profile) : 
         }
     }
 
-    private Result<ProjectService> Register(OpenedProject project)
+    private Result<ProjectService> Register(OpenedProject project, UserProfile profile)
     {
         if (_open.TryGetValue(project.Manifest.ProjectId, out var other))
         {

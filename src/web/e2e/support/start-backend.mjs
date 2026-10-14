@@ -42,7 +42,13 @@ const server = spawn(
   ],
   {
     stdio: "inherit",
-    env: { ...process.env, ERABLE_TEST_MODE: "1", ASPNETCORE_ENVIRONMENT: "Development" },
+    env: {
+      ...process.env,
+      ERABLE_TEST_MODE: "1",
+      // Reference projects copied by POST /_test/reset, and the test users.
+      ERABLE_TEST_FIXTURES: resolve(webDir, "..", "..", "spec", "projects"),
+      ASPNETCORE_ENVIRONMENT: "Development",
+    },
   },
 );
 for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => server.kill(signal));

@@ -60,10 +60,11 @@ test("E2E-05-03 · Insert a link via the palette @pr", async ({ editor }) => { �
 
 Le backend démarré avec `ERABLE_TEST_MODE=1` (jamais actif dans un build Release) expose :
 
-- `POST /_test/reset?fixture=chroniques` : recharge le projet de référence (copie de fichiers, < 100 ms) ;
+- `POST /_test/reset?fixture=chroniques&slot=<test>` : recharge le projet de référence (copie de fichiers, < 100 ms). Chaque `slot` (un par test) reçoit sa propre copie, avec un `projectId` neuf, et son propre profil (cookie `erable-test-slot`) : les tests s'exécutent en parallèle contre un seul backend ;
 - `POST /_test/clock` : fixe l'horloge (`TimeProvider`), pour que les dates (« il y a 2 h ») soient stables ;
 - `POST /_test/login-as/{user}` : ouvre une session sans passer par le formulaire. Le formulaire de connexion est testé une seule fois, en `E2E-14-01`.
-- `GET /_test/blobs` : liste les blobs stockés (vérification de la déduplication).
+- `GET /_test/blobs?projectId=…` : liste les blobs stockés (vérification de la déduplication) ;
+- `POST /_test/limits` : change la taille maximale des pièces jointes (E2E-06-07).
 
 **Horloge par défaut des tests : 13 octobre 2026, 10:00 (Europe/Paris).**
 

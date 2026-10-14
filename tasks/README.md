@@ -37,7 +37,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-04](M1-04-markdown-references.md) | Grammaire `[[ID]]` : parseurs C# et TS | M1-01 | review |
 | [M1-05](M1-05-pages-api.md) | API arbre, éléments, pages, refs, révisions | M1-03, M1-04, M0-04 | review |
 | [M1-06](M1-06-attachments-backend.md) | Blobs et pièces jointes (backend) | M1-05 | review |
-| [M1-07](M1-07-reference-project.md) | Projet « Chroniques d'Aube », builders, `/_test` | M1-05, M1-06 | todo |
+| [M1-07](M1-07-reference-project.md) | Projet « Chroniques d'Aube », builders, `/_test` | M1-05, M1-06 | review |
 | [M1-08](M1-08-home-screen.md) | Écran d'accueil et projets | M1-05, M0-05, M0-06 | todo |
 | [M1-09](M1-09-app-shell.md) | Coque de l'application et routage | M1-08 | todo |
 | [M1-10](M1-10-explorer-tree.md) | Explorateur (arbre) | M1-09 | todo |

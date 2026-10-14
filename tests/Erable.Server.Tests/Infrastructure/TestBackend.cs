@@ -51,7 +51,13 @@ public sealed class TestBackend : IAsyncDisposable
         var data = TempDirectory.Create("erable-data-");
         await File.WriteAllTextAsync(webRoot.Combine("index.html"), IndexHtml, ct);
 
-        var options = new ErableHostOptions { Mode = HostMode.Server, WebRootPath = webRoot.Path, DataDirectory = data.Path };
+        var options = new ErableHostOptions
+        {
+            Mode = HostMode.Server,
+            WebRootPath = webRoot.Path,
+            DataDirectory = data.Path,
+            FixturesDirectory = RepositoryPaths.Combine("spec", "projects"),
+        };
         options = configure?.Invoke(options) ?? options;
         var desktop = options.Mode == HostMode.Desktop;
         if (desktop)

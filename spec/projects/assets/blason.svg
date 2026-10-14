@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="140" viewBox="0 0 120 140" onload="window.__svgExecuted=1">
+  <script>window.__svgExecuted = 1;</script>
+  <path d="M10 10 H110 V70 C110 105 85 125 60 135 C35 125 10 105 10 70 Z" fill="#2e4860" stroke="#c9a227" stroke-width="6"/>
+  <path d="M60 30 L72 60 L60 90 L48 60 Z" fill="#e8eef5"/>
+</svg>

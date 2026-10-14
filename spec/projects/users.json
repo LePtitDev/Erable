@@ -1,0 +1,10 @@
+{
+  "comment": "Test users of the reference project (docs/features.md §2.3). Passwords are added with the accounts (M4-01).",
+  "users": [
+    { "id": "admin", "name": "Admin", "role": "admin" },
+    { "id": "camille", "name": "Camille R.", "role": "editor" },
+    { "id": "malo", "name": "Malo L.", "role": "editor" },
+    { "id": "lea", "name": "Léa M.", "role": "reader" },
+    { "id": "externe", "name": "Externe", "role": null }
+  ]
+}

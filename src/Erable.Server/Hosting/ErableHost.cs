@@ -7,6 +7,7 @@ using Erable.Server.Native;
 using Erable.Server.Projects;
 using Erable.Server.Security;
 using Erable.Server.Spa;
+using Erable.Server.Users;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Json;
@@ -59,16 +60,26 @@ public static class ErableHost
         });
 
         builder.Services.AddSingleton(options);
-        builder.Services.AddSingleton(options.TimeProvider);
+        builder.Services.AddSingleton(ClockOf(options));
         builder.Services.TryAddSingleton<IThemePreferenceSource, SystemThemePreferenceSource>();
         builder.Services.TryAddSingleton<INativeBridge, UnavailableNativeBridge>();
         if (options.SelfTest)
         {
             builder.Services.AddSingleton<SelfTestChannel>();
         }
-        builder.Services.AddSingleton(_ => new UserProfile(ProfileDirectory(options)));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddSingleton<UserProfiles>();
+        builder.Services.AddScoped(services =>
+            services.GetRequiredService<UserProfiles>().For(services.GetRequiredService<IHttpContextAccessor>().HttpContext));
+        builder.Services.AddSingleton<UserDirectory>();
         builder.Services.AddSingleton<ProjectWorkspace>();
         builder.Services.AddSingleton<AttachmentSettings>();
+#if ERABLE_TEST_ENDPOINTS
+        if (options.TestMode)
+        {
+            builder.Services.AddSingleton<Testing.TestSlots>();
+        }
+#endif
         builder.Services.AddProblemDetails();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {
@@ -134,10 +145,25 @@ public static class ErableHost
     /// Per-user documents (recent projects, preferences…): the desktop data folder is the application profile itself;
     /// a server keeps them in <c>&lt;data&gt;/profile</c>.
     /// </summary>
-    private static string ProfileDirectory(ErableHostOptions options)
+    internal static string ProfileDirectory(ErableHostOptions options)
     {
         var data = options.DataDirectory ?? Path.Combine(Path.GetTempPath(), "erable-no-data");
         return options.Mode == HostMode.Desktop ? data : Path.Combine(data, "profile");
+    }
+
+    /// <summary>
+    /// The backend clock. In test mode, unless a test supplies its own, a <see cref="Testing.TestClock"/> starting at the
+    /// reference date of the e2e tests (docs/features.md §1.4), moved by <c>POST /_test/clock</c>.
+    /// </summary>
+    private static TimeProvider ClockOf(ErableHostOptions options)
+    {
+#if ERABLE_TEST_ENDPOINTS
+        if (options.TestMode && ReferenceEquals(options.TimeProvider, TimeProvider.System))
+        {
+            return new Testing.TestClock(Testing.TestClock.ReferenceDate);
+        }
+#endif
+        return options.TimeProvider;
     }
 
     private static void Validate(ErableHostOptions options)

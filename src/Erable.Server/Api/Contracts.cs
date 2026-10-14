@@ -49,7 +49,12 @@ public sealed record ElementDetails(
     DateTimeOffset UpdatedAt,
     string UpdatedBy,
     bool Deleted,
-    IReadOnlyList<PathItem> Path);
+    IReadOnlyList<PathItem> Path,
+    string CreatedByName,
+    string UpdatedByName);
+
+/// <summary>The user making the request.</summary>
+public sealed record CurrentUserInfo(string Id, string Name);
 
 /// <summary>Rename (<c>name</c>), move (<c>parentId</c>) and/or reorder (<c>index</c> among the new siblings).</summary>
 public sealed record UpdateElementRequest(string? Name = null, ElementId? ParentId = null, int? Index = null);

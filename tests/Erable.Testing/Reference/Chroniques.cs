@@ -1,0 +1,162 @@
+using System.Security.Cryptography;
+using System.Text;
+using Erable.Core;
+using Erable.Storage;
+
+namespace Erable.Testing.Reference;
+
+/// <summary>
+/// The reference project « Chroniques d'Aube » (docs/features.md §2), written to <c>spec/projects/chroniques/</c> by
+/// <see cref="Write"/>. The IDs of docs/features.md §2.1 are frozen; the others are derived from the element names,
+/// so that regenerating the project after a format migration keeps every ID. Categories, properties and links join
+/// with M2.
+/// </summary>
+public static class Chroniques
+{
+    public const string Name = "Chroniques d'Aube";
+    public const string FolderName = "chroniques";
+
+    public static readonly ElementId ProjectId = ElementId.Parse("CA0B0E5EC0A5D1E1");
+
+    public static readonly ElementId Ilsa = ElementId.Parse("3F2A9C14E07B5D21");
+    public static readonly ElementId Orsen = ElementId.Parse("7A1C4E90B3F2D615");
+    public static readonly ElementId Dragon = ElementId.Parse("C47D2B9E0F6A1388");
+    public static readonly ElementId Hautbois = ElementId.Parse("5B19C0E2A4D7F311");
+    public static readonly ElementId ColGeleLieu = ElementId.Parse("8C3E1F7A90B2D446");
+    public static readonly ElementId OrdreDuGivre = ElementId.Parse("9E04B6A1C8D2F570");
+    public static readonly ElementId ColGeleQuete = ElementId.Parse("2D8F5A7C1B9E0463");
+
+    /// <summary>Test clock: 13 October 2026, 10:00 Europe/Paris (docs/features.md §1.4).</summary>
+    public static readonly DateTimeOffset Now = new(2026, 10, 13, 8, 0, 0, TimeSpan.Zero);
+
+    public static string AssetsDirectory => RepositoryPaths.Combine("spec", "projects", "assets");
+
+    public static string CommittedDirectory => RepositoryPaths.Combine("spec", "projects", FolderName);
+
+    /// <summary>ID of an element of the reference project, by name (frozen or derived).</summary>
+    public static ElementId IdOf(string name) => Describe().IdOf(name);
+
+    /// <summary>Writes the project into <paramref name="folder"/> and returns it open.</summary>
+    public static OpenedProject Write(string folder) =>
+        ProjectSeeder.Create(Describe(), folder, Name, "fr", ProjectId, Date(2026, 3, 10, 9, 0));
+
+    public static ProjectBuilder Describe()
+    {
+        var p = Project.Build().WithIdFactory(StableId);
+
+        p.WithFolder("Personnages").Stamped("Personnages", Date(2026, 3, 10, 9, 0), "camille");
+        p.WithFolder("PNJ", under: "Personnages").Stamped("PNJ", Date(2026, 3, 10, 9, 1), "camille");
+        p.WithPage("Ilsa Varenne", under: "PNJ", id: Ilsa.ToString(), markdown: IlsaMarkdown)
+            .Stamped("Ilsa Varenne", Date(2026, 3, 12, 10, 30), "camille", Now.AddHours(-2), "camille");
+        p.WithPage("Dialogues", under: "Ilsa Varenne", markdown: """
+            Répliques d’Ilsa selon la réputation du joueur auprès de l’Ordre.
+
+            - **Méfiante** : « Les cartes ne se donnent pas, voyageur. »
+            - **Amicale** : « Le Col ne pardonne pas. Prenez celle-ci, elle est à jour. »
+            """).Stamped("Dialogues", Date(2026, 3, 20, 14, 0), "camille", Date(2026, 9, 2, 16, 0), "malo");
+        p.WithPage("Inventaire", under: "Ilsa Varenne", markdown: """
+            | Objet | Prix |
+            |---|---|
+            | Carte du Col gelé | 40 pièces |
+            | Corde de montagne | 12 pièces |
+            | Lanterne | 8 pièces |
+            """).Stamped("Inventaire", Date(2026, 3, 20, 14, 5), "camille", Date(2026, 8, 18, 11, 0), "camille");
+        p.WithPage("Capitaine Orsen", under: "PNJ", id: Orsen.ToString(), markdown: """
+            Commandant de la garnison de Hautbois, ancien camarade d’Ilsa au sein de l’Ordre.
+
+            ## Présentation
+
+            Orsen doit la vie à [[@Ilsa Varenne]], qui l’a guidé à travers le Col lors de la Longue Nuit. Il tient
+            la garnison d’une main ferme et se méfie des marchands.
+            """).Stamped("Capitaine Orsen", Date(2026, 3, 14, 11, 0), "malo", Date(2026, 10, 10, 9, 15), "malo");
+        p.WithFolder("Créatures", under: "Personnages").Stamped("Créatures", Date(2026, 3, 10, 9, 2), "camille");
+        p.WithPage("Dragon des Cimes", under: "Créatures", id: Dragon.ToString(), markdown: """
+            Gardien des sommets au-delà du Col gelé. On dit qu’il ne descend que les nuits sans lune.
+            """).Stamped("Dragon des Cimes", Date(2026, 4, 2, 15, 0), "camille", Date(2026, 9, 30, 17, 40), "camille");
+
+        p.WithFolder("Lieux").Stamped("Lieux", Date(2026, 3, 10, 9, 3), "camille");
+        p.WithPage("Hautbois", under: "Lieux", id: Hautbois.ToString(), markdown: """
+            Bourg marchand au pied du [[@Col gelé]], dernier refuge avant la montagne.
+
+            ![[@carte_hautbois.webp|Carte de Hautbois]]
+
+            ## Lieux notables
+
+            - Le comptoir d’échange de [[@Ilsa Varenne]].
+            - La garnison du [[@Capitaine Orsen]].
+            """).Stamped("Hautbois", Date(2026, 3, 10, 10, 0), "malo", Date(2026, 10, 12, 15, 0), "malo");
+        p.WithAttachment("carte_hautbois.webp", "Hautbois", Asset("carte_hautbois.webp"))
+            .Stamped("carte_hautbois.webp", Date(2026, 3, 10, 10, 5), "malo");
+        p.WithAttachment("bande_annonce.mp4", "Hautbois", Asset("bande_annonce.mp4"))
+            .Stamped("bande_annonce.mp4", Date(2026, 6, 1, 8, 0), "malo");
+        p.WithAttachment("plans.zip", "Hautbois", Asset("plans.zip"))
+            .Stamped("plans.zip", Date(2026, 6, 1, 8, 1), "malo");
+        p.WithAttachment("blason.svg", "Hautbois", Asset("blason.svg"))
+            .Stamped("blason.svg", Date(2026, 6, 1, 8, 2), "malo");
+        p.WithPage("Col gelé", under: "Lieux", id: ColGeleLieu.ToString(), markdown: """
+            Passage de haute montagne entre Hautbois et les terres du nord, fermé une bonne partie de l’hiver.
+            """).Stamped("Col gelé", Date(2026, 3, 10, 10, 30), "malo", Date(2026, 10, 1, 13, 0), "malo");
+
+        p.WithFolder("Factions").Stamped("Factions", Date(2026, 3, 10, 9, 4), "camille");
+        p.WithPage("Ordre du Givre", under: "Factions", id: OrdreDuGivre.ToString(), markdown: """
+            Ordre de cartographes et de gardiens du Col, installé à Hautbois depuis deux siècles.
+            """).Stamped("Ordre du Givre", Date(2026, 3, 11, 9, 0), "camille", Date(2026, 9, 20, 10, 0), "camille");
+
+        p.WithFolder("Quêtes").Stamped("Quêtes", Date(2026, 3, 10, 9, 5), "camille");
+        p.WithPage("Le Col gelé", under: "Quêtes", id: ColGeleQuete.ToString(), markdown: """
+            Le joueur doit franchir le col gelé avant la tempête.
+
+            ## Déroulement
+
+            1. Acheter une carte du col gelé à [[@Ilsa Varenne]].
+            2. Traverser le col gelé de nuit, en évitant le [[@Dragon des Cimes]].
+            """).Stamped("Le Col gelé", Date(2026, 5, 5, 9, 0), "camille", Date(2026, 10, 12, 9, 0), "camille");
+
+        p.WithAttachment("portrait_ilsa.png", "Ilsa Varenne", Asset("portrait_ilsa.png"))
+            .Stamped("portrait_ilsa.png", Date(2026, 3, 12, 11, 0), "malo");
+        return p;
+    }
+
+    /// <summary>Lead text, sections and embeds of the mockup « Page — lecture ».</summary>
+    private const string IlsaMarkdown = """
+        Ilsa Varenne tient le comptoir d’échange de [[@Hautbois]], au pied du Col gelé. Ancienne cartographe de l’[[@Ordre du Givre]], elle connaît chaque sentier de la région et vend ses cartes à qui sait poser les bonnes questions.
+
+        ## Présentation
+
+        Méfiante envers les soldats mais loyale envers ceux qui l’ont aidée, Ilsa partage un passé commun avec le [[@Capitaine Orsen]], qu’elle a guidé à travers le Col lors de la Longue Nuit.
+
+        ![[@portrait_ilsa.png|Portrait par Malo L.]]
+
+        ![[@carte_hautbois.webp]]
+
+        ## Histoire
+
+        Née à Hautbois, Ilsa rejoint l’Ordre à seize ans comme apprentie. Elle quitte l’Ordre après l’incendie des archives, convaincue que ses supérieurs l’ont provoqué.
+
+        ### Les années de cartographe
+
+        Ses relevés du Col gelé restent les seuls fiables. Le joueur peut les acheter dès la quête [[@Le Col gelé]].
+
+        ## Rôle dans le jeu
+
+        - Marchande de cartes et d’équipement de montagne.
+        - Donneuse de quêtes secondaires dans la région de Hautbois.
+        - Peut devenir hostile si le joueur trahit l’Ordre.
+
+        > **Note de conception** — Le prix des cartes dépend de la propriété Réputation du joueur auprès de l’Ordre.
+        """;
+
+    /// <summary>Derived from the name: stable across regenerations, never in the reserved range.</summary>
+    public static ElementId StableId(string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes("chroniques/" + name));
+        var value = BitConverter.ToUInt64(hash, 0) | 0x8000_0000_0000_0000UL;
+        return new ElementId(value);
+    }
+
+    private static byte[] Asset(string fileName) => File.ReadAllBytes(Path.Combine(AssetsDirectory, fileName));
+
+    private static DateTimeOffset Date(int year, int month, int day, int hour, int minute) =>
+        new(year, month, day, hour, minute, 0, TimeSpan.Zero);
+}

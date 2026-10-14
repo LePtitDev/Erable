@@ -42,6 +42,7 @@ public static class ErableCli
                 Address = parseResult.GetRequiredValue(address),
                 MaxAttachmentSize = parseResult.GetValue(maxAttachment) * 1024 * 1024,
                 TestMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1",
+                FixturesDirectory = Environment.GetEnvironmentVariable("ERABLE_TEST_FIXTURES"),
             };
             await using var app = ErableHost.Build(options);
             await app.StartAsync(cancellationToken).ConfigureAwait(false);
