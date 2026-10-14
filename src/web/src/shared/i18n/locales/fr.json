@@ -259,5 +259,30 @@
   "folder": {
     "empty": "Cet emplacement est vide.",
     "contents": "Contenu"
+  },
+  "page": {
+    "edit": "Modifier",
+    "toc": "Sommaire",
+    "subPages": "Sous-pages",
+    "newSubPage": "Nouvelle sous-page",
+    "newSubPageName": "Nouvelle page",
+    "sidePanel": "Panneau de la page"
+  },
+  "reference": {
+    "broken": {
+      "deleted": "Élément supprimé",
+      "unknown": "Élément introuvable",
+      "existing": ""
+    },
+    "brokenLabel": "{{text}} (lien cassé : {{reason}})"
+  },
+  "embed": {
+    "missing": "Pièce jointe supprimée",
+    "attachmentOf": "Pièce jointe de"
+  },
+  "attachments": {
+    "title": "Pièces jointes",
+    "empty": "Aucune pièce jointe.",
+    "downloadNamed": "Télécharger {{name}}"
   }
 }

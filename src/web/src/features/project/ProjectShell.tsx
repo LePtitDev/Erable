@@ -91,7 +91,7 @@ function ShellFrame({
             />
           </>
         )}
-        <main className={styles["main"]} id="main">
+        <main className={styles["main"]} id="main" data-scroll-restoration-id="main">
           <Outlet />
         </main>
       </div>

@@ -1,0 +1,232 @@
+.page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  padding: var(--space-10) clamp(20px, 4vw, 56px) 64px;
+}
+
+.article {
+  display: flex;
+  flex: 999 1 520px;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+  max-width: 760px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-content);
+  font-size: var(--text-h1);
+  font-weight: var(--weight-semibold);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-tight);
+  overflow-wrap: anywhere;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-bar);
+  height: var(--size-bar);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  color: var(--color-text);
+}
+
+/* ─── Sub-pages ──────────────────────────────────────────────────────── */
+
+.subPages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionTitle {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-h2);
+}
+
+.subGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.subCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.subCard:hover {
+  border-color: var(--color-border-strong);
+}
+
+.newSub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.newSub:hover {
+  color: var(--color-text);
+}
+
+/* ─── Side panel ─────────────────────────────────────────────────────── */
+
+.side {
+  display: flex;
+  flex: 1 1 260px;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 340px;
+}
+
+.panelSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panelTitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.panelEmpty {
+  margin: 0;
+  color: var(--color-text-faint);
+  font-size: var(--text-md);
+}
+
+.toc {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--color-border);
+  list-style: none;
+}
+
+.tocLink {
+  display: block;
+  margin-left: -2px;
+  padding: 5px var(--space-3);
+  border-left: 2px solid transparent;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  text-decoration: none;
+}
+
+.tocLink:hover {
+  color: var(--color-text);
+}
+
+.tocSub {
+  padding-left: 26px;
+  font-size: var(--text-md);
+}
+
+.tocLink[aria-current] {
+  border-left-color: var(--color-accent);
+  color: var(--color-accent-text);
+  font-weight: var(--weight-semibold);
+}
+
+.attachments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attachment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  padding: var(--space-1-5) var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.attachment:hover {
+  background: var(--color-hover);
+}
+
+.ext {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-kind-attachment-soft);
+  color: var(--color-kind-attachment);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+}
+
+.attachmentText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.attachmentName {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--text-md);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachmentName:hover {
+  text-decoration: underline;
+}
+
+.attachmentSize {
+  color: var(--color-text-faint);
+  font-size: var(--text-sm);
+}

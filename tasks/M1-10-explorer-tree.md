@@ -21,7 +21,7 @@ Un explorateur de type IDE : rapide sur 10 000 éléments, au clavier comme à l
 
 ## Critères d'acceptation
 
-- [ ] `E2E-02-01` à `E2E-02-08` et `E2E-17-01` verts.
+- [x] `E2E-02-01` à `E2E-02-08` et `E2E-17-01` verts.
 - [x] Défilement fluide et ouverture d'un nœud < 50 ms sur un arbre de 10 000 éléments (mesure locale, budget formel en M3-06).
 - [x] Tests de composant par rôle et libellé.
 
@@ -44,7 +44,7 @@ Un explorateur de type IDE : rapide sur 10 000 éléments, au clavier comme à l
 - **Projet de référence** : « Point à challenger » levé en début de tâche — E2E-02-04 et les compteurs supposent des catégories ; les catégories, propriétés et types de liens de features §2.1 sont ajoutés comme **éléments nus** de l'arbre (aucune donnée métier : M2). Le domaine (M1-02) n'autorise pas une catégorie sous une catégorie : l'héritage (Entité › Personnage › PNJ) est un attribut de la catégorie (M2), elles sont donc **à plat** sous la racine en M1 → **P-14** ouvert. `ProjectBuilder` accepte une clé distincte du nom (deux « Région », deux dossiers « Personnages »). Projet régénéré.
 - **Tests** : 10 tests de composants (racines et compteurs, flèches, Entrée, F2, création en place, refus vers une autre racine, couper-coller, recherche par saisie, révélation, filtre sans accents), 16 tests du modèle ; e2e `E2E-02-01`, `02-03` à `02-08`, `E2E-17-01`, axe. Mocks d'un projet factorisés (`src/test/projectMocks.ts`). Le dossier par défaut des nouveaux projets est propre à chaque test en mode test (deux navigateurs créaient « Atlas » au même endroit).
 - **P-13** tranché comme recommandé : E2E-17-02 commence par Ctrl+K, rattaché à M3 (features §F17 corrigé).
-- **En attente** : `E2E-02-02` vérifie le nom affiché dans la page d'Ilsa : vert avec M1-11.
+- `E2E-02-02` (nom affiché dans la page d'Ilsa) : vert depuis M1-11.
 
 **Vérification** : `pnpm typecheck`, `lint`, `format:check`, `test` (284) · `dotnet test --solution Erable.sln` (412) · `playwright test f01-home f02-tree f17-a11y a11y` (Chromium + WebKit ; tout vert sauf E2E-02-02, attendu).
 

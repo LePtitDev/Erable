@@ -41,7 +41,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-08](M1-08-home-screen.md) | Écran d'accueil et projets | M1-05, M0-05, M0-06 | review |
 | [M1-09](M1-09-app-shell.md) | Coque de l'application et routage | M1-08 | review |
 | [M1-10](M1-10-explorer-tree.md) | Explorateur (arbre) | M1-09 | review |
-| [M1-11](M1-11-page-view.md) | Lecture d'une page | M1-09 | todo |
+| [M1-11](M1-11-page-view.md) | Lecture d'une page | M1-09 | review |
 | [M1-12](M1-12-page-editor.md) | Éditeur CodeMirror | M1-11 | todo |
 | [M1-13](M1-13-insert-palette.md) | Palette d'insertion `[[` | M1-12 | todo |
 | [M1-14](M1-14-attachments-ui.md) | Pièces jointes (interface) | M1-12, M1-06 | todo |

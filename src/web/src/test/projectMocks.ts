@@ -46,6 +46,17 @@ export function chroniquesNodes(): TreeNodeItem[] {
   ];
 }
 
+function attachmentItem(a: MockAttachment) {
+  return {
+    id: a.id,
+    pageId: a.pageId,
+    fileName: a.fileName,
+    mime: a.mime,
+    size: 2686,
+    display: a.display,
+  };
+}
+
 export function details(node: TreeNodeItem, nodes: readonly TreeNodeItem[]): ElementDetails {
   const path: ElementDetails["path"] = [];
   let parent = node.parentId;
@@ -76,11 +87,21 @@ export function details(node: TreeNodeItem, nodes: readonly TreeNodeItem[]): Ele
  * Mocks the endpoints of an open project around a mutable list of nodes; returns the recorded writes.
  * `pages` gives the Markdown of the pages the test opens.
  */
+export interface MockAttachment {
+  readonly id: ElementId;
+  readonly pageId: ElementId;
+  readonly fileName: string;
+  readonly mime: string;
+  readonly display: "image" | "video" | "audio" | "pdf" | "file";
+}
+
 export function mockProject(
   options: {
     nodes?: TreeNodeItem[];
     pages?: Record<string, string>;
     uiState?: Record<string, unknown>;
+    attachments?: MockAttachment[];
+    deleted?: ElementId[];
   } = {},
 ) {
   const nodes = options.nodes ?? chroniquesNodes();
@@ -187,7 +208,49 @@ export function mockProject(
         subPages: nodes
           .filter((x) => x.parentId === node.id && x.kind === "page")
           .map((x) => ({ id: x.id, name: x.name })),
-        attachments: [],
+        attachments: (options.attachments ?? [])
+          .filter((a) => a.pageId === node.id)
+          .map(attachmentItem),
+      });
+    }),
+    http.get("/api/v1/projects/{projectId}/resolve", ({ query, response }) => {
+      const requested = query
+        .get("ids")
+        .split(",")
+        .filter((x) => x !== "");
+      return response(200).json({
+        items: requested.map((raw) => {
+          const id = requireElementId(raw);
+          const attachment = options.attachments?.find((a) => a.id === id);
+          const node = nodes.find((x) => x.id === id);
+          if (attachment !== undefined) {
+            const owner = nodes.find((x) => x.id === attachment.pageId);
+            return {
+              id,
+              state: "existing" as const,
+              kind: "attachment" as const,
+              name: attachment.fileName,
+              path:
+                owner === undefined
+                  ? []
+                  : [
+                      ...details(owner, nodes).path,
+                      { id: owner.id, kind: owner.kind, name: owner.name },
+                    ],
+              attachment: attachmentItem(attachment),
+            };
+          }
+          if (node === undefined)
+            return { id, state: "unknown" as const, kind: null, name: null, path: [] };
+          return {
+            id,
+            state:
+              options.deleted?.includes(id) === true ? ("deleted" as const) : ("existing" as const),
+            kind: node.kind,
+            name: node.name,
+            path: details(node, nodes).path,
+          };
+        }),
       });
     }),
   );

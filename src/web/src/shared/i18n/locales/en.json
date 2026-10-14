@@ -255,5 +255,30 @@
   "folder": {
     "empty": "This location is empty.",
     "contents": "Contents"
+  },
+  "page": {
+    "edit": "Edit",
+    "toc": "Contents",
+    "subPages": "Sub-pages",
+    "newSubPage": "New sub-page",
+    "newSubPageName": "New page",
+    "sidePanel": "Page panel"
+  },
+  "reference": {
+    "broken": {
+      "deleted": "Deleted element",
+      "unknown": "Element not found",
+      "existing": ""
+    },
+    "brokenLabel": "{{text}} (broken link: {{reason}})"
+  },
+  "embed": {
+    "missing": "Deleted attachment",
+    "attachmentOf": "Attachment of"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "empty": "No attachment.",
+    "downloadNamed": "Download {{name}}"
   }
 }

@@ -255,5 +255,30 @@
   "folder": {
     "empty": "Dieser Ort ist leer.",
     "contents": "Inhalt"
+  },
+  "page": {
+    "edit": "Bearbeiten",
+    "toc": "Inhalt",
+    "subPages": "Unterseiten",
+    "newSubPage": "Neue Unterseite",
+    "newSubPageName": "Neue Seite",
+    "sidePanel": "Seitenleiste der Seite"
+  },
+  "reference": {
+    "broken": {
+      "deleted": "Gelöschtes Element",
+      "unknown": "Element nicht gefunden",
+      "existing": ""
+    },
+    "brokenLabel": "{{text}} (defekter Link: {{reason}})"
+  },
+  "embed": {
+    "missing": "Gelöschter Anhang",
+    "attachmentOf": "Anhang von"
+  },
+  "attachments": {
+    "title": "Anhänge",
+    "empty": "Kein Anhang.",
+    "downloadNamed": "{{name}} herunterladen"
   }
 }

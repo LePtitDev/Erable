@@ -36,6 +36,23 @@ export function createFormatters(language: string, clock: Clock) {
       const [unit, size] = units.find(([, s]) => Math.abs(seconds) >= s) ?? ["second", 1];
       return relative.format(Math.round(seconds / size), unit);
     },
+    /** « 2,6 Ko », « 71,6 Ko », « 1,2 Mo » (binary multiples, the units people see in their file manager). */
+    size: (bytes: number) => {
+      const [value, unit] =
+        bytes < 1024
+          ? [bytes, "byte"]
+          : bytes < 1024 ** 2
+            ? [bytes / 1024, "kilobyte"]
+            : bytes < 1024 ** 3
+              ? [bytes / 1024 ** 2, "megabyte"]
+              : [bytes / 1024 ** 3, "gigabyte"];
+      return new Intl.NumberFormat(locale, {
+        style: "unit",
+        unit,
+        unitDisplay: "short",
+        maximumFractionDigits: unit === "byte" ? 0 : 1,
+      }).format(value);
+    },
     /** « 840,5 » */
     number: (value: number, options?: Intl.NumberFormatOptions) =>
       options === undefined

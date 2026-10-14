@@ -259,5 +259,30 @@
   "folder": {
     "empty": "Esta ubicación está vacía.",
     "contents": "Contenido"
+  },
+  "page": {
+    "edit": "Editar",
+    "toc": "Índice",
+    "subPages": "Subpáginas",
+    "newSubPage": "Nueva subpágina",
+    "newSubPageName": "Nueva página",
+    "sidePanel": "Panel de la página"
+  },
+  "reference": {
+    "broken": {
+      "deleted": "Elemento eliminado",
+      "unknown": "Elemento no encontrado",
+      "existing": ""
+    },
+    "brokenLabel": "{{text}} (enlace roto: {{reason}})"
+  },
+  "embed": {
+    "missing": "Adjunto eliminado",
+    "attachmentOf": "Adjunto de"
+  },
+  "attachments": {
+    "title": "Adjuntos",
+    "empty": "Ningún adjunto.",
+    "downloadNamed": "Descargar {{name}}"
   }
 }

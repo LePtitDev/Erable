@@ -36,6 +36,14 @@ export async function resetProject(
   return (await response.json()) as ResetResult;
 }
 
+interface Options {
+  /**
+   * Freeze the browser clock at the reference date (default). Performance tests turn it off: the fake clock also
+   * replaces `performance`, whose marks then record nothing.
+   */
+  fakeClock: boolean;
+}
+
 interface Fixtures {
   home: HomePage;
   /** « Chroniques d'Aube », freshly copied; the browser clock is set to the reference date. */
@@ -44,10 +52,11 @@ interface Fixtures {
   freshProfile: { readonly slot: string };
 }
 
-export const test = base.extend<Fixtures>({
-  page: async ({ page }, use) => {
+export const test = base.extend<Fixtures & Options>({
+  fakeClock: [true, { option: true }],
+  page: async ({ page, fakeClock }, use) => {
     // Dates shown as « il y a 2 h » are computed in the browser: freeze its clock like the backend one.
-    await page.clock.install({ time: referenceDate });
+    if (fakeClock) await page.clock.install({ time: referenceDate });
     await page.request.post("/_test/clock", { data: { now: null } });
     await use(page);
   },

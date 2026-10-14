@@ -1,8 +1,8 @@
 import type { ElementDetails } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
-import { FolderView } from "../project/FolderView";
+import { PageView } from "./PageView";
 
-/** Page screen: reading (M1-11) and editing (M1-12). */
+/** Page screen: reading (M1-11); editing arrives with M1-12. */
 export function PageRoute({
   projectId,
   element,
@@ -10,5 +10,5 @@ export function PageRoute({
   readonly projectId: ElementId;
   readonly element: ElementDetails;
 }) {
-  return <FolderView projectId={projectId} element={element} />;
+  return <PageView projectId={projectId} element={element} />;
 }
