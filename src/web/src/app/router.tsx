@@ -15,7 +15,7 @@ import { parseElementId, type ElementId } from "../shared/ids/elementId";
 
 const rootRoute = createRootRoute({
   component: Outlet,
-  notFoundComponent: NotFoundScreen,
+  notFoundComponent: () => <NotFoundScreen />,
   errorComponent: ErrorScreen,
 });
 

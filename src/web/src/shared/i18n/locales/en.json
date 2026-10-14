@@ -156,11 +156,79 @@
     "home": "Back to home",
     "search": "Search the project",
     "project": "Project not found",
-    "projectDescription": "This project is not open. Reopen it from the home screen."
+    "projectDescription": "This project is not open. Reopen it from the home screen.",
+    "projectHome": "Open the project",
+    "searchHint": "You can also look for the element with search (Ctrl+K)."
   },
   "errorScreen": {
     "title": "An unexpected error occurred",
     "description": "The display failed. Your saved data is not affected.",
     "reload": "Reload"
+  },
+  "shell": {
+    "home": "Erable home",
+    "breadcrumb": "Breadcrumb",
+    "showExplorer": "Show the explorer",
+    "hideExplorer": "Hide the explorer",
+    "resizeExplorer": "Explorer width",
+    "back": "Previous page",
+    "forward": "Next page",
+    "search": "Search pages, categories, properties…",
+    "searchShortcut": "Ctrl K",
+    "languageNamed": "Language: {{language}}",
+    "toggleTheme": "Toggle light / dark theme",
+    "showSidePanel": "Show the side panel",
+    "hideSidePanel": "Hide the side panel",
+    "status": {
+      "local": "Local project",
+      "pages_one": "{{count}} page",
+      "pages_other": "{{count}} pages",
+      "categories_one": "{{count}} category",
+      "categories_other": "{{count}} categories",
+      "properties_one": "{{count}} property",
+      "properties_other": "{{count}} properties",
+      "links_one": "{{count}} link type",
+      "links_other": "{{count}} link types",
+      "cursor": "Ln {{line}}, Col {{column}}"
+    },
+    "mode": {
+      "read": "Reading",
+      "edit": "Editing"
+    }
+  },
+  "explorer": {
+    "label": "Project explorer",
+    "title": "Explorer"
+  },
+  "kinds": {
+    "root": "Root",
+    "folder": "Folder",
+    "page": "Page",
+    "category": "Category",
+    "propertyDefinition": "Property",
+    "linkType": "Link type",
+    "attachment": "Attachment",
+    "short": {
+      "root": "R",
+      "folder": "F",
+      "page": "P",
+      "category": "C",
+      "propertyDefinition": "Pr",
+      "linkType": "L",
+      "attachment": "A"
+    }
+  },
+  "element": {
+    "id": "ID",
+    "copyId": "Copy the identifier {{id}}",
+    "idCopied": "Identifier copied",
+    "me": "me",
+    "modified": "Modified {{when}} by {{who}}",
+    "created": "created on {{date}}",
+    "kindScreenSoon": "The « {{kind}} » screen comes in a future version."
+  },
+  "folder": {
+    "empty": "This location is empty.",
+    "contents": "Contents"
   }
 }

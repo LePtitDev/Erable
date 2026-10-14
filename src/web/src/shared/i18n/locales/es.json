@@ -156,11 +156,83 @@
     "home": "Volver al inicio",
     "search": "Buscar en el proyecto",
     "project": "Proyecto no encontrado",
-    "projectDescription": "Este proyecto no está abierto. Vuelva a abrirlo desde el inicio."
+    "projectDescription": "Este proyecto no está abierto. Vuelva a abrirlo desde el inicio.",
+    "projectHome": "Abrir el proyecto",
+    "searchHint": "También puede buscar el elemento con la búsqueda (Ctrl+K)."
   },
   "errorScreen": {
     "title": "Se ha producido un error inesperado",
     "description": "La visualización ha fallado. Sus datos guardados no se ven afectados.",
     "reload": "Recargar"
+  },
+  "shell": {
+    "home": "Inicio de Erable",
+    "breadcrumb": "Ruta de navegación",
+    "showExplorer": "Mostrar el explorador",
+    "hideExplorer": "Ocultar el explorador",
+    "resizeExplorer": "Anchura del explorador",
+    "back": "Página anterior",
+    "forward": "Página siguiente",
+    "search": "Buscar páginas, categorías, propiedades…",
+    "searchShortcut": "Ctrl K",
+    "languageNamed": "Idioma: {{language}}",
+    "toggleTheme": "Cambiar entre tema claro y oscuro",
+    "showSidePanel": "Mostrar el panel lateral",
+    "hideSidePanel": "Ocultar el panel lateral",
+    "status": {
+      "local": "Proyecto local",
+      "pages_one": "{{count}} página",
+      "pages_other": "{{count}} páginas",
+      "categories_one": "{{count}} categoría",
+      "categories_other": "{{count}} categorías",
+      "properties_one": "{{count}} propiedad",
+      "properties_other": "{{count}} propiedades",
+      "links_one": "{{count}} tipo de enlace",
+      "links_other": "{{count}} tipos de enlace",
+      "cursor": "Lín {{line}}, Col {{column}}",
+      "pages_many": "{{count}} páginas",
+      "categories_many": "{{count}} categorías",
+      "properties_many": "{{count}} propiedades",
+      "links_many": "{{count}} tipos de enlace"
+    },
+    "mode": {
+      "read": "Lectura",
+      "edit": "Edición"
+    }
+  },
+  "explorer": {
+    "label": "Explorador del proyecto",
+    "title": "Explorador"
+  },
+  "kinds": {
+    "root": "Raíz",
+    "folder": "Carpeta",
+    "page": "Página",
+    "category": "Categoría",
+    "propertyDefinition": "Propiedad",
+    "linkType": "Tipo de enlace",
+    "attachment": "Adjunto",
+    "short": {
+      "root": "R",
+      "folder": "C",
+      "page": "P",
+      "category": "Ca",
+      "propertyDefinition": "Pr",
+      "linkType": "E",
+      "attachment": "A"
+    }
+  },
+  "element": {
+    "id": "ID",
+    "copyId": "Copiar el identificador {{id}}",
+    "idCopied": "Identificador copiado",
+    "me": "mí",
+    "modified": "Modificada {{when}} por {{who}}",
+    "created": "creada el {{date}}",
+    "kindScreenSoon": "La pantalla «{{kind}}» llegará en una próxima versión."
+  },
+  "folder": {
+    "empty": "Esta ubicación está vacía.",
+    "contents": "Contenido"
   }
 }

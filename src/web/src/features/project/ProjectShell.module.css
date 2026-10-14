@@ -1,0 +1,209 @@
+.shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+  background: var(--color-bg);
+}
+
+/* ─── Top bar ─────────────────────────────────────────────────────────── */
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: var(--space-1-5) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.iconButton,
+.textButton {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: var(--size-control-lg);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.iconButton {
+  width: var(--size-control-lg);
+}
+
+.textButton {
+  padding: 0 var(--space-2-5);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+}
+
+.iconButton:hover,
+.textButton:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.projectName {
+  padding: 0 var(--space-2);
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.history {
+  display: flex;
+  gap: var(--space-0-5);
+}
+
+.search {
+  display: flex;
+  flex: 1 1 280px;
+  align-items: center;
+  gap: var(--space-2-5);
+  max-width: 520px;
+  height: var(--size-control-lg);
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.searchText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kbd {
+  padding: var(--space-0-5) var(--space-1-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+/* ─── Body ────────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  min-height: 0;
+}
+
+.explorer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: var(--explorer-width);
+  min-height: 0;
+  padding: var(--space-4) var(--space-2-5);
+  overflow: auto;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.explorerTitle {
+  margin: 0;
+  padding: 0 var(--space-1-5);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  background: var(--color-surface);
+}
+
+/* Narrow screens: the explorer becomes a layer over the content (mobile later, docs/architecture.md §3.1). */
+@media (width <= 720px) {
+  .explorer {
+    position: absolute;
+    top: 52px;
+    bottom: 30px;
+    left: 0;
+    z-index: 10;
+    box-shadow: var(--shadow-pop);
+  }
+}
+
+/* ─── Status bar ──────────────────────────────────────────────────────── */
+
+.statusBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 30px;
+  padding: 0 var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.connection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.cursor {
+  font-family: var(--font-mono);
+}
+
+.mode {
+  margin-left: auto;
+}

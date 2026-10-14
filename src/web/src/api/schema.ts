@@ -118,6 +118,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/ui-state/{key}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetUiState"];
+    put: operations["PutUiState"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects": {
     parameters: {
       query?: never;
@@ -437,6 +453,7 @@ export interface components {
     InspectFolderRequest: {
       folder: string;
     };
+    JsonNode: unknown;
     OpenProjectRequest: {
       folder: string;
     };
@@ -686,6 +703,52 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["RecordLastElementRequest"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  GetUiState: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["JsonNode"];
+        };
+      };
+    };
+  };
+  PutUiState: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["JsonNode"];
       };
     };
     responses: {

@@ -1,0 +1,54 @@
+.badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.md {
+  width: 18px;
+  height: 18px;
+  font-size: var(--text-2xs);
+}
+
+.sm {
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+}
+
+.page,
+.root {
+  background: var(--color-kind-page-soft);
+  color: var(--color-kind-page);
+}
+
+.folder {
+  background: var(--color-sunken);
+  color: var(--color-text-muted);
+}
+
+.category {
+  background: var(--color-kind-category-soft);
+  color: var(--color-kind-category);
+}
+
+.propertyDefinition {
+  background: var(--color-kind-property-soft);
+  color: var(--color-kind-property);
+}
+
+.linkType {
+  background: var(--color-kind-link-soft);
+  color: var(--color-kind-link);
+}
+
+.attachment {
+  background: var(--color-kind-attachment-soft);
+  color: var(--color-kind-attachment);
+}

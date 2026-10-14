@@ -39,7 +39,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-06](M1-06-attachments-backend.md) | Blobs et pièces jointes (backend) | M1-05 | review |
 | [M1-07](M1-07-reference-project.md) | Projet « Chroniques d'Aube », builders, `/_test` | M1-05, M1-06 | review |
 | [M1-08](M1-08-home-screen.md) | Écran d'accueil et projets | M1-05, M0-05, M0-06 | review |
-| [M1-09](M1-09-app-shell.md) | Coque de l'application et routage | M1-08 | todo |
+| [M1-09](M1-09-app-shell.md) | Coque de l'application et routage | M1-08 | review |
 | [M1-10](M1-10-explorer-tree.md) | Explorateur (arbre) | M1-09 | todo |
 | [M1-11](M1-11-page-view.md) | Lecture d'une page | M1-09 | todo |
 | [M1-12](M1-12-page-editor.md) | Éditeur CodeMirror | M1-11 | todo |
@@ -132,4 +132,4 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 
 Améliorations proposées par les agents en cours de route, hors périmètre des tâches. Format : date · tâche d'origine · proposition · statut (proposée / acceptée / refusée).
 
-_(vide)_
+- 2026-10-14 · M1-09 · Onglets « éléments ouverts » du mockup, absents des tâches · proposée

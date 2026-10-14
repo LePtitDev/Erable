@@ -156,11 +156,83 @@
     "home": "Retour à l’accueil",
     "search": "Rechercher dans le projet",
     "project": "Projet introuvable",
-    "projectDescription": "Ce projet n’est pas ouvert. Rouvrez-le depuis l’accueil."
+    "projectDescription": "Ce projet n’est pas ouvert. Rouvrez-le depuis l’accueil.",
+    "projectHome": "Ouvrir le projet",
+    "searchHint": "Vous pouvez aussi chercher l’élément avec la recherche (Ctrl+K)."
   },
   "errorScreen": {
     "title": "Une erreur inattendue est survenue",
     "description": "L’affichage a échoué. Vos données enregistrées ne sont pas concernées.",
     "reload": "Recharger"
+  },
+  "shell": {
+    "home": "Accueil Erable",
+    "breadcrumb": "Fil d’Ariane",
+    "showExplorer": "Afficher l’explorateur",
+    "hideExplorer": "Masquer l’explorateur",
+    "resizeExplorer": "Largeur de l’explorateur",
+    "back": "Page précédente",
+    "forward": "Page suivante",
+    "search": "Rechercher pages, catégories, propriétés…",
+    "searchShortcut": "Ctrl K",
+    "languageNamed": "Langue : {{language}}",
+    "toggleTheme": "Basculer le thème clair / sombre",
+    "showSidePanel": "Afficher le panneau latéral",
+    "hideSidePanel": "Masquer le panneau latéral",
+    "status": {
+      "local": "Projet local",
+      "pages_one": "{{count}} page",
+      "pages_other": "{{count}} pages",
+      "categories_one": "{{count}} catégorie",
+      "categories_other": "{{count}} catégories",
+      "properties_one": "{{count}} propriété",
+      "properties_other": "{{count}} propriétés",
+      "links_one": "{{count}} type de lien",
+      "links_other": "{{count}} types de liens",
+      "cursor": "Ln {{line}}, Col {{column}}",
+      "pages_many": "{{count}} pages",
+      "categories_many": "{{count}} catégories",
+      "properties_many": "{{count}} propriétés",
+      "links_many": "{{count}} types de liens"
+    },
+    "mode": {
+      "read": "Lecture",
+      "edit": "Édition"
+    }
+  },
+  "explorer": {
+    "label": "Explorateur du projet",
+    "title": "Explorateur"
+  },
+  "kinds": {
+    "root": "Racine",
+    "folder": "Dossier",
+    "page": "Page",
+    "category": "Catégorie",
+    "propertyDefinition": "Propriété",
+    "linkType": "Type de lien",
+    "attachment": "Pièce jointe",
+    "short": {
+      "root": "R",
+      "folder": "D",
+      "page": "P",
+      "category": "C",
+      "propertyDefinition": "Pr",
+      "linkType": "L",
+      "attachment": "PJ"
+    }
+  },
+  "element": {
+    "id": "ID",
+    "copyId": "Copier l’identifiant {{id}}",
+    "idCopied": "Identifiant copié",
+    "me": "moi",
+    "modified": "Modifiée {{when}} par {{who}}",
+    "created": "créée le {{date}}",
+    "kindScreenSoon": "L’écran « {{kind}} » arrive dans une prochaine version."
+  },
+  "folder": {
+    "empty": "Cet emplacement est vide.",
+    "contents": "Contenu"
   }
 }

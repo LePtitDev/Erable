@@ -117,7 +117,7 @@ describe("HomeScreen", () => {
     await user.click(within(dialog).getByRole("button", { name: "Créer le projet" }));
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe(`/p/${atlasId}`);
+      expect(router.state.location.pathname.startsWith(`/p/${atlasId}`)).toBe(true);
     });
     expect(body).toEqual({
       folder: "C:\\Users\\arthur\\Documents\\Erable\\Atlas",

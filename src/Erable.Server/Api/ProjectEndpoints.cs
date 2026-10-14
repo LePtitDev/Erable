@@ -5,6 +5,7 @@ using Erable.Core.Tree;
 using Erable.Server.Hosting;
 using Erable.Server.Projects;
 using Erable.Server.Users;
+using System.Text.Json.Nodes;
 using Erable.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +44,8 @@ public static class ProjectEndpoints
         me.MapGet("/recent-projects", ListRecent).WithName("ListRecentProjects");
         me.MapDelete("/recent-projects/{projectId}", RemoveRecent).WithName("RemoveRecentProject");
         me.MapPut("/recent-projects/{projectId}/last-element", RecordLastElement).WithName("RecordLastElement");
+        me.MapGet("/ui-state/{key}", GetUiState).WithName("GetUiState");
+        me.MapPut("/ui-state/{key}", PutUiState).WithName("PutUiState");
         return api;
     }
 
@@ -320,6 +323,40 @@ public static class ProjectEndpoints
         profile.RecordLastElement(projectId, request.ElementId)
             ? TypedResults.NoContent()
             : Problems.Problem(StatusCodes.Status404NotFound, Problems.ProjectNotFound, "Not in the recent projects.");
+
+    // ─── UI state ───────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Small JSON documents of the interface (panel sizes, expanded tree nodes, drafts…), kept in the user profile
+    /// because the browser stores nothing durable (decision Q7). 404 when never written.
+    /// </summary>
+    private static Results<Ok<JsonNode>, ProblemHttpResult> GetUiState(string key, UserProfile profile)
+    {
+        if (!UiStateKey.IsValid(key))
+        {
+            return Problems.Problem(StatusCodes.Status400BadRequest, "request.invalidKey", "Keys: 1 to 100 letters, digits, '.', '-' or '_'.");
+        }
+
+        return profile.Read<JsonNode>(UiStateKey.FileOf(key)) is { } value
+            ? TypedResults.Ok(value)
+            : Problems.Problem(StatusCodes.Status404NotFound, "uiState.notFound");
+    }
+
+    private static Results<NoContent, ProblemHttpResult> PutUiState(string key, JsonNode value, UserProfile profile, HttpContext http)
+    {
+        if (!UiStateKey.IsValid(key))
+        {
+            return Problems.Problem(StatusCodes.Status400BadRequest, "request.invalidKey", "Keys: 1 to 100 letters, digits, '.', '-' or '_'.");
+        }
+
+        if (http.Request.ContentLength > UiStateKey.MaxBytes || value.ToJsonString().Length > UiStateKey.MaxBytes)
+        {
+            return Problems.Problem(StatusCodes.Status413PayloadTooLarge, "uiState.tooLarge", $"At most {UiStateKey.MaxBytes} bytes.");
+        }
+
+        profile.Write(UiStateKey.FileOf(key), value);
+        return TypedResults.NoContent();
+    }
 
     // ─── Mapping ────────────────────────────────────────────────────────────
 

@@ -1,0 +1,14 @@
+.splitter {
+  flex: none;
+  width: 6px;
+  margin: 0 -3px;
+  z-index: 1;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.splitter:hover,
+.splitter:focus-visible {
+  background: var(--color-accent-soft);
+  box-shadow: none;
+}

@@ -17,4 +17,14 @@ test.describe("a11y · axe-core per screen", () => {
       await expectNoSeriousViolations(page);
     });
   }
+
+  test("a11y · Project shell on a folder has no serious violation @pr", async ({
+    page,
+    reference,
+  }) => {
+    await page.goto(reference.url("0000000000000001"));
+    await expect(page.getByRole("heading", { level: 1, name: "Pages" })).toBeVisible();
+
+    await expectNoSeriousViolations(page);
+  });
 });

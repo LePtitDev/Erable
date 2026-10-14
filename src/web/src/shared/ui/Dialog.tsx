@@ -1,5 +1,5 @@
 import { Dialog as Radix } from "radix-ui";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import styles from "./Dialog.module.css";
 
 interface DialogProps {
@@ -29,6 +29,15 @@ export function Dialog({
   size = "md",
   alert = false,
 }: DialogProps) {
+  // Controlled dialogs have no Radix trigger to return to: remember what had the focus when it opened. Read during
+  // the render that opens it, before `autoFocus` or Radix move the focus inside.
+  const [opener, setOpener] = useState<HTMLElement | null>(null);
+  const [wasOpen, setWasOpen] = useState(false);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setOpener(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+  }
+
   return (
     <Radix.Root open={open} onOpenChange={onOpenChange}>
       <Radix.Portal>
@@ -36,6 +45,12 @@ export function Dialog({
         <Radix.Content
           className={`${styles["content"] ?? ""} ${styles[size] ?? ""}`}
           role={alert ? "alertdialog" : "dialog"}
+          onCloseAutoFocus={(event) => {
+            if (opener?.isConnected) {
+              event.preventDefault();
+              opener.focus();
+            }
+          }}
           {...(description === undefined ? { "aria-describedby": undefined } : {})}
         >
           <Radix.Title className={styles["title"]}>{title}</Radix.Title>

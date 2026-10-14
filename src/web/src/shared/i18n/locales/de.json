@@ -156,11 +156,79 @@
     "home": "Zurück zur Startseite",
     "search": "Im Projekt suchen",
     "project": "Projekt nicht gefunden",
-    "projectDescription": "Dieses Projekt ist nicht geöffnet. Öffnen Sie es erneut über die Startseite."
+    "projectDescription": "Dieses Projekt ist nicht geöffnet. Öffnen Sie es erneut über die Startseite.",
+    "projectHome": "Projekt öffnen",
+    "searchHint": "Sie können das Element auch über die Suche finden (Strg+K)."
   },
   "errorScreen": {
     "title": "Ein unerwarteter Fehler ist aufgetreten",
     "description": "Die Anzeige ist fehlgeschlagen. Ihre gespeicherten Daten sind nicht betroffen.",
     "reload": "Neu laden"
+  },
+  "shell": {
+    "home": "Erable-Startseite",
+    "breadcrumb": "Brotkrümelnavigation",
+    "showExplorer": "Explorer anzeigen",
+    "hideExplorer": "Explorer ausblenden",
+    "resizeExplorer": "Breite des Explorers",
+    "back": "Vorherige Seite",
+    "forward": "Nächste Seite",
+    "search": "Seiten, Kategorien, Eigenschaften suchen…",
+    "searchShortcut": "Strg K",
+    "languageNamed": "Sprache: {{language}}",
+    "toggleTheme": "Helles / dunkles Design umschalten",
+    "showSidePanel": "Seitenleiste anzeigen",
+    "hideSidePanel": "Seitenleiste ausblenden",
+    "status": {
+      "local": "Lokales Projekt",
+      "pages_one": "{{count}} Seite",
+      "pages_other": "{{count}} Seiten",
+      "categories_one": "{{count}} Kategorie",
+      "categories_other": "{{count}} Kategorien",
+      "properties_one": "{{count}} Eigenschaft",
+      "properties_other": "{{count}} Eigenschaften",
+      "links_one": "{{count}} Verknüpfungstyp",
+      "links_other": "{{count}} Verknüpfungstypen",
+      "cursor": "Z {{line}}, Sp {{column}}"
+    },
+    "mode": {
+      "read": "Lesen",
+      "edit": "Bearbeiten"
+    }
+  },
+  "explorer": {
+    "label": "Projekt-Explorer",
+    "title": "Explorer"
+  },
+  "kinds": {
+    "root": "Wurzel",
+    "folder": "Ordner",
+    "page": "Seite",
+    "category": "Kategorie",
+    "propertyDefinition": "Eigenschaft",
+    "linkType": "Verknüpfungstyp",
+    "attachment": "Anhang",
+    "short": {
+      "root": "W",
+      "folder": "O",
+      "page": "S",
+      "category": "K",
+      "propertyDefinition": "E",
+      "linkType": "V",
+      "attachment": "A"
+    }
+  },
+  "element": {
+    "id": "ID",
+    "copyId": "Kennung {{id}} kopieren",
+    "idCopied": "Kennung kopiert",
+    "me": "mir",
+    "modified": "Geändert {{when}} von {{who}}",
+    "created": "erstellt am {{date}}",
+    "kindScreenSoon": "Die Ansicht „{{kind}}“ folgt in einer späteren Version."
+  },
+  "folder": {
+    "empty": "Dieser Ort ist leer.",
+    "contents": "Inhalt"
   }
 }
