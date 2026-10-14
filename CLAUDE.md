@@ -163,6 +163,7 @@ dotnet test --solution Erable.sln
 dotnet test --project tests/Erable.Core.Tests          # un seul projet
 dotnet test --solution Erable.sln -c Release           # vérifie aussi l'absence de /_test en Release
 dotnet run --project src/Erable.Server -- serve <dossier> [--port 5080]   # ERABLE_TEST_MODE=1 pour /_test
+dotnet run --project src/Erable.Desktop                 # app desktop (après pnpm -C src/web build)
 
 # SPA (pnpm épinglé par `packageManager` : utiliser Corepack, `corepack pnpm …` si les shims ne sont pas activés)
 pnpm -C src/web install

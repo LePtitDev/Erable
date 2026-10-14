@@ -2,6 +2,7 @@
   <ItemGroup>
     <!-- Runtime -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
+    <PackageVersion Include="Photino.NET" Version="4.0.16" />
     <PackageVersion Include="System.CommandLine" Version="2.0.13" />
   </ItemGroup>
 

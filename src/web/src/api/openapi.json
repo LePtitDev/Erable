@@ -24,6 +24,29 @@
           }
         }
       }
+    },
+    "/api/session": {
+      "post": {
+        "tags": [
+          "erable"
+        ],
+        "operationId": "CreateDesktopSession",
+        "parameters": [
+          {
+            "name": "X-Erable-Session",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {

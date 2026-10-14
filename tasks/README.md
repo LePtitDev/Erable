@@ -22,7 +22,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M0-04](M0-04-openapi-client.md) | OpenAPI, client TS généré, contrôles de dérive | M0-03 | review |
 | [M0-05](M0-05-design-tokens-theme.md) | Tokens de design et thèmes | M0-02 | review |
 | [M0-06](M0-06-i18n.md) | Internationalisation | M0-02 | review |
-| [M0-07](M0-07-desktop-shell.md) | Shell Photino et sécurité loopback | M0-03 | todo |
+| [M0-07](M0-07-desktop-shell.md) | Shell Photino et sécurité loopback | M0-03 | review |
 | [M0-08](M0-08-webview-spike.md) | Spike WebKitGTK / WKWebView | M0-07 | todo |
 | [M0-09](M0-09-test-infrastructure.md) | Infrastructure de test | M0-01, M0-02, M0-03 | todo |
 | [M0-10](M0-10-ci-pipeline.md) | Pipeline CI PR (3 OS) | M0-09 | todo |
@@ -116,7 +116,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 |---|---|---|---|
 | **P-01** | Emplacement de la SPA incohérent : `src/web/` (§A-3) contre `web/e2e/` (features §1.3). | `src/web/`, e2e dans `src/web/e2e/`. Corriger features §1.3. | ✅ Tranché en M0-02 (features §1.3 corrigé) |
 | **P-02** | Racines de l'arbre : §A-5.1 cite une racine optionnelle « (Pièces jointes) », F02.R1 en fixe quatre. | Quatre racines en v1 ; les pièces jointes restent rattachées à leur page et se trouvent via la palette et la recherche. | M1-02 |
-| **P-03** | **Le port aléatoire du mode desktop change l'origine de la SPA à chaque lancement** (`http://127.0.0.1:<port>`) : `localStorage`/IndexedDB sont alors perdus d'un lancement à l'autre. Or F05.R4 (brouillons), F02.R5 (état déplié) et F15.R3 (thème sans flash) supposent un stockage persistant. | Ne rien stocker de durable côté navigateur : brouillons, état de l'arbre et préférences passent par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur. Le thème est injecté dans `index.html` par le backend. Alternative : schéma personnalisé Photino à origine fixe (plus fragile). | M0-07 |
+| **P-03** | **Le port aléatoire du mode desktop change l'origine de la SPA à chaque lancement** (`http://127.0.0.1:<port>`) : `localStorage`/IndexedDB sont alors perdus d'un lancement à l'autre. Or F05.R4 (brouillons), F02.R5 (état déplié) et F15.R3 (thème sans flash) supposent un stockage persistant. | Ne rien stocker de durable côté navigateur : brouillons, état de l'arbre et préférences passent par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur. Le thème est injecté dans `index.html` par le backend. Alternative : schéma personnalisé Photino à origine fixe (plus fragile). | ✅ Tranché en M0-07 : recommandation retenue, décision **Q7** (§A-13) |
 | **P-04** | Verrou mono-instance (F16.R2) absent du format de projet (§A-7.1). | Fichier `erable.lock` (PID, port, jeton IPC) dans le dossier du projet, ignoré par `doctor` ; la seconde instance contacte la première pour la mettre au premier plan. | M1-03 |
 | **P-05** | Fusion à trois voies : §A-8.3 la place **côté client**, §T-4.1 la teste **dans Core** (C#). | Fusion **côté serveur dans Core** : `PUT` avec révision de base → fusion automatique si sans conflit, sinon `409` avec les blocs en conflit. Une seule implémentation, testée par propriétés, valable pour tous les clients. | M4-05 |
 | **P-06** | Critère M0 « l'app **s'installe** sur les 3 OS » alors que Velopack est prévu en M5. | M0 : artefacts `dotnet publish` autonomes (archive) + fumée ; installeur et mise à jour en M5. | M0-11 |

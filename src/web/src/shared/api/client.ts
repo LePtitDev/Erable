@@ -45,8 +45,9 @@ export async function unwrap<T>(
   call: Promise<{ data?: T; error?: unknown; response: Response }>,
 ): Promise<T> {
   const { data, error, response } = await call;
-  if (!response.ok || data === undefined) {
+  if (!response.ok) {
     throw new ApiError(response.status, isProblem(error) ? error : undefined);
   }
-  return data;
+  // Undefined only for bodiless responses (204), whose schema type is `never` or `undefined`.
+  return data as T;
 }

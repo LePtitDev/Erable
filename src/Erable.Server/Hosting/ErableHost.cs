@@ -2,6 +2,8 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Erable.Server.Api;
+using Erable.Server.Native;
+using Erable.Server.Security;
 using Erable.Server.Spa;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -15,6 +17,12 @@ namespace Erable.Server.Hosting;
 /// <summary>Single entry point used by <c>erable serve</c> and by the desktop shell (in-process).</summary>
 public static class ErableHost
 {
+    /// <summary>The only address the desktop backend may listen on (docs/architecture.md §9).</summary>
+    public const string DesktopAddress = "127.0.0.1";
+
+    /// <summary>Minimum session token length in characters (hex: 128 bits).</summary>
+    public const int MinimumTokenLength = 32;
+
     /// <summary>True when the <c>/_test</c> endpoints are compiled in (never in Release builds).</summary>
     public static bool TestEndpointsCompiled =>
 #if ERABLE_TEST_ENDPOINTS
@@ -29,6 +37,7 @@ public static class ErableHost
     public static WebApplication Build(ErableHostOptions options, Action<WebApplicationBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(options);
+        Validate(options);
 
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         {
@@ -47,6 +56,7 @@ public static class ErableHost
         builder.Services.AddSingleton(options);
         builder.Services.AddSingleton(options.TimeProvider);
         builder.Services.TryAddSingleton<IThemePreferenceSource, SystemThemePreferenceSource>();
+        builder.Services.TryAddSingleton<INativeBridge, UnavailableNativeBridge>();
         builder.Services.AddProblemDetails();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {
@@ -94,8 +104,34 @@ public static class ErableHost
         return new Uri(first);
     }
 
+    private static void Validate(ErableHostOptions options)
+    {
+        if (options.Mode != HostMode.Desktop)
+        {
+            return;
+        }
+
+        // Guard rail: a desktop backend reachable from the network would expose the user's projects.
+        if (options.Address != DesktopAddress)
+        {
+            throw new InvalidOperationException(
+                $"Desktop mode only listens on {DesktopAddress}; '{options.Address}' is refused.");
+        }
+
+        if (options.SessionToken is not { Length: >= MinimumTokenLength })
+        {
+            throw new InvalidOperationException(
+                $"Desktop mode requires a session token of at least {MinimumTokenLength} characters.");
+        }
+    }
+
     private static void ConfigurePipeline(WebApplication app, ErableHostOptions options)
     {
+        if (options.Mode == HostMode.Desktop)
+        {
+            app.UseMiddleware<DesktopSecurityMiddleware>();
+        }
+
         app.UseExceptionHandler();
         app.UseStatusCodePages();
 
@@ -112,6 +148,7 @@ public static class ErableHost
 
         app.MapOpenApi(ApiRoutes.OpenApiPattern);
         app.MapInfoEndpoints();
+        app.MapSessionEndpoints();
         app.MapGroup(ApiRoutes.V1);
 
         if (TestEndpointsCompiled && options.TestMode)

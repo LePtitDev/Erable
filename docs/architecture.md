@@ -94,7 +94,9 @@ Erable/
 | i18n | i18next / react-i18next, fichiers JSON par langue (`fr`, `en`, `de`, `es`) |
 | Styles | CSS Modules + design tokens en variables CSS (repris du mockup) |
 
-**Thèmes.** Toutes les couleurs sont des tokens sur `:root`, redéfinis sous `[data-theme="dark"]`. Le choix « Système » suit `prefers-color-scheme`. Aucune couleur en dur dans les composants.
+**Thèmes.** Toutes les couleurs sont des tokens sur `:root`, redéfinis sous `[data-theme="dark"]`. Le choix « Système » suit `prefers-color-scheme`. Aucune couleur en dur dans les composants. Le backend écrit le thème de l'utilisateur dans `<html data-theme>` en servant `index.html` : le premier rendu a déjà le bon thème.
+
+**Aucun état durable dans le navigateur** (décision Q7). En desktop, le port aléatoire change l'origine de la SPA à chaque lancement : `localStorage` et IndexedDB y sont perdus. Brouillons, état de l'arbre et préférences passent donc par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur.
 
 **Mobile plus tard.** Règles à respecter dès maintenant : pas d'API desktop dans la SPA, layout en grille dont les panneaux latéraux peuvent se replier, cibles cliquables ≥ 32 px, raccourcis clavier toujours doublés d'une action à la souris. Le premier « mobile » sera la SPA en PWA sur un serveur.
 
@@ -309,7 +311,9 @@ Un fichier SQLite **ne se versionne pas bien dans Git** et **ne doit pas être p
 
 ## 9. Sécurité
 
-- **Serveur loopback du desktop** : écoute uniquement sur `127.0.0.1`, port aléatoire. Un jeton aléatoire est généré au lancement, transmis au WebView et exigé sur chaque requête. L'en-tête `Host` est vérifié (protection contre le *DNS rebinding*). Sans cela, n'importe quel site ouvert dans un navigateur ou n'importe quel processus local pourrait lire les projets.
+- **Serveur loopback du desktop** : écoute uniquement sur `127.0.0.1`, port aléatoire. Un jeton aléatoire (256 bits) est généré au lancement, transmis au WebView et exigé sur chaque requête d'API, de hub et de test. L'en-tête `Host` est vérifié (protection contre le *DNS rebinding*) et l'en-tête `Origin` des requêtes non GET (CSRF). Sans cela, n'importe quel site ouvert dans un navigateur ou n'importe quel processus local pourrait lire les projets.
+  - *Transmission* : le shell ouvre `http://127.0.0.1:<port>/#session=<jeton>`. Un fragment n'est jamais envoyé au serveur, donc jamais journalisé. La SPA l'efface aussitôt de l'URL et l'échange une fois (`POST /api/session`, en-tête `X-Erable-Session`) contre un cookie `HttpOnly; SameSite=Strict`, que le WebView joint ensuite à toutes les requêtes, WebSocket et `<img>` compris, sans que le jeton soit lisible par un script.
+  - Seule la coquille statique de la SPA (`index.html`, `/assets`) est servie sans jeton : elle ne contient aucune donnée de l'utilisateur.
 - **Mode serveur** : ASP.NET Core Identity (comptes locaux, mots de passe hachés). Cookie httpOnly pour le navigateur, jeton bearer pour l'app desktop. OIDC (Keycloak, Entra, Google) plus tard. Rôles **par projet uniquement** (décision Q5) : lecteur, éditeur, administrateur. Pas de permissions par dossier ou par page.
 - **Contenu** : HTML brut désactivé et sanitisation du rendu (XSS entre utilisateurs). Les pièces jointes sont servies avec `Content-Disposition` et `X-Content-Type-Options: nosniff`. SVG et HTML sont téléchargés, jamais rendus inline.
 - **Limites** : taille maximale d'une pièce jointe configurable, quotas par projet en mode serveur.
@@ -388,4 +392,5 @@ Pour éviter les alertes « application non reconnue », il faut un compte Apple
 - **Q3.** Co-édition en direct en v2. La v1 utilise la concurrence optimiste avec fusion à trois voies (§8.3).
 - **Q4.** Une page peut avoir plusieurs catégories (résolution des valeurs : §5.3).
 - **Q5.** Permissions par projet uniquement (§9).
-- **Q6.** Shell desktop : Photino.NET (§10). Electron reste le repli si le jalon M0 révèle un blocage.
+- **Q6.** Shell desktop : Photino.NET (§10). Electron reste le repli si le jalon M0 révèle un blocage. *Constat M0-07 (oct. 2026)* : Photino.NET n'a plus de commit de code depuis janvier 2025 ; tout ce qui dépend de Photino est isolé dans `PhotinoShell`, et le spike M0-08 le compare au fork actif PhotinoX.
+- **Q7.** Aucun état durable dans le navigateur (§3.1) : préférences, brouillons et état de l'interface sont stockés côté backend et exposés par l'API ; le backend injecte le thème (et, à terme, la langue) dans `index.html`. Alternative écartée : schéma d'URL personnalisé Photino à origine fixe (plus fragile selon les WebViews).
