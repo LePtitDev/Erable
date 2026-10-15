@@ -8,6 +8,7 @@ import { treeQuery } from "../../shared/api/tree";
 import { useUiState } from "../../shared/api/uiState";
 import type { ElementId } from "../../shared/ids/elementId";
 import { useThemeStore } from "../../shared/theme/theme";
+import { useSetTheme } from "../../shared/theme/useSetTheme";
 import { useSystemDark } from "../../shared/theme/useSystemDark";
 import { Logo } from "../../shared/ui/Logo";
 import { PreferencesDialog } from "../home/PreferencesDialog";
@@ -118,7 +119,7 @@ function TopBar({
   const router = useRouter();
   const me = useQuery(meQuery);
   const preference = useThemeStore((s) => s.preference);
-  const setPreference = useThemeStore((s) => s.setPreference);
+  const setPreference = useSetTheme();
   const systemDark = useSystemDark();
   const dark = preference === "dark" || (preference === "system" && systemDark);
 

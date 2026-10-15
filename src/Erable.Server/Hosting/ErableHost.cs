@@ -61,7 +61,6 @@ public static class ErableHost
 
         builder.Services.AddSingleton(options);
         builder.Services.AddSingleton(ClockOf(options));
-        builder.Services.TryAddSingleton<IThemePreferenceSource, SystemThemePreferenceSource>();
         builder.Services.TryAddSingleton<INativeBridge, UnavailableNativeBridge>();
         if (options.SelfTest)
         {

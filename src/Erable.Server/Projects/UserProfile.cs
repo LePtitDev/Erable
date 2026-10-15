@@ -84,6 +84,22 @@ public sealed class UserProfile
         }
     }
 
+    public UserPreferences GetPreferences()
+    {
+        lock (_gate)
+        {
+            return Read<UserPreferences>("preferences.json")?.Normalize() ?? UserPreferences.Default;
+        }
+    }
+
+    public void SavePreferences(UserPreferences preferences)
+    {
+        lock (_gate)
+        {
+            Write("preferences.json", preferences.Normalize());
+        }
+    }
+
     /// <summary>Reads a profile document; null when absent or unreadable (a damaged profile must not block the app).</summary>
     public T? Read<T>(string name)
         where T : class

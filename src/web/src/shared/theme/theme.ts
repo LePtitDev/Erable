@@ -28,7 +28,7 @@ interface ThemeState {
   setPreference: (preference: ThemePreference) => void;
 }
 
-/** UI-side theme state. Persistence through the preferences API arrives with M1-15. */
+/** UI-side theme state; the switcher also saves it through the preferences API (F15.R3). */
 export const useThemeStore = create<ThemeState>()((set) => ({
   preference: readInitialTheme(),
   setPreference: (preference) => {

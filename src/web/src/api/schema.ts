@@ -70,6 +70,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/preferences": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetPreferences"];
+    put: operations["PutPreferences"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/recent-projects": {
     parameters: {
       query?: never;
@@ -560,6 +576,8 @@ export interface components {
       name: string;
       ok: boolean;
     };
+    /** @enum {string} */
+    ThemePreference: "light" | "dark" | "system";
     TreeNodeItem: {
       duplicateName: boolean;
       id: components["schemas"]["ElementId"];
@@ -575,6 +593,13 @@ export interface components {
       name?: null | string;
       /** Format: element-id */
       parentId?: ElementId | null;
+    };
+    UserPreferences: {
+      language: null | string;
+      shortcuts: null | {
+        [key: string]: string;
+      };
+      theme: components["schemas"]["ThemePreference"];
     };
   };
   responses: never;
@@ -663,6 +688,50 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CurrentUserInfo"];
+        };
+      };
+    };
+  };
+  GetPreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserPreferences"];
+        };
+      };
+    };
+  };
+  PutPreferences: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserPreferences"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserPreferences"];
         };
       };
     };

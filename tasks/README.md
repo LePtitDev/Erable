@@ -45,7 +45,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-12](M1-12-page-editor.md) | Éditeur CodeMirror | M1-11 | review |
 | [M1-13](M1-13-insert-palette.md) | Palette d'insertion `[[` | M1-12 | review |
 | [M1-14](M1-14-attachments-ui.md) | Pièces jointes (interface) | M1-12, M1-06 | review |
-| [M1-15](M1-15-preferences.md) | Préférences : langue et thème | M1-08 | todo |
+| [M1-15](M1-15-preferences.md) | Préférences : langue et thème | M1-08 | review |
 | [M1-16](M1-16-doctor.md) | Commande `erable doctor` | M1-06 | review |
 | [M1-17](M1-17-desktop-integration.md) | Intégration desktop native | M1-08, M0-11 | todo |
 

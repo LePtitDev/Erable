@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Erable.Core;
 using Erable.Core.Elements;
 using Erable.Core.Projects;
@@ -5,7 +6,6 @@ using Erable.Core.Tree;
 using Erable.Server.Hosting;
 using Erable.Server.Projects;
 using Erable.Server.Users;
-using System.Text.Json.Nodes;
 using Erable.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +44,8 @@ public static class ProjectEndpoints
         me.MapGet("/recent-projects", ListRecent).WithName("ListRecentProjects");
         me.MapDelete("/recent-projects/{projectId}", RemoveRecent).WithName("RemoveRecentProject");
         me.MapPut("/recent-projects/{projectId}/last-element", RecordLastElement).WithName("RecordLastElement");
+        me.MapGet("/preferences", GetPreferences).WithName("GetPreferences");
+        me.MapPut("/preferences", PutPreferences).WithName("PutPreferences");
         me.MapGet("/ui-state/{key}", GetUiState).WithName("GetUiState");
         me.MapPut("/ui-state/{key}", PutUiState).WithName("PutUiState");
         me.MapDelete("/ui-state/{key}", DeleteUiState).WithName("DeleteUiState");
@@ -330,6 +332,20 @@ public static class ProjectEndpoints
             : Problems.Problem(StatusCodes.Status404NotFound, Problems.ProjectNotFound, "Not in the recent projects.");
 
     // ─── UI state ───────────────────────────────────────────────────────────
+
+    /// <summary>Language, theme and shortcuts of the user (F15), written into index.html before the first paint.</summary>
+    private static Ok<UserPreferences> GetPreferences(UserProfile profile) => TypedResults.Ok(profile.GetPreferences());
+
+    private static Results<Ok<UserPreferences>, ProblemHttpResult> PutPreferences(UserPreferences preferences, UserProfile profile)
+    {
+        if (preferences.Validate() is { } code)
+        {
+            return Problems.Problem(StatusCodes.Status400BadRequest, code, "Unsupported preference value.");
+        }
+
+        profile.SavePreferences(preferences);
+        return TypedResults.Ok(profile.GetPreferences());
+    }
 
     /// <summary>
     /// Small JSON documents of the interface (panel sizes, expanded tree nodes, drafts…), kept in the user profile

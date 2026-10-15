@@ -818,6 +818,54 @@
         }
       }
     },
+    "/api/v1/me/preferences": {
+      "get": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "GetPreferences",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferences"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "PutPreferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferences"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferences"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me/ui-state/{key}": {
       "get": {
         "tags": [
@@ -1615,6 +1663,14 @@
           }
         }
       },
+      "ThemePreference": {
+        "enum": [
+          "light",
+          "dark",
+          "system"
+        ],
+        "type": "string"
+      },
       "TreeNodeItem": {
         "required": [
           "id",
@@ -1677,6 +1733,34 @@
               "integer"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "UserPreferences": {
+        "required": [
+          "language",
+          "theme",
+          "shortcuts"
+        ],
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "theme": {
+            "$ref": "#/components/schemas/ThemePreference"
+          },
+          "shortcuts": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       }
