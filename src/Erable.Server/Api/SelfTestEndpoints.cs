@@ -13,7 +13,8 @@ public sealed record SelfTestStep(string Name, bool Ok, double DurationMs, strin
 /// <summary>Result of the SPA part of <c>--self-test</c>.</summary>
 /// <param name="Steps">Steps in execution order.</param>
 /// <param name="ReadyAtMs">SPA clock (<c>performance.now()</c>) when the home screen was displayed.</param>
-public sealed record SelfTestReport(IReadOnlyList<SelfTestStep> Steps, double ReadyAtMs);
+/// <param name="ReportedAtMs">SPA clock when the report was sent: the journey after the home screen is not startup time.</param>
+public sealed record SelfTestReport(IReadOnlyList<SelfTestStep> Steps, double ReadyAtMs, double? ReportedAtMs = null);
 
 /// <summary>
 /// Receives the SPA's self-test report in the desktop shell. Registered only when the host runs in self-test mode.

@@ -3,10 +3,22 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Erable.Desktop</RootNamespace>
+    <!-- LibraryImport (user32: bring the window to the front, F16.R2) generates its marshalling as unsafe code. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Photino.NET" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Provisional icon (a proper logo arrives with the release work, M5-03). -->
+    <ApplicationIcon>Assets\erable.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Window icon at run time: .ico on Windows, .png elsewhere (PhotinoShell.IconFile). -->
+    <None Include="Assets\erable.ico;Assets\erable.png" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Link="%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

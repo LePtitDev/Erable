@@ -90,11 +90,14 @@ internal static class SelfTest
         else
         {
             steps.AddRange(report.Steps.Select(s => new Step(s.Name, s.Ok, s.DurationMs, s.Detail)));
+            // The report arrives after the whole journey: the home screen was shown that much earlier.
+            var afterHome = TimeSpan.FromMilliseconds(Math.Max(0, (report.ReportedAtMs ?? report.ReadyAtMs) - report.ReadyAtMs));
+            var homeShown = sinceProcessStart - afterHome;
             steps.Add(new Step(
                 "startup-budget",
-                sinceProcessStart <= StartupBudget,
-                sinceProcessStart.TotalMilliseconds,
-                $"home screen {sinceProcessStart.TotalMilliseconds:F0} ms after launch (budget {StartupBudget.TotalMilliseconds:F0} ms)"));
+                homeShown <= StartupBudget,
+                homeShown.TotalMilliseconds,
+                $"home screen {homeShown.TotalMilliseconds:F0} ms after launch (budget {StartupBudget.TotalMilliseconds:F0} ms)"));
         }
 
         return new Result(steps.All(s => s.Ok), steps);

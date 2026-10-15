@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { testI18n } from "../test/i18n";
 import { http, server } from "../test/msw";
+import { noLaunchOptions } from "../shared/api/session";
 import { runSelfTest } from "./run";
 
 describe("runSelfTest", () => {
@@ -13,7 +14,7 @@ describe("runSelfTest", () => {
       }),
     );
 
-    await runSelfTest(testI18n, [
+    await runSelfTest(testI18n, noLaunchOptions, [
       { name: "first", run: () => Promise.resolve("fine") },
       { name: "second", run: () => Promise.reject(new Error("broken")) },
       { name: "never", run: () => Promise.resolve(undefined) },

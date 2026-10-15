@@ -4,6 +4,7 @@ using Erable.Core.Elements;
 using Erable.Core.Projects;
 using Erable.Core.Tree;
 using Erable.Server.Hosting;
+using Erable.Server.Native;
 using Erable.Server.Projects;
 using Erable.Server.Users;
 using Erable.Storage;
@@ -70,10 +71,24 @@ public static class ProjectEndpoints
         return TypedResults.Created($"/api/v1/projects/{summary.Id}", summary);
     }
 
-    private static Results<Ok<ProjectSummary>, ProblemHttpResult> Open(OpenProjectRequest request, ProjectWorkspace workspace, UserProfile profile)
+    private static async Task<Results<Ok<ProjectSummary>, ProblemHttpResult>> Open(
+        OpenProjectRequest request, ProjectWorkspace workspace, UserProfile profile, ErableHostOptions options, INativeBridge bridge,
+        HttpContext http)
     {
         var opened = workspace.Open(request.Folder, profile);
-        return opened.IsSuccess ? TypedResults.Ok(Summary(opened.Value.Project)) : Problems.From(opened.Error);
+        if (opened.IsSuccess)
+        {
+            return TypedResults.Ok(Summary(opened.Value.Project));
+        }
+
+        // F16.R2: the project is open in another window of the application, which comes to the front.
+        if (opened.Error.Code == StorageErrors.Locked && options.Mode == HostMode.Desktop)
+        {
+            await InstanceRegistry.ActivateOwnerAsync(ErableHost.ProfileDirectory(options), request.Folder, bridge.AllowForeground, http.RequestAborted)
+                .ConfigureAwait(false);
+        }
+
+        return Problems.From(opened.Error);
     }
 
     private static Ok<FolderInspection> Inspect(InspectFolderRequest request)

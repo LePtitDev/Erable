@@ -17,6 +17,14 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
 
     public ProjectService? Find(ElementId projectId) => _open.GetValueOrDefault(projectId);
 
+    /// <summary>The open project stored in <paramref name="folder"/>, if any.</summary>
+    public ProjectService? FindByFolder(string folder)
+    {
+        var full = Path.GetFullPath(folder).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return _open.Values.FirstOrDefault(p => string.Equals(
+            p.Project.Folder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), full, StringComparison.OrdinalIgnoreCase));
+    }
+
     /// <summary>Creates a project, opens it and puts it first in the recent projects of <paramref name="profile"/>.</summary>
     public Result<ProjectService> Create(string folder, string name, string contentLanguage, UserProfile profile)
     {

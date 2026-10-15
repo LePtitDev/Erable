@@ -70,7 +70,11 @@
     "attachment": {
       "tooLarge": "Die Datei überschreitet die maximal zulässige Größe.",
       "multipartRequired": "Ungültiger Datei-Upload.",
-      "fileMissing": "Keine Datei empfangen."
+      "fileMissing": "Keine Datei empfangen.",
+      "executable": "Erable öffnet niemals ein Programm oder Skript. Zeigen Sie es im Dateimanager an, wenn Sie wissen, woher es stammt."
+    },
+    "native": {
+      "unavailable": "Diese Aktion gibt es nur in der Desktop-Anwendung."
     }
   },
   "home": {
@@ -108,7 +112,9 @@
         "missing": "Dieser Ordner existiert nicht.",
         "tooNew": "Dieses Projekt verwendet das Format {{version}}, das neuer ist als diese Version von Erable. Aktualisieren Sie die Anwendung, um es zu öffnen; das Projekt wurde nicht verändert.",
         "invalid": "Die Datei erable.json dieses Ordners ist nicht lesbar."
-      }
+      },
+      "browse": "Durchsuchen…",
+      "pickTitle": "Ordner eines Erable-Projekts wählen"
     },
     "connect": {
       "title": "Mit einem Server verbinden",
@@ -284,7 +290,9 @@
     "addLabel": "Anhänge hinzufügen",
     "uploading": "{{name}} wird hochgeladen",
     "tooLarge": "„{{name}}“ überschreitet die maximal zulässige Größe ({{max}}). Es wurde kein Anhang erstellt.",
-    "failed": "Hochladen von „{{name}}“ fehlgeschlagen: {{reason}}"
+    "failed": "Hochladen von „{{name}}“ fehlgeschlagen: {{reason}}",
+    "openWithSystem": "{{name}} mit der Systemanwendung öffnen",
+    "reveal": "{{name}} im Dateimanager anzeigen"
   },
   "editor": {
     "title": "Seitentitel",
@@ -312,7 +320,9 @@
     "discard": "Verwerfen",
     "leaveTitle": "Nicht gespeicherte Änderungen",
     "leaveDescription": "Die Seite vor dem Verlassen speichern?",
-    "conflict": "Die Seite wurde seit dem Öffnen anderswo geändert. Kopieren Sie Ihre Änderungen und laden Sie die Seite vor dem Speichern neu."
+    "conflict": "Die Seite wurde seit dem Öffnen anderswo geändert. Kopieren Sie Ihre Änderungen und laden Sie die Seite vor dem Speichern neu.",
+    "closeTitle": "Erable schließen?",
+    "closeDescription": "Die aktuelle Seite hat nicht gespeicherte Änderungen."
   },
   "time": {
     "justNow": "gerade eben"

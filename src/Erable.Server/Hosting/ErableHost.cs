@@ -73,6 +73,8 @@ public static class ErableHost
         builder.Services.AddSingleton<UserDirectory>();
         builder.Services.AddSingleton<ProjectWorkspace>();
         builder.Services.AddSingleton<AttachmentSettings>();
+        builder.Services.AddSingleton<WindowCoordinator>();
+        builder.Services.AddSingleton<InstanceRegistry>();
 #if ERABLE_TEST_ENDPOINTS
         if (options.TestMode)
         {
@@ -191,6 +193,11 @@ public static class ErableHost
         if (options.Mode == HostMode.Desktop)
         {
             app.UseMiddleware<DesktopSecurityMiddleware>();
+
+            // F16.R2: advertise this instance while it runs, so that another one can bring it to the front.
+            var registry = app.Services.GetRequiredService<InstanceRegistry>();
+            app.Lifetime.ApplicationStarted.Register(() => registry.Register(GetListeningUri(app).Port));
+            app.Lifetime.ApplicationStopping.Register(registry.Unregister);
         }
 
         app.UseExceptionHandler();
@@ -212,6 +219,7 @@ public static class ErableHost
         app.MapSessionEndpoints();
         app.MapSelfTestEndpoints();
         app.MapGroup(ApiRoutes.V1).MapProjectEndpoints();
+        app.MapNativeEndpoints(options);
 
         if (TestEndpointsCompiled && options.TestMode)
         {

@@ -70,7 +70,11 @@
     "attachment": {
       "tooLarge": "Le fichier dépasse la taille maximale autorisée.",
       "multipartRequired": "Envoi de fichier invalide.",
-      "fileMissing": "Aucun fichier reçu."
+      "fileMissing": "Aucun fichier reçu.",
+      "executable": "Erable n’ouvre jamais un programme ou un script. Affichez-le dans l’explorateur si vous savez d’où il vient."
+    },
+    "native": {
+      "unavailable": "Cette action n’existe que dans l’application de bureau."
     }
   },
   "home": {
@@ -108,7 +112,9 @@
         "missing": "Ce dossier n’existe pas.",
         "tooNew": "Ce projet utilise le format {{version}}, plus récent que cette version d’Erable. Mettez à jour l’application pour l’ouvrir ; le projet n’a pas été modifié.",
         "invalid": "Le fichier erable.json de ce dossier est illisible."
-      }
+      },
+      "browse": "Parcourir…",
+      "pickTitle": "Choisir le dossier d’un projet Erable"
     },
     "connect": {
       "title": "Se connecter à un serveur",
@@ -288,7 +294,9 @@
     "addLabel": "Ajouter des pièces jointes",
     "uploading": "Téléversement de {{name}}",
     "tooLarge": "« {{name}} » dépasse la taille maximale autorisée ({{max}}). Aucune pièce jointe n’a été créée.",
-    "failed": "Échec du téléversement de « {{name}} » : {{reason}}"
+    "failed": "Échec du téléversement de « {{name}} » : {{reason}}",
+    "openWithSystem": "Ouvrir {{name}} avec l’application du système",
+    "reveal": "Afficher {{name}} dans l’explorateur de fichiers"
   },
   "editor": {
     "title": "Titre de la page",
@@ -316,7 +324,9 @@
     "discard": "Abandonner",
     "leaveTitle": "Modifications non enregistrées",
     "leaveDescription": "Enregistrer la page avant de la quitter ?",
-    "conflict": "La page a été modifiée ailleurs depuis son ouverture. Copiez vos changements, puis rechargez la page avant d’enregistrer."
+    "conflict": "La page a été modifiée ailleurs depuis son ouverture. Copiez vos changements, puis rechargez la page avant d’enregistrer.",
+    "closeTitle": "Fermer Erable ?",
+    "closeDescription": "La page en cours a des modifications non enregistrées."
   },
   "time": {
     "justNow": "à l’instant"

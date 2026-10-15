@@ -70,7 +70,11 @@
     "attachment": {
       "tooLarge": "The file exceeds the maximum allowed size.",
       "multipartRequired": "Invalid file upload.",
-      "fileMissing": "No file received."
+      "fileMissing": "No file received.",
+      "executable": "Erable never opens a program or a script. Show it in the file manager if you know where it comes from."
+    },
+    "native": {
+      "unavailable": "This action only exists in the desktop application."
     }
   },
   "home": {
@@ -108,7 +112,9 @@
         "missing": "This folder does not exist.",
         "tooNew": "This project uses format {{version}}, newer than this version of Erable. Update the application to open it; the project was not modified.",
         "invalid": "The erable.json file of this folder cannot be read."
-      }
+      },
+      "browse": "Browse…",
+      "pickTitle": "Choose the folder of an Erable project"
     },
     "connect": {
       "title": "Connect to a server",
@@ -284,7 +290,9 @@
     "addLabel": "Add attachments",
     "uploading": "Uploading {{name}}",
     "tooLarge": "“{{name}}” exceeds the maximum allowed size ({{max}}). No attachment was created.",
-    "failed": "Upload of “{{name}}” failed: {{reason}}"
+    "failed": "Upload of “{{name}}” failed: {{reason}}",
+    "openWithSystem": "Open {{name}} with the system application",
+    "reveal": "Show {{name}} in the file manager"
   },
   "editor": {
     "title": "Page title",
@@ -312,7 +320,9 @@
     "discard": "Discard",
     "leaveTitle": "Unsaved changes",
     "leaveDescription": "Save the page before leaving it?",
-    "conflict": "The page was changed elsewhere since it was opened. Copy your changes, then reload the page before saving."
+    "conflict": "The page was changed elsewhere since it was opened. Copy your changes, then reload the page before saving.",
+    "closeTitle": "Close Erable?",
+    "closeDescription": "The current page has unsaved changes."
   },
   "time": {
     "justNow": "just now"

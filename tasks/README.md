@@ -47,7 +47,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M1-14](M1-14-attachments-ui.md) | Pièces jointes (interface) | M1-12, M1-06 | review |
 | [M1-15](M1-15-preferences.md) | Préférences : langue et thème | M1-08 | review |
 | [M1-16](M1-16-doctor.md) | Commande `erable doctor` | M1-06 | review |
-| [M1-17](M1-17-desktop-integration.md) | Intégration desktop native | M1-08, M0-11 | todo |
+| [M1-17](M1-17-desktop-integration.md) | Intégration desktop native | M1-08, M0-11 | review |
 
 ### M2 — Structure
 | ID | Tâche | Dépend de | Statut |
@@ -129,6 +129,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-13** | `E2E-17-02` est rattaché à M1 mais commence par `Ctrl+K`, qui relève de F10 (M3). | Rattacher `E2E-17-02` à M3 (tâche M3-02) et corriger features §F17. Alternative : une recherche par nom minimale dès M1, à partir de l'arbre chargé côté client. | ✅ Tranché en M1-10 : rattaché à M3, features §F17 corrigé |
 
 | **P-14** | L'arbre de features §2.1 imbrique les catégories (Entité › Personnage › PNJ), mais le domaine (M1-02) n'autorise pas une catégorie sous une catégorie : l'héritage est un attribut (`parent_category_id`, §A-5.3). En M1, elles sont à plat sous la racine. | Garder l'arbre pour le rangement (dossiers) et montrer l'héritage dans l'écran Catégorie ; ou afficher les catégories selon leur héritage dans l'explorateur (le parent devient alors la catégorie, ce qui change F02.R2). | M2-01 |
+| **P-15** | Glisser un dossier sur l'accueil (E2E-16-07) : le WebView ne donne pas le chemin d'un dossier déposé et Photino.NET n'expose ni dépôt ni navigation. PhotinoX expose `NavigationStarting` (intercepter le `file:///` du dossier déposé). | Passer à PhotinoX (recommandé dès M0-08, migration ≈ 10 lignes dans `PhotinoShell.cs`) et implémenter E2E-16-07 ; ou reporter le scénario (P2) à M5-03. | M1-17 |
 
 ## Propositions
 

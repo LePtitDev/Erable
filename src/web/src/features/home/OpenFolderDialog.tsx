@@ -1,4 +1,4 @@
-import { useId, useState, type SyntheticEvent } from "react";
+import { useEffect, useId, useRef, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
 import {
@@ -7,6 +7,7 @@ import {
   type FolderInspection,
   type ProjectSummary,
 } from "../../shared/api/projects";
+import { pickFolder, useIsDesktop } from "../../shared/native/native";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
 import field from "../../shared/ui/Field.module.css";
@@ -22,7 +23,8 @@ interface OpenFolderDialogProps {
 /**
  * « Ouvrir un dossier… » (Ctrl+O). The folder is inspected first, without writing anything: a project opens; a
  * folder without manifest offers to create a project, only after confirmation (F01.R1); a project of a newer format
- * is refused with a clear message (F01.R3). The native folder picker of the desktop arrives with M1-17.
+ * is refused with a clear message (F01.R3). On the desktop, the OS folder picker opens at once (E2E-16-03); the
+ * path field stays for typing or pasting a path.
  */
 export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDialogProps) {
   const { t } = useTranslation();
@@ -39,10 +41,8 @@ export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDia
     openProject.reset();
   };
 
-  const submit = async (event: SyntheticEvent) => {
-    event.preventDefault();
+  const inspectAndOpen = async (path: string) => {
     reset();
-    const path = folder.trim();
     if (path === "") return;
     try {
       const result = await inspectFolder(path);
@@ -56,6 +56,38 @@ export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDia
       setFailure(errorMessage(t, error));
     }
   };
+
+  const submit = (event: SyntheticEvent) => {
+    event.preventDefault();
+    void inspectAndOpen(folder.trim());
+  };
+
+  const desktop = useIsDesktop();
+  const browse = async (closeIfCancelled: boolean) => {
+    try {
+      const path = await pickFolder(t("home.open.pickTitle"));
+      if (path === null) {
+        if (closeIfCancelled) onOpenChange(false);
+        return;
+      }
+      setFolder(path);
+      await inspectAndOpen(path);
+    } catch (error) {
+      setFailure(errorMessage(t, error));
+    }
+  };
+  // Opening the dialog on the desktop shows the OS picker straight away, once per opening.
+  const browsed = useRef(false);
+  useEffect(() => {
+    if (!open) {
+      browsed.current = false;
+      return;
+    }
+    if (!desktop || browsed.current) return;
+    browsed.current = true;
+    void browse(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per opening, not on every render of `browse`
+  }, [open, desktop]);
 
   const message =
     failure ??
@@ -75,7 +107,7 @@ export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDia
         title={t("home.open.dialogTitle")}
         description={t("home.open.dialogDescription")}
       >
-        <form className={field["form"]} onSubmit={(e) => void submit(e)}>
+        <form className={field["form"]} onSubmit={submit}>
           <div className={field["field"]}>
             <label htmlFor={id} className={field["label"]}>
               {t("home.open.folder")}
@@ -90,6 +122,7 @@ export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDia
                 reset();
               }}
             />
+            {desktop && <Button onClick={() => void browse(false)}>{t("home.open.browse")}</Button>}
           </div>
           {message !== null && (
             <p role="alert" className={field["error"]}>

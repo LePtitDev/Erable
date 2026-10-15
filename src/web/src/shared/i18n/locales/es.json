@@ -70,7 +70,11 @@
     "attachment": {
       "tooLarge": "El archivo supera el tamaño máximo permitido.",
       "multipartRequired": "Envío de archivo no válido.",
-      "fileMissing": "No se ha recibido ningún archivo."
+      "fileMissing": "No se ha recibido ningún archivo.",
+      "executable": "Erable nunca abre un programa ni un script. Muéstrelo en el explorador si sabe de dónde viene."
+    },
+    "native": {
+      "unavailable": "Esta acción solo existe en la aplicación de escritorio."
     }
   },
   "home": {
@@ -108,7 +112,9 @@
         "missing": "Esta carpeta no existe.",
         "tooNew": "Este proyecto usa el formato {{version}}, más reciente que esta versión de Erable. Actualice la aplicación para abrirlo; el proyecto no se ha modificado.",
         "invalid": "El archivo erable.json de esta carpeta no se puede leer."
-      }
+      },
+      "browse": "Examinar…",
+      "pickTitle": "Elegir la carpeta de un proyecto Erable"
     },
     "connect": {
       "title": "Conectarse a un servidor",
@@ -288,7 +294,9 @@
     "addLabel": "Añadir adjuntos",
     "uploading": "Subiendo {{name}}",
     "tooLarge": "«{{name}}» supera el tamaño máximo permitido ({{max}}). No se ha creado ningún adjunto.",
-    "failed": "Error al subir «{{name}}»: {{reason}}"
+    "failed": "Error al subir «{{name}}»: {{reason}}",
+    "openWithSystem": "Abrir {{name}} con la aplicación del sistema",
+    "reveal": "Mostrar {{name}} en el explorador de archivos"
   },
   "editor": {
     "title": "Título de la página",
@@ -316,7 +324,9 @@
     "discard": "Descartar",
     "leaveTitle": "Cambios sin guardar",
     "leaveDescription": "¿Guardar la página antes de salir?",
-    "conflict": "La página se ha modificado en otro lugar desde que se abrió. Copie sus cambios y recargue la página antes de guardar."
+    "conflict": "La página se ha modificado en otro lugar desde que se abrió. Copie sus cambios y recargue la página antes de guardar.",
+    "closeTitle": "¿Cerrar Erable?",
+    "closeDescription": "La página actual tiene cambios sin guardar."
   },
   "time": {
     "justNow": "ahora mismo"

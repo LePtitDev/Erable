@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Erable.Desktop;
 
+/// <summary><c>Erable.Desktop [folder] [--self-test [--self-test-report file]]</c>.</summary>
 internal static class Program
 {
     private static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(5);
@@ -16,8 +17,23 @@ internal static class Program
         var selfTest = args.Contains(SelfTest.Flag);
         var reportIndex = Array.IndexOf(args, SelfTest.ReportFlag);
         var reportPath = reportIndex >= 0 && reportIndex + 1 < args.Length ? args[reportIndex + 1] : null;
+        var folder = FolderArgument(args, reportIndex);
+        var testMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1";
+        var profile = AppProfile.GetDirectory();
 
         var shell = new PhotinoShell();
+        if (testMode)
+        {
+            shell.PickFolderOverride = Environment.GetEnvironmentVariable("ERABLE_TEST_PICK_FOLDER") is { Length: > 0 } picked ? picked : null;
+        }
+
+        // F16.R2: a project already open in another instance brings that instance to the front, and this one stops
+        // before showing anything.
+        if (folder is not null
+            && InstanceRegistry.ActivateOwnerAsync(profile, folder, shell.AllowForeground, CancellationToken.None).GetAwaiter().GetResult())
+        {
+            return 0;
+        }
 
         // 256-bit session token, generated per launch and never logged (docs/architecture.md §9).
         var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
@@ -27,13 +43,15 @@ internal static class Program
             Address = ErableHost.DesktopAddress,
             Port = 0,
             SessionToken = token,
-            DataDirectory = AppProfile.GetDirectory(),
-            TestMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1",
+            DataDirectory = profile,
+            TestMode = testMode,
             SelfTest = selfTest,
         };
 
         var app = ErableHost.Build(options, builder => builder.Services.AddSingleton<INativeBridge>(shell));
+        shell.Closing = app.Services.GetRequiredService<WindowCoordinator>().OnClosing;
         Task<SelfTest.Result>? selfTestResult = null;
+        string? selfTestFolder = null;
         try
         {
             app.StartAsync().GetAwaiter().GetResult();
@@ -41,9 +59,16 @@ internal static class Program
 
             // The token travels in the fragment: never sent to the server, so never in a request log.
             var fragment = "#session=" + token;
+            if (folder is not null)
+            {
+                fragment += "&open=" + Uri.EscapeDataString(folder);
+            }
+
             if (selfTest)
             {
-                fragment += "&selftest=1";
+                // The smoke journey creates its project in a folder of its own, deleted afterwards.
+                selfTestFolder = Directory.CreateTempSubdirectory("erable-selftest-").FullName;
+                fragment += "&selftest=1&selftestFolder=" + Uri.EscapeDataString(Path.Combine(selfTestFolder, "Fumée"));
                 var channel = app.Services.GetRequiredService<SelfTestChannel>();
                 selfTestResult = Task.Run(async () =>
                 {
@@ -69,10 +94,15 @@ internal static class Program
         }
         finally
         {
-            // Closing the window stops Kestrel and releases the process (F16.R3).
+            // Closing the window stops Kestrel, which closes the projects (WAL checkpoint, lock released) and releases
+            // the process (F16.R3).
             using var timeout = new CancellationTokenSource(ShutdownTimeout);
             app.StopAsync(timeout.Token).GetAwaiter().GetResult();
             app.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            if (selfTestFolder is not null)
+            {
+                TryDelete(selfTestFolder);
+            }
         }
 
         if (selfTestResult is null)
@@ -85,5 +115,33 @@ internal static class Program
             : new SelfTest.Result(false, [new SelfTest.Step("window", false, 0, "window closed before the report")]);
         SelfTest.Write(result, reportPath);
         return result.Success ? 0 : 1;
+    }
+
+    /// <summary>The project folder given on the command line (file managers and « Open with » pass it), if any.</summary>
+    private static string? FolderArgument(string[] args, int reportIndex)
+    {
+        for (var i = 0; i < args.Length; i++)
+        {
+            if (args[i].StartsWith("--", StringComparison.Ordinal) || i == reportIndex + 1 && reportIndex >= 0)
+            {
+                continue;
+            }
+
+            return Path.GetFullPath(args[i]);
+        }
+
+        return null;
+    }
+
+    private static void TryDelete(string folder)
+    {
+        try
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+        catch (IOException)
+        {
+            // A temporary folder: the OS cleans it up eventually.
+        }
     }
 }

@@ -26,6 +26,7 @@ import type { PillTarget } from "../editor/pills";
 import { usePageDraft } from "../editor/usePageDraft";
 import { PalettePopup } from "../palette/PalettePopup";
 import { useInsertPalette } from "../palette/useInsertPalette";
+import { approveClose, useWindowStore } from "../../shared/native/native";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
 import styles from "./PageEditor.module.css";
@@ -107,6 +108,26 @@ function EditorScreen({
   const leaving = useRef(false);
 
   const dirty = doc !== saved.markdown || title.trim() !== saved.name;
+
+  // F16.R3: the desktop shell asks before closing the window while there are unsaved changes.
+  const setUnsavedChanges = useWindowStore((s) => s.setUnsavedChanges);
+  useEffect(() => {
+    setUnsavedChanges(dirty);
+  }, [dirty, setUnsavedChanges]);
+  useEffect(
+    () => () => {
+      setUnsavedChanges(false);
+    },
+    [setUnsavedChanges],
+  );
+  const closeRequests = useWindowStore((s) => s.closeRequests);
+  const [confirmClose, setConfirmClose] = useState(false);
+  const handledCloseRequests = useRef(closeRequests);
+  useEffect(() => {
+    if (closeRequests === handledCloseRequests.current) return;
+    handledCloseRequests.current = closeRequests;
+    setConfirmClose(true);
+  }, [closeRequests]);
 
   useEffect(() => {
     setMode("edit");
@@ -431,6 +452,47 @@ function EditorScreen({
               }}
             >
               {t("editor.discard")}
+            </Button>
+          </>
+        }
+      />
+
+      <Dialog
+        open={confirmClose}
+        onOpenChange={setConfirmClose}
+        alert
+        size="sm"
+        title={t("editor.closeTitle")}
+        description={t("editor.closeDescription")}
+        footer={
+          <>
+            <Button
+              onClick={() => {
+                setConfirmClose(false);
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setConfirmClose(false);
+                leaving.current = true;
+                void draft.discard().then(approveClose);
+              }}
+            >
+              {t("editor.discard")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                void save().then((ok) => {
+                  setConfirmClose(false);
+                  if (ok) void approveClose();
+                });
+              }}
+            >
+              {t("editor.save")}
             </Button>
           </>
         }

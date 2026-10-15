@@ -4,6 +4,7 @@ using Erable.Server.Security;
 using Erable.Testing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Erable.Server.Tests.Infrastructure;
@@ -44,7 +45,8 @@ public sealed class TestBackend : IAsyncDisposable
 
     public static async Task<TestBackend> StartAsync(
         Func<ErableHostOptions, ErableHostOptions>? configure = null,
-        ILoggerProvider? logger = null)
+        ILoggerProvider? logger = null,
+        Action<IServiceCollection>? services = null)
     {
         var ct = TestContext.Current.CancellationToken;
         var webRoot = TempDirectory.Create("erable-web-");
@@ -71,6 +73,8 @@ public sealed class TestBackend : IAsyncDisposable
             {
                 builder.WebHost.UseTestServer();
             }
+
+            services?.Invoke(builder.Services);
 
             if (logger is not null)
             {

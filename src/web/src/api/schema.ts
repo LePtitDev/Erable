@@ -150,6 +150,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/native/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["NativeEvents"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/native/pick-folder": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PickFolder"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/native/window": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["UpdateWindow"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/native/window/close": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CloseWindow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects": {
     parameters: {
       query?: never;
@@ -208,6 +272,38 @@ export interface paths {
     get: operations["DownloadAttachment"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/attachments/{id}/open": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["OpenAttachmentWithSystem"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/attachments/{id}/reveal": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["RevealAttachment"];
     delete?: never;
     options?: never;
     head?: never;
@@ -486,6 +582,9 @@ export interface components {
       folder: string;
     };
     JsonNode: unknown;
+    NativeEvent: {
+      type: string;
+    };
     OpenProjectRequest: {
       folder: string;
     };
@@ -511,6 +610,12 @@ export interface components {
       id: components["schemas"]["ElementId"];
       kind: components["schemas"]["ElementKind"];
       name: string;
+    };
+    PickedFolder: {
+      path: null | string;
+    };
+    PickFolderRequest: {
+      title: string;
     };
     ProjectSummary: {
       contentLanguage: string;
@@ -567,6 +672,8 @@ export interface components {
     SelfTestReport: {
       /** Format: double */
       readyAtMs: number;
+      /** Format: double */
+      reportedAtMs?: null | number;
       steps: components["schemas"]["SelfTestStep"][];
     };
     SelfTestStep: {
@@ -575,6 +682,12 @@ export interface components {
       durationMs: number;
       name: string;
       ok: boolean;
+    };
+    SseItemOfNativeEvent: {
+      data?: components["schemas"]["NativeEvent"];
+      eventId?: null | string;
+      eventType?: null | string;
+      reconnectionInterval?: null | string;
     };
     /** @enum {string} */
     ThemePreference: "light" | "dark" | "system";
@@ -600,6 +713,10 @@ export interface components {
         [key: string]: string;
       };
       theme: components["schemas"]["ThemePreference"];
+    };
+    WindowState: {
+      title: string;
+      unsavedChanges: boolean;
     };
   };
   responses: never;
@@ -866,6 +983,90 @@ export interface operations {
       };
     };
   };
+  NativeEvents: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/event-stream": components["schemas"]["SseItemOfNativeEvent"];
+        };
+      };
+    };
+  };
+  PickFolder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PickFolderRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PickedFolder"];
+        };
+      };
+    };
+  };
+  UpdateWindow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WindowState"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  CloseWindow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   ListOpenProjects: {
     parameters: {
       query?: never;
@@ -968,6 +1169,48 @@ export interface operations {
     responses: {
       /** @description OK */
       200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  OpenAttachmentWithSystem: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RevealAttachment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
         headers: {
           [name: string]: unknown;
         };

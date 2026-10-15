@@ -3,8 +3,16 @@ namespace Erable.Desktop;
 /// <summary>Per-user application folder: recent projects, preferences (docs/architecture.md §7.1).</summary>
 internal static class AppProfile
 {
+    /// <summary>Another profile folder: desktop tests must never touch the profile of the person running them.</summary>
+    public const string OverrideVariable = "ERABLE_PROFILE_DIR";
+
     public static string GetDirectory()
     {
+        if (Environment.GetEnvironmentVariable(OverrideVariable) is { Length: > 0 } custom)
+        {
+            return Path.GetFullPath(custom);
+        }
+
         string root;
         if (OperatingSystem.IsWindows())
         {

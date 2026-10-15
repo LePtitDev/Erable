@@ -267,3 +267,28 @@
   height: 4px;
   accent-color: var(--color-accent);
 }
+
+.attachmentActions {
+  display: flex;
+  flex: none;
+  gap: var(--space-1);
+}
+
+.fileAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-sm);
+  height: var(--size-control-sm);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.fileAction:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}

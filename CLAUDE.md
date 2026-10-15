@@ -196,7 +196,9 @@ pnpm -C src/web exec playwright install chromium webkit   # une fois par machine
 # Desktop
 node build/publish-desktop.mjs win-x64     # ou linux-x64, osx-arm64, osx-x64 → artifacts/desktop/
 pnpm -C src/web e2e:desktop                # Windows : E2E-16-01/02 sur le binaire publié (CDP)
-artifacts/desktop/<rid>/Erable/Erable.Desktop --self-test [--self-test-report rapport.json]   # code de sortie 0/1
+artifacts/desktop/<rid>/Erable/Erable.Desktop [dossier] --self-test [--self-test-report rapport.json]   # code de sortie 0/1
+# Desktop : ERABLE_PROFILE_DIR=<dossier> remplace le profil applicatif (tests) ; avec ERABLE_TEST_MODE=1,
+# ERABLE_TEST_PICK_FOLDER=<dossier> remplace le sélecteur de dossier natif (E2E-16-03)
 ```
 
 Environnement de développement principal : Windows (PowerShell). Le code doit rester portable (chemins via `Path.Combine`, pas de séparateur en dur, fins de ligne gérées par `.gitattributes`).

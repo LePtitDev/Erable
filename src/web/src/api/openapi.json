@@ -947,6 +947,154 @@
           }
         }
       }
+    },
+    "/api/v1/native/pick-folder": {
+      "post": {
+        "tags": [
+          "Native"
+        ],
+        "operationId": "PickFolder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PickFolderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PickedFolder"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/native/window": {
+      "put": {
+        "tags": [
+          "Native"
+        ],
+        "operationId": "UpdateWindow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WindowState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/v1/native/window/close": {
+      "post": {
+        "tags": [
+          "Native"
+        ],
+        "operationId": "CloseWindow",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/v1/native/events": {
+      "get": {
+        "tags": [
+          "Native"
+        ],
+        "operationId": "NativeEvents",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/SseItemOfNativeEvent"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/attachments/{id}/open": {
+      "post": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "OpenAttachmentWithSystem",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/attachments/{id}/reveal": {
+      "post": {
+        "tags": [
+          "Attachments"
+        ],
+        "operationId": "RevealAttachment",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1310,6 +1458,17 @@
         }
       },
       "JsonNode": { },
+      "NativeEvent": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        }
+      },
       "OpenProjectRequest": {
         "required": [
           "folder"
@@ -1402,6 +1561,31 @@
             "$ref": "#/components/schemas/ElementKind"
           },
           "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PickedFolder": {
+        "required": [
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PickFolderRequest": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
             "type": "string"
           }
         }
@@ -1633,6 +1817,13 @@
           "readyAtMs": {
             "type": "number",
             "format": "double"
+          },
+          "reportedAtMs": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
           }
         }
       },
@@ -1656,6 +1847,33 @@
             "format": "double"
           },
           "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SseItemOfNativeEvent": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/NativeEvent"
+          },
+          "eventType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "eventId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reconnectionInterval": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
             "type": [
               "null",
               "string"
@@ -1763,6 +1981,21 @@
             }
           }
         }
+      },
+      "WindowState": {
+        "required": [
+          "title",
+          "unsavedChanges"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "unsavedChanges": {
+            "type": "boolean"
+          }
+        }
       }
     }
   },
@@ -1787,6 +2020,9 @@
     },
     {
       "name": "Me"
+    },
+    {
+      "name": "Native"
     }
   ]
 }

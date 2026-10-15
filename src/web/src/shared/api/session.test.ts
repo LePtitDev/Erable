@@ -31,7 +31,27 @@ describe("establishDesktopSession", () => {
     server.use(http.post("/api/session", ({ response }) => response(204).empty()));
     history.replaceState(null, "", `/#session=${token}&selftest=1`);
 
-    expect(await establishDesktopSession()).toEqual({ selfTest: true });
+    expect(await establishDesktopSession()).toEqual({
+      selfTest: true,
+      selfTestFolder: null,
+      openFolder: null,
+    });
+  });
+
+  it("reads the folders given by the shell", async () => {
+    server.use(http.post("/api/session", ({ response }) => response(204).empty()));
+    const folder = "/home/arthur/Wikis/Chroniques d'Aube";
+    history.replaceState(
+      null,
+      "",
+      `/#session=${token}&open=${encodeURIComponent(folder)}&selftest=1&selftestFolder=${encodeURIComponent(folder)}`,
+    );
+
+    expect(await establishDesktopSession()).toEqual({
+      selfTest: true,
+      selfTestFolder: folder,
+      openFolder: folder,
+    });
   });
 
   it("does nothing without a session fragment", async () => {

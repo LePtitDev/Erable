@@ -336,6 +336,11 @@ Un fichier SQLite **ne se versionne pas bien dans Git** et **ne doit pas être p
 
 **Choix retenu : Photino.NET** (décision Q6), pour rester en C# et en un seul processus. Ce choix reste réversible : le shell ne fait que (1) démarrer le backend, (2) ouvrir la fenêtre, (3) exposer trois ou quatre fonctions natives (sélecteur de dossier, ouvrir un fichier avec l'application système, révéler dans l'explorateur). Si Photino pose problème, on passe à Electron en remplaçant uniquement `Erable.Desktop`.
 
+**Fonctions natives (M1-17)** : toujours par l'API (`/api/v1/native/*`, `…/attachments/{id}/open|reveal`), jamais par un pont JavaScript, et derrière `INativeBridge` côté serveur (404 `native.unavailable` en mode serveur) :
+- sélecteur de dossier (`Ctrl+O`), titre de fenêtre (projet courant), ouvrir avec l'application système (copie nommée dans `<temp>/erable-open/`, **programmes et scripts refusés**), révéler dans l'explorateur ;
+- **fermeture** (F16.R3) : la SPA signale ses modifications non enregistrées (`PUT /native/window`) ; si la fenêtre est fermée avec des modifications, le shell la garde ouverte et prévient la SPA par un flux SSE (`GET /native/events`), qui demande « Enregistrer / Abandonner / Annuler » puis confirme (`POST /native/window/close`). Sans SPA à l'écoute, la fenêtre se ferme (les brouillons sont déjà enregistrés). L'arrêt ferme les projets (checkpoint WAL, verrou libéré) ;
+- **mono-instance par projet** (F16.R2, P-04) : chaque instance s'annonce dans `<profil>/instances/<pid>-<port>.json` (port, jeton IPC distinct du jeton de session). Une instance qui trouve un projet verrouillé — au lancement `Erable.Desktop <dossier>` ou depuis l'accueil — appelle `POST /ipc/activate` des autres : celle qui a le projet passe au premier plan, la seconde s'arrête sans fenêtre.
+
 **Risque à lever au jalon M0** : WebKitGTK sous Linux a des écarts de rendu et de performance avec Chromium. On valide dès le début l'éditeur CodeMirror, le drag & drop dans l'arbre et la lecture vidéo sur les trois OS.
 
 **Packaging** : `dotnet publish` autonome par RID (`win-x64`, `linux-x64`, `osx-arm64`, `osx-x64`) puis **Velopack** (installeur et mise à jour automatique sur les trois OS, AppImage sous Linux). Serveur : image Docker basée sur `mcr.microsoft.com/dotnet/aspnet` (variante *chiseled*).

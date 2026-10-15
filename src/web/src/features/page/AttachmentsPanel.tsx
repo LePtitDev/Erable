@@ -1,9 +1,15 @@
-import { Plus } from "lucide-react";
+import { ExternalLink, FolderSearch, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { errorMessage } from "../../shared/api/errors";
 import { attachmentUrl, type AttachmentItem } from "../../shared/api/pages";
 import { useFormatters } from "../../shared/i18n/format";
 import type { ElementId } from "../../shared/ids/elementId";
+import {
+  openAttachmentWithSystem,
+  revealAttachment,
+  useIsDesktop,
+} from "../../shared/native/native";
 import { extensionOf } from "../../shared/ui/fileNames";
 import styles from "./PageView.module.css";
 import { useUploader } from "./useUploader";
@@ -18,7 +24,8 @@ let nextKey = 0;
 
 /**
  * « Pièces jointes » of the side panel (F04.R4): extension, name, size. « + Ajouter » attaches files to the page
- * without inserting them in the text (E2E-06-03).
+ * without inserting them in the text (E2E-06-03). On the desktop, each file also opens with its system application or
+ * shows in the file manager (programs and scripts are never run: the backend refuses them).
  */
 export function AttachmentsPanel({
   projectId,
@@ -35,6 +42,14 @@ export function AttachmentsPanel({
   const picker = useRef<HTMLInputElement>(null);
   const [running, setRunning] = useState<readonly Running[]>([]);
   const [errors, setErrors] = useState<readonly string[]>([]);
+  const desktop = useIsDesktop();
+
+  const native = (action: () => Promise<unknown>) => {
+    setErrors([]);
+    action().catch((error: unknown) => {
+      setErrors([errorMessage(t, error)]);
+    });
+  };
 
   const add = (files: readonly File[]) => {
     setErrors([]);
@@ -107,6 +122,32 @@ export function AttachmentsPanel({
                 </a>
                 <span className={styles["attachmentSize"]}>{format.size(a.size)}</span>
               </span>
+              {desktop && (
+                <span className={styles["attachmentActions"]}>
+                  <button
+                    type="button"
+                    className={styles["fileAction"]}
+                    aria-label={t("attachments.openWithSystem", { name: a.fileName })}
+                    title={t("attachments.openWithSystem", { name: a.fileName })}
+                    onClick={() => {
+                      native(() => openAttachmentWithSystem(projectId, a.id));
+                    }}
+                  >
+                    <ExternalLink aria-hidden size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className={styles["fileAction"]}
+                    aria-label={t("attachments.reveal", { name: a.fileName })}
+                    title={t("attachments.reveal", { name: a.fileName })}
+                    onClick={() => {
+                      native(() => revealAttachment(projectId, a.id));
+                    }}
+                  >
+                    <FolderSearch aria-hidden size={14} />
+                  </button>
+                </span>
+              )}
             </li>
           ))}
           {running.map((r) => (

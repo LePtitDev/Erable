@@ -34,7 +34,7 @@ test.describe("F15 · Preferences", () => {
   });
 
   test("E2E-15-02 · Dark theme @pr", async ({ page, freshProfile }) => {
-    void freshProfile;
+    expect(freshProfile.slot).not.toBe("");
     const preferences = new PreferencesDialog(page);
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
@@ -52,7 +52,7 @@ test.describe("F15 · Preferences", () => {
   });
 
   test("E2E-15-03 · System theme @nightly", async ({ page, freshProfile }) => {
-    void freshProfile;
+    expect(freshProfile.slot).not.toBe("");
     const preferences = new PreferencesDialog(page);
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");

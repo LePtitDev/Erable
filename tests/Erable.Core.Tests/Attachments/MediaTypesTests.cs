@@ -87,4 +87,27 @@ public sealed class AttachmentFileNameTests
     [InlineData("folder/")]
     public void Normalize_NoName_Fails(string? input) =>
         AttachmentFileName.Normalize(input).Error.Code.ShouldBe(ErrorCodes.NameEmpty);
+
+    [Theory]
+    [InlineData("setup.exe")]
+    [InlineData("SETUP.EXE")]
+    [InlineData("install.msi")]
+    [InlineData("run.bat")]
+    [InlineData("script.ps1")]
+    [InlineData("raccourci.lnk")]
+    [InlineData("setup.exe.")]
+    [InlineData("setup.exe ")]
+    [InlineData("lanceur.sh")]
+    public void IsExecutable_ProgramOrScript_IsTrue(string fileName) =>
+        AttachmentFileName.IsExecutable(fileName).ShouldBeTrue();
+
+    [Theory]
+    [InlineData("carte_hautbois.webp")]
+    [InlineData("plans.zip")]
+    [InlineData("blason.svg")]
+    [InlineData("exe")]
+    [InlineData("rapport.exe.pdf")]
+    [InlineData("sans_extension")]
+    public void IsExecutable_Document_IsFalse(string fileName) =>
+        AttachmentFileName.IsExecutable(fileName).ShouldBeFalse();
 }

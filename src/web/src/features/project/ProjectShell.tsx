@@ -8,6 +8,7 @@ import { treeQuery } from "../../shared/api/tree";
 import { useUiState } from "../../shared/api/uiState";
 import type { ElementId } from "../../shared/ids/elementId";
 import { useThemeStore } from "../../shared/theme/theme";
+import { useWindowStore } from "../../shared/native/native";
 import { useSetTheme } from "../../shared/theme/useSetTheme";
 import { useSystemDark } from "../../shared/theme/useSystemDark";
 import { Logo } from "../../shared/ui/Logo";
@@ -49,9 +50,14 @@ function ShellFrame({
   const layout = useUiState<Layout>("layout", defaultLayout);
   const [preferences, setPreferences] = useState(false);
 
+  // Document and window title (DesktopWindow): the project while it is shown.
+  const setWindowProject = useWindowStore((s) => s.setProjectName);
   useEffect(() => {
-    document.title = `${projectName} — ${t("app.name")}`;
-  }, [projectName, t]);
+    setWindowProject(projectName);
+    return () => {
+      setWindowProject(null);
+    };
+  }, [projectName, setWindowProject]);
 
   const { explorerOpen, explorerWidth } = layout.value;
   return (

@@ -41,6 +41,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Reset_Chroniques_OpensIlsaByItsFrozenId()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (projectId, _) = await ResetAsync(backend, "f01");
 
@@ -57,6 +58,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Reset_TwoSlots_GetIsolatedCopiesAndProfiles()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (first, firstCookie) = await ResetAsync(backend, "f01");
         var (second, secondCookie) = await ResetAsync(backend, "f02");
@@ -75,6 +77,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Reset_SameSlotAgain_ClosesThePreviousCopy()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (previous, _) = await ResetAsync(backend, "f01");
 
@@ -87,6 +90,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Reset_IsFast()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         await ResetAsync(backend, "warmup");
 
@@ -110,6 +114,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Clock_Set_StampsTheNextSave()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (projectId, _) = await ResetAsync(backend, "f01");
         var at = new DateTimeOffset(2026, 12, 24, 18, 0, 0, TimeSpan.Zero);
@@ -124,6 +129,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Clock_Default_IsTheReferenceDate()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var clock = (TimeProvider)backend.Services.GetService(typeof(TimeProvider))!;
 
@@ -133,6 +139,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Blobs_SameFileAttachedTwice_OneBlob()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (projectId, _) = await ResetAsync(backend, "f01");
         var before = await (await GetAsync(backend, $"/_test/blobs?projectId={projectId}")).ReadAsync<JsonObject>();
@@ -147,6 +154,7 @@ public sealed class TestEndpointsTests
     [Fact]
     public async Task Limits_Lowered_RefusesALargerFile()
     {
+        SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (projectId, _) = await ResetAsync(backend, "f01");
         (await backend.Client.PostJsonAsync("/_test/limits", new { maxAttachmentSize = 100 })).EnsureSuccessStatusCode();
@@ -164,6 +172,14 @@ public sealed class TestEndpointsTests
         using var response = await backend.Client.PostAsync(new Uri("/_test/reset?slot=f01", UriKind.Relative), null, Ct);
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        ErableHost.TestEndpointsCompiled.ShouldBeTrue();
+    }
+
+    /// <summary>Release builds compile the endpoints out (CLAUDE.md §6.12): nothing to test there but their absence.</summary>
+    private static void SkipWhenCompiledOut()
+    {
+        if (!ErableHost.TestEndpointsCompiled)
+        {
+            Assert.Skip("The /_test endpoints are compiled out of Release builds.");
+        }
     }
 }

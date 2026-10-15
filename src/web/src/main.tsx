@@ -4,7 +4,8 @@ import "./shared/theme/global.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./app/App";
-import { establishDesktopSession } from "./shared/api/session";
+import { api, unwrap } from "./shared/api/client";
+import { establishDesktopSession, noLaunchOptions } from "./shared/api/session";
 import { createI18n, initialLanguage } from "./shared/i18n/i18n";
 import { applyTheme, readInitialTheme } from "./shared/theme/theme";
 
@@ -21,9 +22,22 @@ const [i18n, launch] = await Promise.all([
   // Never block the first render: if this fails, API calls answer 401 and the UI shows the error.
   establishDesktopSession().catch((error: unknown) => {
     console.error("Desktop session could not be established", error);
-    return { selfTest: false };
+    return noLaunchOptions;
   }),
 ]);
+
+// `Erable.Desktop <folder>`: the project opens first, so that the router starts on it.
+if (launch.openFolder !== null) {
+  try {
+    const project = await unwrap(
+      api.POST("/api/v1/projects/open", { body: { folder: launch.openFolder } }),
+    );
+    history.replaceState(history.state, "", `/p/${project.id}`);
+  } catch (error) {
+    // The home screen shows instead; the recent list tells why the folder cannot open.
+    console.error("The project given on the command line could not be opened", error);
+  }
+}
 
 createRoot(container).render(
   <StrictMode>
@@ -33,5 +47,5 @@ createRoot(container).render(
 
 if (launch.selfTest) {
   // Loaded only on demand: the smoke journey is not part of the main bundle.
-  void import("./selftest/run").then(({ runSelfTest }) => runSelfTest(i18n));
+  void import("./selftest/run").then(({ runSelfTest }) => runSelfTest(i18n, launch));
 }
