@@ -6,7 +6,11 @@ namespace Erable.Core;
 /// </summary>
 /// <param name="Code">Stable dotted identifier of the error.</param>
 /// <param name="Message">English explanation for logs and developers (never shown as is to users).</param>
-public sealed record DomainError(string Code, string Message);
+/// <param name="Extensions">
+/// Optional machine-readable details, returned as extensions of the <c>ProblemDetails</c> (e.g. the IDs of a category
+/// loop, the pages blocking a type change). Values are JSON-serializable.
+/// </param>
+public sealed record DomainError(string Code, string Message, IReadOnlyDictionary<string, object?>? Extensions = null);
 
 /// <summary>Outcome of a business operation: a value or a <see cref="DomainError"/>, no exception for business cases.</summary>
 public readonly struct Result<T>

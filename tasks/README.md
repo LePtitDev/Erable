@@ -52,7 +52,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 ### M2 — Structure
 | ID | Tâche | Dépend de | Statut |
 |---|---|---|---|
-| [M2-01](M2-01-category-domain.md) | Domaine : catégories, héritage, résolution | M1-02 | todo |
+| [M2-01](M2-01-category-domain.md) | Domaine : catégories, héritage, résolution | M1-02 | review |
 | [M2-02](M2-02-property-rules.md) | Définitions de propriétés et moteur de règles | M2-01 | todo |
 | [M2-03](M2-03-structure-storage-api.md) | Stockage et API : catégories, propriétés, valeurs | M2-02, M1-05 | todo |
 | [M2-04](M2-04-category-screen.md) | Écran Catégorie | M2-03, M1-11 | todo |
@@ -128,7 +128,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-12** | Titres des tests e2e en français dans features §1.3, alors que le code est en anglais. | Titre anglais précédé de l'ID (`E2E-05-03 · Insert a link via the palette`) ; la vérification de traçabilité ne porte que sur l'ID. Déjà inscrit dans `CLAUDE.md`. | ✅ Tranché en M0-09 (features §1.1 et §1.3 corrigés) |
 | **P-13** | `E2E-17-02` est rattaché à M1 mais commence par `Ctrl+K`, qui relève de F10 (M3). | Rattacher `E2E-17-02` à M3 (tâche M3-02) et corriger features §F17. Alternative : une recherche par nom minimale dès M1, à partir de l'arbre chargé côté client. | ✅ Tranché en M1-10 : rattaché à M3, features §F17 corrigé |
 
-| **P-14** | L'arbre de features §2.1 imbrique les catégories (Entité › Personnage › PNJ), mais le domaine (M1-02) n'autorise pas une catégorie sous une catégorie : l'héritage est un attribut (`parent_category_id`, §A-5.3). En M1, elles sont à plat sous la racine. | Garder l'arbre pour le rangement (dossiers) et montrer l'héritage dans l'écran Catégorie ; ou afficher les catégories selon leur héritage dans l'explorateur (le parent devient alors la catégorie, ce qui change F02.R2). | M2-01 |
+| **P-14** | L'arbre de features §2.1 imbrique les catégories (Entité › Personnage › PNJ), mais le domaine (M1-02) n'autorise pas une catégorie sous une catégorie : l'héritage est un attribut (`parent_category_id`, §A-5.3). En M1, elles sont à plat sous la racine. | Garder l'arbre pour le rangement (dossiers) et montrer l'héritage dans l'écran Catégorie ; ou afficher les catégories selon leur héritage dans l'explorateur (le parent devient alors la catégorie, ce qui change F02.R2). | ✅ Tranché en M2-01 : l'arbre range (dossiers), l'héritage est montré dans l'écran Catégorie |
 | **P-15** | Glisser un dossier sur l'accueil (E2E-16-07) : le WebView ne donne pas le chemin d'un dossier déposé et Photino.NET n'expose ni dépôt ni navigation. PhotinoX expose `NavigationStarting` (intercepter le `file:///` du dossier déposé). | Passer à PhotinoX (recommandé dès M0-08, migration ≈ 10 lignes dans `PhotinoShell.cs`) et implémenter E2E-16-07 ; ou reporter le scénario (P2) à M5-03. | ✅ Tranché en M1-17 : PhotinoX retenu (Q6 mis à jour), E2E-16-07 implémenté |
 
 ## Propositions

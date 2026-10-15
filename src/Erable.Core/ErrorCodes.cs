@@ -34,4 +34,10 @@ public static class ErrorCodes
 
     /// <summary>The file exceeds the configured maximum attachment size (F06.R5).</summary>
     public const string AttachmentTooLarge = "attachment.tooLarge";
+
+    /// <summary>The chosen parent category does not exist.</summary>
+    public const string CategoryParentNotFound = "category.parent.notFound";
+
+    /// <summary>The chosen parent would create an inheritance loop (F07.R2); the loop is in the <c>loop</c> extension.</summary>
+    public const string CategoryCycle = "category.parent.cycle";
 }

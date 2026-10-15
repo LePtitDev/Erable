@@ -151,6 +151,12 @@ Une **sous-page** est simplement une page dont le parent est une page. Le dossie
 
 Si deux catégories *sans lien d'héritage* entre elles fournissent des valeurs différentes au même niveau, la valeur est marquée **en conflit**. L'UI demande alors de la fixer sur la page plutôt que de choisir arbitrairement.
 
+Précisions (M2-01) :
+- pour chaque catégorie de la page, la catégorie la plus proche de sa chaîne (elle-même d'abord) qui définit une valeur est candidate ; une candidate ancêtre d'une autre candidate est écartée (PNJ + Marchand : Marchand l'emporte, sans conflit) ;
+- deux catégories sans lien qui fournissent la **même** valeur ne sont **pas** en conflit ; l'origine les cite toutes les deux ;
+- une valeur `list<T>` se résout comme une valeur simple : la liste de la page (ou de la catégorie la plus spécifique) **remplace** les listes héritées, elle ne s'y ajoute pas ;
+- la résolution ne dépend pas de l'ordre des catégories de la page (seul l'ordre d'affichage des candidates d'un conflit le suit).
+
 ### 5.4 Définition de propriété
 
 `name` (affiché), `key` (identifiant lisible, unique, modifiable sans rien casser puisque les références passent par l'ID), `description`, `type`, `default`, `rules[]`.
