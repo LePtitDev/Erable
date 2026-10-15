@@ -1,0 +1,110 @@
+.input,
+.textarea {
+  width: 100%;
+  min-height: var(--size-control-md);
+  box-sizing: border-box;
+  padding: 0 var(--space-2-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+
+.textarea {
+  padding: var(--space-1-5) var(--space-2-5);
+  resize: vertical;
+}
+
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-control-md);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.track {
+  display: inline-flex;
+  align-items: center;
+  width: 32px;
+  height: 18px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: var(--radius-pill);
+  background: var(--color-border-strong);
+  transition: background 0.15s;
+}
+
+.thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  transition: transform 0.15s;
+}
+
+.switch[aria-checked="true"] .track {
+  background: var(--color-accent);
+}
+
+.switch[aria-checked="true"] .thumb {
+  transform: translateX(14px);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.remove,
+.addItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: var(--size-control-sm);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.addItem {
+  align-self: flex-start;
+}
+
+.remove:hover,
+.addItem:hover {
+  background: var(--color-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track,
+  .thumb {
+    transition: none;
+  }
+}

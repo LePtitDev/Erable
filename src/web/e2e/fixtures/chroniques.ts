@@ -11,6 +11,10 @@ export const chroniques = {
   colGeleLieu: "8C3E1F7A90B2D446",
   ordreDuGivre: "9E04B6A1C8D2F570",
   colGeleQuete: "2D8F5A7C1B9E0463",
+  entite: "E1A0000000000001",
+  personnage: "E1A0000000000002",
+  pnj: "0D7EA95162C3B804",
+  niveau: "44B107E9C2A63F58",
 } as const;
 
 /** Default test clock: 13 October 2026, 10:00 Europe/Paris (docs/features.md §1.4). */

@@ -12,6 +12,14 @@
   gap: var(--space-4);
 }
 
+.titleGroup {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
 .title {
   margin: 0;
   font-family: var(--font-content);

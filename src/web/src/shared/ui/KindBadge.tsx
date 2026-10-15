@@ -8,7 +8,7 @@ export function KindBadge({
   size = "md",
 }: {
   readonly kind: ElementKind;
-  readonly size?: "sm" | "md";
+  readonly size?: "sm" | "md" | "lg";
 }) {
   const { t } = useTranslation();
   return (

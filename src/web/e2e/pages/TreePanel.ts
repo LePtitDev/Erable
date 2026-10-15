@@ -55,6 +55,15 @@ export class TreePanel {
     await this.page.keyboard.press("Enter");
   }
 
+  /** Creates a category from the context menu of a line (the Catégories root or one of its folders). */
+  async newCategory(name: string, under = "Catégories") {
+    const target = under === "Catégories" ? this.root(under) : this.item(under);
+    await target.click({ button: "right" });
+    await this.page.getByRole("menuitem", { name: t("explorer.newCategory") }).click();
+    await this.tree.getByRole("textbox", { name: t("explorer.newName.category") }).fill(name);
+    await this.page.keyboard.press("Enter");
+  }
+
   async rename(name: string, newName: string) {
     await this.item(name).click();
     await this.tree.press("F2");

@@ -5,6 +5,7 @@ import { useFormatters } from "../../shared/i18n/format";
 import type { ElementId } from "../../shared/ids/elementId";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { IdChip } from "../../shared/ui/IdChip";
+import { KindBadge } from "../../shared/ui/KindBadge";
 import { useAuthorName } from "./authors";
 import styles from "./ElementHeader.module.css";
 
@@ -17,10 +18,22 @@ interface ElementHeaderProps {
   readonly chips?: ReactNode;
   /** Replaces the title (inline rename, editor). */
   readonly title?: ReactNode;
+  /** Shows the large kind badge before the title (category and property screens). */
+  readonly kind?: boolean;
+  /** ID of the title, for an `aria-labelledby`. */
+  readonly titleId?: string;
 }
 
 /** Breadcrumb, title, ID, modification line (mockup « Page — lecture », F03, E2E-04-01). */
-export function ElementHeader({ projectId, element, actions, chips, title }: ElementHeaderProps) {
+export function ElementHeader({
+  projectId,
+  element,
+  actions,
+  chips,
+  title,
+  kind = false,
+  titleId,
+}: ElementHeaderProps) {
   const { t } = useTranslation();
   const format = useFormatters();
   const author = useAuthorName();
@@ -29,7 +42,14 @@ export function ElementHeader({ projectId, element, actions, chips, title }: Ele
     <header className={styles["header"]}>
       {!root && <Breadcrumb projectId={projectId} path={element.path} current={element.name} />}
       <div className={styles["titleRow"]}>
-        {title ?? <h1 className={styles["title"]}>{element.name}</h1>}
+        <div className={styles["titleGroup"]}>
+          {kind && <KindBadge kind={element.kind} size="lg" />}
+          {title ?? (
+            <h1 className={styles["title"]} id={titleId}>
+              {element.name}
+            </h1>
+          )}
+        </div>
         {actions !== undefined && <div className={styles["actions"]}>{actions}</div>}
       </div>
       {!root && (

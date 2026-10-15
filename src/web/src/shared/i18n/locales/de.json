@@ -65,7 +65,10 @@
       }
     },
     "page": {
-      "revisionConflict": "Die Seite wurde inzwischen geändert. Laden Sie sie vor dem Speichern neu."
+      "revisionConflict": "Die Seite wurde inzwischen geändert. Laden Sie sie vor dem Speichern neu.",
+      "category": {
+        "invalid": "Eine Kategorie der Seite existiert nicht mehr."
+      }
     },
     "attachment": {
       "tooLarge": "Die Datei überschreitet die maximal zulässige Größe.",
@@ -75,6 +78,36 @@
     },
     "native": {
       "unavailable": "Diese Aktion gibt es nur in der Desktop-Anwendung."
+    },
+    "category": {
+      "parent": {
+        "cycle": "Diese Oberkategorie würde eine Vererbungsschleife erzeugen.",
+        "notFound": "Die Oberkategorie existiert nicht mehr."
+      }
+    },
+    "property": {
+      "type": {
+        "invalid": "Unbekannter Eigenschaftstyp."
+      },
+      "value": {
+        "invalid": "Ungültiger Wert für diesen Eigenschaftstyp.",
+        "notConvertible": "Vorhandene Werte können nicht in diesen Typ umgewandelt werden."
+      },
+      "rule": {
+        "invalid": "Ungültige Validierungsregel für diesen Typ."
+      },
+      "key": {
+        "invalid": "Ungültiger Schlüssel: Kleinbuchstaben, Ziffern, „_“ oder „-“, beginnend mit einem Buchstaben.",
+        "taken": "Eine andere Eigenschaft verwendet diesen Schlüssel bereits."
+      },
+      "option": {
+        "invalid": "Ungültige Optionen: Jede Option hat eine eindeutige Bezeichnung und einen eindeutigen Schlüssel.",
+        "inUse": "Seiten verwenden die entfernte Option noch: Wählen Sie eine Ersatzoption."
+      },
+      "description": {
+        "tooLong": "Die Beschreibung ist zu lang."
+      },
+      "notFound": "Diese Eigenschaft existiert nicht mehr."
     }
   },
   "home": {
@@ -214,7 +247,8 @@
     "renameLabel": "Neuer Name",
     "newName": {
       "page": "Name der neuen Seite",
-      "folder": "Name des neuen Ordners"
+      "folder": "Name des neuen Ordners",
+      "category": "Name der neuen Kategorie"
     },
     "cut": "Verschieben…",
     "cutShortcut": "Strg+X",
@@ -229,7 +263,8 @@
       "crossRoot": "Ein Element bleibt unter seiner eigenen Wurzel.",
       "intoDescendant": "Ein Element kann nicht unter einen seiner Nachkommen.",
       "invalidParent": "Dieser Ort kann dieses Element nicht enthalten."
-    }
+    },
+    "newCategory": "Neue Kategorie"
   },
   "kinds": {
     "root": "Wurzel",
@@ -361,5 +396,93 @@
     "count_zero": "Kein Vorschlag",
     "count_one": "{{count}} Vorschlag",
     "count_other": "{{count}} Vorschläge"
+  },
+  "property": {
+    "yes": "Ja",
+    "no": "Nein",
+    "empty": "—",
+    "emptyList": "Leere Liste",
+    "listItem": "{{name}}, Element {{index}}",
+    "removeItem": "Element {{index}} entfernen",
+    "addItem": "Element hinzufügen",
+    "rule": {
+      "greater_than": "> {{value}}",
+      "greater_or_equal": "≥ {{value}}",
+      "less_than": "< {{value}}",
+      "less_or_equal": "≤ {{value}}",
+      "between": "zwischen {{min}} und {{max}}",
+      "not_equal": "≠ {{value}}",
+      "min_length": "Länge ≥ {{value}}",
+      "max_length": "Länge ≤ {{value}}",
+      "match": "Muster {{value}}",
+      "not_empty": "nicht leer",
+      "in": "eine von: {{value}}",
+      "after": "nach dem {{value}}",
+      "before": "vor dem {{value}}",
+      "kind_page": "eine Seite",
+      "kind_category": "eine Kategorie",
+      "in_category": "Kategorie = {{value}}",
+      "min_count": "mindestens {{value}} Elemente",
+      "max_count": "höchstens {{value}} Elemente"
+    },
+    "violation": {
+      "greater_than": "Muss größer als {{value}} sein",
+      "greater_or_equal": "Muss größer oder gleich {{value}} sein",
+      "less_than": "Muss kleiner als {{value}} sein",
+      "less_or_equal": "Muss kleiner oder gleich {{value}} sein",
+      "between": "Muss zwischen {{min}} und {{max}} liegen",
+      "not_equal": "Muss sich von {{value}} unterscheiden",
+      "min_length": "Muss mindestens {{value}} Zeichen enthalten",
+      "max_length": "Darf höchstens {{value}} Zeichen enthalten",
+      "match": "Muss dem Muster {{value}} entsprechen",
+      "not_empty": "Darf nicht leer sein",
+      "in": "Muss eine der Optionen sein: {{value}}",
+      "after": "Muss nach dem {{value}} liegen",
+      "before": "Muss vor dem {{value}} liegen",
+      "kind_page": "Muss auf eine Seite verweisen",
+      "kind_category": "Muss auf eine Kategorie verweisen",
+      "in_category": "Muss auf eine Seite der Kategorie {{value}} verweisen",
+      "min_count": "Muss mindestens {{value}} Elemente enthalten",
+      "max_count": "Darf höchstens {{value}} Elemente enthalten",
+      "item": "Element {{index}}: {{message}}"
+    }
+  },
+  "category": {
+    "description": "Beschreibung",
+    "noDescription": "Keine Beschreibung.",
+    "inheritance": "Vererbung",
+    "lineage": "Vererbungskette",
+    "subCategories": "Unterkategorien:",
+    "noSubCategories": "Keine Unterkategorie.",
+    "parent": "Oberkategorie",
+    "noParent": "Keine (oberste Kategorie)",
+    "loop": "Würde eine Schleife erzeugen: {{loop}}",
+    "editing": "Kategorie bearbeiten",
+    "properties": "Eigenschaften",
+    "propertiesHint": "Gelten für jede Seite der Kategorie. Die Werte sind Vorgaben und können pro Seite überschrieben werden.",
+    "noProperties": "Keine Eigenschaft: Fügen Sie einen Standardwert hinzu, damit sie für die Seiten der Kategorie gilt.",
+    "addProperty": "Hinzufügen",
+    "addPropertyTitle": "Eigenschaft hinzufügen",
+    "valueOf": "Standardwert von {{name}}",
+    "removeValue": "Wert von {{name}} entfernen",
+    "override": "Überschreiben",
+    "overrides": "überschrieben",
+    "definitionDefault": "Standard der Eigenschaft",
+    "column": {
+      "property": "Eigenschaft",
+      "type": "Typ",
+      "default": "Standardwert",
+      "rules": "Regeln",
+      "source": "Herkunft",
+      "actions": "Aktionen"
+    },
+    "pages": "Seiten der Kategorie",
+    "includeSubCategories": "Unterkategorien einbeziehen",
+    "filter": "Filtern",
+    "filterLabel": "Seiten der Kategorie filtern",
+    "noPages": "Keine Seite in dieser Kategorie.",
+    "searchSoon": "Verfügbar mit dem Suchbildschirm.",
+    "seeInSearch_one": "Die Seite in der Suche anzeigen",
+    "seeInSearch_other": "Die {{count}} Seiten in der Suche anzeigen"
   }
 }

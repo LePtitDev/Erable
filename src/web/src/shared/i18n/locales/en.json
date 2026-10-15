@@ -65,7 +65,10 @@
       }
     },
     "page": {
-      "revisionConflict": "The page changed in the meantime. Reload it before saving."
+      "revisionConflict": "The page changed in the meantime. Reload it before saving.",
+      "category": {
+        "invalid": "A category of the page no longer exists."
+      }
     },
     "attachment": {
       "tooLarge": "The file exceeds the maximum allowed size.",
@@ -75,6 +78,36 @@
     },
     "native": {
       "unavailable": "This action only exists in the desktop application."
+    },
+    "category": {
+      "parent": {
+        "cycle": "This parent would create an inheritance loop.",
+        "notFound": "The parent category no longer exists."
+      }
+    },
+    "property": {
+      "type": {
+        "invalid": "Unknown property type."
+      },
+      "value": {
+        "invalid": "Invalid value for this property type.",
+        "notConvertible": "Existing values cannot be converted to this type."
+      },
+      "rule": {
+        "invalid": "Invalid validation rule for this type."
+      },
+      "key": {
+        "invalid": "Invalid key: lower-case letters, digits, “_” or “-”, starting with a letter.",
+        "taken": "Another property already uses this key."
+      },
+      "option": {
+        "invalid": "Invalid options: each option has a unique label and key.",
+        "inUse": "Pages still use the removed option: choose a replacement option."
+      },
+      "description": {
+        "tooLong": "The description is too long."
+      },
+      "notFound": "This property no longer exists."
     }
   },
   "home": {
@@ -214,7 +247,8 @@
     "renameLabel": "New name",
     "newName": {
       "page": "Name of the new page",
-      "folder": "Name of the new folder"
+      "folder": "Name of the new folder",
+      "category": "Name of the new category"
     },
     "cut": "Move…",
     "cutShortcut": "Ctrl+X",
@@ -229,7 +263,8 @@
       "crossRoot": "An element stays under its own root.",
       "intoDescendant": "An element cannot go under one of its descendants.",
       "invalidParent": "This location cannot contain this element."
-    }
+    },
+    "newCategory": "New category"
   },
   "kinds": {
     "root": "Root",
@@ -361,5 +396,93 @@
     "count_zero": "No suggestion",
     "count_one": "{{count}} suggestion",
     "count_other": "{{count}} suggestions"
+  },
+  "property": {
+    "yes": "Yes",
+    "no": "No",
+    "empty": "—",
+    "emptyList": "Empty list",
+    "listItem": "{{name}}, item {{index}}",
+    "removeItem": "Remove item {{index}}",
+    "addItem": "Add an item",
+    "rule": {
+      "greater_than": "> {{value}}",
+      "greater_or_equal": "≥ {{value}}",
+      "less_than": "< {{value}}",
+      "less_or_equal": "≤ {{value}}",
+      "between": "between {{min}} and {{max}}",
+      "not_equal": "≠ {{value}}",
+      "min_length": "length ≥ {{value}}",
+      "max_length": "length ≤ {{value}}",
+      "match": "pattern {{value}}",
+      "not_empty": "not empty",
+      "in": "one of: {{value}}",
+      "after": "after {{value}}",
+      "before": "before {{value}}",
+      "kind_page": "a page",
+      "kind_category": "a category",
+      "in_category": "category = {{value}}",
+      "min_count": "at least {{value}} items",
+      "max_count": "at most {{value}} items"
+    },
+    "violation": {
+      "greater_than": "Must be greater than {{value}}",
+      "greater_or_equal": "Must be greater than or equal to {{value}}",
+      "less_than": "Must be less than {{value}}",
+      "less_or_equal": "Must be less than or equal to {{value}}",
+      "between": "Must be between {{min}} and {{max}}",
+      "not_equal": "Must be different from {{value}}",
+      "min_length": "Must have at least {{value}} characters",
+      "max_length": "Must have at most {{value}} characters",
+      "match": "Must match the pattern {{value}}",
+      "not_empty": "Must not be empty",
+      "in": "Must be one of: {{value}}",
+      "after": "Must be after {{value}}",
+      "before": "Must be before {{value}}",
+      "kind_page": "Must point to a page",
+      "kind_category": "Must point to a category",
+      "in_category": "Must point to a page of the category {{value}}",
+      "min_count": "Must have at least {{value}} items",
+      "max_count": "Must have at most {{value}} items",
+      "item": "Item {{index}}: {{message}}"
+    }
+  },
+  "category": {
+    "description": "Description",
+    "noDescription": "No description.",
+    "inheritance": "Inheritance",
+    "lineage": "Inheritance chain",
+    "subCategories": "Subcategories:",
+    "noSubCategories": "No subcategory.",
+    "parent": "Parent category",
+    "noParent": "None (top-level category)",
+    "loop": "Would create a loop: {{loop}}",
+    "editing": "Editing the category",
+    "properties": "Properties",
+    "propertiesHint": "Applied to every page of the category. The values are defaults and can be overridden on each page.",
+    "noProperties": "No property: add a default value so that it applies to the pages of the category.",
+    "addProperty": "Add",
+    "addPropertyTitle": "Add a property",
+    "valueOf": "Default value of {{name}}",
+    "removeValue": "Remove the value of {{name}}",
+    "override": "Override",
+    "overrides": "overridden",
+    "definitionDefault": "Property default",
+    "column": {
+      "property": "Property",
+      "type": "Type",
+      "default": "Default value",
+      "rules": "Rules",
+      "source": "Source",
+      "actions": "Actions"
+    },
+    "pages": "Pages of the category",
+    "includeSubCategories": "Include subcategories",
+    "filter": "Filter",
+    "filterLabel": "Filter the pages of the category",
+    "noPages": "No page in this category.",
+    "searchSoon": "Available with the Search screen.",
+    "seeInSearch_one": "See the page in the search",
+    "seeInSearch_other": "See the {{count}} pages in the search"
   }
 }

@@ -3,7 +3,11 @@ import { api, unwrap } from "../../shared/api/client";
 import { queryKeys } from "../../shared/api/keys";
 import type { ProjectTree } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
+import { createCategory } from "../../shared/api/structure";
 import { applyMove } from "./treeModel";
+
+/** What the explorer creates: pages and folders, and the elements of the other roots (M2). */
+export type CreatableKind = "page" | "folder" | "category";
 
 interface MoveChange {
   readonly id: ElementId;
@@ -61,23 +65,29 @@ export function useTreeMutations(projectId: ElementId) {
       parentId,
       name,
     }: {
-      kind: "page" | "folder";
+      kind: CreatableKind;
       parentId: ElementId;
       name: string;
-    }) =>
-      kind === "page"
-        ? unwrap(
+    }) => {
+      switch (kind) {
+        case "page":
+          return unwrap(
             api.POST("/api/v1/projects/{projectId}/pages", {
               params: { path: { projectId } },
               body: { parentId, name },
             }),
-          )
-        : unwrap(
+          );
+        case "folder":
+          return unwrap(
             api.POST("/api/v1/projects/{projectId}/folders", {
               params: { path: { projectId } },
               body: { parentId, name },
             }),
-          ),
+          );
+        case "category":
+          return createCategory(projectId, parentId, name).then((view) => view.element);
+      }
+    },
     onSuccess: refresh,
   });
 

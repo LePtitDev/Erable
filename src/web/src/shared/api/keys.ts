@@ -18,6 +18,14 @@ export const queryKeys = {
   resolve: (projectId: ElementId, id: ElementId) => ["projects", projectId, "resolve", id] as const,
   backlinks: (projectId: ElementId, id: ElementId) =>
     ["projects", projectId, "backlinks", id] as const,
+  categories: (projectId: ElementId) => ["projects", projectId, "categories"] as const,
+  category: (projectId: ElementId, id: ElementId) =>
+    ["projects", projectId, "categories", id] as const,
+  categoryPages: (projectId: ElementId, id: ElementId, includeSubCategories: boolean) =>
+    ["projects", projectId, "categories", id, "pages", includeSubCategories] as const,
+  properties: (projectId: ElementId) => ["projects", projectId, "properties"] as const,
+  property: (projectId: ElementId, id: ElementId) =>
+    ["projects", projectId, "properties", id] as const,
   /** Everything that shows names or structure of a project: after a rename or a move. */
   projectContent: (projectId: ElementId) => ["projects", projectId] as const,
 };

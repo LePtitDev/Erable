@@ -19,7 +19,7 @@ Afficher et saisir les valeurs de propriétés d'une page, avec héritage, confl
 
 ## Critères d'acceptation
 
-- [ ] `E2E-05-12`, `E2E-07-04`, `E2E-07-05`, `E2E-07-06`, `E2E-08-06` verts.
+- [ ] `E2E-05-12`, `E2E-07-04`, `E2E-07-05`, `E2E-07-06`, `E2E-07-08` (repris de M2-04), `E2E-08-06` verts.
 - [ ] Tests de composant de chaque éditeur de type.
 
 ## Notes d'implémentation

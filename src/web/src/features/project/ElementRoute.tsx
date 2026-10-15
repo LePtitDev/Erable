@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../../shared/api/client";
@@ -9,11 +9,13 @@ import { NotFoundScreen } from "./ErrorScreens";
 import { FolderView } from "./FolderView";
 import { GenericElementView } from "./GenericElementView";
 import { PageRoute } from "../page/PageRoute";
+import { CategoryView } from "../category/CategoryView";
 
 /** `/p/:projectId/e/:elementId`: the kind of the element chooses the view (docs/architecture.md §3.1, F03.R3). */
 export function ElementRoute() {
   const { t } = useTranslation();
   const { projectId, elementId } = useParams({ from: "/p/$projectId/e/$elementId" });
+  const { edit } = useSearch({ from: "/p/$projectId/e/$elementId" });
   const enabled = projectId !== null && elementId !== null;
   const element = useQuery({
     ...elementQuery(projectId ?? ("" as never), elementId ?? ("" as never)),
@@ -44,8 +46,16 @@ export function ElementRoute() {
     case "root":
     case "folder":
       return <FolderView projectId={projectId} element={element.data} />;
-    case "attachment":
     case "category":
+      return (
+        <CategoryView
+          key={element.data.id}
+          projectId={projectId}
+          element={element.data}
+          edit={edit === true}
+        />
+      );
+    case "attachment":
     case "propertyDefinition":
     case "linkType":
       return <GenericElementView projectId={projectId} element={element.data} />;

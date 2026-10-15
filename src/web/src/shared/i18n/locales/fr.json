@@ -65,7 +65,10 @@
       }
     },
     "page": {
-      "revisionConflict": "La page a été modifiée entre-temps. Rechargez-la avant d’enregistrer."
+      "revisionConflict": "La page a été modifiée entre-temps. Rechargez-la avant d’enregistrer.",
+      "category": {
+        "invalid": "Une catégorie de la page n’existe plus."
+      }
     },
     "attachment": {
       "tooLarge": "Le fichier dépasse la taille maximale autorisée.",
@@ -75,6 +78,36 @@
     },
     "native": {
       "unavailable": "Cette action n’existe que dans l’application de bureau."
+    },
+    "category": {
+      "parent": {
+        "cycle": "Ce parent créerait une boucle d’héritage.",
+        "notFound": "La catégorie parente n’existe plus."
+      }
+    },
+    "property": {
+      "type": {
+        "invalid": "Type de propriété inconnu."
+      },
+      "value": {
+        "invalid": "Valeur invalide pour ce type de propriété.",
+        "notConvertible": "Des valeurs existantes ne peuvent pas être converties vers ce type."
+      },
+      "rule": {
+        "invalid": "Règle de validation invalide pour ce type."
+      },
+      "key": {
+        "invalid": "Clé invalide : lettres minuscules, chiffres, « _ » ou « - », en commençant par une lettre.",
+        "taken": "Une autre propriété utilise déjà cette clé."
+      },
+      "option": {
+        "invalid": "Options invalides : chaque option a un libellé et une clé uniques.",
+        "inUse": "Des pages utilisent encore l’option supprimée : choisissez une option de remplacement."
+      },
+      "description": {
+        "tooLong": "La description est trop longue."
+      },
+      "notFound": "Cette propriété n’existe plus."
     }
   },
   "home": {
@@ -218,7 +251,8 @@
     "renameLabel": "Nouveau nom",
     "newName": {
       "page": "Nom de la nouvelle page",
-      "folder": "Nom du nouveau dossier"
+      "folder": "Nom du nouveau dossier",
+      "category": "Nom de la nouvelle catégorie"
     },
     "cut": "Déplacer…",
     "cutShortcut": "Ctrl+X",
@@ -233,7 +267,8 @@
       "crossRoot": "Un élément reste sous sa propre racine.",
       "intoDescendant": "Un élément ne peut pas aller sous l’un de ses descendants.",
       "invalidParent": "Cet emplacement ne peut pas contenir cet élément."
-    }
+    },
+    "newCategory": "Nouvelle catégorie"
   },
   "kinds": {
     "root": "Racine",
@@ -366,5 +401,94 @@
     "count_one": "{{count}} suggestion",
     "count_many": "{{count}} suggestions",
     "count_other": "{{count}} suggestions"
+  },
+  "property": {
+    "yes": "Oui",
+    "no": "Non",
+    "empty": "—",
+    "emptyList": "Liste vide",
+    "listItem": "{{name}}, élément {{index}}",
+    "removeItem": "Retirer l’élément {{index}}",
+    "addItem": "Ajouter un élément",
+    "rule": {
+      "greater_than": "> {{value}}",
+      "greater_or_equal": "≥ {{value}}",
+      "less_than": "< {{value}}",
+      "less_or_equal": "≤ {{value}}",
+      "between": "entre {{min}} et {{max}}",
+      "not_equal": "≠ {{value}}",
+      "min_length": "longueur ≥ {{value}}",
+      "max_length": "longueur ≤ {{value}}",
+      "match": "motif {{value}}",
+      "not_empty": "non vide",
+      "in": "parmi : {{value}}",
+      "after": "après le {{value}}",
+      "before": "avant le {{value}}",
+      "kind_page": "une page",
+      "kind_category": "une catégorie",
+      "in_category": "catégorie = {{value}}",
+      "min_count": "au moins {{value}} éléments",
+      "max_count": "au plus {{value}} éléments"
+    },
+    "violation": {
+      "greater_than": "Doit être supérieur à {{value}}",
+      "greater_or_equal": "Doit être supérieur ou égal à {{value}}",
+      "less_than": "Doit être inférieur à {{value}}",
+      "less_or_equal": "Doit être inférieur ou égal à {{value}}",
+      "between": "Doit être compris entre {{min}} et {{max}}",
+      "not_equal": "Doit être différent de {{value}}",
+      "min_length": "Doit contenir au moins {{value}} caractères",
+      "max_length": "Doit contenir au plus {{value}} caractères",
+      "match": "Doit correspondre au motif {{value}}",
+      "not_empty": "Ne doit pas être vide",
+      "in": "Doit être l’une des options : {{value}}",
+      "after": "Doit être postérieure au {{value}}",
+      "before": "Doit être antérieure au {{value}}",
+      "kind_page": "Doit désigner une page",
+      "kind_category": "Doit désigner une catégorie",
+      "in_category": "Doit désigner une page de la catégorie {{value}}",
+      "min_count": "Doit contenir au moins {{value}} éléments",
+      "max_count": "Doit contenir au plus {{value}} éléments",
+      "item": "Élément {{index}} : {{message}}"
+    }
+  },
+  "category": {
+    "description": "Description",
+    "noDescription": "Aucune description.",
+    "inheritance": "Héritage",
+    "lineage": "Chaîne d’héritage",
+    "subCategories": "Sous-catégories :",
+    "noSubCategories": "Aucune sous-catégorie.",
+    "parent": "Catégorie parente",
+    "noParent": "Aucune (catégorie racine)",
+    "loop": "Créerait une boucle : {{loop}}",
+    "editing": "Modification de la catégorie",
+    "properties": "Propriétés",
+    "propertiesHint": "Appliquées à chaque page de la catégorie. Les valeurs servent de défaut et peuvent être redéfinies par page.",
+    "noProperties": "Aucune propriété : ajoutez une valeur par défaut pour qu’elle s’applique aux pages de la catégorie.",
+    "addProperty": "Ajouter",
+    "addPropertyTitle": "Ajouter une propriété",
+    "valueOf": "Valeur par défaut de {{name}}",
+    "removeValue": "Retirer la valeur de {{name}}",
+    "override": "Redéfinir",
+    "overrides": "redéfinie",
+    "definitionDefault": "Défaut de la propriété",
+    "column": {
+      "property": "Propriété",
+      "type": "Type",
+      "default": "Valeur par défaut",
+      "rules": "Règles",
+      "source": "Source",
+      "actions": "Actions"
+    },
+    "pages": "Pages de la catégorie",
+    "includeSubCategories": "Inclure les sous-catégories",
+    "filter": "Filtrer",
+    "filterLabel": "Filtrer les pages de la catégorie",
+    "noPages": "Aucune page dans cette catégorie.",
+    "searchSoon": "Disponible avec l’écran Recherche.",
+    "seeInSearch_one": "Voir la page dans la recherche",
+    "seeInSearch_other": "Voir les {{count}} pages dans la recherche",
+    "seeInSearch_many": "Voir les {{count}} pages dans la recherche"
   }
 }

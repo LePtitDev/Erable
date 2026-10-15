@@ -42,7 +42,7 @@ import {
   type TreeIndex,
   type TreeRow,
 } from "./treeModel";
-import { useTreeMutations } from "./useTreeMutations";
+import { useTreeMutations, type CreatableKind } from "./useTreeMutations";
 
 /** Above this many visible rows, only the rows on screen are rendered (budget: 10 000 elements, docs/testing.md §11). */
 const virtualizeFrom = 200;
@@ -51,7 +51,7 @@ const dragType = "application/x-erable-element";
 
 type Editing =
   | { readonly mode: "rename"; readonly id: ElementId }
-  | { readonly mode: "create"; readonly kind: "page" | "folder"; readonly parentId: ElementId };
+  | { readonly mode: "create"; readonly kind: CreatableKind; readonly parentId: ElementId };
 
 interface DragState {
   readonly id: ElementId;
@@ -172,7 +172,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   };
 
   /** Where a new element of `kind` goes: the focused element if it can contain it, else its nearest container. */
-  const createTarget = (kind: "page" | "folder"): ElementId => {
+  const createTarget = (kind: CreatableKind): ElementId => {
     const start = focused ?? roots.pages;
     for (const candidate of [start, ...ancestorsOf(index, start).map((a) => a.id)]) {
       if (canContain(index, candidate, kind)) return candidate;
@@ -180,7 +180,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
     return roots.pages;
   };
 
-  const startCreate = (kind: "page" | "folder", parentId = createTarget(kind)) => {
+  const startCreate = (kind: CreatableKind, parentId = createTarget(kind)) => {
     setError(null);
     setFilter("");
     setExpanded((set) => set.add(parentId));
@@ -209,6 +209,13 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
               to: "/p/$projectId/e/$elementId",
               params: { projectId, elementId: created.id },
               search: { edit: true, focus: "title" },
+            });
+          } else if (current.kind !== "folder") {
+            // A new category opens in edit mode: parent, description, defaults (E2E-07-02).
+            void navigate({
+              to: "/p/$projectId/e/$elementId",
+              params: { projectId, elementId: created.id },
+              search: { edit: true },
             });
           }
         },
@@ -708,7 +715,7 @@ function ContextMenu({
   readonly index: TreeIndex;
   readonly cut: ElementId | null;
   readonly onClose: () => void;
-  readonly onCreate: (kind: "page" | "folder", parentId: ElementId) => void;
+  readonly onCreate: (kind: CreatableKind, parentId: ElementId) => void;
   readonly onRename: (id: ElementId) => void;
   readonly onCut: (id: ElementId) => void;
   readonly onPaste: (id: ElementId) => void;
@@ -740,6 +747,16 @@ function ContextMenu({
               }}
             >
               {node.kind === "page" ? t("explorer.newSubPage") : t("explorer.newPage")}
+            </DropdownMenu.Item>
+          )}
+          {node !== undefined && canContain(index, node.id, "category") && (
+            <DropdownMenu.Item
+              className={styles["menuItem"]}
+              onSelect={() => {
+                onCreate("category", node.id);
+              }}
+            >
+              {t("explorer.newCategory")}
             </DropdownMenu.Item>
           )}
           {node !== undefined && canContain(index, node.id, "folder") && (

@@ -2,6 +2,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { roots } from "../../shared/ids/roots";
+import { mockStructure, pnjView } from "../../test/structureMocks";
 import { ids, mockProject } from "../../test/projectMocks";
 import { renderApp } from "../../test/render";
 
@@ -99,9 +100,10 @@ describe("Explorer", () => {
   });
 
   it("refuses to move a category into Pages with the keyboard alternative (E2E-02-04)", async () => {
-    const { writes } = mockProject({
+    const { writes, nodes } = mockProject({
       uiState: { [`tree-${ids.project}`]: { expanded: [roots.pages, roots.categories] } },
     });
+    mockStructure({ view: pnjView(nodes) });
     const user = userEvent.setup();
     const { tree } = await openTree();
 
