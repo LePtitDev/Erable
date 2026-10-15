@@ -108,6 +108,16 @@ public static class ErableHost
                     return Task.CompletedTask;
                 }
 
+                // Values and rules are free JSON whose shape depends on the property type (docs/architecture.md §5.4):
+                // any JSON in the schema, read and checked by the SPA (src/shared/properties).
+                if (type == typeof(System.Text.Json.Nodes.JsonObject))
+                {
+                    schema.Type = JsonSchemaType.Object;
+                    schema.Properties?.Clear();
+                    schema.AdditionalProperties = new OpenApiSchema();
+                    return Task.CompletedTask;
+                }
+
                 // Enums are serialized as strings (JsonStringEnumConverter) but the generator omits their type.
                 if (context.JsonTypeInfo.Type.IsEnum && schema.Enum is { Count: > 0 })
                 {

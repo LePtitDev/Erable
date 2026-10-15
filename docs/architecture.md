@@ -266,13 +266,14 @@ revisions       (element_id, revision, author, at, snapshot BLOB)  -- JSON compr
 categories      (id PK, parent_category_id, description)
 page_categories (page_id, category_id, sort_order)
 property_defs   (id PK, key UNIQUE, type, default_json, rules_json, enum_json)
-property_values (owner_id, property_id, idx,                -- owner = page ou catégorie
-                 v_int, v_real, v_text, v_ref)              -- colonnes typées → filtres SQL
+property_values (owner_id, property_id, idx,                -- owner = page ou catégorie ; idx 0 (scalaire),
+                 v_int, v_real, v_text, v_ref)              -- 0..n-1 (liste), -1 (liste vide) ; colonnes typées → filtres SQL
+resolved_values (page_id, property_id, idx, v_*, origin, source_id)  -- dérivée (P-07) : valeur effective après héritage
 link_types      (id PK, description, inverse_name)
-links           (id PK, source_id, link_type_id, target_id)
+links           (id PK, source_id, link_type_id, target_id, created_at, created_by)
 refs            (source_id, target_id, anchor, is_embed)    -- index dérivé du Markdown
 attachments     (id PK, page_id, file_name, mime, size, sha256)
-validation_issues (owner_id, property_id, rule_op, message)
+validation_issues (owner_id, property_id, rule_index, rule_op, rule_json, item_index)  -- dérivée
 user_activity   (user_id, element_id, last_viewed_at)       -- « récemment consultées »
 search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacritics 2')
 ```

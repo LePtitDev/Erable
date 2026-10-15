@@ -39,6 +39,7 @@ public static class ProjectEndpoints
         project.MapGet("/pages/{id}/content", GetPageContent).WithName("GetPageContent").WithTags("Pages");
         project.MapPut("/pages/{id}/content", SavePageContent).WithName("SavePageContent").WithTags("Pages");
         project.MapAttachmentEndpoints();
+        project.MapStructureEndpoints();
 
         var me = api.MapGroup("/me").WithTags("Me");
         me.MapGet("/", GetMe).WithName("GetMe");
@@ -255,7 +256,10 @@ public static class ProjectEndpoints
             ? tree.Children(id).Where(n => n.Kind == ElementKind.Page).Select(n => new ChildPage(n.Id, n.Name)).ToArray()
             : [];
         var attachments = repository.GetAttachments(id).Select(AttachmentItem.From).ToArray();
-        return TypedResults.Ok(new PageView(Details(found, service, users), content?.Markdown ?? string.Empty, subPages, attachments));
+        var structure = StructureEndpoints.PagePropertiesOf(service, id);
+        return TypedResults.Ok(new PageView(
+            Details(found, service, users), content?.Markdown ?? string.Empty, subPages, attachments,
+            structure?.Categories ?? [], structure?.Properties ?? []));
     }
 
     private static Results<Ok<PageContent>, ProblemHttpResult> GetPageContent(
@@ -292,7 +296,12 @@ public static class ProjectEndpoints
                 "Send If-Match with the revision the edit started from.");
         }
 
-        var saved = await service.SavePageContentAsync(id, request.Markdown, expected, CurrentUser.Id(http), http.RequestAborted)
+        var structure = request.Categories is null && request.Properties is null
+            ? null
+            : new PageStructureInput(
+                request.Categories,
+                request.Properties?.Select(p => (p.PropertyId, System.Text.Json.JsonSerializer.SerializeToElement(p.Value))).ToArray());
+        var saved = await service.SavePageContentAsync(id, request.Markdown, expected, CurrentUser.Id(http), structure, http.RequestAborted)
             .ConfigureAwait(false);
         if (!saved.IsSuccess)
         {
@@ -411,7 +420,7 @@ public static class ProjectEndpoints
         project.Manifest.ProjectId, project.Manifest.Name, project.Folder, project.Manifest.ContentLanguage,
         project.Manifest.FormatVersion, project.Manifest.CreatedAt);
 
-    private static ElementDetails Details(ElementWithPath found, ProjectService service, UserDirectory users)
+    internal static ElementDetails Details(ElementWithPath found, ProjectService service, UserDirectory users)
     {
         var e = found.Element;
         var language = service.Project.Manifest.ContentLanguage;
@@ -421,7 +430,7 @@ public static class ProjectEndpoints
             e.DeletedAt is not null, [.. found.Path.Select(n => PathItemOf(n, language))], users.NameOf(e.CreatedBy), users.NameOf(e.UpdatedBy));
     }
 
-    private static PathItem PathItemOf(TreeNode node, string language) => new(node.Id, node.Kind, DisplayName(node, language));
+    internal static PathItem PathItemOf(TreeNode node, string language) => new(node.Id, node.Kind, DisplayName(node, language));
 
     /// <summary>Roots are labelled in the project's content language (docs/architecture.md §11.1).</summary>
     private static string DisplayName(TreeNode node, string language) =>

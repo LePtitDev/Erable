@@ -211,6 +211,8 @@ export function mockProject(
         attachments: (options.attachments ?? [])
           .filter((a) => a.pageId === node.id)
           .map(attachmentItem),
+        categories: [],
+        properties: [],
       });
     }),
     http.get("/api/v1/projects/{projectId}/resolve", ({ query, response }) => {

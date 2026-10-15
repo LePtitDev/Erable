@@ -75,13 +75,22 @@ public sealed record AttachmentItem(ElementId Id, ElementId PageId, string FileN
     }
 }
 
-/// <summary>Everything the page view needs in one call (F04).</summary>
+/// <summary>Everything the page view needs in one call (F04): content, sub-pages, attachments, categories, resolved properties.</summary>
 public sealed record PageView(
-    ElementDetails Element, string Markdown, IReadOnlyList<ChildPage> SubPages, IReadOnlyList<AttachmentItem> Attachments);
+    ElementDetails Element,
+    string Markdown,
+    IReadOnlyList<ChildPage> SubPages,
+    IReadOnlyList<AttachmentItem> Attachments,
+    IReadOnlyList<CategorySummary> Categories,
+    IReadOnlyList<PagePropertyItem> Properties);
 
 public sealed record PageContent(string Markdown, long Revision);
 
-public sealed record SavePageContentRequest(string Markdown);
+/// <summary>
+/// The Markdown of a page; when given, its categories and every value it defines (full replacement), saved in the
+/// same revision (M2-06).
+/// </summary>
+public sealed record SavePageContentRequest(string Markdown, IReadOnlyList<ElementId>? Categories = null, IReadOnlyList<PagePropertyValue>? Properties = null);
 
 public sealed record PageSavedResult(long Revision, DateTimeOffset UpdatedAt, string UpdatedBy);
 

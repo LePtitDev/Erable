@@ -64,11 +64,45 @@ public sealed partial class ProjectBuilder
     public ProjectBuilder WithAttachment(string fileName, string page, byte[] content, string? id = null) =>
         Add(fileName, ElementKind.Attachment, page, id, null, content ?? throw new ArgumentNullException(nameof(content)), null);
 
-    public ProjectBuilder WithCategory(string name, string? under = null, string? id = null, string? key = null) =>
+    /// <param name="parent">Builder key of the parent category (inheritance, not the tree).</param>
+    /// <param name="values">Default values: builder key of the property → JSON (<c>"\"@Name\""</c> for a reference).</param>
+    public ProjectBuilder WithCategory(
+        string name, string? under = null, string? id = null, string? key = null, string? parent = null, string description = "",
+        IReadOnlyDictionary<string, string>? values = null)
+    {
         Add(name, ElementKind.Category, under ?? "Catégories", id, null, null, key);
+        _entries[^1] = _entries[^1] with { Category = new CategorySpec(parent, description, values ?? new Dictionary<string, string>()) };
+        return this;
+    }
 
-    public ProjectBuilder WithProperty(string name, string? under = null, string? id = null, string? key = null) =>
+    /// <param name="type">Property type (<c>int</c>, <c>list&lt;string&gt;</c>…); bare element when null (M1 projects).</param>
+    /// <param name="rules">JSON array of rules (<c>"@Name"</c> placeholders allowed).</param>
+    /// <param name="propertyKey">Readable key; derived from the name when null.</param>
+    public ProjectBuilder WithProperty(
+        string name, string? under = null, string? id = null, string? key = null, string? type = null, string rules = "[]",
+        IReadOnlyList<(string Key, string Label)>? options = null, string? @default = null, string? propertyKey = null, string description = "")
+    {
         Add(name, ElementKind.PropertyDefinition, under ?? "Propriétés", id, null, null, key);
+        if (type is not null)
+        {
+            _entries[^1] = _entries[^1] with { Property = new PropertySpec(type, rules, options ?? [], @default, propertyKey, description) };
+        }
+
+        return this;
+    }
+
+    /// <summary>Categories (builder keys, in order) and own values (property key → JSON) of a page already declared.</summary>
+    public ProjectBuilder Classified(string page, IReadOnlyList<string> categories, IReadOnlyDictionary<string, string>? values = null)
+    {
+        var index = _entries.FindIndex(e => e.Key == page);
+        if (index < 0)
+        {
+            throw new KeyNotFoundException($"No element named '{page}' in the builder.");
+        }
+
+        _entries[index] = _entries[index] with { Page = new PageSpec(categories, values ?? new Dictionary<string, string>()) };
+        return this;
+    }
 
     public ProjectBuilder WithLinkType(string name, string? under = null, string? id = null, string? key = null) =>
         Add(name, ElementKind.LinkType, under ?? "Liens", id, null, null, key);
@@ -132,8 +166,28 @@ public sealed partial class ProjectBuilder
         _ => "Pages",
     };
 
+    /// <summary>Replaces the <c>"@Name"</c> strings of a JSON text by the IDs of the named elements.</summary>
+    public string ResolveJson(string json)
+    {
+        ArgumentNullException.ThrowIfNull(json);
+        return JsonPlaceholder().Replace(json, m => "\"" + IdOf(m.Groups["name"].Value) + "\"");
+    }
+
     [GeneratedRegex(@"(?<open>!?\[\[)@(?<name>[^\]|#]+)")]
     private static partial Regex Placeholder();
+
+    [GeneratedRegex("\"@(?<name>[^\"]+)\"")]
+    private static partial Regex JsonPlaceholder();
+
+    /// <summary>Inheritance and default values of a category.</summary>
+    public sealed record CategorySpec(string? Parent, string Description, IReadOnlyDictionary<string, string> Values);
+
+    /// <summary>Definition of a property (JSON fields, placeholders allowed).</summary>
+    public sealed record PropertySpec(
+        string Type, string Rules, IReadOnlyList<(string Key, string Label)> Options, string? Default, string? Key, string Description);
+
+    /// <summary>Categories and own values of a page.</summary>
+    public sealed record PageSpec(IReadOnlyList<string> Categories, IReadOnlyDictionary<string, string> Values);
 
     /// <summary>Who created and last modified an element, and when.</summary>
     public sealed record Stamp(DateTimeOffset CreatedAt, string CreatedBy, DateTimeOffset UpdatedAt, string UpdatedBy);
@@ -144,5 +198,11 @@ public sealed partial class ProjectBuilder
     {
         /// <summary>Builder key (the name unless declared otherwise).</summary>
         public string Key { get; init; } = Name;
+
+        public CategorySpec? Category { get; init; }
+
+        public PropertySpec? Property { get; init; }
+
+        public PageSpec? Page { get; init; }
     }
 }

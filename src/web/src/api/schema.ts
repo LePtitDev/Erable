@@ -310,6 +310,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/categories": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListCategories"];
+    put?: never;
+    post: operations["CreateCategory"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/categories/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetCategory"];
+    put: operations["UpdateCategory"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/categories/{id}/pages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetCategoryPages"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/categories/{id}/values/{propertyId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["SetCategoryValue"];
+    post?: never;
+    delete: operations["RemoveCategoryValue"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/elements/{id}": {
     parameters: {
       query?: never;
@@ -422,6 +486,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/pages/{id}/properties": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetPageProperties"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/properties": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListProperties"];
+    put?: never;
+    post: operations["CreateProperty"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/properties/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetProperty"];
+    put: operations["UpdateProperty"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/resolve": {
     parameters: {
       query?: never;
@@ -517,9 +629,60 @@ export interface components {
       sourceKind: components["schemas"]["ElementKind"];
       sourceName: string;
     };
+    CategoryListItem: {
+      id: components["schemas"]["ElementId"];
+      name: string;
+      parentCategoryId: null | components["schemas"]["ElementId"];
+    };
+    CategoryPageItem: {
+      id: components["schemas"]["ElementId"];
+      name: string;
+      path: components["schemas"]["PathItem"][];
+      via: components["schemas"]["CategorySummary"];
+    };
+    CategoryPropertyItem: {
+      origin: components["schemas"]["ValueOrigin"];
+      overrides: boolean;
+      property: components["schemas"]["PropertyDefinitionItem"];
+      source: null | components["schemas"]["CategorySummary"];
+      value: null | components["schemas"]["JsonNode"];
+    };
+    CategorySummary: {
+      id: components["schemas"]["ElementId"];
+      name: string;
+    };
+    CategoryValueRequest: {
+      value: components["schemas"]["JsonNode"];
+    };
+    CategoryView: {
+      description: string;
+      element: components["schemas"]["ElementDetails"];
+      lineage: components["schemas"]["CategorySummary"][];
+      /** Format: int32 */
+      pageCount: number;
+      /** Format: int32 */
+      pageCountWithSubCategories: number;
+      parent: null | components["schemas"]["CategorySummary"];
+      properties: components["schemas"]["CategoryPropertyItem"][];
+      subCategories: components["schemas"]["CategorySummary"][];
+    };
     ChildPage: {
       id: components["schemas"]["ElementId"];
       name: string;
+    };
+    ConflictCandidateItem: {
+      categoryId: components["schemas"]["ElementId"];
+      categoryName: string;
+      value: components["schemas"]["JsonNode"];
+    };
+    CreateCategoryRequest: {
+      description?: null | string;
+      /** Format: int32 */
+      index?: null | number;
+      name: string;
+      /** Format: element-id */
+      parentCategoryId?: ElementId | null;
+      parentId: components["schemas"]["ElementId"];
     };
     CreateFolderRequest: {
       /** Format: int32 */
@@ -538,6 +701,18 @@ export interface components {
       contentLanguage: string;
       folder: string;
       name: string;
+    };
+    CreatePropertyRequest: {
+      default?: unknown;
+      description?: null | string;
+      /** Format: int32 */
+      index?: null | number;
+      key?: null | string;
+      name: string;
+      options?: null | components["schemas"]["EnumOptionInput"][];
+      parentId: components["schemas"]["ElementId"];
+      rules?: null | components["schemas"]["JsonArray"];
+      type: string;
     };
     CurrentUserInfo: {
       defaultProjectsFolder: string;
@@ -567,6 +742,14 @@ export interface components {
     /** @enum {string} */
     ElementKind:
       "root" | "folder" | "page" | "category" | "propertyDefinition" | "linkType" | "attachment";
+    EnumOptionInput: {
+      key: null | string;
+      label: string;
+    };
+    EnumOptionItem: {
+      key: string;
+      label: string;
+    };
     FolderInspection: {
       /** Format: int32 */
       formatVersion: null | number;
@@ -581,7 +764,11 @@ export interface components {
     InspectFolderRequest: {
       folder: string;
     };
+    JsonArray: unknown[];
     JsonNode: unknown;
+    JsonObject: {
+      [key: string]: unknown;
+    };
     NativeEvent: {
       path?: null | string;
       type: string;
@@ -594,6 +781,23 @@ export interface components {
       /** Format: int64 */
       revision: number;
     };
+    PageProperties: {
+      categories: components["schemas"]["CategorySummary"][];
+      properties: components["schemas"]["PagePropertyItem"][];
+    };
+    PagePropertyItem: {
+      candidates: components["schemas"]["ConflictCandidateItem"][];
+      origin: components["schemas"]["ValueOrigin"];
+      ownValue: null | components["schemas"]["JsonNode"];
+      property: components["schemas"]["PropertyDefinitionItem"];
+      sources: components["schemas"]["CategorySummary"][];
+      value: null | components["schemas"]["JsonNode"];
+      violations: components["schemas"]["ViolationItem"][];
+    };
+    PagePropertyValue: {
+      propertyId: components["schemas"]["ElementId"];
+      value: components["schemas"]["JsonNode"];
+    };
     PageSavedResult: {
       /** Format: int64 */
       revision: number;
@@ -603,8 +807,10 @@ export interface components {
     };
     PageView: {
       attachments: components["schemas"]["AttachmentItem"][];
+      categories: components["schemas"]["CategorySummary"][];
       element: components["schemas"]["ElementDetails"];
       markdown: string;
+      properties: components["schemas"]["PagePropertyItem"][];
       subPages: components["schemas"]["ChildPage"][];
     };
     PathItem: {
@@ -631,6 +837,30 @@ export interface components {
     ProjectTree: {
       counts: components["schemas"]["RootCounts"];
       nodes: components["schemas"]["TreeNodeItem"][];
+    };
+    PropertyDefinitionItem: {
+      default: null | components["schemas"]["JsonNode"];
+      description: string;
+      id: components["schemas"]["ElementId"];
+      key: string;
+      name: string;
+      options: components["schemas"]["EnumOptionItem"][];
+      rules: components["schemas"]["JsonArray"];
+      type: string;
+    };
+    PropertyView: {
+      definition: components["schemas"]["PropertyDefinitionItem"];
+      element: components["schemas"]["ElementDetails"];
+      /** Format: int32 */
+      filledCount: number;
+      usedBy: components["schemas"]["CategorySummary"][];
+      violations: components["schemas"]["PropertyViolationPage"][];
+    };
+    PropertyViolationPage: {
+      pageId: components["schemas"]["ElementId"];
+      pageName: string;
+      value: null | components["schemas"]["JsonNode"];
+      violations: components["schemas"]["ViolationItem"][];
     };
     RecentProjectItem: {
       folder: string;
@@ -668,7 +898,9 @@ export interface components {
       properties: number;
     };
     SavePageContentRequest: {
+      categories?: null | unknown[];
       markdown: string;
+      properties?: null | components["schemas"]["PagePropertyValue"][];
     };
     SelfTestReport: {
       /** Format: double */
@@ -701,6 +933,10 @@ export interface components {
       /** Format: int64 */
       sortOrder: number;
     };
+    UpdateCategoryRequest: {
+      description: string;
+      parentCategoryId: null | components["schemas"]["ElementId"];
+    };
     UpdateElementRequest: {
       /** Format: int32 */
       index?: null | number;
@@ -708,12 +944,30 @@ export interface components {
       /** Format: element-id */
       parentId?: ElementId | null;
     };
+    UpdatePropertyRequest: {
+      default: null | components["schemas"]["JsonNode"];
+      description: string;
+      key: string;
+      options: components["schemas"]["EnumOptionInput"][];
+      replacements?: null | {
+        [key: string]: string;
+      };
+      rules: components["schemas"]["JsonArray"];
+      type: string;
+    };
     UserPreferences: {
       language: null | string;
       shortcuts: null | {
         [key: string]: string;
       };
       theme: components["schemas"]["ThemePreference"];
+    };
+    /** @enum {string} */
+    ValueOrigin: "own" | "inherited" | "default" | "conflict";
+    ViolationItem: {
+      /** Format: int32 */
+      index: null | number;
+      rule: components["schemas"]["JsonObject"];
     };
     WindowState: {
       title: string;
@@ -1219,6 +1473,181 @@ export interface operations {
       };
     };
   };
+  ListCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryListItem"][];
+        };
+      };
+    };
+  };
+  CreateCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCategoryRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryView"];
+        };
+      };
+    };
+  };
+  GetCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryView"];
+        };
+      };
+    };
+  };
+  UpdateCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCategoryRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryView"];
+        };
+      };
+    };
+  };
+  GetCategoryPages: {
+    parameters: {
+      query?: {
+        includeSubCategories?: boolean;
+      };
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryPageItem"][];
+        };
+      };
+    };
+  };
+  SetCategoryValue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+        propertyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CategoryValueRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryView"];
+        };
+      };
+    };
+  };
+  RemoveCategoryValue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+        propertyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CategoryView"];
+        };
+      };
+    };
+  };
   GetElement: {
     parameters: {
       query?: never;
@@ -1445,6 +1874,127 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PageSavedResult"];
+        };
+      };
+    };
+  };
+  GetPageProperties: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageProperties"];
+        };
+      };
+    };
+  };
+  ListProperties: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PropertyDefinitionItem"][];
+        };
+      };
+    };
+  };
+  CreateProperty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePropertyRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PropertyView"];
+        };
+      };
+    };
+  };
+  GetProperty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PropertyView"];
+        };
+      };
+    };
+  };
+  UpdateProperty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdatePropertyRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PropertyView"];
         };
       };
     };

@@ -127,29 +127,53 @@ public static class Chroniques
         p.WithAttachment("portrait_ilsa.png", "Ilsa Varenne", Asset("portrait_ilsa.png"))
             .Stamped("portrait_ilsa.png", Date(2026, 3, 12, 11, 0), "malo");
 
-        // Structure (docs/features.md §2.1): bare elements of the tree in M1; their descriptions, values, rules and
-        // links join with M2. Categories are flat: their inheritance is a property of the category (M2), not a tree
-        // position. Keys disambiguate the names used twice (« Région », « Personnages », « PNJ »).
-        p.WithCategory("Entité", id: Entite.ToString());
-        p.WithCategory("Personnage", id: Personnage.ToString());
-        p.WithCategory("PNJ", id: Pnj.ToString(), key: "Catégorie PNJ");
-        p.WithCategory("Marchand");
-        p.WithCategory("Garde");
-        p.WithCategory("Érudit");
-        p.WithCategory("Joueur");
-        p.WithCategory("Créature");
-        p.WithCategory("Région", key: "Catégorie Région");
-        p.WithCategory("Quête");
-        p.WithCategory("Faction");
+        // Structure (docs/features.md §2.1, §2.2). Categories are flat in the tree: their inheritance is an attribute of
+        // the category (decision P-14). Keys disambiguate the names used twice (« Région », « Personnages », « PNJ »).
+        // Properties come first: category defaults refer to them.
         p.WithFolder("Personnages", under: "Propriétés", key: "Propriétés/Personnages");
-        p.WithProperty("Niveau", under: "Propriétés/Personnages", id: Niveau.ToString());
-        p.WithProperty("Rôle", under: "Propriétés/Personnages");
-        p.WithProperty("Âge", under: "Propriétés/Personnages");
-        p.WithProperty("Points de vie", under: "Propriétés/Personnages");
-        p.WithProperty("Hostile", under: "Propriétés/Personnages");
+        p.WithProperty("Niveau", under: "Propriétés/Personnages", id: Niveau.ToString(), type: "int",
+            rules: """[{"op":"greater_or_equal","value":1},{"op":"less_or_equal","value":60}]""",
+            description: "Niveau de puissance du personnage, de 1 à 60.");
+        p.WithProperty("Rôle", under: "Propriétés/Personnages", type: "enum",
+            options: [("marchande", "Marchande"), ("garde", "Garde"), ("erudit", "Érudit"), ("voyageur", "Voyageur")],
+            description: "Fonction du personnage dans le monde.");
+        p.WithProperty("Âge", under: "Propriétés/Personnages", type: "int", rules: """[{"op":"greater_or_equal","value":0}]""");
+        p.WithProperty("Points de vie", under: "Propriétés/Personnages", type: "int", rules: """[{"op":"greater_than","value":0}]""");
+        p.WithProperty("Hostile", under: "Propriétés/Personnages", type: "bool", description: "Attaque le joueur à vue.");
         p.WithFolder("Monde", under: "Propriétés");
-        p.WithProperty("Région", under: "Monde", key: "Propriété Région");
-        p.WithProperty("Réputation", under: "Monde");
+        p.WithProperty("Région", under: "Monde", key: "Propriété Région", type: "ref",
+            rules: """[{"op":"in_category","value":"@Catégorie Région"}]""", description: "Lieu où l'on trouve l'élément.");
+        p.WithProperty("Réputation", under: "Monde", type: "int", rules: """[{"op":"between","value":[-100,100]}]""");
+
+        p.WithCategory("Entité", id: Entite.ToString(), description: "Tout ce qui vit dans le monde.");
+        p.WithCategory("Personnage", id: Personnage.ToString(), parent: "Entité", description: "Être doué de parole.");
+        p.WithCategory("PNJ", id: Pnj.ToString(), key: "Catégorie PNJ", parent: "Personnage",
+            description: "Personnage non joueur : contrôlé par le meneur de jeu.",
+            values: new Dictionary<string, string> { ["Hostile"] = "false", ["Niveau"] = "10" });
+        p.WithCategory("Marchand", parent: "Catégorie PNJ", description: "PNJ qui vend ou achète des objets.");
+        p.WithCategory("Garde", parent: "Catégorie PNJ", description: "PNJ chargé de la sécurité d'un lieu.");
+        p.WithCategory("Érudit", parent: "Catégorie PNJ", description: "PNJ savant, source d'informations.");
+        p.WithCategory("Joueur", parent: "Personnage", description: "Personnage incarné par un joueur.",
+            values: new Dictionary<string, string> { ["Niveau"] = "1" });
+        p.WithCategory("Créature", parent: "Entité", description: "Être sauvage ou monstrueux.",
+            values: new Dictionary<string, string> { ["Niveau"] = "20", ["Hostile"] = "true" });
+        p.WithCategory("Région", key: "Catégorie Région", description: "Lieu du monde.");
+        p.WithCategory("Quête", description: "Mission proposée au joueur.");
+        p.WithCategory("Faction", description: "Groupe organisé.");
+
+        p.Classified("Ilsa Varenne", ["Catégorie PNJ", "Marchand"], new Dictionary<string, string>
+        {
+            ["Niveau"] = "72", ["Rôle"] = "\"marchande\"", ["Propriété Région"] = "\"@Hautbois\"",
+        });
+        p.Classified("Capitaine Orsen", ["Catégorie PNJ", "Garde"], new Dictionary<string, string>
+        {
+            ["Niveau"] = "40", ["Rôle"] = "\"garde\"", ["Propriété Région"] = "\"@Hautbois\"",
+        });
+        p.Classified("Dragon des Cimes", ["Créature"], new Dictionary<string, string> { ["Niveau"] = "99" });
+        p.Classified("Hautbois", ["Catégorie Région"]);
+        p.Classified("Col gelé", ["Catégorie Région"]);
+        p.Classified("Le Col gelé", ["Quête"]);
+        p.Classified("Ordre du Givre", ["Faction"]);
         p.WithLinkType("Allié de");
         p.WithLinkType("Situé à");
         p.WithLinkType("Mentor de");

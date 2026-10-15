@@ -16,14 +16,20 @@ public static class Problems
     public static ProblemHttpResult From(DomainError error)
     {
         ArgumentNullException.ThrowIfNull(error);
-        return Problem(StatusOf(error.Code), error.Code, error.Message);
+        return Problem(StatusOf(error.Code), error.Code, error.Message, error.Extensions);
     }
 
-    public static ProblemHttpResult Problem(int status, string code, string? detail = null) =>
-        TypedResults.Problem(
-            statusCode: status,
-            detail: detail,
-            extensions: new Dictionary<string, object?>(StringComparer.Ordinal) { ["code"] = code });
+    /// <summary>A problem with the stable <c>code</c> and optional machine-readable extensions (a category loop, blocking pages…).</summary>
+    public static ProblemHttpResult Problem(int status, string code, string? detail = null, IReadOnlyDictionary<string, object?>? extensions = null)
+    {
+        var all = new Dictionary<string, object?>(StringComparer.Ordinal) { ["code"] = code };
+        foreach (var (key, value) in extensions ?? new Dictionary<string, object?>())
+        {
+            all[key] = value;
+        }
+
+        return TypedResults.Problem(statusCode: status, detail: detail, extensions: all);
+    }
 
     public static ProblemHttpResult ProjectNotOpen(ElementId projectId) =>
         Problem(StatusCodes.Status404NotFound, ProjectNotFound, $"Project {projectId} is not open.");
@@ -36,6 +42,7 @@ public static class Problems
         ErrorCodes.ElementNotFound => StatusCodes.Status404NotFound,
         StorageErrors.Locked or StorageErrors.AlreadyExists or "project.duplicateId" => StatusCodes.Status409Conflict,
         "page.revisionConflict" => StatusCodes.Status409Conflict,
+        ErrorCodes.PropertyKeyTaken => StatusCodes.Status409Conflict,
         StorageErrors.Inaccessible => StatusCodes.Status403Forbidden,
         // Everything else is a request that a business rule refuses.
         _ => StatusCodes.Status422UnprocessableEntity,

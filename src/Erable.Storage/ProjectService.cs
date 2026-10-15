@@ -31,7 +31,7 @@ public sealed record Backlink(Element Source, IReadOnlyList<StoredReference> Ref
 /// Application operations on an open project: each write is one transaction that applies the Core rules, updates the
 /// derived indexes (references) and records a revision (F13.R1). Reads never block writes (WAL).
 /// </summary>
-public sealed class ProjectService(OpenedProject project, TimeProvider clock)
+public sealed partial class ProjectService(OpenedProject project, TimeProvider clock)
 {
     /// <summary>Upper bound of IDs per <see cref="Resolve"/> call.</summary>
     public const int MaxResolve = 500;
@@ -172,10 +172,13 @@ public sealed class ProjectService(OpenedProject project, TimeProvider clock)
 
     /// <summary>
     /// Saves the Markdown of a page if it is still at <paramref name="expectedRevision"/> (optimistic concurrency;
-    /// the three-way merge arrives with M4-05). Content, plain text, references and revision: one transaction.
+    /// the three-way merge arrives with M4-05). Content, plain text, references, categories and values (when given),
+    /// derived values, validation issues and revision: one transaction, one revision (F13.R1). Rule violations never
+    /// block the save (docs/architecture.md §5.4); a malformed value does.
     /// </summary>
     public Task<Result<PageSaved>> SavePageContentAsync(
-        ElementId pageId, string markdown, long expectedRevision, string author, CancellationToken cancellationToken = default)
+        ElementId pageId, string markdown, long expectedRevision, string author, PageStructureInput? structure = null,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(markdown);
         return Project.Database.WriteAsync((connection, transaction) =>
@@ -191,8 +194,14 @@ public sealed class ProjectService(OpenedProject project, TimeProvider clock)
                 return Result.Failure<PageSaved>(RevisionConflict);
             }
 
+            if (structure is not null && ApplyPageStructure(connection, transaction, pageId, structure) is { } error)
+            {
+                return Result.Failure<PageSaved>(error);
+            }
+
             var now = clock.GetUtcNow();
             WriteContent(connection, transaction, pageId, markdown);
+            StructureState.Load(connection, [pageId]).WriteDerived(connection, transaction, [pageId], null);
             var revision = ProjectRepository.Touch(connection, transaction, pageId, now, author);
             var saved = element with { Revision = revision, UpdatedAt = now, UpdatedBy = author };
             InsertRevision(connection, transaction, saved, markdown, author, now);
@@ -300,7 +309,7 @@ public sealed class ProjectService(OpenedProject project, TimeProvider clock)
     private static void InsertRevision(
         SqliteConnection connection, SqliteTransaction transaction, Element element, string? markdown, string author, DateTimeOffset at)
     {
-        var snapshot = new RevisionSnapshot(element.Id, element.Kind, element.ParentId, element.Name, markdown, null);
+        var snapshot = Snapshot(connection, element, markdown);
         ProjectRepository.InsertRevision(connection, transaction, element.Id, element.Revision, author, at, snapshot.Serialize());
     }
 

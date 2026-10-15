@@ -719,6 +719,503 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/pages/{id}/properties": {
+      "get": {
+        "tags": [
+          "Pages"
+        ],
+        "operationId": "GetPageProperties",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageProperties"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "ListCategories",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryListItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "CreateCategory",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/categories/{id}": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "GetCategory",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "UpdateCategory",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/categories/{id}/pages": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "GetCategoryPages",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeSubCategories",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryPageItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/categories/{id}/values/{propertyId}": {
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "SetCategoryValue",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryValueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "operationId": "RemoveCategoryValue",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "operationId": "ListProperties",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PropertyDefinitionItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Properties"
+        ],
+        "operationId": "CreateProperty",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePropertyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/properties/{id}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "operationId": "GetProperty",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "operationId": "UpdateProperty",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePropertyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -1200,6 +1697,182 @@
           }
         }
       },
+      "CategoryListItem": {
+        "required": [
+          "id",
+          "name",
+          "parentCategoryId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentCategoryId": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ElementId"
+              }
+            ]
+          }
+        }
+      },
+      "CategoryPageItem": {
+        "required": [
+          "id",
+          "name",
+          "path",
+          "via"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PathItem"
+            }
+          },
+          "via": {
+            "$ref": "#/components/schemas/CategorySummary"
+          }
+        }
+      },
+      "CategoryPropertyItem": {
+        "required": [
+          "property",
+          "value",
+          "origin",
+          "source",
+          "overrides"
+        ],
+        "type": "object",
+        "properties": {
+          "property": {
+            "$ref": "#/components/schemas/PropertyDefinitionItem"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "origin": {
+            "$ref": "#/components/schemas/ValueOrigin"
+          },
+          "source": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CategorySummary"
+              }
+            ]
+          },
+          "overrides": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CategorySummary": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CategoryValueRequest": {
+        "required": [
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
+      "CategoryView": {
+        "required": [
+          "element",
+          "description",
+          "parent",
+          "lineage",
+          "subCategories",
+          "properties",
+          "pageCount",
+          "pageCountWithSubCategories"
+        ],
+        "type": "object",
+        "properties": {
+          "element": {
+            "$ref": "#/components/schemas/ElementDetails"
+          },
+          "description": {
+            "type": "string"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CategorySummary"
+              }
+            ]
+          },
+          "lineage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "subCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryPropertyItem"
+            }
+          },
+          "pageCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageCountWithSubCategories": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "ChildPage": {
         "required": [
           "id",
@@ -1212,6 +1885,61 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "ConflictCandidateItem": {
+        "required": [
+          "categoryId",
+          "categoryName",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
+      "CreateCategoryRequest": {
+        "required": [
+          "parentId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "index": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "parentCategoryId": {
+            "pattern": "^[0-9A-F]{16}$",
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "element-id"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -1281,6 +2009,64 @@
           },
           "contentLanguage": {
             "type": "string"
+          }
+        }
+      },
+      "CreatePropertyRequest": {
+        "required": [
+          "parentId",
+          "name",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "index": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "key": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "default": { },
+          "rules": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonArray"
+              }
+            ]
+          },
+          "options": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/EnumOptionInput"
+            }
           }
         }
       },
@@ -1392,6 +2178,39 @@
         ],
         "type": "string"
       },
+      "EnumOptionInput": {
+        "required": [
+          "key",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "EnumOptionItem": {
+        "required": [
+          "key",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
       "FolderInspection": {
         "required": [
           "status",
@@ -1457,7 +2276,14 @@
           }
         }
       },
+      "JsonArray": {
+        "type": "array"
+      },
       "JsonNode": { },
+      "JsonObject": {
+        "type": "object",
+        "additionalProperties": { }
+      },
       "NativeEvent": {
         "required": [
           "type"
@@ -1502,6 +2328,100 @@
           }
         }
       },
+      "PageProperties": {
+        "required": [
+          "categories",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagePropertyItem"
+            }
+          }
+        }
+      },
+      "PagePropertyItem": {
+        "required": [
+          "property",
+          "ownValue",
+          "value",
+          "origin",
+          "sources",
+          "candidates",
+          "violations"
+        ],
+        "type": "object",
+        "properties": {
+          "property": {
+            "$ref": "#/components/schemas/PropertyDefinitionItem"
+          },
+          "ownValue": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "origin": {
+            "$ref": "#/components/schemas/ValueOrigin"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConflictCandidateItem"
+            }
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ViolationItem"
+            }
+          }
+        }
+      },
+      "PagePropertyValue": {
+        "required": [
+          "propertyId",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "value": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
       "PageSavedResult": {
         "required": [
           "revision",
@@ -1528,7 +2448,9 @@
           "element",
           "markdown",
           "subPages",
-          "attachments"
+          "attachments",
+          "categories",
+          "properties"
         ],
         "type": "object",
         "properties": {
@@ -1548,6 +2470,18 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AttachmentItem"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagePropertyItem"
             }
           }
         }
@@ -1644,6 +2578,122 @@
           },
           "counts": {
             "$ref": "#/components/schemas/RootCounts"
+          }
+        }
+      },
+      "PropertyDefinitionItem": {
+        "required": [
+          "id",
+          "name",
+          "key",
+          "description",
+          "type",
+          "default",
+          "rules",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "default": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "rules": {
+            "$ref": "#/components/schemas/JsonArray"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnumOptionItem"
+            }
+          }
+        }
+      },
+      "PropertyView": {
+        "required": [
+          "element",
+          "definition",
+          "usedBy",
+          "filledCount",
+          "violations"
+        ],
+        "type": "object",
+        "properties": {
+          "element": {
+            "$ref": "#/components/schemas/ElementDetails"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/PropertyDefinitionItem"
+          },
+          "usedBy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "filledCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyViolationPage"
+            }
+          }
+        }
+      },
+      "PropertyViolationPage": {
+        "required": [
+          "pageId",
+          "pageName",
+          "value",
+          "violations"
+        ],
+        "type": "object",
+        "properties": {
+          "pageId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "pageName": {
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ViolationItem"
+            }
           }
         }
       },
@@ -1804,6 +2854,21 @@
         "properties": {
           "markdown": {
             "type": "string"
+          },
+          "categories": {
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "properties": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PagePropertyValue"
+            }
           }
         }
       },
@@ -1934,6 +2999,28 @@
           }
         }
       },
+      "UpdateCategoryRequest": {
+        "required": [
+          "description",
+          "parentCategoryId"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "parentCategoryId": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ElementId"
+              }
+            ]
+          }
+        }
+      },
       "UpdateElementRequest": {
         "type": "object",
         "properties": {
@@ -1957,6 +3044,56 @@
               "integer"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "UpdatePropertyRequest": {
+        "required": [
+          "key",
+          "description",
+          "type",
+          "default",
+          "rules",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "default": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "rules": {
+            "$ref": "#/components/schemas/JsonArray"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnumOptionInput"
+            }
+          },
+          "replacements": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },
@@ -1985,6 +3122,34 @@
             "additionalProperties": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ValueOrigin": {
+        "enum": [
+          "own",
+          "inherited",
+          "default",
+          "conflict"
+        ],
+        "type": "string"
+      },
+      "ViolationItem": {
+        "required": [
+          "rule",
+          "index"
+        ],
+        "type": "object",
+        "properties": {
+          "rule": {
+            "$ref": "#/components/schemas/JsonObject"
+          },
+          "index": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -2023,6 +3188,12 @@
     },
     {
       "name": "Attachments"
+    },
+    {
+      "name": "Categories"
+    },
+    {
+      "name": "Properties"
     },
     {
       "name": "Me"

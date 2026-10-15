@@ -4,5 +4,5 @@ namespace Erable.Core;
 public static class ProjectFormat
 {
     /// <summary>Latest <c>formatVersion</c> this build can read and write.</summary>
-    public const int CurrentVersion = 1;
+    public const int CurrentVersion = 2;
 }

@@ -54,7 +54,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 |---|---|---|---|
 | [M2-01](M2-01-category-domain.md) | Domaine : catégories, héritage, résolution | M1-02 | review |
 | [M2-02](M2-02-property-rules.md) | Définitions de propriétés et moteur de règles | M2-01 | review |
-| [M2-03](M2-03-structure-storage-api.md) | Stockage et API : catégories, propriétés, valeurs | M2-02, M1-05 | todo |
+| [M2-03](M2-03-structure-storage-api.md) | Stockage et API : catégories, propriétés, valeurs | M2-02, M1-05 | review |
 | [M2-04](M2-04-category-screen.md) | Écran Catégorie | M2-03, M1-11 | todo |
 | [M2-05](M2-05-property-screen.md) | Écran Propriété | M2-03, M1-11 | todo |
 | [M2-06](M2-06-page-properties-panel.md) | Propriétés sur la page (lecture et édition) | M2-03, M1-12 | todo |
@@ -120,7 +120,7 @@ Relevés pendant la planification, en relisant les documents et le mockup. Chacu
 | **P-04** | Verrou mono-instance (F16.R2) absent du format de projet (§A-7.1). | Fichier `erable.lock` (PID, port, jeton IPC) dans le dossier du projet, ignoré par `doctor` ; la seconde instance contacte la première pour la mettre au premier plan. | ✅ Tranché en M1-03 : `erable.lock` ouvert sans partage, PID seulement (port et jeton IPC via le profil applicatif en M1-17) |
 | **P-05** | Fusion à trois voies : §A-8.3 la place **côté client**, §T-4.1 la teste **dans Core** (C#). | Fusion **côté serveur dans Core** : `PUT` avec révision de base → fusion automatique si sans conflit, sinon `409` avec les blocs en conflit. Une seule implémentation, testée par propriétés, valable pour tous les clients. | M4-05 |
 | **P-06** | Critère M0 « l'app **s'installe** sur les 3 OS » alors que Velopack est prévu en M5. | M0 : artefacts `dotnet publish` autonomes (archive) + fumée ; installeur et mise à jour en M5. | ✅ Tranché en M0-11 : archives `.zip` / `.tar.gz` |
-| **P-07** | Filtres de recherche sur valeurs **héritées** (F10.R3) : résoudre l'héritage à la volée par `WITH RECURSIVE` sur 10 000 pages risque de dépasser le budget de 100 ms. | Table dérivée `resolved_property_values` maintenue à l'écriture (comme `refs`), reconstruite par `doctor`. | M2-03 |
+| **P-07** | Filtres de recherche sur valeurs **héritées** (F10.R3) : résoudre l'héritage à la volée par `WITH RECURSIVE` sur 10 000 pages risque de dépasser le budget de 100 ms. | Table dérivée `resolved_property_values` maintenue à l'écriture (comme `refs`), reconstruite par `doctor`. | ✅ Tranché en M2-03 : tables dérivées `resolved_values` et `validation_issues` |
 | **P-08** | `projectId` dans `erable.json` : format non précisé. | Même format que `ElementId` (16 hexa), pour la cohérence des URL `/p/:projectId/…`. | ✅ Tranché en M1-03 : recommandation retenue |
 | **P-09** | Le mockup d'édition affiche encore « Alt+Espace » et « fusionnés en direct », écartés par §A-11.3 et §A-8.3. | Les documents priment ; le mockup sert pour la mise en page, pas pour ces libellés. | ✅ Tranché en M1-12 : libellés des documents retenus (Ctrl+Espace, « fusionnés à l'enregistrement » en M4) |
 | **P-10** | La stratégie de test est ambitieuse pour le début du projet (Stryker, NBomber, captures visuelles, fumée 3 OS dès M0). | Garder le plan, mais n'activer un outil qu'au jalon prévu en §T-16 et accepter de reporter les outils « nightly » si le coût de maintenance dépasse le bénéfice observé. | ✅ Appliqué en M0-09 : seul l'outillage M0 est installé |

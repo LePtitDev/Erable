@@ -53,6 +53,11 @@ public static class DoctorCodes
     public const string RevisionBlobMissing = "blob.missingForRevision";
     public const string BlobOrphan = "blob.orphan";
     public const string BlobTemporary = "blob.temporary";
+    public const string CategoryCycle = "category.cycle";
+    public const string StructureRowMissing = "structure.rowMissing";
+    public const string ValueInvalid = "value.invalid";
+    public const string ValueUnknownProperty = "value.unknownProperty";
+    public const string DerivedOutOfSync = "derived.outOfSync";
 }
 
 /// <summary>
@@ -119,6 +124,7 @@ public static class ProjectDoctor
 
         CheckTree(project, findings);
         CheckPages(project, fix, findings);
+        CheckStructure(project, fix, findings);
         CheckBlobs(project, fix, closed, findings);
         return Report(project, findings);
     }
@@ -258,6 +264,67 @@ public static class ProjectDoctor
         findings.AddRange(outOfSync.Select(p => new DoctorFinding(
             DoctorCodes.IndexOutOfSync, DoctorSeverity.Warning, "The search text or reference index differs from the Markdown.", p.Id,
             Fixable: true, Fixed: fix)));
+    }
+
+    /// <summary>
+    /// Categories, definitions and values (schema v2): rows of structure elements, inheritance cycles, values that no
+    /// longer match their definition, and the derived tables (resolved values, validation issues), rebuilt by fix.
+    /// </summary>
+    private static void CheckStructure(OpenedProject project, bool fix, List<DoctorFinding> findings)
+    {
+        using var connection = project.Database.OpenConnection();
+        foreach (var (id, kind) in connection.Query<(long Id, string Kind)>(
+            """
+            SELECT e.id, e.kind FROM elements e
+            WHERE (e.kind = 'category' AND e.id NOT IN (SELECT id FROM categories))
+               OR (e.kind = 'propertyDefinition' AND e.id NOT IN (SELECT id FROM property_defs))
+               OR (e.kind = 'linkType' AND e.id NOT IN (SELECT id FROM link_types))
+            ORDER BY e.id
+            """))
+        {
+            findings.Add(new(DoctorCodes.StructureRowMissing, DoctorSeverity.Error, $"The {kind} has no row of its own (description, definition…).", ElementId.FromInt64(id)));
+        }
+
+        var state = StructureState.Load(connection, null);
+        foreach (var id in state.Graph.FindCycles())
+        {
+            findings.Add(new(DoctorCodes.CategoryCycle, DoctorSeverity.Error, "The category is part of an inheritance cycle.", id));
+        }
+
+        var elements = connection.Query<long>("SELECT id FROM elements").ToHashSet();
+        var definitions = StructureRepository.LoadDefinitions(connection).ToDictionary(d => d.Id);
+        foreach (var group in StructureRepository.LoadValueRows(connection).GroupBy(r => (r.OwnerId, r.PropertyId)))
+        {
+            var property = ElementId.FromInt64(group.Key.PropertyId);
+            if (!definitions.TryGetValue(property, out var definition))
+            {
+                if (!elements.Contains(group.Key.PropertyId))
+                {
+                    findings.Add(new(DoctorCodes.ValueUnknownProperty, DoctorSeverity.Info, $"Value of unknown property {property}.", ElementId.FromInt64(group.Key.OwnerId)));
+                }
+            }
+            else if (ValueStorage.Read([.. group], definition.Type) is null)
+            {
+                findings.Add(new(DoctorCodes.ValueInvalid, DoctorSeverity.Error,
+                    $"The value of property {property} does not match its type {definition.Type}.", ElementId.FromInt64(group.Key.OwnerId)));
+            }
+        }
+
+        var (resolved, issues) = state.ComputeDerived(null, null);
+        if (!resolved.SequenceEqual(StructureRepository.LoadResolvedRows(connection)) || !issues.SequenceEqual(StructureRepository.LoadIssueRows(connection)))
+        {
+            if (fix)
+            {
+                project.Database.WriteAsync((c, t) =>
+                {
+                    StructureState.Load(c, null).WriteDerived(c, t, null, null);
+                    return 0;
+                }).GetAwaiter().GetResult();
+            }
+
+            findings.Add(new(DoctorCodes.DerivedOutOfSync, DoctorSeverity.Warning,
+                "The resolved values or validation issues differ from the categories and values.", Fixable: true, Fixed: fix));
+        }
     }
 
     private static void CheckBlobs(OpenedProject project, bool fix, bool closed, List<DoctorFinding> findings)

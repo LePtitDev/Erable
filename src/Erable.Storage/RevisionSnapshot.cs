@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Erable.Core;
 using Erable.Core.Elements;
 
@@ -7,11 +8,24 @@ namespace Erable.Storage;
 
 /// <summary>
 /// State of an element at one revision (F13.R1), stored as Brotli-compressed JSON in <c>revisions.snapshot</c>.
-/// Categories and property values join it in M2.
+/// From format v2 it also holds the categories and own values of a page, the fields of a category and the definition of
+/// a property (absent from older snapshots).
 /// </summary>
 public sealed record RevisionSnapshot(
     ElementId Id, ElementKind Kind, ElementId ParentId, string Name, string? Markdown, AttachmentSnapshot? Attachment)
 {
+    /// <summary>Categories of a page, in their order.</summary>
+    public IReadOnlyList<ElementId>? Categories { get; init; }
+
+    /// <summary>Values defined by a page or a category: property ID → JSON value.</summary>
+    public IReadOnlyDictionary<string, JsonNode?>? Values { get; init; }
+
+    /// <summary>Description and parent of a category.</summary>
+    public CategorySnapshot? Category { get; init; }
+
+    /// <summary>Definition of a property (key, type, default, rules, options).</summary>
+    public JsonObject? Definition { get; init; }
+
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
         Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
@@ -39,3 +53,6 @@ public sealed record RevisionSnapshot(
 
 /// <summary>Attachment metadata kept in its revisions (the blob stays alive while a revision references it).</summary>
 public sealed record AttachmentSnapshot(string FileName, string Mime, long Size, string Sha256);
+
+/// <summary>Stored fields of a category kept in its revisions.</summary>
+public sealed record CategorySnapshot(string Description, ElementId? ParentCategoryId);

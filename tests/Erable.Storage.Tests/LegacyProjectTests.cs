@@ -4,6 +4,7 @@ using Dapper;
 using Erable.Core;
 using Erable.Core.Elements;
 using Erable.Core.Projects;
+using Erable.Core.Properties;
 using Erable.Testing;
 using Microsoft.Extensions.Time.Testing;
 
@@ -20,6 +21,8 @@ public sealed class LegacyProjectTests
     private static readonly ElementId Ilsa = ElementId.Parse("3F2A9C14E07B5D21");
     private static readonly ElementId Orsen = ElementId.Parse("7A1C4E90B3F2D615");
     private static readonly ElementId Portrait = ElementId.Parse("1E6AC1F0A0000002");
+    private static readonly ElementId Pnj = ElementId.Parse("1E6AC1F0A0000003");
+    private static readonly ElementId Niveau = ElementId.Parse("1E6AC1F0A0000004");
     private static readonly byte[] PortraitBytes = Encoding.UTF8.GetBytes("legacy v1 blob\n");
 
     public static TheoryData<int> Versions =>
@@ -45,6 +48,19 @@ public sealed class LegacyProjectTests
         project.Repository.GetIncomingReferences(Orsen).Select(r => r.SourceId).ShouldBe([Ilsa]);
         project.Repository.GetAttachments(Ilsa).Single().FileName.ShouldBe("portrait_ilsa.txt");
         project.Repository.LoadTree().FindAnomalies().ShouldBeEmpty();
+        // The frozen projects are written by hand: their search text is not the analyzer's (a derived index, rebuilt by fix).
+        ProjectDoctor.Diagnose(project, fix: false).Findings
+            .Where(f => f.Severity != DoctorSeverity.Info && f.Code != DoctorCodes.IndexOutOfSync).Select(f => f.Code).ShouldBeEmpty();
+        if (version >= 2)
+        {
+            // Structure (format v2): categories, definitions, values and their derived tables.
+            var state = StructureState.Load(connection, null);
+            state.CategoriesOf(Ilsa).ShouldBe([Pnj]);
+            var niveau = state.ResolvePage(Ilsa).Single(p => p.Definition.Id == Niveau);
+            niveau.Resolution.EffectiveValue.ShouldBe(new IntValue(72));
+            niveau.Violations.Count.ShouldBe(1);
+            state.ResolvePage(Orsen).Single(p => p.Definition.Id == Niveau).Origin.ShouldBe(ValueOrigin.Inherited);
+        }
     }
 
     /// <summary>
@@ -60,7 +76,7 @@ public sealed class LegacyProjectTests
             Directory.Delete(target, recursive: true);
         }
 
-        using (var project = ProjectStore.Create(target, "Projet figé v1", "fr", new FakeTimeProvider(Now)).Value)
+        using (var project = ProjectStore.Create(target, $"Projet figé v{ProjectFormat.CurrentVersion}", "fr", new FakeTimeProvider(Now)).Value)
         {
             var sha = Convert.ToHexStringLower(SHA256.HashData(PortraitBytes));
             var blob = Path.Combine(project.BlobsDirectory, sha[..2], sha[2..4], sha);
@@ -84,6 +100,18 @@ public sealed class LegacyProjectTests
                     new StoredReference(Ilsa, Orsen, null, false, 28),
                     new StoredReference(Ilsa, Portrait, null, true, 50),
                 ]);
+
+                // Format v2: a category with a default, a property with a rule, values and their derived tables.
+                ProjectRepository.InsertElement(c, t, E(Pnj, ElementKind.Category, Roots.Categories.Id, "PNJ", 65536));
+                ProjectRepository.InsertElement(c, t, E(Niveau, ElementKind.PropertyDefinition, Roots.Properties.Id, "Niveau", 65536));
+                StructureRepository.UpsertCategory(c, t, new CategoryRecord(Pnj, ElementId.None, "Personnage non joueur."));
+                StructureRepository.UpsertDefinition(c, t, new PropertyDefinition(
+                    Niveau, "Niveau", "niveau", "", PropertyType.Int, null, [new NumberRule(RuleOp.LessOrEqual, 60)], []));
+                StructureRepository.SetValue(c, t, Pnj, Niveau, new IntValue(10));
+                StructureRepository.SetValue(c, t, Ilsa, Niveau, new IntValue(72));
+                StructureRepository.ReplacePageCategories(c, t, Ilsa, [Pnj]);
+                StructureRepository.ReplacePageCategories(c, t, Orsen, [Pnj]);
+                StructureState.Load(c, null).WriteDerived(c, t, null, null);
                 return 0;
             });
         }

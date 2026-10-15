@@ -61,4 +61,13 @@ public static class ErrorCodes
 
     /// <summary>A value cannot be converted to the new type (F08.R6).</summary>
     public const string PropertyValueNotConvertible = "property.value.notConvertible";
+
+    /// <summary>An enum option still used by values was removed without a replacement (F08.R5); pages in <c>pages</c>.</summary>
+    public const string PropertyOptionInUse = "property.option.inUse";
+
+    /// <summary>A category given to a page does not exist (or is in the trash).</summary>
+    public const string PageCategoryInvalid = "page.category.invalid";
+
+    /// <summary>A value is given for a property that does not exist (or is in the trash).</summary>
+    public const string PropertyNotFound = "property.notFound";
 }

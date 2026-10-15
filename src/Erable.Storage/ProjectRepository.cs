@@ -35,7 +35,14 @@ public sealed class ProjectRepository(ProjectDatabase database)
     public IReadOnlyList<TreeNode> LoadTreeNodes(SqliteConnection? connection = null)
     {
         using var owned = connection is null ? Database.OpenConnection() : null;
-        var rows = (connection ?? owned!).Query<TreeRow>(
+        return ReadTreeNodes(connection ?? owned!);
+    }
+
+    /// <summary>Structure of the live (not deleted) elements, on a given connection.</summary>
+    public static IReadOnlyList<TreeNode> ReadTreeNodes(SqliteConnection connection)
+    {
+        ArgumentNullException.ThrowIfNull(connection);
+        var rows = connection.Query<TreeRow>(
             "SELECT id AS Id, kind AS Kind, parent_id AS ParentId, name AS Name, sort_order AS SortOrder FROM elements WHERE deleted_at IS NULL");
         return [.. rows.Select(r => r.ToNode())];
     }
