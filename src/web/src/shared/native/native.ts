@@ -46,9 +46,12 @@ interface WindowStore {
   readonly unsavedChanges: boolean;
   /** Incremented each time the user closes the window while there are unsaved changes. */
   readonly closeRequests: number;
+  /** Last folder dropped on the window, numbered so that the same folder dropped twice is seen twice. */
+  readonly droppedFolder: { readonly path: string; readonly sequence: number } | null;
   setProjectName: (name: string | null) => void;
   setUnsavedChanges: (value: boolean) => void;
   requestClose: () => void;
+  dropFolder: (path: string) => void;
 }
 
 /** What the window title and the close confirmation need; synchronized with the shell by `DesktopWindow`. */
@@ -56,6 +59,7 @@ export const useWindowStore = create<WindowStore>()((set) => ({
   projectName: null,
   unsavedChanges: false,
   closeRequests: 0,
+  droppedFolder: null,
   setProjectName: (projectName) => {
     set({ projectName });
   },
@@ -64,6 +68,9 @@ export const useWindowStore = create<WindowStore>()((set) => ({
   },
   requestClose: () => {
     set((s) => ({ closeRequests: s.closeRequests + 1 }));
+  },
+  dropFolder: (path) => {
+    set((s) => ({ droppedFolder: { path, sequence: (s.droppedFolder?.sequence ?? 0) + 1 } }));
   },
 }));
 

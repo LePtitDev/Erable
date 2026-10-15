@@ -182,6 +182,39 @@ public sealed class NativeApiTests
     }
 
     [Fact]
+    public async Task Events_FolderDropped_TellsTheSpaItsPath()
+    {
+        var bridge = new FakeBridge();
+        await using var backend = await StartDesktopAsync(bridge);
+        var window = backend.Services.GetRequiredService<WindowCoordinator>();
+        var pending = backend.Client.GetAsync(
+            new Uri("/api/v1/native/events", UriKind.Relative), HttpCompletionOption.ResponseHeadersRead, Ct);
+
+        // Published once the SPA listens: retried until the stream has started.
+        using var started = new CancellationTokenSource();
+        var publisher = Task.Run(async () =>
+        {
+            while (!started.IsCancellationRequested)
+            {
+                window.OnFolderDropped(@"C:\Wikis\Chroniques d'Aube");
+                await Task.Delay(50, CancellationToken.None);
+            }
+        }, Ct);
+        using var events = await pending;
+        await started.CancelAsync();
+        await publisher;
+        using var reader = new StreamReader(await events.Content.ReadAsStreamAsync(Ct));
+        var line = await reader.ReadLineAsync(Ct);
+        while (line is not null && !line.StartsWith("data:", StringComparison.Ordinal))
+        {
+            line = await reader.ReadLineAsync(Ct);
+        }
+
+        line.ShouldNotBeNull().ShouldContain("folderDropped");
+        line.ShouldContain("Chroniques d'Aube");
+    }
+
+    [Fact]
     public void OnClosing_NoUnsavedChanges_ClosesAtOnce()
     {
         var window = new WindowCoordinator(new FakeBridge());

@@ -64,4 +64,17 @@ test.describe("F01 · Home and projects", () => {
     );
     expect(fingerprint(reference.folder)).toEqual(before);
   });
+
+  test("M1-17 · Opening a folder lands on the project, not on an element named after its path @pr", async ({
+    home,
+    page,
+    reference,
+  }) => {
+    await home.goto();
+
+    await home.openFolder(reference.folder);
+
+    await expect(page.getByRole("tree", { name: t("explorer.title") })).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/p/${reference.id}(/e/[0-9A-F]{16})?$`));
+  });
 });

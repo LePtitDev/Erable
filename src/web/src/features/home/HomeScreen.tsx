@@ -9,7 +9,7 @@ import {
   Settings,
   SquareLibrary,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiInfoQuery } from "../../shared/api/queries";
 import { meQuery, type ProjectSummary } from "../../shared/api/projects";
@@ -22,6 +22,7 @@ import styles from "./HomeScreen.module.css";
 import { NewProjectDialog } from "./NewProjectDialog";
 import { OpenFolderDialog } from "./OpenFolderDialog";
 import { PreferencesDialog } from "./PreferencesDialog";
+import { useWindowStore } from "../../shared/native/native";
 import { RecentProjects } from "./RecentProjects";
 
 type OpenDialog = "new" | "open" | "preferences" | "help" | null;
@@ -33,6 +34,18 @@ export function HomeScreen() {
   const info = useQuery(apiInfoQuery);
   const me = useQuery(meQuery);
   const [dialog, setDialog] = useState<OpenDialog>(null);
+  const [droppedFolder, setDroppedFolder] = useState<string | null>(null);
+
+  // F16 (E2E-16-07): a folder dropped on the window opens like « Ouvrir un dossier… », drops made elsewhere are not
+  // replayed when the home screen shows up later.
+  const dropped = useWindowStore((s) => s.droppedFolder);
+  const seenDrop = useRef(dropped?.sequence ?? 0);
+  useEffect(() => {
+    if (dropped === null || dropped.sequence === seenDrop.current) return;
+    seenDrop.current = dropped.sequence;
+    setDroppedFolder(dropped.path);
+    setDialog("open");
+  }, [dropped]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -194,7 +207,16 @@ export function HomeScreen() {
       </main>
 
       <NewProjectDialog open={dialog === "new"} onOpenChange={close} onCreated={opened} />
-      <OpenFolderDialog open={dialog === "open"} onOpenChange={close} onOpened={opened} />
+      <OpenFolderDialog
+        key={droppedFolder ?? "picker"}
+        open={dialog === "open"}
+        onOpenChange={(open) => {
+          if (!open) setDroppedFolder(null);
+          close(open);
+        }}
+        onOpened={opened}
+        initialFolder={droppedFolder}
+      />
       <PreferencesDialog open={dialog === "preferences"} onOpenChange={close} />
       <HelpDialog open={dialog === "help"} onOpenChange={close} />
     </div>

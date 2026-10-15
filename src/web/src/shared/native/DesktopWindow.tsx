@@ -5,7 +5,8 @@ import { approveClose, useIsDesktop, useWindowStore, windowTitle } from "./nativ
 /**
  * Keeps the desktop window in step with the SPA: its title follows the current project, the shell knows whether
  * closing would lose changes, and a close request from the shell (server-sent event) reaches the page editor, which
- * asks « Enregistrer / Abandonner / Annuler » (F16.R3, E2E-16-05). Renders nothing.
+ * asks « Enregistrer / Abandonner / Annuler » (F16.R3, E2E-16-05); a folder dropped on the window reaches the home
+ * screen (E2E-16-07). Renders nothing.
  */
 export function DesktopWindow() {
   const desktop = useIsDesktop();
@@ -30,7 +31,11 @@ export function DesktopWindow() {
     if (!desktop) return;
     const events = new EventSource("/api/v1/native/events");
     events.onmessage = (message: MessageEvent<string>) => {
-      const event = JSON.parse(message.data) as { type?: string };
+      const event = JSON.parse(message.data) as { type?: string; path?: string | null };
+      if (event.type === "folderDropped" && typeof event.path === "string") {
+        useWindowStore.getState().dropFolder(event.path);
+        return;
+      }
       if (event.type !== "closeRequested") return;
       // The changes may have been saved in the meantime: nothing left to ask.
       if (useWindowStore.getState().unsavedChanges) useWindowStore.getState().requestClose();

@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import { request as httpRequest } from "node:http";
 import { connect } from "node:net";
 import { networkInterfaces } from "node:os";
+import { pathToFileURL } from "node:url";
 import { chroniques } from "../fixtures/chroniques";
 import { EditorPage, InsertPalette } from "../pages/EditorPage";
 import { PageViewPage } from "../pages/PageViewPage";
@@ -121,6 +122,7 @@ test("E2E-16-03 · Open a folder with the native picker @desktop", async () => {
 
   await expect(page.getByRole("tree", { name: t("explorer.title") })).toBeVisible();
   await expect(page).toHaveTitle("Chroniques d'Aube — Erable");
+  await expect(page).toHaveURL(/\/p\/[0-9A-F]{16}(\/e\/[0-9A-F]{16})?$/);
 });
 
 test("E2E-16-04 · Second instance @desktop", async () => {
@@ -163,6 +165,24 @@ test("E2E-16-05 · Clean shutdown @desktop", async () => {
   app = await launchDesktop({ args: [folder], profile });
   await app.page.goto(await pageUrl(app, chroniques.hautbois));
   await expect(new PageViewPage(app.page).content).toContainText("Ajout avant fermeture.");
+});
+
+test("E2E-16-07 · Drop a folder on the home screen @desktop", async () => {
+  const folder = copyReferenceProject();
+  app = await launchDesktop();
+  const { page } = app;
+  await expect(page.getByRole("button", { name: t("home.open.title") })).toBeVisible();
+
+  // Dropping a folder makes the WebView navigate to its file:/// URL, which the shell cancels and turns into an
+  // « open this folder » event. A browser-initiated navigation takes that same path; CDP drag events do not run the
+  // drop's default action, and a real OS drag would need the mouse and the foreground of the person's desktop.
+  const cdp = await page.context().newCDPSession(page);
+  const navigation = await cdp.send("Page.navigate", { url: pathToFileURL(folder).href });
+
+  expect(navigation.errorText, "the shell cancels the navigation").toBe("net::ERR_ABORTED");
+  await expect(page.getByRole("tree", { name: t("explorer.title") })).toBeVisible();
+  await expect(page).toHaveTitle("Chroniques d'Aube — Erable");
+  await expect(page).toHaveURL(/\/p\/[0-9A-F]{16}(\/e\/[0-9A-F]{16})?$/);
 });
 
 test("E2E-16-02 · Local server is protected @desktop", async () => {

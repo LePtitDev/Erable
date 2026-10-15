@@ -4,10 +4,16 @@ using System.Threading.Channels;
 namespace Erable.Server.Native;
 
 /// <summary>Something the desktop shell tells the SPA (server-sent events of <c>GET /api/v1/native/events</c>).</summary>
-/// <param name="Type"><c>closeRequested</c>: the user closed the window while a page had unsaved changes.</param>
-public sealed record NativeEvent(string Type)
+/// <param name="Type">
+/// <c>closeRequested</c>: the user closed the window while a page had unsaved changes; <c>folderDropped</c>: a folder
+/// was dropped on the window (E2E-16-07).
+/// </param>
+/// <param name="Path">The dropped folder (<c>folderDropped</c> only).</param>
+public sealed record NativeEvent(string Type, string? Path = null)
 {
     public static readonly NativeEvent CloseRequested = new("closeRequested");
+
+    public static NativeEvent FolderDropped(string path) => new("folderDropped", path);
 }
 
 /// <summary>
@@ -48,6 +54,18 @@ public sealed class WindowCoordinator(INativeBridge bridge)
             }
 
             return true;
+        }
+    }
+
+    /// <summary>Called by the shell when a folder is dropped on the window: the SPA opens it like « Ouvrir un dossier ».</summary>
+    public void OnFolderDropped(string path)
+    {
+        lock (_gate)
+        {
+            foreach (var subscriber in _subscribers)
+            {
+                subscriber.Writer.TryWrite(NativeEvent.FolderDropped(path));
+            }
         }
     }
 

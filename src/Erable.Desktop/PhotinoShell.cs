@@ -6,8 +6,8 @@ using Photino.NET;
 namespace Erable.Desktop;
 
 /// <summary>
-/// Everything that depends on Photino lives here, so that the shell can be swapped (PhotinoX, Electron…) by
-/// rewriting this file only (decision Q6, task M0-08).
+/// Everything that depends on Photino (the PhotinoX fork, decision Q6) lives here, so that the shell can be swapped
+/// (Electron…) by rewriting this file only.
 /// </summary>
 internal sealed partial class PhotinoShell : INativeBridge
 {
@@ -19,6 +19,12 @@ internal sealed partial class PhotinoShell : INativeBridge
     /// <summary>Asked when the user closes the window: true keeps it open (unsaved changes, F16.R3).</summary>
     public Func<bool>? Closing { get; set; }
 
+    /// <summary>
+    /// A folder dropped on the window (E2E-16-07). The WebView never tells the page the path of a dropped folder; left
+    /// unhandled, the drop makes it navigate to <c>file:///…</c>, which the shell cancels and reports here instead.
+    /// </summary>
+    public Action<string>? FolderDropped { get; set; }
+
     /// <summary>Test mode only: the folder « chosen » in the picker, which a test cannot click (E2E-16-03).</summary>
     public string? PickFolderOverride { get; set; }
 
@@ -27,25 +33,42 @@ internal sealed partial class PhotinoShell : INativeBridge
     /// <summary>Opens the window on <paramref name="url"/> and blocks the (STA) thread until it is closed.</summary>
     public void Run(Uri url)
     {
-        _window = new PhotinoWindow()
+        _window = new PhotinoWindow(null)
+            // First: Photino logs every setting call, and the URL fragment carries the session token.
+            .SetLogVerbosity(0)
             .SetTitle(_title)
             .SetUseOsDefaultSize(false)
             .SetSize(1280, 820)
             .SetMinSize(720, 480)
             .Center()
-            // Photino logs loaded URLs at higher verbosity; the URL fragment carries the session token.
-            .SetLogVerbosity(0)
             .SetContextMenuEnabled(false)
             .SetDevToolsEnabled(IsDevToolsEnabled())
-            .RegisterWindowClosingHandler((_, _) => Closing?.Invoke() ?? false);
+            .RegisterClosingHandler((_, e) => e.Cancel = Closing?.Invoke() ?? false)
+            .RegisterNavigationStartingHandler((_, e) => OnNavigationStarting(e));
         if (IconFile() is { } icon)
         {
             _window.SetIconFile(icon);
         }
 
         _window.Load(url);
-        _window.WaitForClose();
+        new PhotinoApplication().Run(_window);
         _window = null;
+    }
+
+    /// <summary>The SPA never leaves its origin for a local file: a dropped folder opens as a project, anything else is ignored.</summary>
+    private void OnNavigationStarting(NavigationStartingEventArgs e)
+    {
+        if (!e.Uri.IsFile)
+        {
+            return;
+        }
+
+        e.Cancel = true;
+        var path = e.Uri.LocalPath;
+        if (Directory.Exists(path))
+        {
+            FolderDropped?.Invoke(Path.GetFullPath(path));
+        }
     }
 
     /// <summary>Closes the window from any thread; <see cref="Run"/> then returns.</summary>
@@ -83,8 +106,8 @@ internal sealed partial class PhotinoShell : INativeBridge
             {
                 window.SetMinimized(false);
                 // Raises the window above the others without keeping it there.
-                window.SetTopMost(true);
-                window.SetTopMost(false);
+                window.SetTopmost(true);
+                window.SetTopmost(false);
             }
         });
     }

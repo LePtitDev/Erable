@@ -18,6 +18,8 @@ interface OpenFolderDialogProps {
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
   readonly onOpened: (project: ProjectSummary) => void;
+  /** A folder to open at once instead of asking (dropped on the window, E2E-16-07). */
+  readonly initialFolder?: string | null;
 }
 
 /**
@@ -26,11 +28,17 @@ interface OpenFolderDialogProps {
  * is refused with a clear message (F01.R3). On the desktop, the OS folder picker opens at once (E2E-16-03); the
  * path field stays for typing or pasting a path.
  */
-export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDialogProps) {
+export function OpenFolderDialog({
+  open,
+  onOpenChange,
+  onOpened,
+  initialFolder = null,
+}: OpenFolderDialogProps) {
   const { t } = useTranslation();
   const id = useId();
   const openProject = useOpenProject();
-  const [folder, setFolder] = useState("");
+  // Keyed by the dropped folder in HomeScreen: a new drop is a new dialog.
+  const [folder, setFolder] = useState(initialFolder ?? "");
   const [inspection, setInspection] = useState<FolderInspection | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [createIn, setCreateIn] = useState<string | null>(null);
@@ -48,7 +56,13 @@ export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDia
       const result = await inspectFolder(path);
       setInspection(result);
       if (result.status === "project") {
-        openProject.mutate(path, { onSuccess: onOpened });
+        // Not `onSuccess: onOpened`: the mutation passes its variables (the path) as a second argument, which
+        // onOpened would take for the element to show.
+        openProject.mutate(path, {
+          onSuccess: (project) => {
+            onOpened(project);
+          },
+        });
       } else if (result.status === "notAProject") {
         setCreateIn(path);
       }
@@ -83,11 +97,14 @@ export function OpenFolderDialog({ open, onOpenChange, onOpened }: OpenFolderDia
       browsed.current = false;
       return;
     }
-    if (!desktop || browsed.current) return;
+    if (browsed.current || (initialFolder === null && !desktop)) return;
     browsed.current = true;
-    void browse(true);
+    // After this render: the inspection (of the dropped folder, or of the one picked) updates the dialog state.
+    queueMicrotask(() => {
+      void (initialFolder === null ? browse(true) : inspectAndOpen(initialFolder));
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per opening, not on every render of `browse`
-  }, [open, desktop]);
+  }, [open, desktop, initialFolder]);
 
   const message =
     failure ??

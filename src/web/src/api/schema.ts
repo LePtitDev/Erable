@@ -583,6 +583,7 @@ export interface components {
     };
     JsonNode: unknown;
     NativeEvent: {
+      path?: null | string;
       type: string;
     };
     OpenProjectRequest: {

@@ -14,7 +14,7 @@
 | Temps réel | **SignalR** | Présence, notifications de modification, plus tard co-édition. |
 | Frontend | **React + TypeScript + Vite** | Une SPA unique, servie par le backend ou déployée en statique. |
 | Éditeur | **CodeMirror 6** | Markdown source avec décorations (noms à la place des ID, autocomplétion). |
-| Desktop | **Photino.NET** (WebView natif) + backend **in-process** | 100 % C# côté natif, ~50 Mo, Windows / Linux / macOS. Repli possible : Electron. |
+| Desktop | **Photino** (fork **PhotinoX**, WebView natif) + backend **in-process** | 100 % C# côté natif, ~50 Mo, Windows / Linux / macOS. Repli possible : Electron. |
 | Stockage | **SQLite (un fichier par projet)** + **pièces jointes adressées par contenu** sur disque | Zéro service à installer, sauvegarde = copier un dossier, FTS5 pour la recherche. |
 | Identifiants | **UID 64 bits aléatoire**, affiché en hexa (`3F2A 9C14 E07B 5D21`) | Renommer ou déplacer ne casse jamais une référence. |
 | Contrat API | **REST JSON + OpenAPI**, client TypeScript **généré** | Front et back ne divergent pas silencieusement. |
@@ -326,7 +326,7 @@ Un fichier SQLite **ne se versionne pas bien dans Git** et **ne doit pas être p
 
 ## 10. Desktop : choix du shell
 
-| | **Photino.NET** (retenu) | Electron | Tauri 2 |
+| | **Photino** (retenu, fork PhotinoX) | Electron | Tauri 2 |
 |---|---|---|---|
 | Langage du shell | C# | JS/Node | Rust |
 | Backend .NET | in-process, un seul processus | sidecar (2 processus) | sidecar |
@@ -334,7 +334,9 @@ Un fichier SQLite **ne se versionne pas bien dans Git** et **ne doit pas être p
 | Moteur de rendu | WebView2 / WebKitGTK / WKWebView | Chromium identique partout | comme Photino |
 | Maturité / outillage | modeste | très élevée | élevée |
 
-**Choix retenu : Photino.NET** (décision Q6), pour rester en C# et en un seul processus. Ce choix reste réversible : le shell ne fait que (1) démarrer le backend, (2) ouvrir la fenêtre, (3) exposer trois ou quatre fonctions natives (sélecteur de dossier, ouvrir un fichier avec l'application système, révéler dans l'explorateur). Si Photino pose problème, on passe à Electron en remplaçant uniquement `Erable.Desktop`.
+**Choix retenu : Photino, via le fork maintenu PhotinoX** (décision Q6), pour rester en C# et en un seul processus. Ce choix reste réversible : le shell ne fait que (1) démarrer le backend, (2) ouvrir la fenêtre, (3) exposer trois ou quatre fonctions natives (sélecteur de dossier, ouvrir un fichier avec l'application système, révéler dans l'explorateur). Si Photino pose problème, on passe à Electron en remplaçant uniquement `Erable.Desktop`.
+
+**Dossier déposé sur la fenêtre (E2E-16-07)** : le WebView ne donne jamais à la page le chemin d'un dossier déposé. Laissé sans gestionnaire, le dépôt fait naviguer le WebView vers `file:///…` ; le shell annule toute navigation `file:` (`NavigationStarting`, PhotinoX) et, si c'est un dossier, le signale à la SPA par le flux SSE (`folderDropped`), qui l'ouvre comme « Ouvrir un dossier… ». La SPA ne quitte donc jamais son origine.
 
 **Fonctions natives (M1-17)** : toujours par l'API (`/api/v1/native/*`, `…/attachments/{id}/open|reveal`), jamais par un pont JavaScript, et derrière `INativeBridge` côté serveur (404 `native.unavailable` en mode serveur) :
 - sélecteur de dossier (`Ctrl+O`), titre de fenêtre (projet courant), ouvrir avec l'application système (copie nommée dans `<temp>/erable-open/`, **programmes et scripts refusés**), révéler dans l'explorateur ;
@@ -400,5 +402,5 @@ Pour éviter les alertes « application non reconnue », il faut un compte Apple
 - **Q3.** Co-édition en direct en v2. La v1 utilise la concurrence optimiste avec fusion à trois voies (§8.3).
 - **Q4.** Une page peut avoir plusieurs catégories (résolution des valeurs : §5.3).
 - **Q5.** Permissions par projet uniquement (§9).
-- **Q6.** Shell desktop : Photino.NET (§10). Electron reste le repli si le jalon M0 révèle un blocage. *Constat M0-07 (oct. 2026)* : Photino.NET n'a plus de commit de code depuis janvier 2025 ; tout ce qui dépend de Photino est isolé dans `PhotinoShell`, et le spike M0-08 le compare au fork actif PhotinoX.
+- **Q6.** Shell desktop : Photino (§10). Electron reste le repli si le jalon M0 révèle un blocage. *Constat M0-07 (oct. 2026)* : Photino.NET n'a plus de commit de code depuis janvier 2025 ; tout ce qui dépend de Photino est isolé dans `PhotinoShell`, et le spike M0-08 le compare au fork actif PhotinoX. *Décision M1-17 (15 oct. 2026, P-15)* : **passage à PhotinoX 5.3.5** (Apache-2.0, cible .NET 10), qui expose `NavigationStarting` nécessaire au dépôt de dossier ; Linux et macOS restent à vérifier sur ce fork.
 - **Q7.** Aucun état durable dans le navigateur (§3.1) : préférences, brouillons et état de l'interface sont stockés côté backend et exposés par l'API ; le backend injecte le thème (et, à terme, la langue) dans `index.html`. Alternative écartée : schéma d'URL personnalisé Photino à origine fixe (plus fragile selon les WebViews).

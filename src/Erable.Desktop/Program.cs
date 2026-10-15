@@ -49,7 +49,9 @@ internal static class Program
         };
 
         var app = ErableHost.Build(options, builder => builder.Services.AddSingleton<INativeBridge>(shell));
-        shell.Closing = app.Services.GetRequiredService<WindowCoordinator>().OnClosing;
+        var window = app.Services.GetRequiredService<WindowCoordinator>();
+        shell.Closing = window.OnClosing;
+        shell.FolderDropped = window.OnFolderDropped;
         Task<SelfTest.Result>? selfTestResult = null;
         string? selfTestFolder = null;
         try
