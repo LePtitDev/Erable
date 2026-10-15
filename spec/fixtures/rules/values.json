@@ -1,0 +1,349 @@
+{
+  "description": "Reading a typed value from JSON (malformed values are refused, rule violations only warn). canonical: the value written back.",
+  "cases": [
+    {
+      "name": "bool true",
+      "type": "bool",
+      "json": true,
+      "valid": true,
+      "canonical": true
+    },
+    {
+      "name": "bool as number",
+      "type": "bool",
+      "json": 1,
+      "valid": false
+    },
+    {
+      "name": "int",
+      "type": "int",
+      "json": 72,
+      "valid": true,
+      "canonical": 72
+    },
+    {
+      "name": "int negative",
+      "type": "int",
+      "json": -5,
+      "valid": true,
+      "canonical": -5
+    },
+    {
+      "name": "int written 72.0",
+      "type": "int",
+      "json": 72.0,
+      "valid": true,
+      "canonical": 72
+    },
+    {
+      "name": "int fractional",
+      "type": "int",
+      "json": 72.5,
+      "valid": false
+    },
+    {
+      "name": "int as a string",
+      "type": "int",
+      "json": "72",
+      "valid": false
+    },
+    {
+      "name": "int max safe",
+      "type": "int",
+      "json": 9007199254740991,
+      "valid": true,
+      "canonical": 9007199254740991
+    },
+    {
+      "name": "int above max safe",
+      "type": "int",
+      "json": 9007199254740992,
+      "valid": false
+    },
+    {
+      "name": "int huge",
+      "type": "int",
+      "json": 1e+300,
+      "valid": false
+    },
+    {
+      "name": "float",
+      "type": "float",
+      "json": 1.5,
+      "valid": true,
+      "canonical": 1.5
+    },
+    {
+      "name": "float integral",
+      "type": "float",
+      "json": 2,
+      "valid": true,
+      "canonical": 2
+    },
+    {
+      "name": "float huge",
+      "type": "float",
+      "json": 1e+300,
+      "valid": true,
+      "canonical": 1e+300
+    },
+    {
+      "name": "float as a string",
+      "type": "float",
+      "json": "1.5",
+      "valid": false
+    },
+    {
+      "name": "string",
+      "type": "string",
+      "json": "Marchande",
+      "valid": true,
+      "canonical": "Marchande"
+    },
+    {
+      "name": "string empty",
+      "type": "string",
+      "json": "",
+      "valid": true,
+      "canonical": ""
+    },
+    {
+      "name": "string with a tab",
+      "type": "string",
+      "json": "a\tb",
+      "valid": true,
+      "canonical": "a\tb"
+    },
+    {
+      "name": "string with a line feed",
+      "type": "string",
+      "json": "a\nb",
+      "valid": false
+    },
+    {
+      "name": "string NFC normalized",
+      "type": "string",
+      "json": "é",
+      "valid": true,
+      "canonical": "é"
+    },
+    {
+      "name": "string too long",
+      "type": "string",
+      "json": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "valid": false
+    },
+    {
+      "name": "string at the limit",
+      "type": "string",
+      "json": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "valid": true,
+      "canonical": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "name": "string as number",
+      "type": "string",
+      "json": 3,
+      "valid": false
+    },
+    {
+      "name": "text with line feeds",
+      "type": "text",
+      "json": "a\nb",
+      "valid": true,
+      "canonical": "a\nb"
+    },
+    {
+      "name": "enum option key",
+      "type": "enum",
+      "json": "garde",
+      "valid": true,
+      "canonical": "garde",
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum label is not a key",
+      "type": "enum",
+      "json": "Garde",
+      "valid": false,
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum unknown",
+      "type": "enum",
+      "json": "voleur",
+      "valid": false,
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "date",
+      "type": "date",
+      "json": "2026-02-28",
+      "valid": true,
+      "canonical": "2026-02-28"
+    },
+    {
+      "name": "date leap day",
+      "type": "date",
+      "json": "2024-02-29",
+      "valid": true,
+      "canonical": "2024-02-29"
+    },
+    {
+      "name": "date impossible day",
+      "type": "date",
+      "json": "2026-02-30",
+      "valid": false
+    },
+    {
+      "name": "date short year",
+      "type": "date",
+      "json": "26-02-28",
+      "valid": false
+    },
+    {
+      "name": "date year zero",
+      "type": "date",
+      "json": "0000-01-01",
+      "valid": false
+    },
+    {
+      "name": "date with a time",
+      "type": "date",
+      "json": "2026-02-28T10:00",
+      "valid": false
+    },
+    {
+      "name": "ref lower case",
+      "type": "ref",
+      "json": "3f2a9c14e07b5d21",
+      "valid": true,
+      "canonical": "3F2A9C14E07B5D21"
+    },
+    {
+      "name": "ref zero",
+      "type": "ref",
+      "json": "0000000000000000",
+      "valid": false
+    },
+    {
+      "name": "ref as number",
+      "type": "ref",
+      "json": 12,
+      "valid": false
+    },
+    {
+      "name": "list<int>",
+      "type": "list<int>",
+      "json": [
+        1,
+        2
+      ],
+      "valid": true,
+      "canonical": [
+        1,
+        2
+      ]
+    },
+    {
+      "name": "list<int> empty",
+      "type": "list<int>",
+      "json": [],
+      "valid": true,
+      "canonical": []
+    },
+    {
+      "name": "list<int> with a string",
+      "type": "list<int>",
+      "json": [
+        1,
+        "a"
+      ],
+      "valid": false
+    },
+    {
+      "name": "list<int> not an array",
+      "type": "list<int>",
+      "json": 1,
+      "valid": false
+    },
+    {
+      "name": "list<enum> keys",
+      "type": "list<enum>",
+      "json": [
+        "garde",
+        "erudit"
+      ],
+      "valid": true,
+      "canonical": [
+        "garde",
+        "erudit"
+      ],
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "int null",
+      "type": "int",
+      "json": null,
+      "valid": false
+    },
+    {
+      "name": "string null",
+      "type": "string",
+      "json": null,
+      "valid": false
+    }
+  ]
+}

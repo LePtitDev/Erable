@@ -1,0 +1,1198 @@
+{
+  "description": "Rule evaluation (docs/architecture.md §5.4). violations: rule op in rule order, index for an item rule of a list. context: kinds of the referenced elements and [page, category] memberships (sub-categories already included).",
+  "cases": [
+    {
+      "name": "int greater_than: below fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_than",
+          "value": 0
+        }
+      ],
+      "value": -1,
+      "violations": [
+        {
+          "op": "greater_than"
+        }
+      ]
+    },
+    {
+      "name": "int greater_than: equal fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_than",
+          "value": 0
+        }
+      ],
+      "value": 0,
+      "violations": [
+        {
+          "op": "greater_than"
+        }
+      ]
+    },
+    {
+      "name": "int greater_than: above passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_than",
+          "value": 0
+        }
+      ],
+      "value": 1,
+      "violations": []
+    },
+    {
+      "name": "int greater_or_equal: below fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_or_equal",
+          "value": 1
+        }
+      ],
+      "value": 0,
+      "violations": [
+        {
+          "op": "greater_or_equal"
+        }
+      ]
+    },
+    {
+      "name": "int greater_or_equal: equal passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_or_equal",
+          "value": 1
+        }
+      ],
+      "value": 1,
+      "violations": []
+    },
+    {
+      "name": "int less_than: equal fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "less_than",
+          "value": 10
+        }
+      ],
+      "value": 10,
+      "violations": [
+        {
+          "op": "less_than"
+        }
+      ]
+    },
+    {
+      "name": "int less_than: below passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "less_than",
+          "value": 10
+        }
+      ],
+      "value": 9,
+      "violations": []
+    },
+    {
+      "name": "int less_or_equal: Niveau 72 fails (Ilsa)",
+      "type": "int",
+      "rules": [
+        {
+          "op": "less_or_equal",
+          "value": 60
+        }
+      ],
+      "value": 72,
+      "violations": [
+        {
+          "op": "less_or_equal"
+        }
+      ]
+    },
+    {
+      "name": "int less_or_equal: equal passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "less_or_equal",
+          "value": 60
+        }
+      ],
+      "value": 60,
+      "violations": []
+    },
+    {
+      "name": "int between: below fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "between",
+          "value": [
+            1,
+            60
+          ]
+        }
+      ],
+      "value": 0,
+      "violations": [
+        {
+          "op": "between"
+        }
+      ]
+    },
+    {
+      "name": "int between: lower bound passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "between",
+          "value": [
+            1,
+            60
+          ]
+        }
+      ],
+      "value": 1,
+      "violations": []
+    },
+    {
+      "name": "int between: upper bound passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "between",
+          "value": [
+            1,
+            60
+          ]
+        }
+      ],
+      "value": 60,
+      "violations": []
+    },
+    {
+      "name": "int between: above fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "between",
+          "value": [
+            1,
+            60
+          ]
+        }
+      ],
+      "value": 61,
+      "violations": [
+        {
+          "op": "between"
+        }
+      ]
+    },
+    {
+      "name": "int not_equal: equal fails",
+      "type": "int",
+      "rules": [
+        {
+          "op": "not_equal",
+          "value": 13
+        }
+      ],
+      "value": 13,
+      "violations": [
+        {
+          "op": "not_equal"
+        }
+      ]
+    },
+    {
+      "name": "int not_equal: different passes",
+      "type": "int",
+      "rules": [
+        {
+          "op": "not_equal",
+          "value": 13
+        }
+      ],
+      "value": 12,
+      "violations": []
+    },
+    {
+      "name": "int less_than with a fractional bound",
+      "type": "int",
+      "rules": [
+        {
+          "op": "less_than",
+          "value": 2.5
+        }
+      ],
+      "value": 3,
+      "violations": [
+        {
+          "op": "less_than"
+        }
+      ]
+    },
+    {
+      "name": "int negative bound",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_or_equal",
+          "value": -10
+        }
+      ],
+      "value": -10,
+      "violations": []
+    },
+    {
+      "name": "int Niveau rules, 72",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_or_equal",
+          "value": 1
+        },
+        {
+          "op": "less_or_equal",
+          "value": 60
+        }
+      ],
+      "value": 72,
+      "violations": [
+        {
+          "op": "less_or_equal"
+        }
+      ]
+    },
+    {
+      "name": "int Niveau rules, 0",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_or_equal",
+          "value": 1
+        },
+        {
+          "op": "less_or_equal",
+          "value": 60
+        }
+      ],
+      "value": 0,
+      "violations": [
+        {
+          "op": "greater_or_equal"
+        }
+      ]
+    },
+    {
+      "name": "int Niveau rules, 99 with 80 (E2E-08-05)",
+      "type": "int",
+      "rules": [
+        {
+          "op": "greater_or_equal",
+          "value": 1
+        },
+        {
+          "op": "less_or_equal",
+          "value": 80
+        }
+      ],
+      "value": 99,
+      "violations": [
+        {
+          "op": "less_or_equal"
+        }
+      ]
+    },
+    {
+      "name": "int both rules of the same op fail in order",
+      "type": "int",
+      "rules": [
+        {
+          "op": "less_than",
+          "value": 5
+        },
+        {
+          "op": "less_than",
+          "value": 3
+        }
+      ],
+      "value": 7,
+      "violations": [
+        {
+          "op": "less_than"
+        },
+        {
+          "op": "less_than"
+        }
+      ]
+    },
+    {
+      "name": "float greater_than: -2 fails (E2E-08-02)",
+      "type": "float",
+      "rules": [
+        {
+          "op": "greater_than",
+          "value": 0
+        }
+      ],
+      "value": -2,
+      "violations": [
+        {
+          "op": "greater_than"
+        }
+      ]
+    },
+    {
+      "name": "float greater_than: 0.5 passes",
+      "type": "float",
+      "rules": [
+        {
+          "op": "greater_than",
+          "value": 0
+        }
+      ],
+      "value": 0.5,
+      "violations": []
+    },
+    {
+      "name": "float between: upper bound passes",
+      "type": "float",
+      "rules": [
+        {
+          "op": "between",
+          "value": [
+            0.5,
+            1.5
+          ]
+        }
+      ],
+      "value": 1.5,
+      "violations": []
+    },
+    {
+      "name": "float between: just above fails",
+      "type": "float",
+      "rules": [
+        {
+          "op": "between",
+          "value": [
+            0.5,
+            1.5
+          ]
+        }
+      ],
+      "value": 1.50001,
+      "violations": [
+        {
+          "op": "between"
+        }
+      ]
+    },
+    {
+      "name": "float not_equal on a decimal",
+      "type": "float",
+      "rules": [
+        {
+          "op": "not_equal",
+          "value": 0.1
+        }
+      ],
+      "value": 0.1,
+      "violations": [
+        {
+          "op": "not_equal"
+        }
+      ]
+    },
+    {
+      "name": "string min_length: too short fails",
+      "type": "string",
+      "rules": [
+        {
+          "op": "min_length",
+          "value": 3
+        }
+      ],
+      "value": "ab",
+      "violations": [
+        {
+          "op": "min_length"
+        }
+      ]
+    },
+    {
+      "name": "string min_length: exact passes",
+      "type": "string",
+      "rules": [
+        {
+          "op": "min_length",
+          "value": 3
+        }
+      ],
+      "value": "abc",
+      "violations": []
+    },
+    {
+      "name": "string min_length counts NFC code points",
+      "type": "string",
+      "rules": [
+        {
+          "op": "min_length",
+          "value": 2
+        }
+      ],
+      "value": "é",
+      "violations": [
+        {
+          "op": "min_length"
+        }
+      ]
+    },
+    {
+      "name": "string max_length: too long fails",
+      "type": "string",
+      "rules": [
+        {
+          "op": "max_length",
+          "value": 5
+        }
+      ],
+      "value": "abcdef",
+      "violations": [
+        {
+          "op": "max_length"
+        }
+      ]
+    },
+    {
+      "name": "string max_length counts an emoji once",
+      "type": "string",
+      "rules": [
+        {
+          "op": "max_length",
+          "value": 2
+        }
+      ],
+      "value": "😀😀",
+      "violations": []
+    },
+    {
+      "name": "string match: E2E-08-07 invalid",
+      "type": "string",
+      "rules": [
+        {
+          "op": "match",
+          "value": "^[A-Z]{3}-\\d{2}$"
+        }
+      ],
+      "value": "ab-1",
+      "violations": [
+        {
+          "op": "match"
+        }
+      ]
+    },
+    {
+      "name": "string match: E2E-08-07 valid",
+      "type": "string",
+      "rules": [
+        {
+          "op": "match",
+          "value": "^[A-Z]{3}-\\d{2}$"
+        }
+      ],
+      "value": "ABC-12",
+      "violations": []
+    },
+    {
+      "name": "string match is a search, not a full match",
+      "type": "string",
+      "rules": [
+        {
+          "op": "match",
+          "value": "[0-9]"
+        }
+      ],
+      "value": "abc1",
+      "violations": []
+    },
+    {
+      "name": "string match anchored fails on a prefix",
+      "type": "string",
+      "rules": [
+        {
+          "op": "match",
+          "value": "^[A-Z]{3}-\\d{2}$"
+        }
+      ],
+      "value": "xABC-12",
+      "violations": [
+        {
+          "op": "match"
+        }
+      ]
+    },
+    {
+      "name": "string not_empty: empty fails",
+      "type": "string",
+      "rules": [
+        {
+          "op": "not_empty"
+        }
+      ],
+      "value": "",
+      "violations": [
+        {
+          "op": "not_empty"
+        }
+      ]
+    },
+    {
+      "name": "string not_empty: spaces fail",
+      "type": "string",
+      "rules": [
+        {
+          "op": "not_empty"
+        }
+      ],
+      "value": "   ",
+      "violations": [
+        {
+          "op": "not_empty"
+        }
+      ]
+    },
+    {
+      "name": "string not_empty: no-break space fails",
+      "type": "string",
+      "rules": [
+        {
+          "op": "not_empty"
+        }
+      ],
+      "value": " \t",
+      "violations": [
+        {
+          "op": "not_empty"
+        }
+      ]
+    },
+    {
+      "name": "string not_empty: a letter passes",
+      "type": "string",
+      "rules": [
+        {
+          "op": "not_empty"
+        }
+      ],
+      "value": " a ",
+      "violations": []
+    },
+    {
+      "name": "string all rules",
+      "type": "string",
+      "rules": [
+        {
+          "op": "min_length",
+          "value": 2
+        },
+        {
+          "op": "max_length",
+          "value": 4
+        },
+        {
+          "op": "match",
+          "value": "^a"
+        },
+        {
+          "op": "not_empty"
+        }
+      ],
+      "value": "b",
+      "violations": [
+        {
+          "op": "min_length"
+        },
+        {
+          "op": "match"
+        }
+      ]
+    },
+    {
+      "name": "text max_length: too long fails",
+      "type": "text",
+      "rules": [
+        {
+          "op": "max_length",
+          "value": 10
+        }
+      ],
+      "value": "Une ligne\net une autre",
+      "violations": [
+        {
+          "op": "max_length"
+        }
+      ]
+    },
+    {
+      "name": "text max_length: short passes",
+      "type": "text",
+      "rules": [
+        {
+          "op": "max_length",
+          "value": 10
+        }
+      ],
+      "value": "a\nb",
+      "violations": []
+    },
+    {
+      "name": "enum in: outside fails",
+      "type": "enum",
+      "rules": [
+        {
+          "op": "in",
+          "value": [
+            "marchande",
+            "garde"
+          ]
+        }
+      ],
+      "value": "erudit",
+      "violations": [
+        {
+          "op": "in"
+        }
+      ],
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum in: inside passes",
+      "type": "enum",
+      "rules": [
+        {
+          "op": "in",
+          "value": [
+            "marchande",
+            "garde"
+          ]
+        }
+      ],
+      "value": "garde",
+      "violations": [],
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum in: empty subset refuses everything",
+      "type": "enum",
+      "rules": [
+        {
+          "op": "in",
+          "value": []
+        }
+      ],
+      "value": "garde",
+      "violations": [
+        {
+          "op": "in"
+        }
+      ],
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "date after: same day fails",
+      "type": "date",
+      "rules": [
+        {
+          "op": "after",
+          "value": "2026-01-01"
+        }
+      ],
+      "value": "2026-01-01",
+      "violations": [
+        {
+          "op": "after"
+        }
+      ]
+    },
+    {
+      "name": "date after: next day passes",
+      "type": "date",
+      "rules": [
+        {
+          "op": "after",
+          "value": "2026-01-01"
+        }
+      ],
+      "value": "2026-01-02",
+      "violations": []
+    },
+    {
+      "name": "date before: previous day passes",
+      "type": "date",
+      "rules": [
+        {
+          "op": "before",
+          "value": "2026-01-01"
+        }
+      ],
+      "value": "2025-12-31",
+      "violations": []
+    },
+    {
+      "name": "date before: same day fails",
+      "type": "date",
+      "rules": [
+        {
+          "op": "before",
+          "value": "2026-01-01"
+        }
+      ],
+      "value": "2026-01-01",
+      "violations": [
+        {
+          "op": "before"
+        }
+      ]
+    },
+    {
+      "name": "ref kind page: a page passes",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "kind",
+          "value": "page"
+        }
+      ],
+      "value": "1000000000000001",
+      "violations": [],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "ref kind page: a category fails",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "kind",
+          "value": "page"
+        }
+      ],
+      "value": "2000000000000001",
+      "violations": [
+        {
+          "op": "kind"
+        }
+      ],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "ref kind page: an unknown element fails",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "kind",
+          "value": "page"
+        }
+      ],
+      "value": "3000000000000001",
+      "violations": [
+        {
+          "op": "kind"
+        }
+      ],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "ref kind category: a category passes",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "kind",
+          "value": "category"
+        }
+      ],
+      "value": "2000000000000001",
+      "violations": [],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "ref in_category: member passes",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "in_category",
+          "value": "2000000000000001"
+        }
+      ],
+      "value": "1000000000000001",
+      "violations": [],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "ref in_category: other page fails (E2E-08-06)",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "in_category",
+          "value": "2000000000000001"
+        }
+      ],
+      "value": "1000000000000002",
+      "violations": [
+        {
+          "op": "in_category"
+        }
+      ],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "ref without context: kind fails",
+      "type": "ref",
+      "rules": [
+        {
+          "op": "kind",
+          "value": "page"
+        }
+      ],
+      "value": "1000000000000001",
+      "violations": [
+        {
+          "op": "kind"
+        }
+      ]
+    },
+    {
+      "name": "list<int> min_count: too few fails",
+      "type": "list<int>",
+      "rules": [
+        {
+          "op": "min_count",
+          "value": 2
+        }
+      ],
+      "value": [
+        1
+      ],
+      "violations": [
+        {
+          "op": "min_count"
+        }
+      ]
+    },
+    {
+      "name": "list<int> max_count: too many fails",
+      "type": "list<int>",
+      "rules": [
+        {
+          "op": "max_count",
+          "value": 2
+        }
+      ],
+      "value": [
+        1,
+        2,
+        3
+      ],
+      "violations": [
+        {
+          "op": "max_count"
+        }
+      ]
+    },
+    {
+      "name": "list<int> item rules report each failing index",
+      "type": "list<int>",
+      "rules": [
+        {
+          "op": "min_count",
+          "value": 1
+        },
+        {
+          "op": "less_or_equal",
+          "value": 60
+        }
+      ],
+      "value": [
+        10,
+        72,
+        99
+      ],
+      "violations": [
+        {
+          "op": "less_or_equal",
+          "index": 1
+        },
+        {
+          "op": "less_or_equal",
+          "index": 2
+        }
+      ]
+    },
+    {
+      "name": "list<int> rule order, then item order",
+      "type": "list<int>",
+      "rules": [
+        {
+          "op": "greater_than",
+          "value": 0
+        },
+        {
+          "op": "max_count",
+          "value": 1
+        },
+        {
+          "op": "less_than",
+          "value": 5
+        }
+      ],
+      "value": [
+        0,
+        9
+      ],
+      "violations": [
+        {
+          "op": "greater_than",
+          "index": 0
+        },
+        {
+          "op": "max_count"
+        },
+        {
+          "op": "less_than",
+          "index": 1
+        }
+      ]
+    },
+    {
+      "name": "list<string> empty list: item rules never fail",
+      "type": "list<string>",
+      "rules": [
+        {
+          "op": "not_empty"
+        }
+      ],
+      "value": [],
+      "violations": []
+    },
+    {
+      "name": "list<string> empty list: min_count fails",
+      "type": "list<string>",
+      "rules": [
+        {
+          "op": "min_count",
+          "value": 1
+        }
+      ],
+      "value": [],
+      "violations": [
+        {
+          "op": "min_count"
+        }
+      ]
+    },
+    {
+      "name": "list<enum> in applies to each option",
+      "type": "list<enum>",
+      "rules": [
+        {
+          "op": "in",
+          "value": [
+            "garde"
+          ]
+        }
+      ],
+      "value": [
+        "garde",
+        "marchande"
+      ],
+      "violations": [
+        {
+          "op": "in",
+          "index": 1
+        }
+      ],
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "list<ref> in_category on each page",
+      "type": "list<ref>",
+      "rules": [
+        {
+          "op": "in_category",
+          "value": "2000000000000001"
+        }
+      ],
+      "value": [
+        "1000000000000001",
+        "1000000000000002"
+      ],
+      "violations": [
+        {
+          "op": "in_category",
+          "index": 1
+        }
+      ],
+      "context": {
+        "kinds": {
+          "1000000000000001": "page",
+          "1000000000000002": "page",
+          "2000000000000001": "category"
+        },
+        "inCategory": [
+          [
+            "1000000000000001",
+            "2000000000000001"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "bool has no rule",
+      "type": "bool",
+      "rules": [],
+      "value": true,
+      "violations": []
+    },
+    {
+      "name": "no rule, no violation",
+      "type": "int",
+      "rules": [],
+      "value": 123,
+      "violations": []
+    }
+  ]
+}

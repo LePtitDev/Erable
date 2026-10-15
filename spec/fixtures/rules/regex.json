@@ -1,0 +1,508 @@
+{
+  "description": "The safe regular-expression subset of the match rule: same meaning in .NET and JavaScript, no exponential backtracking. matches: [value, found]. javascript: the canonical pattern given to the JavaScript engine (no flags).",
+  "cases": [
+    {
+      "name": "E2E-08-07 code",
+      "pattern": "^[A-Z]{3}-\\d{2}$",
+      "valid": true,
+      "matches": [
+        [
+          "ABC-12",
+          true
+        ],
+        [
+          "ab-1",
+          false
+        ],
+        [
+          "ABC-12\n",
+          false
+        ],
+        [
+          "ABC-123",
+          false
+        ]
+      ],
+      "javascript": "^[\\u0041-\\u005A]{3}\\u002D[\\u0030-\\u0039]{2}$"
+    },
+    {
+      "name": "dot excludes line terminators",
+      "pattern": "a.c",
+      "valid": true,
+      "matches": [
+        [
+          "abc",
+          true
+        ],
+        [
+          "a\nc",
+          false
+        ],
+        [
+          "a\rc",
+          false
+        ],
+        [
+          "a c",
+          false
+        ],
+        [
+          "a\tc",
+          true
+        ]
+      ],
+      "javascript": "\\u0061[^\\u000A\\u000D\\u2028\\u2029]\\u0063"
+    },
+    {
+      "name": "digit is ASCII only",
+      "pattern": "\\d",
+      "valid": true,
+      "matches": [
+        [
+          "7",
+          true
+        ],
+        [
+          "٣",
+          false
+        ]
+      ],
+      "javascript": "[\\u0030-\\u0039]"
+    },
+    {
+      "name": "word is ASCII only",
+      "pattern": "^\\w+$",
+      "valid": true,
+      "matches": [
+        [
+          "abc_1",
+          true
+        ],
+        [
+          "é",
+          false
+        ]
+      ],
+      "javascript": "^[\\u0041-\\u005A\\u0061-\\u007A\\u0030-\\u0039\\u005F]+$"
+    },
+    {
+      "name": "space is ASCII only",
+      "pattern": "\\s",
+      "valid": true,
+      "matches": [
+        [
+          " ",
+          true
+        ],
+        [
+          " ",
+          false
+        ],
+        [
+          "\t",
+          true
+        ]
+      ],
+      "javascript": "[\\u0009\\u000A\\u000B\\u000C\\u000D\\u0020]"
+    },
+    {
+      "name": "negated escapes",
+      "pattern": "^\\D\\W\\S$",
+      "valid": true,
+      "matches": [
+        [
+          "a-b",
+          true
+        ],
+        [
+          "1-b",
+          false
+        ]
+      ],
+      "javascript": "^[^\\u0030-\\u0039][^\\u0041-\\u005A\\u0061-\\u007A\\u0030-\\u0039\\u005F][^\\u0009\\u000A\\u000B\\u000C\\u000D\\u0020]$"
+    },
+    {
+      "name": "nested quantifier in a repeated group",
+      "pattern": "(a+)+$",
+      "valid": false
+    },
+    {
+      "name": "trailing dash in a class",
+      "pattern": "^[a-]$",
+      "valid": true,
+      "matches": [
+        [
+          "-",
+          true
+        ],
+        [
+          "a",
+          true
+        ],
+        [
+          "b",
+          false
+        ]
+      ],
+      "javascript": "^[\\u0061\\u002D]$"
+    },
+    {
+      "name": "set then dash in a class",
+      "pattern": "^[\\d-z]$",
+      "valid": true,
+      "matches": [
+        [
+          "-",
+          true
+        ],
+        [
+          "5",
+          true
+        ],
+        [
+          "z",
+          true
+        ],
+        [
+          "y",
+          false
+        ]
+      ],
+      "javascript": "^[\\u0030-\\u0039\\u002D\\u007A]$"
+    },
+    {
+      "name": "negated class",
+      "pattern": "^[^0-9]+$",
+      "valid": true,
+      "matches": [
+        [
+          "abc",
+          true
+        ],
+        [
+          "a1",
+          false
+        ]
+      ],
+      "javascript": "^[^\\u0030-\\u0039]+$"
+    },
+    {
+      "name": "escaped metacharacters",
+      "pattern": "^\\(\\$\\.\\*\\)\\[\\]\\{\\}\\/\\-\\\\$",
+      "valid": true,
+      "matches": [
+        [
+          "($.*)[]{}/-\\",
+          true
+        ],
+        [
+          "x",
+          false
+        ]
+      ],
+      "javascript": "^\\u0028\\u0024\\u002E\\u002A\\u0029\\u005B\\u005D\\u007B\\u007D\\u002F\\u002D\\u005C$"
+    },
+    {
+      "name": "lazy quantifier",
+      "pattern": "^a{2,3}?$",
+      "valid": true,
+      "matches": [
+        [
+          "aa",
+          true
+        ],
+        [
+          "aaa",
+          true
+        ],
+        [
+          "a",
+          false
+        ]
+      ],
+      "javascript": "^\\u0061{2,3}?$"
+    },
+    {
+      "name": "open-ended repetition",
+      "pattern": "^a{2,}$",
+      "valid": true,
+      "matches": [
+        [
+          "aaaa",
+          true
+        ],
+        [
+          "a",
+          false
+        ]
+      ],
+      "javascript": "^\\u0061{2,}$"
+    },
+    {
+      "name": "exact repetition",
+      "pattern": "^(?:ab){2}$",
+      "valid": true,
+      "matches": [
+        [
+          "abab",
+          true
+        ],
+        [
+          "ab",
+          false
+        ]
+      ],
+      "javascript": "^(?:\\u0061\\u0062){2}$"
+    },
+    {
+      "name": "alternation with an empty branch",
+      "pattern": "^(x|)$",
+      "valid": true,
+      "matches": [
+        [
+          "",
+          true
+        ],
+        [
+          "x",
+          true
+        ],
+        [
+          "y",
+          false
+        ]
+      ],
+      "javascript": "^(?:\\u0078|)$"
+    },
+    {
+      "name": "escaped tab and line feed",
+      "pattern": "a\\tb\\n",
+      "valid": true,
+      "matches": [
+        [
+          "a\tb\n",
+          true
+        ],
+        [
+          "ab",
+          false
+        ]
+      ],
+      "javascript": "\\u0061\\u0009\\u0062\\u000A"
+    },
+    {
+      "name": "case sensitive",
+      "pattern": "^abc$",
+      "valid": true,
+      "matches": [
+        [
+          "ABC",
+          false
+        ],
+        [
+          "abc",
+          true
+        ]
+      ],
+      "javascript": "^\\u0061\\u0062\\u0063$"
+    },
+    {
+      "name": "astral character as a literal",
+      "pattern": "^😀$",
+      "valid": true,
+      "matches": [
+        [
+          "😀",
+          true
+        ],
+        [
+          "a",
+          false
+        ]
+      ],
+      "javascript": "^\\uD83D\\uDE00$"
+    },
+    {
+      "name": "accented literal",
+      "pattern": "^été$",
+      "valid": true,
+      "matches": [
+        [
+          "été",
+          true
+        ]
+      ],
+      "javascript": "^\\u00E9\\u0074\\u00E9$"
+    },
+    {
+      "name": "look-ahead",
+      "pattern": "a(?=b)",
+      "valid": false
+    },
+    {
+      "name": "look-behind",
+      "pattern": "(?<=a)b",
+      "valid": false
+    },
+    {
+      "name": "named group",
+      "pattern": "(?<n>a)",
+      "valid": false
+    },
+    {
+      "name": "back-reference",
+      "pattern": "(a)\\1",
+      "valid": false
+    },
+    {
+      "name": "inline option",
+      "pattern": "(?i)a",
+      "valid": false
+    },
+    {
+      "name": "unicode class",
+      "pattern": "\\p{L}",
+      "valid": false
+    },
+    {
+      "name": "word boundary",
+      "pattern": "\\bword",
+      "valid": false
+    },
+    {
+      "name": "double quantifier",
+      "pattern": "a**",
+      "valid": false
+    },
+    {
+      "name": "quantifier first",
+      "pattern": "*a",
+      "valid": false
+    },
+    {
+      "name": "quantified anchor",
+      "pattern": "^*a",
+      "valid": false
+    },
+    {
+      "name": "empty class",
+      "pattern": "[]",
+      "valid": false
+    },
+    {
+      "name": "negated empty class",
+      "pattern": "[^]",
+      "valid": false
+    },
+    {
+      "name": "reversed repetition",
+      "pattern": "a{3,2}",
+      "valid": false
+    },
+    {
+      "name": "repetition too large",
+      "pattern": "a{1001}",
+      "valid": false
+    },
+    {
+      "name": "repetition without minimum",
+      "pattern": "a{,3}",
+      "valid": false
+    },
+    {
+      "name": "lone brace",
+      "pattern": "a{",
+      "valid": false
+    },
+    {
+      "name": "unescaped closing brace",
+      "pattern": "a}",
+      "valid": false
+    },
+    {
+      "name": "unescaped closing bracket",
+      "pattern": "a]",
+      "valid": false
+    },
+    {
+      "name": "reversed range",
+      "pattern": "[z-a]",
+      "valid": false
+    },
+    {
+      "name": "range to a set",
+      "pattern": "[a-\\d]",
+      "valid": false
+    },
+    {
+      "name": "negated set in a class",
+      "pattern": "[\\D]",
+      "valid": false
+    },
+    {
+      "name": "bracket in a class",
+      "pattern": "[[]",
+      "valid": false
+    },
+    {
+      "name": "unclosed class",
+      "pattern": "[a",
+      "valid": false
+    },
+    {
+      "name": "unclosed group",
+      "pattern": "(a",
+      "valid": false
+    },
+    {
+      "name": "unbalanced parenthesis",
+      "pattern": "a)",
+      "valid": false
+    },
+    {
+      "name": "trailing backslash",
+      "pattern": "a\\",
+      "valid": false
+    },
+    {
+      "name": "unknown escape",
+      "pattern": "\\k",
+      "valid": false
+    },
+    {
+      "name": "too long",
+      "pattern": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "valid": false
+    },
+    {
+      "name": "alternation in a repeated group",
+      "pattern": "^(a|aa)+$",
+      "valid": false
+    },
+    {
+      "name": "quantifier nested deeper",
+      "pattern": "((?:ab)c*){2}",
+      "valid": false
+    },
+    {
+      "name": "repeated simple group next to a quantifier",
+      "pattern": "^(?:ab)+c*$",
+      "valid": true,
+      "matches": [
+        [
+          "ababccc",
+          true
+        ],
+        [
+          "abc",
+          true
+        ],
+        [
+          "ac",
+          false
+        ]
+      ],
+      "javascript": "^(?:\\u0061\\u0062)+\\u0063*$"
+    }
+  ]
+}

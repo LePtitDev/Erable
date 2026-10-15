@@ -40,4 +40,25 @@ public static class ErrorCodes
 
     /// <summary>The chosen parent would create an inheritance loop (F07.R2); the loop is in the <c>loop</c> extension.</summary>
     public const string CategoryCycle = "category.parent.cycle";
+
+    /// <summary>Not one of the property types of docs/architecture.md §5.4.</summary>
+    public const string PropertyTypeInvalid = "property.type.invalid";
+
+    /// <summary>A value does not match the type of its property (refused, unlike rule violations which only warn).</summary>
+    public const string PropertyValueInvalid = "property.value.invalid";
+
+    /// <summary>A rule is malformed or not available for the type (F08.R2).</summary>
+    public const string PropertyRuleInvalid = "property.rule.invalid";
+
+    public const string PropertyKeyInvalid = "property.key.invalid";
+
+    /// <summary>Another property already uses this key.</summary>
+    public const string PropertyKeyTaken = "property.key.taken";
+
+    public const string PropertyOptionInvalid = "property.option.invalid";
+
+    public const string PropertyDescriptionTooLong = "property.description.tooLong";
+
+    /// <summary>A value cannot be converted to the new type (F08.R6).</summary>
+    public const string PropertyValueNotConvertible = "property.value.notConvertible";
 }

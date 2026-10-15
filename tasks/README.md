@@ -53,7 +53,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | ID | Tâche | Dépend de | Statut |
 |---|---|---|---|
 | [M2-01](M2-01-category-domain.md) | Domaine : catégories, héritage, résolution | M1-02 | review |
-| [M2-02](M2-02-property-rules.md) | Définitions de propriétés et moteur de règles | M2-01 | todo |
+| [M2-02](M2-02-property-rules.md) | Définitions de propriétés et moteur de règles | M2-01 | review |
 | [M2-03](M2-03-structure-storage-api.md) | Stockage et API : catégories, propriétés, valeurs | M2-02, M1-05 | todo |
 | [M2-04](M2-04-category-screen.md) | Écran Catégorie | M2-03, M1-11 | todo |
 | [M2-05](M2-05-property-screen.md) | Écran Propriété | M2-03, M1-11 | todo |

@@ -93,7 +93,8 @@ Trois logiques existent en double (§A-5.4, §A-6.3) : parseur de références, 
 ```
 spec/fixtures/
 ├─ ids.json            { "input": "3f2a9c14e07b5d21", "valid": true, "canonical": "3F2A9C14E07B5D21" }
-├─ rules.json          { "type": "int", "rule": {"op":"less_or_equal","value":60}, "value": 72, "ok": false }
+├─ rules/              evaluation.json { "type": "int", "rules": [{"op":"less_or_equal","value":60}], "value": 72, "violations": [{"op":"less_or_equal"}] }
+│                      definitions.json, values.json, regex.json
 └─ markdown/
    ├─ refs.json        { "md": "Voir [[3F2A9C14E07B5D21|lui]].", "refs": [{ "id": "…", "label": "lui", "embed": false, "start": 5 }] }
    └─ edge-cases.json  refs dans du code, échappements, crochets imbriqués, ID de 15/17 caractères…

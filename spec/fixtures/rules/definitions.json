@@ -1,0 +1,530 @@
+{
+  "description": "Reading a rule for a type: availability (F08.R2) and operand shape. canonical: the rule written back.",
+  "cases": [
+    {
+      "name": "int less_or_equal",
+      "type": "int",
+      "rule": {
+        "op": "less_or_equal",
+        "value": 60
+      },
+      "valid": true,
+      "canonical": {
+        "op": "less_or_equal",
+        "value": 60
+      }
+    },
+    {
+      "name": "float greater_than decimal",
+      "type": "float",
+      "rule": {
+        "op": "greater_than",
+        "value": 0.5
+      },
+      "valid": true,
+      "canonical": {
+        "op": "greater_than",
+        "value": 0.5
+      }
+    },
+    {
+      "name": "int between",
+      "type": "int",
+      "rule": {
+        "op": "between",
+        "value": [
+          1,
+          60
+        ]
+      },
+      "valid": true,
+      "canonical": {
+        "op": "between",
+        "value": [
+          1,
+          60
+        ]
+      }
+    },
+    {
+      "name": "int between equal bounds",
+      "type": "int",
+      "rule": {
+        "op": "between",
+        "value": [
+          5,
+          5
+        ]
+      },
+      "valid": true,
+      "canonical": {
+        "op": "between",
+        "value": [
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "name": "int between reversed bounds",
+      "type": "int",
+      "rule": {
+        "op": "between",
+        "value": [
+          60,
+          1
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "int between one bound",
+      "type": "int",
+      "rule": {
+        "op": "between",
+        "value": [
+          1
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "int between not an array",
+      "type": "int",
+      "rule": {
+        "op": "between",
+        "value": 1
+      },
+      "valid": false
+    },
+    {
+      "name": "int value as a string",
+      "type": "int",
+      "rule": {
+        "op": "less_or_equal",
+        "value": "60"
+      },
+      "valid": false
+    },
+    {
+      "name": "int value missing",
+      "type": "int",
+      "rule": {
+        "op": "less_or_equal"
+      },
+      "valid": false
+    },
+    {
+      "name": "int min_length not available",
+      "type": "int",
+      "rule": {
+        "op": "min_length",
+        "value": 1
+      },
+      "valid": false
+    },
+    {
+      "name": "int min_count needs a list",
+      "type": "int",
+      "rule": {
+        "op": "min_count",
+        "value": 1
+      },
+      "valid": false
+    },
+    {
+      "name": "bool has no rule",
+      "type": "bool",
+      "rule": {
+        "op": "not_equal",
+        "value": 1
+      },
+      "valid": false
+    },
+    {
+      "name": "string min_length",
+      "type": "string",
+      "rule": {
+        "op": "min_length",
+        "value": 3
+      },
+      "valid": true,
+      "canonical": {
+        "op": "min_length",
+        "value": 3
+      }
+    },
+    {
+      "name": "string min_length written 3.0",
+      "type": "string",
+      "rule": {
+        "op": "min_length",
+        "value": 3.0
+      },
+      "valid": true,
+      "canonical": {
+        "op": "min_length",
+        "value": 3
+      }
+    },
+    {
+      "name": "string min_length negative",
+      "type": "string",
+      "rule": {
+        "op": "min_length",
+        "value": -1
+      },
+      "valid": false
+    },
+    {
+      "name": "string min_length fractional",
+      "type": "string",
+      "rule": {
+        "op": "min_length",
+        "value": 1.5
+      },
+      "valid": false
+    },
+    {
+      "name": "string not_empty",
+      "type": "string",
+      "rule": {
+        "op": "not_empty"
+      },
+      "valid": true,
+      "canonical": {
+        "op": "not_empty"
+      }
+    },
+    {
+      "name": "string not_empty ignores a value",
+      "type": "string",
+      "rule": {
+        "op": "not_empty",
+        "value": 3
+      },
+      "valid": true,
+      "canonical": {
+        "op": "not_empty"
+      }
+    },
+    {
+      "name": "string match",
+      "type": "string",
+      "rule": {
+        "op": "match",
+        "value": "^[A-Z]{3}-\\d{2}$"
+      },
+      "valid": true,
+      "canonical": {
+        "op": "match",
+        "value": "^[A-Z]{3}-\\d{2}$"
+      }
+    },
+    {
+      "name": "string match look-ahead refused",
+      "type": "string",
+      "rule": {
+        "op": "match",
+        "value": "a(?=b)"
+      },
+      "valid": false
+    },
+    {
+      "name": "string match not a string",
+      "type": "string",
+      "rule": {
+        "op": "match",
+        "value": 3
+      },
+      "valid": false
+    },
+    {
+      "name": "text match not available",
+      "type": "text",
+      "rule": {
+        "op": "match",
+        "value": "a"
+      },
+      "valid": false
+    },
+    {
+      "name": "text max_length",
+      "type": "text",
+      "rule": {
+        "op": "max_length",
+        "value": 500
+      },
+      "valid": true,
+      "canonical": {
+        "op": "max_length",
+        "value": 500
+      }
+    },
+    {
+      "name": "enum in",
+      "type": "enum",
+      "rule": {
+        "op": "in",
+        "value": [
+          "garde",
+          "marchande"
+        ]
+      },
+      "valid": true,
+      "canonical": {
+        "op": "in",
+        "value": [
+          "garde",
+          "marchande"
+        ]
+      },
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum in removes duplicates",
+      "type": "enum",
+      "rule": {
+        "op": "in",
+        "value": [
+          "garde",
+          "garde"
+        ]
+      },
+      "valid": true,
+      "canonical": {
+        "op": "in",
+        "value": [
+          "garde"
+        ]
+      },
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum in unknown option",
+      "type": "enum",
+      "rule": {
+        "op": "in",
+        "value": [
+          "voleur"
+        ]
+      },
+      "valid": false,
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "enum in not strings",
+      "type": "enum",
+      "rule": {
+        "op": "in",
+        "value": [
+          1
+        ]
+      },
+      "valid": false,
+      "options": [
+        {
+          "key": "marchande",
+          "label": "Marchande"
+        },
+        {
+          "key": "garde",
+          "label": "Garde"
+        },
+        {
+          "key": "erudit",
+          "label": "Érudit"
+        }
+      ]
+    },
+    {
+      "name": "date after",
+      "type": "date",
+      "rule": {
+        "op": "after",
+        "value": "2026-01-01"
+      },
+      "valid": true,
+      "canonical": {
+        "op": "after",
+        "value": "2026-01-01"
+      }
+    },
+    {
+      "name": "date before invalid date",
+      "type": "date",
+      "rule": {
+        "op": "before",
+        "value": "2026-13-01"
+      },
+      "valid": false
+    },
+    {
+      "name": "ref kind page",
+      "type": "ref",
+      "rule": {
+        "op": "kind",
+        "value": "page"
+      },
+      "valid": true,
+      "canonical": {
+        "op": "kind",
+        "value": "page"
+      }
+    },
+    {
+      "name": "ref kind folder refused",
+      "type": "ref",
+      "rule": {
+        "op": "kind",
+        "value": "folder"
+      },
+      "valid": false
+    },
+    {
+      "name": "ref in_category canonical ID",
+      "type": "ref",
+      "rule": {
+        "op": "in_category",
+        "value": "2000000000000001"
+      },
+      "valid": true,
+      "canonical": {
+        "op": "in_category",
+        "value": "2000000000000001"
+      }
+    },
+    {
+      "name": "ref in_category lower case ID",
+      "type": "ref",
+      "rule": {
+        "op": "in_category",
+        "value": "abcdef0123456789"
+      },
+      "valid": true,
+      "canonical": {
+        "op": "in_category",
+        "value": "ABCDEF0123456789"
+      }
+    },
+    {
+      "name": "ref in_category not an ID",
+      "type": "ref",
+      "rule": {
+        "op": "in_category",
+        "value": "Région"
+      },
+      "valid": false
+    },
+    {
+      "name": "list<int> min_count",
+      "type": "list<int>",
+      "rule": {
+        "op": "min_count",
+        "value": 1
+      },
+      "valid": true,
+      "canonical": {
+        "op": "min_count",
+        "value": 1
+      }
+    },
+    {
+      "name": "list<int> item rule",
+      "type": "list<int>",
+      "rule": {
+        "op": "less_than",
+        "value": 3
+      },
+      "valid": true,
+      "canonical": {
+        "op": "less_than",
+        "value": 3
+      }
+    },
+    {
+      "name": "list<bool> count only",
+      "type": "list<bool>",
+      "rule": {
+        "op": "max_count",
+        "value": 3
+      },
+      "valid": true,
+      "canonical": {
+        "op": "max_count",
+        "value": 3
+      }
+    },
+    {
+      "name": "unknown op",
+      "type": "int",
+      "rule": {
+        "op": "even"
+      },
+      "valid": false
+    },
+    {
+      "name": "missing op",
+      "type": "int",
+      "rule": {
+        "value": 3
+      },
+      "valid": false
+    },
+    {
+      "name": "op is not a string",
+      "type": "int",
+      "rule": {
+        "op": 3
+      },
+      "valid": false
+    },
+    {
+      "name": "rule is not an object",
+      "type": "int",
+      "rule": [
+        1
+      ],
+      "valid": false
+    }
+  ]
+}
