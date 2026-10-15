@@ -279,7 +279,12 @@
   "attachments": {
     "title": "Attachments",
     "empty": "No attachment.",
-    "downloadNamed": "Download {{name}}"
+    "downloadNamed": "Download {{name}}",
+    "add": "Add",
+    "addLabel": "Add attachments",
+    "uploading": "Uploading {{name}}",
+    "tooLarge": "“{{name}}” exceeds the maximum allowed size ({{max}}). No attachment was created.",
+    "failed": "Upload of “{{name}}” failed: {{reason}}"
   },
   "editor": {
     "title": "Page title",

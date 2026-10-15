@@ -283,7 +283,12 @@
   "attachments": {
     "title": "Adjuntos",
     "empty": "Ningún adjunto.",
-    "downloadNamed": "Descargar {{name}}"
+    "downloadNamed": "Descargar {{name}}",
+    "add": "Añadir",
+    "addLabel": "Añadir adjuntos",
+    "uploading": "Subiendo {{name}}",
+    "tooLarge": "«{{name}}» supera el tamaño máximo permitido ({{max}}). No se ha creado ningún adjunto.",
+    "failed": "Error al subir «{{name}}»: {{reason}}"
   },
   "editor": {
     "title": "Título de la página",

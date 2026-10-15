@@ -283,7 +283,12 @@
   "attachments": {
     "title": "Pièces jointes",
     "empty": "Aucune pièce jointe.",
-    "downloadNamed": "Télécharger {{name}}"
+    "downloadNamed": "Télécharger {{name}}",
+    "add": "Ajouter",
+    "addLabel": "Ajouter des pièces jointes",
+    "uploading": "Téléversement de {{name}}",
+    "tooLarge": "« {{name}} » dépasse la taille maximale autorisée ({{max}}). Aucune pièce jointe n’a été créée.",
+    "failed": "Échec du téléversement de « {{name}} » : {{reason}}"
   },
   "editor": {
     "title": "Titre de la page",

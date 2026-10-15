@@ -279,7 +279,12 @@
   "attachments": {
     "title": "Anhänge",
     "empty": "Kein Anhang.",
-    "downloadNamed": "{{name}} herunterladen"
+    "downloadNamed": "{{name}} herunterladen",
+    "add": "Hinzufügen",
+    "addLabel": "Anhänge hinzufügen",
+    "uploading": "{{name}} wird hochgeladen",
+    "tooLarge": "„{{name}}“ überschreitet die maximal zulässige Größe ({{max}}). Es wurde kein Anhang erstellt.",
+    "failed": "Hochladen von „{{name}}“ fehlgeschlagen: {{reason}}"
   },
   "editor": {
     "title": "Seitentitel",

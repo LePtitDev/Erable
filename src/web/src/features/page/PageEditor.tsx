@@ -29,6 +29,7 @@ import { useInsertPalette } from "../palette/useInsertPalette";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
 import styles from "./PageEditor.module.css";
+import { useEditorUploads } from "./useEditorUploads";
 
 interface PageEditorProps {
   readonly projectId: ElementId;
@@ -79,6 +80,12 @@ function EditorScreen({
   const navigate = useNavigate();
   const editor = useRef<MarkdownEditorHandle>(null);
   const palette = useInsertPalette(projectId, editor);
+  const uploads = useEditorUploads(projectId, element.id);
+  const extensions = useMemo(
+    () => [palette.extension, uploads.extension],
+    [palette.extension, uploads.extension],
+  );
+  const filePicker = useRef<HTMLInputElement>(null);
   const setMode = useShellStore((s) => s.setMode);
   const setCursor = useShellStore((s) => s.setCursor);
 
@@ -151,7 +158,8 @@ function EditorScreen({
 
   /** Saves the text (If-Match), then the title; true when everything is saved. */
   const save = useCallback(async (): Promise<boolean> => {
-    if (saving) return false;
+    // Placeholders of running uploads are not text: saving now would lose their `![[ID]]`.
+    if (saving || uploads.pending > 0) return false;
     setSaving(true);
     setError(null);
     try {
@@ -183,7 +191,7 @@ function EditorScreen({
     } finally {
       setSaving(false);
     }
-  }, [saving, saved, doc, title, projectId, element.id, draft, client, t]);
+  }, [saving, uploads.pending, saved, doc, title, projectId, element.id, draft, client, t]);
 
   const saveAndClose = useCallback(async () => {
     if (await save()) finish();
@@ -265,7 +273,7 @@ function EditorScreen({
           <Button
             variant="primary"
             onClick={() => void saveAndClose()}
-            disabled={saving}
+            disabled={saving || uploads.pending > 0}
             aria-keyshortcuts={saveKeys}
           >
             {t("editor.save")}
@@ -309,6 +317,16 @@ function EditorScreen({
           {error}
         </p>
       )}
+      {uploads.errors.length > 0 && (
+        <div role="alert" className={styles["error"]}>
+          {uploads.errors.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+          <Button size="sm" onClick={uploads.dismissErrors}>
+            {t("common.close")}
+          </Button>
+        </div>
+      )}
 
       <div role="toolbar" aria-label={t("editor.toolbar")} className={styles["toolbar"]}>
         {tool(t("editor.heading"), <Heading aria-hidden size={16} />, (s) => setHeading(s, 2))}
@@ -331,10 +349,27 @@ function EditorScreen({
           <FileText aria-hidden size={16} />
           {t("editor.reference")}
         </button>
-        <button type="button" className={styles["textTool"]} disabled title={t("common.soon")}>
+        <button
+          type="button"
+          className={styles["textTool"]}
+          onMouseDown={(e) => {
+            e.preventDefault();
+          }}
+          onClick={() => filePicker.current?.click()}
+        >
           <Paperclip aria-hidden size={16} />
           {t("editor.attachment")}
         </button>
+        <input
+          ref={filePicker}
+          type="file"
+          multiple
+          hidden
+          onChange={(e) => {
+            uploads.insertFiles(editor.current?.view ?? null, [...(e.target.files ?? [])]);
+            e.target.value = "";
+          }}
+        />
         <span className={styles["toolbarEnd"]}>
           <label className={styles["rawIds"]}>
             <input
@@ -367,7 +402,7 @@ function EditorScreen({
           }}
           onSave={() => void saveAndClose()}
           onUpdate={palette.onUpdate}
-          extensions={palette.extension}
+          extensions={extensions}
         />
         {palette.popup !== null && <PalettePopup {...palette.popup} />}
       </section>
