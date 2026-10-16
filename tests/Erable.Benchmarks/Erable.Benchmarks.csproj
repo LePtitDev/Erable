@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Performance tooling (M3-06, docs/testing.md §11): large project generator, budgets over HTTP, BenchmarkDotNet. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+    <RootNamespace>Erable.Benchmarks</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Erable.Testing\Erable.Testing.csproj" />
+    <ProjectReference Include="..\..\src\Erable.Server\Erable.Server.csproj" />
+  </ItemGroup>
+
+</Project>

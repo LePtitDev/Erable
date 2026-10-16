@@ -230,6 +230,8 @@ Mesurés sur le projet généré **10 000 pages / 300 catégories / 50 000 réf�
 - **NBomber** (C#) simule 50 utilisateurs (80 % lecture, 20 % écriture) sur un serveur pendant 10 minutes : aucune erreur, p95 dans les budgets, mémoire stable (pas de fuite).
 - Taille du bundle vérifiée à chaque PR.
 
+**Outillage (M3-06)** : `tests/Erable.Benchmarks` (Release) fournit `generate` (projet à graine fixe, `--light` pour la CI), `budgets` (p95 serveur en HTTP sur le projet généré), `bench` (BenchmarkDotNet en processus, historique `artifacts/perf/history.json`, comparaison à `spec/perf/baseline.json`, échec au-delà de +15 %) et `compare`. Les budgets du navigateur sont les tests Playwright `@perf` (`pnpm e2e:perf`, avec `ERABLE_LARGE_PROJECT` pour le grand projet). Les commandes sont dans `CLAUDE.md` §9, les mesures du jour dans `tasks/M3-06-performance.md`.
+
 ---
 
 ## 12. Mesurer la qualité des tests eux-mêmes

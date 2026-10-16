@@ -231,6 +231,22 @@ public sealed class ElementTreeTests
     }
 
     [Fact]
+    public void DuplicateNames_AnyTree_AgreesWithHasDuplicateNameForEveryNode()
+    {
+        var builder = Chroniques();
+        var tree = builder.BuildTree();
+        tree.Create(ElementId.NewRandom(), ElementKind.Page, builder.IdOf("Lieux"), "  hautbois ").IsSuccess.ShouldBeTrue();
+        tree.Create(ElementId.NewRandom(), ElementKind.Page, builder.IdOf("PNJ"), "capitaine ORSEN").IsSuccess.ShouldBeTrue();
+        tree.Create(ElementId.NewRandom(), ElementKind.Page, builder.IdOf("Lieux"), "Autre").IsSuccess.ShouldBeTrue();
+
+        var duplicates = tree.DuplicateNames();
+
+        tree.Nodes.ShouldAllBe(n => duplicates.Contains(n.Id) == tree.HasDuplicateName(n.Id));
+        duplicates.ShouldContain(builder.IdOf("Hautbois"));
+        duplicates.Count.ShouldBe(4);
+    }
+
+    [Fact]
     public void HasDuplicateName_SameNameInAnotherFolder_IsFalse()
     {
         var builder = Chroniques().WithPage("Hautbois bis", under: "Factions");

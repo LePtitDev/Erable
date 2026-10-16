@@ -117,12 +117,13 @@ public static class ProjectEndpoints
 
         var tree = service.LoadTree();
         var language = service.Project.Manifest.ContentLanguage;
+        var duplicates = tree.DuplicateNames();
         var nodes = tree.Nodes
             .Where(n => n.Kind != ElementKind.Attachment)
             .OrderBy(n => n.SortOrder).ThenBy(n => n.Id.Value)
             .Select(n => new TreeNodeItem(
                 n.Id, n.Kind, n.ParentId.IsNone ? null : n.ParentId, DisplayName(n, language), n.SortOrder,
-                !n.IsRoot && tree.HasDuplicateName(n.Id)))
+                duplicates.Contains(n.Id)))
             .ToArray();
         int Count(RootDefinition root) => tree.Descendants(root.Id).Count(n => n.Kind == root.ItemKind);
         var counts = new RootCounts(Count(Roots.Pages), Count(Roots.Categories), Count(Roots.Properties), Count(Roots.Links));

@@ -1,0 +1,11 @@
+{
+  "ParseLongPage": 19608244.3,
+  "ParseOneHugeParagraph": 40967522.2,
+  "ResolvePageProperties": 36287448.9,
+  "SavePage": 43455366.7,
+  "LoadTree": 12320112.5,
+  "TreeProjection": 17130491.7,
+  "SearchText": 34465033.3,
+  "SearchTextWithFilters": 54407970,
+  "SearchOutOfRules": 5069277.9
+}

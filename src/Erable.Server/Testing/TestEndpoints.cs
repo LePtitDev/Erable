@@ -30,7 +30,7 @@ internal static class TestEndpoints
     /// <summary>
     /// Gives the calling test slot (one per e2e test file) a fresh copy of a reference project and a fresh profile,
     /// selected by the <c>erable-test-slot</c> cookie. Each copy gets its own <c>projectId</c>: copies of the same
-    /// fixture are open side by side, so test files run in parallel. <c>fixture=none</c> only resets the profile.
+    /// fixture are open side by side, so test files run in parallel. <c>fixture=none</c> only resets the profile; <c>fixture=large</c> copies the project named by <c>ERABLE_LARGE_PROJECT</c>.
     /// </summary>
     private static Results<Ok<TestResetResult>, ProblemHttpResult> Reset(
         [FromQuery] string slot, [FromQuery] string? fixture, HttpContext http, ErableHostOptions options,
@@ -42,7 +42,14 @@ internal static class TestEndpoints
         }
 
         fixture ??= "chroniques";
-        var source = fixture == "none" ? null : Path.Combine(options.FixturesDirectory ?? string.Empty, fixture);
+        var source = fixture switch
+        {
+            "none" => null,
+            // The large project of the performance tests (M3-06) is generated, not versioned: its folder is given by the
+            // environment (`erable.benchmarks generate --light`).
+            "large" => Environment.GetEnvironmentVariable("ERABLE_LARGE_PROJECT") ?? string.Empty,
+            _ => Path.Combine(options.FixturesDirectory ?? string.Empty, fixture),
+        };
         if (source is not null && (fixture.Contains('.', StringComparison.Ordinal) || !ManifestFile.Exists(source)))
         {
             return Problems.Problem(StatusCodes.Status404NotFound, "test.unknownFixture", $"No reference project '{fixture}' in the fixtures folder.");

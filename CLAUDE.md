@@ -193,6 +193,13 @@ pnpm -C src/web e2e:perf         # mesures de temps (@perf), seules, un worker (
 pnpm -C src/web e2e:trace        # traçabilité E2E-* ↔ tests ; `-- --enforce M1` échoue s'il manque un scénario ≤ M1
 pnpm -C src/web exec playwright install chromium webkit   # une fois par machine
 
+# Performance (M3-06, docs/testing.md §11) : toujours en Release
+dotnet run -c Release --project tests/Erable.Benchmarks -- generate artifacts/perf/large [--light] [--pages 10000 --categories 300 --refs 50000 --attachments-size 2GB --seed 42]   # --light : 16 Mo de pièces jointes (CI)
+dotnet run -c Release --project tests/Erable.Benchmarks -- budgets [--folder artifacts/perf/large] [--light] [--json fichier]   # budgets serveur (p95) en HTTP ; code 1 si dépassé
+dotnet run -c Release --project tests/Erable.Benchmarks -- bench [--pages 10000] [--update-baseline]   # BenchmarkDotNet ; écrit artifacts/perf/, compare à spec/perf/baseline.json (code 1 au-delà de +15 %)
+ERABLE_LARGE_PROJECT=<dossier généré avec --light> pnpm -C src/web e2e:perf   # budgets navigateur (arbre, page, palette, frappe) ; sans la variable, seuls les tests @perf du projet de référence tournent
+pnpm -C src/web bundle-size                # échoue au-delà de 500 Ko gzip
+
 # Desktop
 node build/publish-desktop.mjs win-x64     # ou linux-x64, osx-arm64, osx-x64 → artifacts/desktop/
 pnpm -C src/web e2e:desktop                # Windows : E2E-16-01/02 sur le binaire publié (CDP)

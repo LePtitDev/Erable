@@ -127,6 +127,14 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
     () => withCreateRow(visibleRows(index, expanded, filter), editing, index),
     [index, expanded, filter, editing],
   );
+  // « Ouverture du projet → arbre affiché < 1 s » (docs/testing.md §11.1): the first time the tree has lines to show.
+  const shownMarked = useRef(false);
+  useEffect(() => {
+    if (rows.length > 0 && !shownMarked.current) {
+      shownMarked.current = true;
+      performance.mark("erable:tree-shown");
+    }
+  }, [rows.length]);
   const focused = focusedId ?? currentId ?? rows[0]?.node.id ?? null;
   const focusedIndex = rows.findIndex((r) => r.node.id === focused);
 

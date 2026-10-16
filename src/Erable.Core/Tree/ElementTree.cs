@@ -133,6 +133,32 @@ public sealed class ElementTree
             && Children(node.ParentId).Any(s => s.Id != id && ElementName.AreDuplicates(s.Name, node.Name));
     }
 
+    /// <summary>
+    /// Every element that shares its name with a sibling, found in one pass over the tree: the same answer as
+    /// <see cref="HasDuplicateName"/> for each node, without listing the siblings of each of them (M3-06: 10 000 nodes).
+    /// </summary>
+    public HashSet<ElementId> DuplicateNames()
+    {
+        var byParent = new Dictionary<ElementId, Dictionary<string, List<ElementId>>>();
+        foreach (var node in _nodes.Values.Where(n => !n.IsRoot))
+        {
+            if (!byParent.TryGetValue(node.ParentId, out var names))
+            {
+                byParent[node.ParentId] = names = new Dictionary<string, List<ElementId>>(StringComparer.OrdinalIgnoreCase);
+            }
+
+            var key = node.Name.Trim();
+            if (!names.TryGetValue(key, out var ids))
+            {
+                names[key] = ids = [];
+            }
+
+            ids.Add(node.Id);
+        }
+
+        return [.. byParent.Values.SelectMany(names => names.Values).Where(ids => ids.Count > 1).SelectMany(ids => ids)];
+    }
+
     /// <summary>Checks that <paramref name="kind"/> may live under <paramref name="parentId"/>, without changing anything.</summary>
     public DomainError? CheckParent(ElementKind kind, ElementId parentId)
     {
