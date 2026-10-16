@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useId, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { login } from "../../shared/api/auth";
+import { login, type SessionResult } from "../../shared/api/auth";
 import { errorMessage } from "../../shared/api/errors";
 import { Button } from "../../shared/ui/Button";
 import field from "../../shared/ui/Field.module.css";
@@ -10,7 +10,14 @@ import field from "../../shared/ui/Field.module.css";
  * Login and password (E2E-14-01, E2E-14-02). A wrong login and a wrong password get the same message: the screen
  * never tells which one failed.
  */
-export function LoginForm({ onSignedIn }: { readonly onSignedIn: () => void }) {
+export function LoginForm({
+  onSignedIn,
+  resetCache = true,
+}: {
+  readonly onSignedIn: (session: SessionResult) => void;
+  /** Forget everything fetched so far (a new sign-in); false when the same user comes back to the screen they left. */
+  readonly resetCache?: boolean;
+}) {
   const { t } = useTranslation();
   const client = useQueryClient();
   const ids = { login: useId(), password: useId() };
@@ -24,11 +31,11 @@ export function LoginForm({ onSignedIn }: { readonly onSignedIn: () => void }) {
     setPending(true);
     setError(null);
     login(loginName, password)
-      .then(async () => {
+      .then(async (session) => {
         // Whatever was cached belongs to the previous identity (or to nobody).
-        await client.resetQueries();
+        if (resetCache) await client.resetQueries();
         setPassword("");
-        onSignedIn();
+        onSignedIn(session);
       })
       .catch((failure: unknown) => {
         setError(errorMessage(t, failure));

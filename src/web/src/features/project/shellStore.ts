@@ -16,6 +16,9 @@ interface ShellState {
   readonly viewingId: ElementId | null;
   /** The heading around the cursor of the editor, told to the others while editing. */
   readonly section: string | null;
+  /** Somebody else saved the page being edited since it was opened (login of the author). */
+  readonly remoteChange: string | null;
+  setRemoteChange: (by: string | null) => void;
   setViewing: (id: ElementId | null) => void;
   setSection: (section: string | null) => void;
   setMode: (mode: ShellMode, editingId?: ElementId) => void;
@@ -30,6 +33,10 @@ export const useShellStore = create<ShellState>()((set) => ({
   validationErrors: 0,
   editingId: null,
   viewingId: null,
+  remoteChange: null,
+  setRemoteChange: (remoteChange) => {
+    set({ remoteChange });
+  },
   section: null,
   setViewing: (viewingId) => {
     set({ viewingId });
@@ -41,6 +48,7 @@ export const useShellStore = create<ShellState>()((set) => ({
     set({
       mode,
       editingId: mode === "edit" ? (editingId ?? null) : null,
+      remoteChange: null,
       ...(mode === "read" ? { cursor: null, section: null } : {}),
     });
   },

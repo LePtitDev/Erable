@@ -13,12 +13,16 @@ import {
 import { useTranslation } from "react-i18next";
 import { api, unwrap } from "../../shared/api/client";
 import { errorCode, errorMessage } from "../../shared/api/errors";
+import { mergeConflictOf, type MergeConflict } from "../../shared/api/mergeConflict";
+import { useNoticeStore } from "../../shared/ui/notices";
+import { usePresenceStore } from "../../shared/realtime/presenceStore";
 import { queryKeys } from "../../shared/api/keys";
 import {
   pageContentQuery,
   pageQuery,
   resolveQuery,
   savePageContent,
+  type PageStructure,
   type PageView as PageData,
 } from "../../shared/api/pages";
 import type { ElementDetails } from "../../shared/api/tree";
@@ -36,6 +40,7 @@ import { approveClose, useWindowStore } from "../../shared/native/native";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
 import { EditingBanner } from "../presence/Presence";
+import { ConflictResolution, type Resolution } from "./ConflictResolution";
 import { sectionAt } from "../editor/section";
 import { CategoryChips } from "../properties/PagePropertiesView";
 import styles from "./PageEditor.module.css";
@@ -120,6 +125,11 @@ function EditorScreen({
   const [rawIds, setRawIds] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // A save that could not be merged: both versions of the passages in conflict, to settle (M4-05).
+  const [conflict, setConflict] = useState<MergeConflict | null>(null);
+  const notify = useNoticeStore((n) => n.push);
+  const remoteChange = useShellStore((st) => st.remoteChange);
+  const presence = usePresenceStore((p) => p.users);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [offerDraft, setOfferDraft] = useState(
     draft.draft !== null && draft.draft.markdown !== initialSaved,
@@ -221,67 +231,131 @@ function EditorScreen({
     });
   }, [navigate, projectId, element.id]);
 
-  /** Saves the text (If-Match), then the title; true when everything is saved. */
-  const save = useCallback(async (): Promise<boolean> => {
-    // Placeholders of running uploads are not text: saving now would lose their `![[ID]]`.
-    if (saving || uploads.pending > 0) return false;
-    setSaving(true);
-    setError(null);
-    try {
-      let revision = saved.revision;
-      if (doc !== saved.markdown || structure.dirty) {
-        revision = (
-          await savePageContent(
+  /**
+   * Saves a page against a revision (If-Match), then the title; true when everything is saved. A save that arrives
+   * after another one is merged by the server (« Fusionné avec les modifications de … »); when the two edits touch the
+   * same passages nothing is written and the resolution view opens with both versions (M4-05, F14.R5).
+   */
+  const persist = useCallback(
+    async (plan: {
+      readonly markdown: string;
+      readonly revision: number;
+      readonly structure: PageStructure | undefined;
+      readonly force: boolean;
+    }): Promise<boolean> => {
+      // Placeholders of running uploads are not text: saving now would lose their `![[ID]]`.
+      if (saving || uploads.pending > 0) return false;
+      setSaving(true);
+      setError(null);
+      try {
+        let revision = plan.revision;
+        let text = plan.markdown;
+        if (plan.force || plan.markdown !== saved.markdown || plan.structure !== undefined) {
+          const result = await savePageContent(
             projectId,
             element.id,
-            doc,
+            plan.markdown,
             revision,
-            structure.dirty ? structureOf(structure.draft) : undefined,
-          )
-        ).revision;
-        structure.markSaved();
+            plan.structure,
+          );
+          revision = result.revision;
+          if (result.merged) {
+            text = result.merged.markdown;
+            notify(
+              t("conflict.merged", {
+                names: result.merged.mergedWith.map((a) => a.name).join(", "),
+              }),
+            );
+          }
+          structure.markSaved();
+        }
+        const name = title.trim();
+        if (name !== "" && name !== saved.name) {
+          revision = (
+            await unwrap(
+              api.PATCH("/api/v1/projects/{projectId}/elements/{id}", {
+                params: { path: { projectId, id: element.id } },
+                body: { name },
+              }),
+            )
+          ).revision;
+        }
+        setSaved({ markdown: text, revision, name: name === "" ? saved.name : name });
+        setConflict(null);
+        useShellStore.getState().setRemoteChange(null);
+        await draft.discard();
+        await client.invalidateQueries({ queryKey: queryKeys.projectContent(projectId) });
+        return true;
+      } catch (e) {
+        const refused = mergeConflictOf(e);
+        if (refused !== null) {
+          setConflict(refused);
+        } else {
+          setError(
+            errorCode(e) === "page.revisionConflict" ? t("editor.conflict") : errorMessage(t, e),
+          );
+        }
+        return false;
+      } finally {
+        setSaving(false);
       }
-      const name = title.trim();
-      if (name !== "" && name !== saved.name) {
-        revision = (
-          await unwrap(
-            api.PATCH("/api/v1/projects/{projectId}/elements/{id}", {
-              params: { path: { projectId, id: element.id } },
-              body: { name },
-            }),
-          )
-        ).revision;
-      }
-      setSaved({ markdown: doc, revision, name: name === "" ? saved.name : name });
-      await draft.discard();
-      await client.invalidateQueries({ queryKey: queryKeys.projectContent(projectId) });
-      return true;
-    } catch (e) {
-      // 409: the page changed since it was opened; the three-way merge arrives with M4-05.
-      setError(
-        errorCode(e) === "page.revisionConflict" ? t("editor.conflict") : errorMessage(t, e),
-      );
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  }, [
-    saving,
-    uploads.pending,
-    saved,
-    doc,
-    title,
-    structure,
-    projectId,
-    element.id,
-    draft,
-    client,
-    t,
-  ]);
+    },
+    [
+      saving,
+      uploads.pending,
+      saved,
+      title,
+      structure,
+      projectId,
+      element.id,
+      draft,
+      client,
+      notify,
+      t,
+    ],
+  );
+
+  const save = useCallback(
+    () =>
+      persist({
+        markdown: doc,
+        revision: saved.revision,
+        structure: structure.dirty ? structureOf(structure.draft) : undefined,
+        force: false,
+      }),
+    [persist, doc, saved.revision, structure],
+  );
 
   const saveAndClose = useCallback(async () => {
     if (await save()) finish();
   }, [save, finish]);
+
+  /** The user settled every passage in conflict: the resolved page is saved against the revision it conflicted with. */
+  const saveResolved = useCallback(
+    async (resolution: Resolution) => {
+      const settled =
+        resolution.categories === null || resolution.properties === null
+          ? undefined
+          : {
+              categories: [...resolution.categories],
+              properties: resolution.properties.map((p) => ({
+                propertyId: p.propertyId,
+                value: p.value,
+              })),
+            };
+      if (
+        await persist({
+          markdown: resolution.markdown,
+          revision: resolution.revision,
+          structure: settled,
+          force: true,
+        })
+      ) {
+        finish();
+      }
+    },
+    [persist, finish],
+  );
 
   // F05.R5: leaving with unsaved changes asks first (in-app navigation and closing the tab).
   const blocker = useBlocker({
@@ -370,6 +444,24 @@ function EditorScreen({
       </header>
 
       <EditingBanner elementId={element.id} />
+      {remoteChange !== null && (
+        <p role="status" className={styles["banner"]}>
+          {t("conflict.remoteChanged", {
+            names: presence.find((u) => u.userId === remoteChange)?.name ?? remoteChange,
+          })}
+        </p>
+      )}
+      {conflict !== null && (
+        <ConflictResolution
+          projectId={projectId}
+          conflict={conflict}
+          busy={saving}
+          onResolve={(resolution) => void saveResolved(resolution)}
+          onCancel={() => {
+            setConflict(null);
+          }}
+        />
+      )}
       {offerDraft && draft.draft !== null && (
         <div role="alert" className={styles["banner"]}>
           <span>

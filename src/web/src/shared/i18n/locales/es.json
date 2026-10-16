@@ -929,5 +929,27 @@
     "editing_one": "{{names}} también está editando esta página{{section}}. Sus cambios se fusionarán al guardar.",
     "editing_other": "{{names}} también están editando esta página. Sus cambios se fusionarán al guardar.",
     "editing_many": "{{names}} también están editando esta página. Sus cambios se fusionarán al guardar."
+  },
+  "conflict": {
+    "title": "Guardado en conflicto",
+    "description": "{{names}} ha modificado los mismos pasajes que usted. Elija, para cada pasaje, la versión que se conserva: la otra queda en el historial de la página, no se pierde nada.",
+    "item": "Pasaje {{index}} de {{total}}",
+    "mine": "Su versión",
+    "theirs": "Versión de {{names}}",
+    "empty": "(pasaje eliminado)",
+    "keepMine": "Conservar la mía",
+    "keepTheirs": "Conservar la suya",
+    "keepBoth": "Conservar ambas",
+    "custom": "Editar a mano",
+    "customLabel": "Texto conservado para el pasaje {{index}}",
+    "save": "Guardar",
+    "cancel": "Volver al editor",
+    "merged": "Fusionado con los cambios de {{names}}.",
+    "remoteChanged": "{{names}} guardó esta página mientras usted la editaba. Sus cambios se fusionarán al guardar.",
+    "values": {
+      "title": "Propiedades modificadas en ambos lados",
+      "mine": "Conservar mi valor: {{value}}",
+      "theirs": "Conservar el valor de {{names}}: {{value}}"
+    }
   }
 }

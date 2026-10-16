@@ -903,5 +903,27 @@
     "section": " — Abschnitt „{{section}}“",
     "editing_one": "{{names}} bearbeitet diese Seite ebenfalls{{section}}. Ihre Änderungen werden beim Speichern zusammengeführt.",
     "editing_other": "{{names}} bearbeiten diese Seite ebenfalls. Ihre Änderungen werden beim Speichern zusammengeführt."
+  },
+  "conflict": {
+    "title": "Konflikt beim Speichern",
+    "description": "{{names}} hat dieselben Stellen geändert wie Sie. Wählen Sie für jede Stelle die Version, die bleiben soll: Die andere bleibt im Verlauf der Seite erhalten, nichts geht verloren.",
+    "item": "Stelle {{index}} von {{total}}",
+    "mine": "Ihre Version",
+    "theirs": "Version von {{names}}",
+    "empty": "(Stelle gelöscht)",
+    "keepMine": "Meine behalten",
+    "keepTheirs": "Ihre behalten",
+    "keepBoth": "Beide behalten",
+    "custom": "Von Hand bearbeiten",
+    "customLabel": "Beibehaltener Text für Stelle {{index}}",
+    "save": "Speichern",
+    "cancel": "Zurück zum Editor",
+    "merged": "Mit den Änderungen von {{names}} zusammengeführt.",
+    "remoteChanged": "{{names}} hat diese Seite gespeichert, während Sie sie bearbeiten. Ihre Änderungen werden beim Speichern zusammengeführt.",
+    "values": {
+      "title": "Auf beiden Seiten geänderte Eigenschaften",
+      "mine": "Meinen Wert behalten: {{value}}",
+      "theirs": "Wert von {{names}} behalten: {{value}}"
+    }
   }
 }

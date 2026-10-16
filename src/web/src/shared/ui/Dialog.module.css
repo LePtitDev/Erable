@@ -32,6 +32,10 @@
   max-width: 560px;
 }
 
+.lg {
+  max-width: 880px;
+}
+
 .title {
   margin: 0;
   font-size: var(--text-2xl);

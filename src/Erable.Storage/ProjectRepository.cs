@@ -227,6 +227,27 @@ public sealed class ProjectRepository(ProjectDatabase database)
             .Select(r => new StoredRevision(r.Revision, r.Author, StorageFormat.ParseTimestamp(r.At), RevisionSnapshot.Deserialize(r.Snapshot)))];
     }
 
+    /// <summary>One revision of an element, without reading the others; null when it does not exist.</summary>
+    public StoredRevision? LoadRevision(ElementId id, long revision, SqliteConnection? connection = null)
+    {
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        var row = (connection ?? owned!).QuerySingleOrDefault<(long Revision, string Author, string At, byte[] Snapshot)?>(
+            "SELECT revision, author, at, snapshot FROM revisions WHERE element_id = @Id AND revision = @Revision",
+            new { Id = id.ToInt64(), Revision = revision });
+        return row is { } r
+            ? new StoredRevision(r.Revision, r.Author, StorageFormat.ParseTimestamp(r.At), RevisionSnapshot.Deserialize(r.Snapshot))
+            : null;
+    }
+
+    /// <summary>The authors of the revisions saved after <paramref name="revision"/>, oldest first.</summary>
+    public IReadOnlyList<string> RevisionAuthorsAfter(ElementId id, long revision, SqliteConnection? connection = null)
+    {
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        return [.. (connection ?? owned!).Query<string>(
+            "SELECT author FROM revisions WHERE element_id = @Id AND revision > @Revision ORDER BY revision",
+            new { Id = id.ToInt64(), Revision = revision })];
+    }
+
     public int CountRevisions(ElementId id)
     {
         using var connection = Database.OpenConnection();

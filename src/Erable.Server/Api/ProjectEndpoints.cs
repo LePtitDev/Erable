@@ -353,7 +353,7 @@ public static class ProjectEndpoints
 
     /// <summary>Optimistic concurrency: <c>If-Match: "&lt;revision&gt;"</c> is mandatory; a stale revision answers 409.</summary>
     private static async Task<Results<Ok<PageSavedResult>, ProblemHttpResult>> SavePageContent(
-        ElementId projectId, ElementId id, SavePageContentRequest request, ProjectWorkspace workspace, HttpContext http,
+        ElementId projectId, ElementId id, SavePageContentRequest request, ProjectWorkspace workspace, UserDirectory users, HttpContext http,
         [FromHeader(Name = "If-Match")] string? ifMatch)
     {
         if (workspace.Find(projectId) is not { } service)
@@ -376,11 +376,33 @@ public static class ProjectEndpoints
             .ConfigureAwait(false);
         if (!saved.IsSuccess)
         {
-            return Problems.From(saved.Error);
+            return Problems.From(WithAuthorNames(saved.Error, users));
         }
 
         http.Response.Headers.ETag = $"\"{saved.Value.Revision}\"";
-        return TypedResults.Ok(new PageSavedResult(saved.Value.Revision, saved.Value.UpdatedAt, saved.Value.UpdatedBy));
+        var merged = saved.Value.Merged is { } merge
+            ? new PageMergedInfo(
+                merge.Markdown,
+                merge.Categories,
+                merge.Values?.Select(v => new PagePropertyValue(ElementId.Parse(v.Key), v.Value ?? new JsonObject())).ToArray(),
+                [.. merge.MergedWith.Select(a => new AuthorItem(a, users.NameOf(a)))])
+            : null;
+        return TypedResults.Ok(new PageSavedResult(saved.Value.Revision, saved.Value.UpdatedAt, saved.Value.UpdatedBy, merged));
+    }
+
+    /// <summary>A conflict names the other editors (the storage only knows their logins).</summary>
+    private static DomainError WithAuthorNames(DomainError error, UserDirectory users)
+    {
+        if (error.Extensions is not { } extensions || !extensions.TryGetValue("mergedWith", out var raw) || raw is not IEnumerable<string> logins)
+        {
+            return error;
+        }
+
+        var named = new Dictionary<string, object?>(extensions, StringComparer.Ordinal)
+        {
+            ["mergedWith"] = logins.Select(login => new AuthorItem(login, users.NameOf(login))).ToArray(),
+        };
+        return error with { Extensions = named };
     }
 
     // ─── Me ─────────────────────────────────────────────────────────────────

@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { finishRelogin, useAuthStore } from "../../shared/api/auth";
+import { meQuery } from "../../shared/api/projects";
 import { Dialog } from "../../shared/ui/Dialog";
 import { LoginForm } from "./LoginForm";
 
@@ -10,6 +12,7 @@ import { LoginForm } from "./LoginForm";
 export function ReloginDialog() {
   const { t } = useTranslation();
   const open = useAuthStore((s) => s.reloginOpen);
+  const client = useQueryClient();
   return (
     <Dialog
       open={open}
@@ -20,8 +23,15 @@ export function ReloginDialog() {
       size="sm"
     >
       <LoginForm
-        onSignedIn={() => {
-          finishRelogin(true);
+        // The same user back on the same screen: nothing is reloaded, an unsaved page is still there.
+        resetCache={false}
+        onSignedIn={(session) => {
+          if (client.getQueryData(meQuery.queryKey)?.id === session.id) {
+            finishRelogin(true);
+          } else {
+            // Somebody else signed in: nothing of the screen belongs to them.
+            globalThis.location.reload();
+          }
         }}
       />
     </Dialog>

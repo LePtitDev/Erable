@@ -10,7 +10,7 @@ interface DialogProps {
   readonly children?: ReactNode;
   /** Actions, right-aligned under the content. */
   readonly footer?: ReactNode;
-  readonly size?: "sm" | "md";
+  readonly size?: "sm" | "md" | "lg";
   /** Role `alertdialog` for confirmations (E2E-17-03): Escape still closes it. */
   readonly alert?: boolean;
 }

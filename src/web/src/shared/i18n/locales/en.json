@@ -903,5 +903,27 @@
     "section": " — section “{{section}}”",
     "editing_one": "{{names}} is also editing this page{{section}}. Your changes will be merged when you save.",
     "editing_other": "{{names}} are also editing this page. Your changes will be merged when you save."
+  },
+  "conflict": {
+    "title": "Conflicting save",
+    "description": "{{names}} changed the same passages as you. For each passage, choose the version to keep: the other one stays in the history of the page, nothing is lost.",
+    "item": "Passage {{index}} of {{total}}",
+    "mine": "Your version",
+    "theirs": "{{names}}’s version",
+    "empty": "(passage deleted)",
+    "keepMine": "Keep mine",
+    "keepTheirs": "Keep theirs",
+    "keepBoth": "Keep both",
+    "custom": "Edit by hand",
+    "customLabel": "Text kept for passage {{index}}",
+    "save": "Save",
+    "cancel": "Back to the editor",
+    "merged": "Merged with the changes of {{names}}.",
+    "remoteChanged": "{{names}} saved this page while you were editing it. Your changes will be merged when you save.",
+    "values": {
+      "title": "Properties changed on both sides",
+      "mine": "Keep my value: {{value}}",
+      "theirs": "Keep {{names}}’s value: {{value}}"
+    }
   }
 }

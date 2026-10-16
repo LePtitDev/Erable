@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
+import { meQuery } from "../../shared/api/projects";
 import type { ElementId } from "../../shared/ids/elementId";
 import {
   invalidateAll,
@@ -27,6 +28,11 @@ export function useProjectEvents(projectId: ElementId): void {
 
     connectToProject(projectId, {
       elementChanged: (event) => {
+        const me = client.getQueryData(meQuery.queryKey);
+        if (event.elementId === editing() && event.by !== me?.id) {
+          // Saved by somebody else while this user edits it: told in the editor; the merge happens at the save.
+          useShellStore.getState().setRemoteChange(event.by);
+        }
         void invalidateElementChanged(client, projectId, event.elementId, editing());
       },
       elementMoved: (event) => {

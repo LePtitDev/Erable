@@ -16,6 +16,7 @@ import { QuickSearch } from "../search/QuickSearch";
 import { PreferencesDialog } from "../home/PreferencesDialog";
 import { Explorer } from "../explorer/Explorer";
 import { UserMenu } from "../auth/UserMenu";
+import { Notices } from "./Notices";
 import { PresenceAvatars } from "../presence/Presence";
 import { ApiError } from "../../shared/api/client";
 import { apiInfoQuery } from "../../shared/api/queries";
@@ -147,6 +148,7 @@ function ShellFrame({
         </main>
       </div>
       <StatusBar projectId={projectId} />
+      <Notices />
       <PreferencesDialog open={preferences} onOpenChange={setPreferences} />
       <QuickSearch projectId={projectId} open={quickSearch} onOpenChange={setQuickSearch} />
     </div>

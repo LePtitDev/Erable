@@ -2604,6 +2604,21 @@
           }
         }
       },
+      "AuthorItem": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "BacklinkItem": {
         "required": [
           "sourceId",
@@ -3716,6 +3731,41 @@
           }
         }
       },
+      "PageMergedInfo": {
+        "required": [
+          "markdown",
+          "categories",
+          "properties",
+          "mergedWith"
+        ],
+        "type": "object",
+        "properties": {
+          "markdown": {
+            "type": "string"
+          },
+          "categories": {
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "properties": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PagePropertyValue"
+            }
+          },
+          "mergedWith": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthorItem"
+            }
+          }
+        }
+      },
       "PagePreviewRequest": {
         "required": [
           "categories",
@@ -3857,6 +3907,16 @@
           },
           "updatedBy": {
             "type": "string"
+          },
+          "merged": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PageMergedInfo"
+              }
+            ]
           }
         }
       },

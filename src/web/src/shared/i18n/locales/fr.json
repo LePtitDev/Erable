@@ -929,5 +929,27 @@
     "editing_one": "{{names}} modifie aussi cette page{{section}}. Vos changements seront fusionnés à l’enregistrement.",
     "editing_other": "{{names}} modifient aussi cette page. Vos changements seront fusionnés à l’enregistrement.",
     "editing_many": "{{names}} modifient aussi cette page. Vos changements seront fusionnés à l’enregistrement."
+  },
+  "conflict": {
+    "title": "Enregistrement en conflit",
+    "description": "{{names}} a modifié les mêmes passages que vous. Choisissez, pour chaque passage, la version à conserver : l’autre reste dans l’historique de la page, rien n’est perdu.",
+    "item": "Passage {{index}} sur {{total}}",
+    "mine": "Votre version",
+    "theirs": "Version de {{names}}",
+    "empty": "(passage supprimé)",
+    "keepMine": "Garder la mienne",
+    "keepTheirs": "Garder la leur",
+    "keepBoth": "Garder les deux",
+    "custom": "Modifier à la main",
+    "customLabel": "Texte retenu pour le passage {{index}}",
+    "save": "Enregistrer",
+    "cancel": "Revenir à l’éditeur",
+    "merged": "Fusionné avec les modifications de {{names}}.",
+    "remoteChanged": "{{names}} a enregistré cette page pendant que vous la modifiez. Vos changements seront fusionnés à l’enregistrement.",
+    "values": {
+      "title": "Propriétés modifiées des deux côtés",
+      "mine": "Garder ma valeur : {{value}}",
+      "theirs": "Garder la valeur de {{names}} : {{value}}"
+    }
   }
 }

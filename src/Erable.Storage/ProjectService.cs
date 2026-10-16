@@ -9,7 +9,8 @@ using Microsoft.Data.Sqlite;
 namespace Erable.Storage;
 
 /// <summary>A page saved: its new revision and modification stamp.</summary>
-public sealed record PageSaved(ElementId PageId, long Revision, DateTimeOffset UpdatedAt, string UpdatedBy);
+/// <param name="Merged">Set when the save arrived after another one and was merged with it (M4-05).</param>
+public sealed record PageSaved(ElementId PageId, long Revision, DateTimeOffset UpdatedAt, string UpdatedBy, PageMerge? Merged = null);
 
 /// <summary>Where an element lives: ancestors from the root (included) down to the parent.</summary>
 public sealed record ElementWithPath(Element Element, IReadOnlyList<TreeNode> Path);
@@ -171,8 +172,10 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
         }, cancellationToken);
 
     /// <summary>
-    /// Saves the Markdown of a page if it is still at <paramref name="expectedRevision"/> (optimistic concurrency;
-    /// the three-way merge arrives with M4-05). Content, plain text, references, categories and values (when given),
+    /// Saves the Markdown of a page started from <paramref name="expectedRevision"/> (optimistic concurrency). If the
+    /// page has moved on since, the two edits are merged against that revision (M4-05, <see cref="MergeStaleSave"/>): a
+    /// merge without conflict is saved as a new revision, with the merged state in <see cref="PageSaved.Merged"/>; a
+    /// conflict writes nothing and fails with <see cref="RevisionConflict"/> and both versions. Content, plain text, references, categories and values (when given),
     /// derived values, validation issues and revision: one transaction, one revision (F13.R1). Rule violations never
     /// block the save (docs/architecture.md §5.4); a malformed value does.
     /// </summary>
@@ -189,9 +192,18 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
                 return Result.Failure<PageSaved>(new DomainError(ErrorCodes.ElementNotFound, $"Page {pageId} does not exist."));
             }
 
+            PageMerge? merge = null;
             if (element.Revision != expectedRevision)
             {
-                return Result.Failure<PageSaved>(RevisionConflict);
+                var attempt = MergeStaleSave(connection, element, markdown, expectedRevision, structure, author);
+                if (!attempt.IsSuccess)
+                {
+                    return Result.Failure<PageSaved>(attempt.Error);
+                }
+
+                markdown = attempt.Value.Markdown;
+                structure = attempt.Value.Structure;
+                merge = attempt.Value.Info;
             }
 
             if (structure is not null && ApplyPageStructure(connection, transaction, pageId, structure) is { } error)
@@ -205,7 +217,7 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
             var revision = ProjectRepository.Touch(connection, transaction, pageId, now, author);
             var saved = element with { Revision = revision, UpdatedAt = now, UpdatedBy = author };
             InsertRevision(connection, transaction, saved, markdown, author, now);
-            return Result.Success(new PageSaved(pageId, revision, now, author));
+            return Result.Success(new PageSaved(pageId, revision, now, author, merge));
         }, cancellationToken);
     }
 

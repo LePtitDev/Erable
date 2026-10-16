@@ -95,7 +95,22 @@ public sealed record PageContent(string Markdown, long Revision);
 /// </summary>
 public sealed record SavePageContentRequest(string Markdown, IReadOnlyList<ElementId>? Categories = null, IReadOnlyList<PagePropertyValue>? Properties = null);
 
-public sealed record PageSavedResult(long Revision, DateTimeOffset UpdatedAt, string UpdatedBy);
+/// <summary>A user, by login and display name.</summary>
+public sealed record AuthorItem(string Id, string Name);
+
+/// <summary>
+/// A save that arrived after another one and was merged with it (M4-05): the page as it is now, which the editor shows
+/// instead of what it sent, and whom it was merged with (« Fusionné avec les modifications de Camille R. »).
+/// </summary>
+/// <param name="Categories">Null when the save carried no categories.</param>
+/// <param name="Properties">Null when the save carried no values.</param>
+public sealed record PageMergedInfo(
+    string Markdown,
+    IReadOnlyList<ElementId>? Categories,
+    IReadOnlyList<PagePropertyValue>? Properties,
+    IReadOnlyList<AuthorItem> MergedWith);
+
+public sealed record PageSavedResult(long Revision, DateTimeOffset UpdatedAt, string UpdatedBy, PageMergedInfo? Merged = null);
 
 /// <summary>Current state of a referenced ID; <c>attachment</c> is set for attachments (embeds, F06.R2).</summary>
 public sealed record ResolvedItem(

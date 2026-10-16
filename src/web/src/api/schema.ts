@@ -925,6 +925,10 @@ export interface components {
       /** Format: int64 */
       size: number;
     };
+    AuthorItem: {
+      id: string;
+      name: string;
+    };
     BacklinkItem: {
       /** Format: int32 */
       count: number;
@@ -1198,6 +1202,12 @@ export interface components {
       incoming: components["schemas"]["PageLinkItem"][];
       outgoing: components["schemas"]["PageLinkItem"][];
     };
+    PageMergedInfo: {
+      categories: null | unknown[];
+      markdown: string;
+      mergedWith: components["schemas"]["AuthorItem"][];
+      properties: null | components["schemas"]["PagePropertyValue"][];
+    };
     PagePreviewRequest: {
       categories: unknown[];
       properties: components["schemas"]["PagePropertyValue"][];
@@ -1221,6 +1231,7 @@ export interface components {
       value: components["schemas"]["JsonNode"];
     };
     PageSavedResult: {
+      merged?: null | components["schemas"]["PageMergedInfo"];
       /** Format: int64 */
       revision: number;
       /** Format: date-time */
