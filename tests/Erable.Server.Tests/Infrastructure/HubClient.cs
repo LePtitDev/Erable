@@ -26,7 +26,16 @@ public sealed class HubClient : IAsyncDisposable
             .WithUrl(new Uri(server.BaseAddress, ApiRoutes.ProjectHub), options =>
             {
                 options.HttpMessageHandlerFactory = _ => server.CreateHandler();
-                options.Transports = HttpTransportType.LongPolling;
+                // Long polling by default; a client with its own keep-alive (a silent one) uses a WebSocket, whose silence the
+                // server's heartbeat sees as it would on a browser's connection.
+                options.Transports = keepAlive is null ? HttpTransportType.LongPolling : HttpTransportType.WebSockets;
+                options.SkipNegotiation = false;
+                options.WebSocketFactory = async (context, cancellationToken) =>
+                {
+                    var socket = server.CreateWebSocketClient();
+                    socket.ConfigureRequest = request => request.Headers.Authorization = "Bearer " + token;
+                    return await socket.ConnectAsync(context.Uri, cancellationToken);
+                };
                 options.AccessTokenProvider = () => Task.FromResult<string?>(token);
             });
         if (keepAlive is { } interval)
@@ -39,6 +48,7 @@ public sealed class HubClient : IAsyncDisposable
         Connection.On<ElementMovedEvent>("ElementMoved", e => _events.Writer.TryWrite(e));
         Connection.On<ElementDeletedEvent>("ElementDeleted", e => _events.Writer.TryWrite(e));
         Connection.On<TreeChangedEvent>("TreeChanged", e => _events.Writer.TryWrite(e));
+        Connection.On<MembersChangedEvent>("MembersChanged", e => _events.Writer.TryWrite(e));
         Connection.On<PresenceChangedEvent>("PresenceChanged", e => _presence.Writer.TryWrite(e));
     }
 

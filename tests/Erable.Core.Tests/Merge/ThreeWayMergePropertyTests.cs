@@ -156,10 +156,13 @@ public sealed class ThreeWayMergePropertyTests
 
             merge.Text.ShouldContain(MineMarker);
             merge.Text.ShouldContain(TheirsMarker);
-            merge.Text.Replace(MineMarker, string.Empty, StringComparison.Ordinal).Replace(TheirsMarker, string.Empty, StringComparison.Ordinal)
-                .ShouldBe(baseText);
+            // A marker on a line of its own brings its line break with it.
+            Remove(Remove(merge.Text, MineMarker, mineAt.Item2), TheirsMarker, theirsAt.Item2).ShouldBe(baseText);
         });
     }
+
+    private static string Remove(string text, string marker, bool wholeLine) =>
+        text.Replace(wholeLine ? marker + "\n" : marker, string.Empty, StringComparison.Ordinal);
 
     /// <summary>A marker inserted at a character position, or on a line of its own when <paramref name="wholeLine"/>.</summary>
     private static string Insert(string text, int position, bool wholeLine, string marker)

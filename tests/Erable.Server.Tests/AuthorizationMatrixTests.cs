@@ -1,9 +1,9 @@
 using System.Net;
 using Erable.Server.Api;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Erable.Server.Security;
 using Erable.Server.Tests.Infrastructure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 

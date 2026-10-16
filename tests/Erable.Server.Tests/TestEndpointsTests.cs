@@ -23,7 +23,8 @@ public sealed class TestEndpointsTests
         using var response = await backend.Client.PostAsync(new Uri($"/_test/reset?slot={slot}&fixture={fixture}", UriKind.Relative), null, Ct);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadFromJsonAsync<JsonObject>(Ct);
-        var cookie = response.Headers.GetValues("Set-Cookie").Single().Split(';')[0];
+        var cookie = // The reset also signs the slot in (the session cookie); the cookie that names the slot is the other one.
+        response.Headers.GetValues("Set-Cookie").Single(c => !c.StartsWith("erable_auth=", StringComparison.Ordinal)).Split(';')[0];
         return (ElementId.Parse(body!["projectId"]!.GetValue<string>()), cookie);
     }
 
@@ -117,7 +118,8 @@ public sealed class TestEndpointsTests
         SkipWhenCompiledOut();
         await using var backend = await StartAsync();
         var (projectId, _) = await ResetAsync(backend, "f01");
-        var at = new DateTimeOffset(2026, 12, 24, 18, 0, 0, TimeSpan.Zero);
+        // Sessions expire with this clock too: a date months away would sign everybody out (the e2e tests keep to hours).
+        var at = Chroniques.Now.AddHours(3);
 
         (await backend.Client.PostJsonAsync("/_test/clock", new { now = at })).StatusCode.ShouldBe(HttpStatusCode.NoContent);
         var page = await backend.CreatePageAsync(projectId, Erable.Core.Elements.Roots.Pages.Id, "Lame de givre");

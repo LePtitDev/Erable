@@ -219,8 +219,12 @@ public sealed class AuthApiTests
         var leaked = await response.Content.ReadAsStringAsync(Ct);
         leaked.ShouldNotContain("Ilsa");
         leaked.ShouldNotContain("Secret");
-        (await unknown.Content.ReadAsStringAsync(Ct)).ShouldBe(leaked);
+        // Same answer down to the byte, the trace identifier of the request apart.
+        WithoutTrace(await unknown.Content.ReadAsStringAsync(Ct)).ShouldBe(WithoutTrace(leaked));
     }
+
+    private static string WithoutTrace(string problem) =>
+        System.Text.RegularExpressions.Regex.Replace(problem, "\"traceId\":\"[^\"]*\"", string.Empty, System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromSeconds(1));
 
     [Fact]
     public async Task Reader_CanRead_ButAForgedWriteIsRefusedWith403()

@@ -143,7 +143,8 @@ public static class SessionCookies
             SameSite = SameSiteMode.Strict,
             Secure = context.Request.IsHttps || options.CookieSecure,
             Path = "/",
-            Expires = expires,
+            // Relative to the clock of the server (frozen in the tests): an absolute date would be judged by the browser's own clock.
+            MaxAge = expires - context.RequestServices.GetRequiredService<TimeProvider>().GetUtcNow(),
             IsEssential = true,
         });
 

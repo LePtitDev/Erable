@@ -1,15 +1,15 @@
-using System.Security.Cryptography;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using Erable.Server.Accounts;
 using Erable.Server.Hosting;
 using Erable.Server.Security;
 using Erable.Storage;
 using Erable.Testing;
-using Shouldly;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Shouldly;
 
 namespace Erable.Server.Tests.Infrastructure;
 
@@ -133,7 +133,12 @@ public sealed class TestBackend : IAsyncDisposable
             }
 
             var accounts = app.Services.GetRequiredService<AccountService>();
-            accounts.CreateAccount(AdminLogin, "Admin", AdminPassword, isServerAdmin: true).IsSuccess.ShouldBeTrue();
+            // Test mode seeds its own « admin » (spec/projects/users.json): it is that account then.
+            if (accounts.Store.GetAccount(AdminLogin) is null)
+            {
+                accounts.CreateAccount(AdminLogin, "Admin", AdminPassword, isServerAdmin: true).IsSuccess.ShouldBeTrue();
+            }
+
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accounts.StartSession(AdminLogin, ServerStore.SessionKindBearer).Token);
         }
 

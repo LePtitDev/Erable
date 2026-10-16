@@ -1,5 +1,5 @@
 import { screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { requireElementId } from "../../shared/ids/elementId";
 import {
   clearPresence,
@@ -10,6 +10,12 @@ import { http, server } from "../../test/msw";
 import { renderWithProviders } from "../../test/render";
 import { EditingBanner, ElementPresence, PresenceAvatars } from "./Presence";
 
+// The components are rendered outside any router: no project in the address, so « moi » is the user of the machine.
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  const original: object = await importOriginal();
+  return { ...original, useParams: () => ({}) };
+});
+
 const page = requireElementId("3F2A9C14E07B5D21");
 const other = requireElementId("5B19C0E2A4D7F311");
 
@@ -19,6 +25,16 @@ function user(id: string, name: string, over: Partial<PresenceUser> = {}): Prese
 
 beforeEach(() => {
   server.use(
+    // A server: no connected servers to ask about.
+    http.get("/api/info", ({ response }) =>
+      response(200).json({
+        appVersion: "0.1.0",
+        apiVersion: "v1",
+        formatVersion: 4,
+        mode: "server",
+        folderProjects: false,
+      }),
+    ),
     http.get("/api/v1/me", ({ response }) =>
       response(200).json({
         id: "malo",
@@ -55,9 +71,12 @@ describe("presence (M4-04, F14.R3)", () => {
 
     renderWithProviders(<EditingBanner elementId={page} />);
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Camille R., Léa M. modifient aussi cette page.",
-    );
+    // Malo is the user: the banner names the two others once /me has answered.
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Camille R., Léa M. modifient aussi cette page.",
+      );
+    });
   });
 
   it("says nothing when only the user edits, or when the others edit another page", async () => {
@@ -80,7 +99,9 @@ describe("presence (M4-04, F14.R3)", () => {
     renderWithProviders(<ElementPresence elementId={page} />);
 
     expect(await screen.findByRole("img", { name: "Camille R. consulte" })).toHaveTextContent("CR");
-    expect(screen.queryByRole("img", { name: /Malo/ })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole("img", { name: /Malo/ })).not.toBeInTheDocument();
+    });
   });
 
   it("shows three avatars in the top bar and counts the rest", async () => {

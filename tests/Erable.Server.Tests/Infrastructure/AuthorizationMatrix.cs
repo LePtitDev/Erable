@@ -126,7 +126,9 @@ public static class AuthorizationMatrix
     private static void CheckDeclaration(RouteEndpoint endpoint, string method, AccessRule rule, List<string> violations)
     {
         var pattern = endpoint.RoutePattern.RawText ?? "?";
-        if (!pattern.Contains("{projectId}", StringComparison.Ordinal) || rule.Level == Access.Public)
+        // /me/... holds the caller's own data about a project (recent entries): a project the user lost must stay removable from it.
+        if (!pattern.Contains("{projectId}", StringComparison.Ordinal) || rule.Level == Access.Public
+            || pattern.StartsWith("/api/v1/me/", StringComparison.Ordinal))
         {
             return;
         }

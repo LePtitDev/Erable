@@ -63,7 +63,7 @@ test.describe("F14 · Roles and isolation", () => {
       await expect(page.getByRole("heading", { level: 1, name: "Ilsa Varenne" })).toBeVisible();
 
       await expect(page.getByRole("button", { name: t("page.edit") })).toHaveCount(0);
-      await expect(page.getByRole("button", { name: t("links.link") })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: t("links.link"), exact: true })).toHaveCount(0);
       await expect(page.getByRole("button", { name: t("attachments.addLabel") })).toHaveCount(0);
       await expect(page.getByRole("button", { name: t("page.newSubPage") })).toHaveCount(0);
       await expect(page.getByRole("button", { name: t("explorer.newPage") })).toHaveCount(0);

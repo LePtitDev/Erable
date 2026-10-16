@@ -135,13 +135,14 @@ public sealed class ProjectsApiTests
     }
 
     [Fact]
-    public async Task GetProject_InvalidId_Returns400()
+    public async Task GetProject_InvalidId_Returns404()
     {
         await using var backend = await TestBackend.StartAsync();
 
         using var response = await backend.Client.GetAsync(new Uri("/api/v1/projects/12", UriKind.Relative), TestContext.Current.CancellationToken);
 
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        // A text that is no ID names no project the caller belongs to: same answer as any project they cannot see (M4-02).
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]

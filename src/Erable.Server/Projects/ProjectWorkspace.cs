@@ -29,7 +29,7 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
     /// <summary>Creates a project, opens it and puts it first in the recent projects of <paramref name="profile"/>.</summary>
     public Result<ProjectService> Create(string folder, string name, string contentLanguage, UserProfile? profile, string author = KnownUsers.Local)
     {
-        
+
         lock (_gate)
         {
             var created = ProjectStore.Create(folder, name, contentLanguage, clock, author);
@@ -43,7 +43,7 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
     /// </summary>
     public Result<ProjectService> Open(string folder, UserProfile? profile, bool migrate = false)
     {
-        
+
         lock (_gate)
         {
             var full = Path.GetFullPath(folder);

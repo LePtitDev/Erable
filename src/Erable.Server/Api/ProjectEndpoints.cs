@@ -1,14 +1,14 @@
 using System.Text.Json.Nodes;
 using Erable.Core;
 using Erable.Core.Accounts;
-using Erable.Server.Accounts;
-using Erable.Server.Security;
 using Erable.Core.Elements;
 using Erable.Core.Projects;
 using Erable.Core.Tree;
+using Erable.Server.Accounts;
 using Erable.Server.Hosting;
 using Erable.Server.Native;
 using Erable.Server.Projects;
+using Erable.Server.Security;
 using Erable.Server.Users;
 using Erable.Storage;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -435,8 +435,10 @@ public static class ProjectEndpoints
 
     // ─── Recent projects ────────────────────────────────────────────────────
 
-    private static Ok<RecentProjectItem[]> ListRecent(UserProfile profile) =>
+    /// <summary>The recent projects of the user; on a server, only the ones they are still a member of (the folder of a project is not theirs to see).</summary>
+    private static Ok<RecentProjectItem[]> ListRecent(UserProfile profile, AccountService accounts, HttpContext http) =>
         TypedResults.Ok(profile.GetRecentProjects()
+            .Where(r => !accounts.Enabled || !accounts.Store.IsRegistered(r.ProjectId) || accounts.Store.GetRole(r.ProjectId, CurrentUser.Id(http)) is not null)
             .Select(r => new RecentProjectItem(r.ProjectId, r.Name, r.Folder, r.LastOpenedAt, r.LastElementId, ProjectStore.Inspect(r.Folder).Status))
             .ToArray());
 

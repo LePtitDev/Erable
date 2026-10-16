@@ -14,6 +14,8 @@ export class QuickSearchPage {
   }
 
   async open() {
+    // The shortcut is registered once the project screen has rendered (the tree is there): not before.
+    await this.page.getByRole("tree").waitFor();
     await this.page.keyboard.press("Control+k");
     await this.field.waitFor();
   }

@@ -108,7 +108,9 @@ internal static class TestEndpoints
             CopyDirectory(source, folder);
             var manifest = ManifestFile.Read(folder).Value;
             ManifestFile.Write(folder, manifest with { ProjectId = ElementId.NewRandom() });
-            var profile = profiles.ForTestSlot(slot, signedIn is { Length: > 0 } ? signedIn : null);
+            // Whoever opens the copy leaves it among their recent projects: a user who is no member of it (E2E-14-04) must not.
+            var opener = signedIn is { Length: > 0 } && TestUsers.Read(options).Any(u => u.Id == signedIn && u.Role is not null) ? signedIn : null;
+            var profile = profiles.ForTestSlot(slot, opener);
             var opened = workspace.Open(folder, profile);
             if (!opened.IsSuccess)
             {
@@ -185,10 +187,17 @@ internal static class TestEndpoints
         return TypedResults.NoContent();
     }
 
-    /// <summary>Ends every session (E2E-14-09: the session expires while a page is being edited).</summary>
-    private static NoContent ExpireSessions(AccountService accounts)
+    /// <summary>
+    /// Ends the session of the caller (E2E-14-09: the session expires while a page is being edited). Only that one: the
+    /// other tests run against the same backend at the same time.
+    /// </summary>
+    private static NoContent ExpireSessions(HttpContext http, AccountService accounts)
     {
-        accounts.Store.PurgeExpiredSessions(DateTimeOffset.MaxValue);
+        if (SessionCookies.TokenOf(http) is { } token)
+        {
+            accounts.EndSession(token);
+        }
+
         return TypedResults.NoContent();
     }
 

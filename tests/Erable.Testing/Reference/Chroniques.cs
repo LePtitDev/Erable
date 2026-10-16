@@ -163,11 +163,15 @@ public static class Chroniques
 
         p.Classified("Ilsa Varenne", ["Catégorie PNJ", "Marchand"], new Dictionary<string, string>
         {
-            ["Niveau"] = "72", ["Rôle"] = "\"marchande\"", ["Propriété Région"] = "\"@Hautbois\"",
+            ["Niveau"] = "72",
+            ["Rôle"] = "\"marchande\"",
+            ["Propriété Région"] = "\"@Hautbois\"",
         });
         p.Classified("Capitaine Orsen", ["Catégorie PNJ", "Garde"], new Dictionary<string, string>
         {
-            ["Niveau"] = "40", ["Rôle"] = "\"garde\"", ["Propriété Région"] = "\"@Hautbois\"",
+            ["Niveau"] = "40",
+            ["Rôle"] = "\"garde\"",
+            ["Propriété Région"] = "\"@Hautbois\"",
         });
         p.Classified("Dragon des Cimes", ["Créature"], new Dictionary<string, string> { ["Niveau"] = "99" });
         p.Classified("Hautbois", ["Catégorie Région"]);

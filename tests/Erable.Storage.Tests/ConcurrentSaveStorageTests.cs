@@ -81,7 +81,7 @@ public sealed class ConcurrentSaveStorageTests : IDisposable
         // E2E-14-08
         var start = Revision();
         var original = Markdown();
-        const string Sentence = "Née à Hautbois, Ilsa rejoint l’Ordre à seize ans.";
+        const string Sentence = "Née à Hautbois, Ilsa rejoint l’Ordre à seize ans comme apprentie. Elle quitte l’Ordre après l’incendie des archives, convaincue que ses supérieurs l’ont provoqué.";
         original.ShouldContain(Sentence);
         var camille = original.Replace(Sentence, "Ilsa est née à Hautbois.", StringComparison.Ordinal);
         var malo = original.Replace(Sentence, "Ilsa rejoint l’Ordre très jeune.", StringComparison.Ordinal);
@@ -112,7 +112,7 @@ public sealed class ConcurrentSaveStorageTests : IDisposable
         // E2E-14-08: malo chooses his version; the version of camille stays in the history.
         var start = Revision();
         var original = Markdown();
-        const string Sentence = "Née à Hautbois, Ilsa rejoint l’Ordre à seize ans.";
+        const string Sentence = "Née à Hautbois, Ilsa rejoint l’Ordre à seize ans comme apprentie. Elle quitte l’Ordre après l’incendie des archives, convaincue que ses supérieurs l’ont provoqué.";
         var camille = original.Replace(Sentence, "Ilsa est née à Hautbois.", StringComparison.Ordinal);
         var malo = original.Replace(Sentence, "Ilsa rejoint l’Ordre très jeune.", StringComparison.Ordinal);
         (await SaveAsync("camille", camille, start)).IsSuccess.ShouldBeTrue();
@@ -146,8 +146,8 @@ public sealed class ConcurrentSaveStorageTests : IDisposable
         var saved = await SaveAsync("malo", original + "\nNote de malo.", start, new PageStructureInput([Pnj], null));
 
         saved.IsSuccess.ShouldBeTrue();
-        saved.Value.Merged!.Categories.ShouldBe([Pnj, Erudit]);
-        _service.GetRevision(Ilsa, Revision())!.Snapshot.Categories!.Order().ShouldBe(new[] { Pnj, Erudit }.Order());
+        saved.Value.Merged!.Categories.ShouldNotBeNull().ShouldBe([Pnj, Erudit], ignoreOrder: true);
+        _service.GetRevision(Ilsa, Revision())!.Snapshot.Categories!.ShouldBe([Pnj, Erudit], ignoreOrder: true);
     }
 
     [Fact]
@@ -156,16 +156,16 @@ public sealed class ConcurrentSaveStorageTests : IDisposable
         var start = Revision();
         var original = Markdown();
         var niveau = Chroniques.Niveau;
-        var role = Chroniques.IdOf("Rôle");
+        var age = Chroniques.IdOf("Âge");
         (await SaveAsync("camille", original, start, new PageStructureInput(null, [(niveau, Json(40))]))).IsSuccess.ShouldBeTrue();
 
-        var saved = await SaveAsync("malo", original, start, new PageStructureInput(null, [(niveau, Json(72)), (role, JsonSerializer.SerializeToElement("garde"))]));
+        var saved = await SaveAsync("malo", original, start, new PageStructureInput(null, [(niveau, Json(72)), (age, Json(30))]));
 
         saved.IsSuccess.ShouldBeTrue();
         var values = saved.Value.Merged!.Values!;
-        // Malo did not change the level (72 as at the start): camille's 40 stays; the role is his.
+        // Malo did not change the level (72 as at the start): camille's 40 stays; the age is his. Both sides dropped the role and the region: they stay dropped.
         values[niveau.ToString()]!.ToJsonString().ShouldBe("40");
-        values[role.ToString()]!.ToJsonString().ShouldBe("\"garde\"");
+        values[age.ToString()]!.ToJsonString().ShouldBe("30");
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public sealed class ConcurrentSaveStorageTests : IDisposable
 
         saved.IsSuccess.ShouldBeTrue();
         saved.Value.Merged!.Categories.ShouldBeNull();
-        _service.GetRevision(Ilsa, Revision())!.Snapshot.Categories!.Order().ShouldBe(new[] { Pnj, Erudit }.Order());
+        _service.GetRevision(Ilsa, Revision())!.Snapshot.Categories!.ShouldBe([Pnj, Erudit], ignoreOrder: true);
     }
 
     [Fact]

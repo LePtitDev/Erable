@@ -106,7 +106,6 @@ internal sealed class ServerProcess : IAsyncDisposable
     public void Kill()
     {
         Kill(_process);
-        Http.Dispose();
     }
 
     private static void Kill(Process process)
@@ -125,6 +124,7 @@ internal sealed class ServerProcess : IAsyncDisposable
     public ValueTask DisposeAsync()
     {
         Kill();
+        Http.Dispose();
         _process.Dispose();
         return ValueTask.CompletedTask;
     }
