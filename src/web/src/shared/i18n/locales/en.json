@@ -385,6 +385,38 @@
       "advanced": "Advanced search"
     }
   },
+  "history": {
+    "button": "History",
+    "title": "History of “{{name}}”",
+    "back": "Back to the page",
+    "hint": "Tick two revisions to compare them. Restoring creates a new revision: the history is never rewritten.",
+    "list": "Revisions",
+    "revision": "Revision {{revision}}",
+    "compare": "Compare revision {{revision}}",
+    "restore": "Restore revision {{revision}}",
+    "restoreShort": "Restore",
+    "restoration": "Restoration of revision {{revision}}",
+    "restored": "Revision {{revision}} was created.",
+    "skipped": "Elements deleted since could not come back ({{count}}).",
+    "pickTwo": "Tick two revisions to see their differences.",
+    "diffLabel": "Differences between revisions {{from}} and {{to}}",
+    "noDifference": "No difference.",
+    "name": "Name:",
+    "categories": "Categories:",
+    "properties": "Changed properties",
+    "valueRemoved": "(removed)",
+    "text": "Text",
+    "added": "Added",
+    "removed": "Removed",
+    "change": {
+      "created": "Creation",
+      "name": "Name",
+      "text": "Text",
+      "categories": "Categories",
+      "properties": "Properties",
+      "other": "Other change"
+    }
+  },
   "kinds": {
     "root": "Root",
     "folder": "Folder",

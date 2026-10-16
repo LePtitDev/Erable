@@ -307,9 +307,10 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
     }
 
     private static void InsertRevision(
-        SqliteConnection connection, SqliteTransaction transaction, Element element, string? markdown, string author, DateTimeOffset at)
+        SqliteConnection connection, SqliteTransaction transaction, Element element, string? markdown, string author, DateTimeOffset at,
+        long? restoredFrom = null)
     {
-        var snapshot = Snapshot(connection, element, markdown);
+        var snapshot = Snapshot(connection, element, markdown) with { RestoredFrom = restoredFrom };
         ProjectRepository.InsertRevision(connection, transaction, element.Id, element.Revision, author, at, snapshot.Serialize());
     }
 

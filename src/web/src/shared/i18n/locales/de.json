@@ -385,6 +385,38 @@
       "advanced": "Erweiterte Suche"
     }
   },
+  "history": {
+    "button": "Verlauf",
+    "title": "Verlauf von „{{name}}“",
+    "back": "Zurück zur Seite",
+    "hint": "Wählen Sie zwei Revisionen zum Vergleichen. Wiederherstellen erzeugt eine neue Revision: Der Verlauf wird nie überschrieben.",
+    "list": "Revisionen",
+    "revision": "Revision {{revision}}",
+    "compare": "Revision {{revision}} vergleichen",
+    "restore": "Revision {{revision}} wiederherstellen",
+    "restoreShort": "Wiederherstellen",
+    "restoration": "Wiederherstellung von Revision {{revision}}",
+    "restored": "Revision {{revision}} wurde erstellt.",
+    "skipped": "Inzwischen gelöschte Elemente konnten nicht zurückkehren ({{count}}).",
+    "pickTwo": "Wählen Sie zwei Revisionen, um die Unterschiede zu sehen.",
+    "diffLabel": "Unterschiede zwischen den Revisionen {{from}} und {{to}}",
+    "noDifference": "Kein Unterschied.",
+    "name": "Name:",
+    "categories": "Kategorien:",
+    "properties": "Geänderte Eigenschaften",
+    "valueRemoved": "(entfernt)",
+    "text": "Text",
+    "added": "Hinzugefügt",
+    "removed": "Entfernt",
+    "change": {
+      "created": "Erstellung",
+      "name": "Name",
+      "text": "Text",
+      "categories": "Kategorien",
+      "properties": "Eigenschaften",
+      "other": "Andere Änderung"
+    }
+  },
   "kinds": {
     "root": "Wurzel",
     "folder": "Ordner",

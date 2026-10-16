@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { PanelRightClose, PanelRightOpen, Pencil, Plus } from "lucide-react";
+import { History, PanelRightClose, PanelRightOpen, Pencil, Plus } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { pageQuery, resolveQuery, type PageView as PageData } from "../../shared/api/pages";
@@ -94,6 +94,17 @@ export function PageView({
           actions={
             <>
               {toggleSidePanel}
+              <Button
+                onClick={() => {
+                  void navigate({
+                    to: "/p/$projectId/e/$elementId/history",
+                    params: { projectId, elementId: element.id },
+                  });
+                }}
+              >
+                <History aria-hidden size={16} />
+                {t("history.button")}
+              </Button>
               <Button
                 variant="primary"
                 onClick={() => {

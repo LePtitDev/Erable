@@ -392,6 +392,38 @@
       "advanced": "Búsqueda avanzada"
     }
   },
+  "history": {
+    "button": "Historial",
+    "title": "Historial de «{{name}}»",
+    "back": "Volver a la página",
+    "hint": "Marque dos revisiones para compararlas. Restaurar crea una nueva revisión: el historial nunca se reescribe.",
+    "list": "Revisiones",
+    "revision": "Revisión {{revision}}",
+    "compare": "Comparar la revisión {{revision}}",
+    "restore": "Restaurar la revisión {{revision}}",
+    "restoreShort": "Restaurar",
+    "restoration": "Restauración de la revisión {{revision}}",
+    "restored": "Se creó la revisión {{revision}}.",
+    "skipped": "Algunos elementos eliminados desde entonces no pudieron volver ({{count}}).",
+    "pickTwo": "Marque dos revisiones para ver sus diferencias.",
+    "diffLabel": "Diferencias entre las revisiones {{from}} y {{to}}",
+    "noDifference": "Sin diferencias.",
+    "name": "Nombre:",
+    "categories": "Categorías:",
+    "properties": "Propiedades modificadas",
+    "valueRemoved": "(quitada)",
+    "text": "Texto",
+    "added": "Añadido",
+    "removed": "Eliminado",
+    "change": {
+      "created": "Creación",
+      "name": "Nombre",
+      "text": "Texto",
+      "categories": "Categorías",
+      "properties": "Propiedades",
+      "other": "Otro cambio"
+    }
+  },
   "kinds": {
     "root": "Raíz",
     "folder": "Carpeta",

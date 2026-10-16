@@ -12,6 +12,9 @@ public sealed record StoredPageContent(ElementId PageId, string Markdown, string
 /// <summary>One row of the derived <c>refs</c> index.</summary>
 public sealed record StoredReference(ElementId SourceId, ElementId TargetId, string? Anchor, bool IsEmbed, int Position);
 
+/// <summary>One saved state of an element: who, when, and the whole state (F13.R1).</summary>
+public sealed record StoredRevision(long Revision, string Author, DateTimeOffset At, RevisionSnapshot Snapshot);
+
 /// <summary>Attachment metadata (the content is the blob named by <see cref="Sha256"/>).</summary>
 public sealed record AttachmentRecord(ElementId Id, ElementId PageId, string FileName, string Mime, long Size, string Sha256);
 
@@ -212,6 +215,16 @@ public sealed class ProjectRepository(ProjectDatabase database)
             "INSERT INTO revisions (element_id, revision, author, at, snapshot, blob_sha256) VALUES (@Id, @Revision, @Author, @At, @Snapshot, @Blob)",
             new { Id = id.ToInt64(), Revision = revision, Author = author, At = StorageFormat.Timestamp(at), Snapshot = snapshot, Blob = blobSha256 },
             transaction);
+    }
+
+    /// <summary>The revisions of an element, oldest first, with their decoded snapshot.</summary>
+    public IReadOnlyList<StoredRevision> LoadRevisions(ElementId id, SqliteConnection? connection = null)
+    {
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        return [.. (connection ?? owned!).Query<(long Revision, string Author, string At, byte[] Snapshot)>(
+                "SELECT revision, author, at, snapshot FROM revisions WHERE element_id = @Id ORDER BY revision",
+                new { Id = id.ToInt64() })
+            .Select(r => new StoredRevision(r.Revision, r.Author, StorageFormat.ParseTimestamp(r.At), RevisionSnapshot.Deserialize(r.Snapshot)))];
     }
 
     public int CountRevisions(ElementId id)

@@ -7,6 +7,8 @@
   <ItemGroup>
     <!-- Pure parsing library (no IO): extraction of references, headings and plain text (docs/markdown-syntax.md). -->
     <PackageReference Include="Markdig" />
+    <!-- Pure diff library (no IO): text of revisions, reused by the three-way merge of M4-05. MIT, no dependencies. -->
+    <PackageReference Include="DiffPlex" />
   </ItemGroup>
 
 </Project>

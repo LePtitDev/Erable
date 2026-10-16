@@ -39,7 +39,7 @@ public static class Problems
 
     private static int StatusOf(string code) => code switch
     {
-        ErrorCodes.ElementNotFound or ErrorCodes.LinkNotFound or ErrorCodes.LinkTypeNotFound or ErrorCodes.TrashEntryNotFound => StatusCodes.Status404NotFound,
+        ErrorCodes.ElementNotFound or ErrorCodes.RevisionNotFound or ErrorCodes.LinkNotFound or ErrorCodes.LinkTypeNotFound or ErrorCodes.TrashEntryNotFound => StatusCodes.Status404NotFound,
         StorageErrors.Locked or StorageErrors.AlreadyExists or StorageErrors.MigrationRequired or "project.duplicateId" => StatusCodes.Status409Conflict,
         StorageErrors.MigrationFailed => StatusCodes.Status500InternalServerError,
         "page.revisionConflict" => StatusCodes.Status409Conflict,

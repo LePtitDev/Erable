@@ -44,6 +44,7 @@ public static class ProjectEndpoints
         project.MapTrashEndpoints();
         project.MapSearchEndpoints();
         project.MapRecentEndpoints();
+        project.MapHistoryEndpoints();
 
         var me = api.MapGroup("/me").WithTags("Me");
         me.MapGet("/", GetMe).WithName("GetMe");

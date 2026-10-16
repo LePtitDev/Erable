@@ -392,6 +392,38 @@
       "advanced": "Recherche avancée"
     }
   },
+  "history": {
+    "button": "Historique",
+    "title": "Historique de « {{name}} »",
+    "back": "Retour à la page",
+    "hint": "Cochez deux révisions pour les comparer. Restaurer crée une nouvelle révision : l’historique n’est jamais réécrit.",
+    "list": "Révisions",
+    "revision": "Révision {{revision}}",
+    "compare": "Comparer la révision {{revision}}",
+    "restore": "Restaurer la révision {{revision}}",
+    "restoreShort": "Restaurer",
+    "restoration": "Restauration de la révision {{revision}}",
+    "restored": "La révision {{revision}} a été créée.",
+    "skipped": "Des éléments supprimés depuis n’ont pas pu revenir ({{count}}).",
+    "pickTwo": "Cochez deux révisions pour voir leurs différences.",
+    "diffLabel": "Différences entre les révisions {{from}} et {{to}}",
+    "noDifference": "Aucune différence.",
+    "name": "Nom :",
+    "categories": "Catégories :",
+    "properties": "Propriétés modifiées",
+    "valueRemoved": "(retirée)",
+    "text": "Texte",
+    "added": "Ajouté",
+    "removed": "Supprimé",
+    "change": {
+      "created": "Création",
+      "name": "Nom",
+      "text": "Texte",
+      "categories": "Catégories",
+      "properties": "Propriétés",
+      "other": "Autre modification"
+    }
+  },
   "kinds": {
     "root": "Racine",
     "folder": "Dossier",

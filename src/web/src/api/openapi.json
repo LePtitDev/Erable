@@ -1920,6 +1920,197 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/elements/{id}/revisions": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "ListRevisions",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RevisionItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/elements/{id}/revisions/diff": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "DiffRevisions",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionDiffView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/elements/{id}/revisions/{revision}": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "GetRevision",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/elements/{id}/revisions/{revision}/restore": {
+      "post": {
+        "tags": [
+          "History"
+        ],
+        "operationId": "RestoreRevision",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionRestoredView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -2896,6 +3087,86 @@
             "format": "int32"
           }
         }
+      },
+      "DiffLineItem": {
+        "required": [
+          "number",
+          "text",
+          "pieces"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "text": {
+            "type": "string"
+          },
+          "pieces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiffPieceItem"
+            }
+          }
+        }
+      },
+      "DiffPieceItem": {
+        "required": [
+          "text",
+          "changed"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "changed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DiffRowItem": {
+        "required": [
+          "kind",
+          "old",
+          "new"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DiffRowKind"
+          },
+          "old": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DiffLineItem"
+              }
+            ]
+          },
+          "new": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DiffLineItem"
+              }
+            ]
+          }
+        }
+      },
+      "DiffRowKind": {
+        "enum": [
+          "unchanged",
+          "added",
+          "removed",
+          "modified"
+        ],
+        "type": "string"
       },
       "EditedItem": {
         "required": [
@@ -3972,6 +4243,185 @@
           }
         }
       },
+      "RevisionDiffView": {
+        "required": [
+          "from",
+          "to",
+          "nameChanged",
+          "fromName",
+          "toName",
+          "text",
+          "categoriesAdded",
+          "categoriesRemoved",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/RevisionItem"
+          },
+          "to": {
+            "$ref": "#/components/schemas/RevisionItem"
+          },
+          "nameChanged": {
+            "type": "boolean"
+          },
+          "fromName": {
+            "type": "string"
+          },
+          "toName": {
+            "type": "string"
+          },
+          "text": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiffRowItem"
+            }
+          },
+          "categoriesAdded": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "categoriesRemoved": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValueChangeItem"
+            }
+          }
+        }
+      },
+      "RevisionItem": {
+        "required": [
+          "revision",
+          "author",
+          "authorName",
+          "at",
+          "changes",
+          "restoredFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "author": {
+            "type": "string"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "restoredFrom": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "RevisionRestoredView": {
+        "required": [
+          "revision",
+          "skippedCategories",
+          "skippedValues"
+        ],
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "skippedCategories": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "skippedValues": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RevisionValue": {
+        "required": [
+          "propertyId",
+          "propertyName",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          }
+        }
+      },
+      "RevisionView": {
+        "required": [
+          "entry",
+          "name",
+          "markdown",
+          "categories",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/RevisionItem"
+          },
+          "name": {
+            "type": "string"
+          },
+          "markdown": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RevisionValue"
+            }
+          }
+        }
+      },
       "RootCounts": {
         "required": [
           "pages",
@@ -4493,6 +4943,43 @@
           }
         }
       },
+      "ValueChangeItem": {
+        "required": [
+          "propertyId",
+          "propertyName",
+          "old",
+          "new"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "old": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "new": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          }
+        }
+      },
       "ValueOrigin": {
         "enum": [
           "own",
@@ -4598,6 +5085,9 @@
     },
     {
       "name": "Recent"
+    },
+    {
+      "name": "History"
     },
     {
       "name": "Me"

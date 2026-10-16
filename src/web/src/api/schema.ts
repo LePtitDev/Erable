@@ -422,6 +422,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/elements/{id}/revisions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListRevisions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/elements/{id}/revisions/{revision}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetRevision"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/elements/{id}/revisions/{revision}/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["RestoreRevision"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/elements/{id}/revisions/diff": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["DiffRevisions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/folders": {
     parameters: {
       query?: never;
@@ -956,6 +1020,23 @@ export interface components {
       /** Format: int32 */
       values: number;
     };
+    DiffLineItem: {
+      /** Format: int32 */
+      number: number;
+      pieces: components["schemas"]["DiffPieceItem"][];
+      text: string;
+    };
+    DiffPieceItem: {
+      changed: boolean;
+      text: string;
+    };
+    DiffRowItem: {
+      kind: components["schemas"]["DiffRowKind"];
+      new: null | components["schemas"]["DiffLineItem"];
+      old: null | components["schemas"]["DiffLineItem"];
+    };
+    /** @enum {string} */
+    DiffRowKind: "unchanged" | "added" | "removed" | "modified";
     EditedItem: {
       /** Format: date-time */
       editedAt: string;
@@ -1209,6 +1290,48 @@ export interface components {
       /** Format: int32 */
       restored: number;
     };
+    RevisionDiffView: {
+      categoriesAdded: components["schemas"]["CategorySummary"][];
+      categoriesRemoved: components["schemas"]["CategorySummary"][];
+      from: components["schemas"]["RevisionItem"];
+      fromName: string;
+      nameChanged: boolean;
+      text: components["schemas"]["DiffRowItem"][];
+      to: components["schemas"]["RevisionItem"];
+      toName: string;
+      values: components["schemas"]["ValueChangeItem"][];
+    };
+    RevisionItem: {
+      /** Format: date-time */
+      at: string;
+      author: string;
+      authorName: string;
+      changes: string[];
+      /** Format: int64 */
+      restoredFrom: null | number;
+      /** Format: int64 */
+      revision: number;
+    };
+    RevisionRestoredView: {
+      /** Format: int64 */
+      revision: number;
+      /** Format: int32 */
+      skippedCategories: number;
+      /** Format: int32 */
+      skippedValues: number;
+    };
+    RevisionValue: {
+      propertyId: components["schemas"]["ElementId"];
+      propertyName: string;
+      value: null | components["schemas"]["JsonNode"];
+    };
+    RevisionView: {
+      categories: components["schemas"]["CategorySummary"][];
+      entry: components["schemas"]["RevisionItem"];
+      markdown: null | string;
+      name: string;
+      values: components["schemas"]["RevisionValue"][];
+    };
     RootCounts: {
       /** Format: int32 */
       categories: number;
@@ -1332,6 +1455,12 @@ export interface components {
         [key: string]: string;
       };
       theme: components["schemas"]["ThemePreference"];
+    };
+    ValueChangeItem: {
+      new: null | components["schemas"]["JsonNode"];
+      old: null | components["schemas"]["JsonNode"];
+      propertyId: components["schemas"]["ElementId"];
+      propertyName: string;
     };
     /** @enum {string} */
     ValueOrigin: "own" | "inherited" | "default" | "conflict";
@@ -2139,6 +2268,103 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["DeleteImpactView"];
+        };
+      };
+    };
+  };
+  ListRevisions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RevisionItem"][];
+        };
+      };
+    };
+  };
+  GetRevision: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+        revision: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RevisionView"];
+        };
+      };
+    };
+  };
+  RestoreRevision: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+        revision: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RevisionRestoredView"];
+        };
+      };
+    };
+  };
+  DiffRevisions: {
+    parameters: {
+      query: {
+        from: number;
+        to: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RevisionDiffView"];
         };
       };
     };

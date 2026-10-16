@@ -10,6 +10,7 @@ import { HomeScreen } from "../features/home/HomeScreen";
 import { ProjectShell } from "../features/project/ProjectShell";
 import { ProjectIndex } from "../features/project/ProjectIndex";
 import { ElementRoute } from "../features/project/ElementRoute";
+import { HistoryView } from "../features/history/HistoryView";
 import { SearchView } from "../features/search/SearchView";
 import {
   parseSearchParams,
@@ -75,6 +76,22 @@ export const trashRoute = createRoute({
   component: TrashView,
 });
 
+/** The history of an element (F13): `?from=&to=` are the two revisions compared. */
+export const historyRoute = createRoute({
+  getParentRoute: () => projectRoute,
+  path: "/e/$elementId/history",
+  params: {
+    parse: (raw) => ({ elementId: idParam(raw.elementId) }),
+    stringify: (params) => ({ elementId: params.elementId ?? "" }),
+  },
+  validateSearch: (search: Record<string, unknown>): { from?: number; to?: number } => {
+    const from = Number(search["from"]);
+    const to = Number(search["to"]);
+    return Number.isInteger(from) && Number.isInteger(to) && from > 0 && to > 0 ? { from, to } : {};
+  },
+  component: HistoryView,
+});
+
 /**
  * The search screen (F10): its whole state is in the URL, so that a search is a link (F10.R4). Whatever the URL
  * says is read, then written back in its short form: a link with an unknown parameter opens a valid search.
@@ -100,7 +117,13 @@ const devRoutes = import.meta.env.DEV
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  projectRoute.addChildren([projectIndexRoute, trashRoute, searchRoute, elementRoute]),
+  projectRoute.addChildren([
+    projectIndexRoute,
+    trashRoute,
+    searchRoute,
+    historyRoute,
+    elementRoute,
+  ]),
   ...devRoutes,
 ]);
 

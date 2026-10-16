@@ -103,4 +103,10 @@ public static class ErrorCodes
 
     /// <summary>The cursor of a search page is not one this server issued.</summary>
     public const string SearchCursorInvalid = "search.cursor.invalid";
+
+    /// <summary>The element has no such revision.</summary>
+    public const string RevisionNotFound = "revision.notFound";
+
+    /// <summary>Only the revisions of a live page can be restored.</summary>
+    public const string RevisionNotRestorable = "revision.notRestorable";
 }
