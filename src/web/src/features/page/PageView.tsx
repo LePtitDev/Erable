@@ -14,6 +14,12 @@ import { Button } from "../../shared/ui/Button";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { useTreeMutations } from "../explorer/useTreeMutations";
 import { ElementHeader } from "../project/ElementHeader";
+import {
+  CategoryChips,
+  OutOfRulesBadge,
+  PagePropertiesView,
+} from "../properties/PagePropertiesView";
+import { hasViolations, toPageProperty } from "../properties/pageProperties";
 import { defaultLayout, type Layout } from "../project/layout";
 import { AttachmentsPanel } from "./AttachmentsPanel";
 import { anchorsOf, definitionsOf } from "./markdown/markdownSupport";
@@ -41,6 +47,10 @@ export function PageView({
     performance.mark("erable:page-open");
   }, [element.id]);
 
+  const properties = useMemo(
+    () => (page.data === undefined ? [] : page.data.properties.map(toPageProperty)),
+    [page.data],
+  );
   const sidePanelOpen = layout.value.sidePanelOpen;
   const toggleSidePanel = (
     <button
@@ -67,6 +77,14 @@ export function PageView({
         <ElementHeader
           projectId={projectId}
           element={element}
+          chips={
+            page.isSuccess && (
+              <>
+                <CategoryChips projectId={projectId} categories={page.data.categories} />
+                {hasViolations(properties) && <OutOfRulesBadge />}
+              </>
+            )
+          }
           title={
             <h1 id="page-title" className={styles["title"]}>
               {element.name}
@@ -103,6 +121,7 @@ export function PageView({
       </article>
       {sidePanelOpen && page.isSuccess && (
         <aside id="page-side-panel" className={styles["side"]} aria-label={t("page.sidePanel")}>
+          <PagePropertiesView projectId={projectId} properties={properties} />
           <Toc markdown={page.data.markdown} hasSubPages={page.data.subPages.length > 0} />
           <AttachmentsPanel
             projectId={projectId}

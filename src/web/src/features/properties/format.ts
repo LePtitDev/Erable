@@ -7,6 +7,7 @@ import type { ElementId } from "../../shared/ids/elementId";
 import type { RuleViolation, ValidationRule } from "../../shared/properties/rules";
 import type { PropertyValue, ScalarValue } from "../../shared/properties/types";
 import type { Definition } from "./definitions";
+import type { Candidate } from "./pageProperties";
 
 /** Name of an element by ID, from the explorer tree already in cache (refs, `in_category`). */
 export function useElementNames(projectId: ElementId): (id: ElementId) => string {
@@ -134,4 +135,16 @@ export function rawRule(rule: ValidationRule): string {
     default:
       return `${rule.op} ${String(rule.value)}`;
   }
+}
+
+/** « En conflit : PNJ (Non) / Montagnard (Oui) » (F07.R3). */
+export function useConflictText(projectId: ElementId) {
+  const { t } = useTranslation();
+  const format = usePropertyFormat(projectId);
+  return (definition: Definition, candidates: readonly Candidate[]) =>
+    t("page.conflict", {
+      candidates: candidates
+        .map((c) => `${c.categoryName} (${format.value(definition, c.value)})`)
+        .join(" / "),
+    });
 }

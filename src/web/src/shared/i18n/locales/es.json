@@ -232,7 +232,10 @@
       "pages_many": "{{count}} páginas",
       "categories_many": "{{count}} categorías",
       "properties_many": "{{count}} propiedades",
-      "links_many": "{{count}} tipos de enlace"
+      "links_many": "{{count}} tipos de enlace",
+      "errors_one": "{{count}} error de validación",
+      "errors_other": "{{count}} errores de validación",
+      "errors_many": "{{count}} errores de validación"
     },
     "mode": {
       "read": "Lectura",
@@ -309,7 +312,35 @@
     "subPages": "Subpáginas",
     "newSubPage": "Nueva subpágina",
     "newSubPageName": "Nueva página",
-    "sidePanel": "Panel de la página"
+    "sidePanel": "Panel de la página",
+    "propertiesTitle": "Propiedades",
+    "valueCount_one": "{{count}} valor",
+    "valueCount_other": "{{count}} valores",
+    "valueCount_many": "{{count}} valores",
+    "noProperties": "Ninguna propiedad.",
+    "via": "vía {{categories}}",
+    "outOfRules": "fuera de las reglas",
+    "outOfRulesHint": "Al menos un valor incumple las reglas de su propiedad.",
+    "conflict": "En conflicto: {{candidates}}",
+    "resolveConflict": "Resolver el conflicto de {{name}}",
+    "inheritedFrom": "Valor heredado de la categoría {{categories}}",
+    "fromDefault": "Valor por defecto de la propiedad",
+    "restoreInherited": "Restablecer el valor heredado",
+    "removeValue": "Quitar el valor de {{name}}",
+    "addProperty": "Añadir una propiedad",
+    "categoriesLabel": "Categorías de la página",
+    "categoriesTitle": "Categorías",
+    "noCategories": "Ninguna categoría.",
+    "addCategory": "Añadir una categoría",
+    "addCategoryButton": "Añadir la categoría",
+    "removeCategory": "Quitar la categoría {{name}}",
+    "chooseCategory": "Elegir una categoría",
+    "tabs": {
+      "label": "Secciones del panel",
+      "properties": "Propiedades",
+      "categories": "Categorías",
+      "files": "Archivos"
+    }
   },
   "reference": {
     "broken": {
@@ -542,7 +573,8 @@
       "title": "Cambio de tipo imposible",
       "explain": "Estos valores existentes no se pueden convertir al nuevo tipo. Corríjalos o mantenga el tipo actual.",
       "pages": "Páginas cuyo valor no es convertible"
-    }
+    },
+    "valueOf": "Valor de {{name}}"
   },
   "category": {
     "description": "Descripción",

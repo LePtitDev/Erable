@@ -204,6 +204,11 @@
   font-family: var(--font-mono);
 }
 
+.errors {
+  color: var(--color-danger);
+  font-weight: var(--weight-semibold);
+}
+
 .mode {
   margin-left: auto;
 }

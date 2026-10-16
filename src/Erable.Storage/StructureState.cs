@@ -30,7 +30,8 @@ public sealed record ResolvedProperty(
     PropertyDefinition Definition,
     PropertyValue? OwnValue,
     Resolution<PropertyValue> Resolution,
-    IReadOnlyList<RuleViolation> Violations)
+    IReadOnlyList<RuleViolation> Violations,
+    Resolution<PropertyValue>? Fallback = null)
 {
     public ValueOrigin Origin => Resolution switch
     {
@@ -106,6 +107,27 @@ public sealed class StructureState : IRuleContext
 
     public PropertyValue? ValueOf(ElementId owner, ElementId property) => _values.GetValueOrDefault((owner, property));
 
+    /// <summary>
+    /// Replaces the categories and the own values of a page in this snapshot, without writing anything: the resolution
+    /// that follows shows what saving them would give (live preview of the page editor, M2-06). Unknown categories are
+    /// ignored.
+    /// </summary>
+    public void Overlay(ElementId pageId, IReadOnlyList<ElementId> categories, IReadOnlyList<(ElementId Property, PropertyValue Value)> values)
+    {
+        ArgumentNullException.ThrowIfNull(categories);
+        ArgumentNullException.ThrowIfNull(values);
+        _pageCategories[pageId] = [.. categories.Where(Categories.ContainsKey).Distinct()];
+        foreach (var key in _values.Keys.Where(k => k.Owner == pageId).ToList())
+        {
+            _values.Remove(key);
+        }
+
+        foreach (var (property, value) in values)
+        {
+            _values[(pageId, property)] = value;
+        }
+    }
+
     /// <summary>Own values of an owner (page or category), by property, for live definitions.</summary>
     public IReadOnlyList<(ElementId Property, PropertyValue Value)> ValuesOf(ElementId owner) =>
         [.. _values.Where(v => v.Key.Owner == owner).Select(v => (v.Key.Property, v.Value)).OrderBy(v => v.Property.Value)];
@@ -126,10 +148,26 @@ public sealed class StructureState : IRuleContext
         {
             var resolution = ValueResolver.ForPage(Graph, pageId, categories, Lookup(definition.Id), definition.Default);
             var violations = resolution.EffectiveValue is { } value ? definition.Validate(value, this) : [];
-            result.Add(new ResolvedProperty(pageId, definition, ValueOf(pageId, definition.Id), resolution, violations));
+            var own = ValueOf(pageId, definition.Id);
+            result.Add(new ResolvedProperty(pageId, definition, own, resolution, violations, own is null ? null : FallbackOf(pageId, categories, definition)));
         }
 
         return result;
+    }
+
+    /// <summary>What the page would have without its own value (« Rétablir la valeur héritée »); null when nothing.</summary>
+    private Resolution<PropertyValue>? FallbackOf(ElementId pageId, IReadOnlyList<ElementId> categories, PropertyDefinition definition)
+    {
+        var lookup = Lookup(definition.Id);
+        var without = ValueResolver.ForPage(
+            Graph, pageId, categories,
+            (ElementId owner, [MaybeNullWhen(false)] out PropertyValue value) =>
+            {
+                value = null;
+                return owner != pageId && lookup(owner, out value);
+            },
+            definition.Default);
+        return without is Resolution<PropertyValue>.Unset ? null : without;
     }
 
     /// <summary>Value of a property for a category: own, inherited from an ancestor, or the definition default.</summary>

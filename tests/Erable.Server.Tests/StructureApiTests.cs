@@ -439,4 +439,96 @@ public sealed class StructureApiTests
         hostile.Value.ShouldBeNull();
         hostile.Candidates.Select(c => (c.CategoryName, c.Value.GetValue<bool>())).ShouldBe([("PNJ", false), ("Montagnard", true)]);
     }
+    // ─── Preview (page editor) ──────────────────────────────────────────────
+
+    private static Task<HttpResponseMessage> PreviewAsync(TestBackend backend, string root, ElementId page, PagePreviewRequest body) =>
+        backend.Client.PostAsJsonAsync($"{root}/pages/{page}/properties/preview", body, ApiJson.Options, Ct);
+
+    [Fact]
+    public async Task PreviewPageProperties_AddedCategory_ShowsWhatItWouldProvideWithoutSavingAnything()
+    {
+        var (backend, root) = await StartAsync();
+        await using var _ = backend;
+        using var created = await backend.Client.PostJsonAsync($"{root}/categories", new CreateCategoryRequest(Roots.Categories.Id, "Montagnard"));
+        var montagnard = (await created.ReadAsync<CategoryView>()).Element.Id;
+        (await PutAsync(backend, $"{root}/categories/{montagnard}/values/{Hostile}", new CategoryValueRequest(JsonValue.Create(true)))).Dispose();
+
+        using var response = await PreviewAsync(backend, root, Chroniques.Ilsa, new PagePreviewRequest([Chroniques.Pnj, Marchand, montagnard], []));
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var preview = await response.ReadAsync<PageProperties>();
+        preview.Categories.Select(c => c.Name).ShouldBe(["PNJ", "Marchand", "Montagnard"]);
+        preview.Properties.Single(p => p.Property.Id == Hostile).Origin.ShouldBe(ValueOrigin.Conflict);
+        var saved = await GetAsync<PageProperties>(backend, $"{root}/pages/{Chroniques.Ilsa}/properties");
+        saved.Categories.Select(c => c.Name).ShouldBe(["PNJ", "Marchand"]);
+    }
+
+    [Fact]
+    public async Task PreviewPageProperties_OwnValue_ReplacesTheSavedOnesAndIsValidated()
+    {
+        var (backend, root) = await StartAsync();
+        await using var _ = backend;
+
+        using var response = await PreviewAsync(backend, root, Chroniques.Ilsa, new PagePreviewRequest(
+            [Chroniques.Pnj], [new PagePropertyValue(Chroniques.Niveau, JsonValue.Create(55))]));
+
+        var niveau = (await response.ReadAsync<PageProperties>()).Properties.Single(p => p.Property.Id == Chroniques.Niveau);
+        niveau.Value!.GetValue<int>().ShouldBe(55);
+        niveau.Violations.ShouldBeEmpty();
+        var saved = (await GetAsync<PageProperties>(backend, $"{root}/pages/{Chroniques.Ilsa}/properties")).Properties.Single(p => p.Property.Id == Chroniques.Niveau);
+        saved.Value!.GetValue<int>().ShouldBe(72);
+    }
+
+    [Fact]
+    public async Task PreviewPageProperties_MalformedValue_IsIgnored()
+    {
+        var (backend, root) = await StartAsync();
+        await using var _ = backend;
+
+        using var response = await PreviewAsync(backend, root, Chroniques.Ilsa, new PagePreviewRequest(
+            [Chroniques.Pnj], [new PagePropertyValue(Chroniques.IdOf("Âge"), JsonValue.Create("vieux"))]));
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await response.ReadAsync<PageProperties>()).Properties.ShouldNotContain(p => p.Property.Id == Chroniques.IdOf("Âge"));
+    }
+
+    [Fact]
+    public async Task PreviewPageProperties_Unknown_Returns404()
+    {
+        var (backend, root) = await StartAsync();
+        await using var _ = backend;
+
+        using var response = await PreviewAsync(backend, root, ElementId.Parse("DEADBEEF00000001"), new PagePreviewRequest([], []));
+
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+    [Fact]
+    public async Task GetPageProperties_OwnValueOverridingACategory_ExposesTheFallback()
+    {
+        // E2E-07-05: « Rétablir la valeur héritée » needs to know what the page would have without its value.
+        var (backend, root) = await StartAsync();
+        await using var _ = backend;
+        (await SaveAsync(backend, root, Chroniques.Orsen, new SavePageContentRequest(
+            "", null, [new PagePropertyValue(Hostile, JsonValue.Create(true))]))).Dispose();
+
+        var hostile = (await GetAsync<PageProperties>(backend, $"{root}/pages/{Chroniques.Orsen}/properties")).Properties.Single(p => p.Property.Id == Hostile);
+
+        hostile.Origin.ShouldBe(ValueOrigin.Own);
+        hostile.Fallback.ShouldNotBeNull();
+        hostile.Fallback.Origin.ShouldBe(ValueOrigin.Inherited);
+        hostile.Fallback.Value!.GetValue<bool>().ShouldBeFalse();
+        hostile.Fallback.Sources.Select(c => c.Name).ShouldBe(["PNJ"]);
+    }
+
+    [Fact]
+    public async Task GetPageProperties_OwnValueOnly_HasNoFallback()
+    {
+        var (backend, root) = await StartAsync();
+        await using var _ = backend;
+
+        var role = (await GetAsync<PageProperties>(backend, $"{root}/pages/{Chroniques.Orsen}/properties")).Properties.Single(p => p.Property.Id == Role);
+
+        role.Origin.ShouldBe(ValueOrigin.Own);
+        role.Fallback.ShouldBeNull();
+    }
 }

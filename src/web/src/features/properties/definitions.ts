@@ -50,3 +50,28 @@ export function readValue(definition: Definition, json: unknown): PropertyValue 
 export function typeName(definition: Definition): string {
   return definition.type.list ? `list<${definition.type.scalar}>` : definition.type.scalar;
 }
+
+/**
+ * A first value for a property just given to a page or a category: its default, else the neutral value of its type
+ * (a reference has none: the user must pick a page).
+ */
+export function initialValue(definition: Definition): PropertyValue | undefined {
+  if (definition.default !== undefined) return definition.default;
+  if (definition.type.list) return [];
+  switch (definition.type.scalar) {
+    case "bool":
+      return false;
+    case "int":
+    case "float":
+      return 0;
+    case "string":
+    case "text":
+      return "";
+    case "enum":
+      return definition.options[0]?.key;
+    case "date":
+      return new Date().toISOString().slice(0, 10);
+    case "ref":
+      return undefined;
+  }
+}

@@ -1,4 +1,5 @@
 import { HttpResponse } from "msw";
+import type { PageView } from "../shared/api/pages";
 import type { ElementDetails, ElementKind, TreeNodeItem } from "../shared/api/tree";
 import { requireElementId, type ElementId } from "../shared/ids/elementId";
 import { roots } from "../shared/ids/roots";
@@ -102,6 +103,8 @@ export function mockProject(
     uiState?: Record<string, unknown>;
     attachments?: MockAttachment[];
     deleted?: ElementId[];
+    /** Categories and resolved properties returned with every page view (M2-06). */
+    structure?: { categories: PageView["categories"]; properties: PageView["properties"] };
   } = {},
 ) {
   const nodes = options.nodes ?? chroniquesNodes();
@@ -211,8 +214,8 @@ export function mockProject(
         attachments: (options.attachments ?? [])
           .filter((a) => a.pageId === node.id)
           .map(attachmentItem),
-        categories: [],
-        properties: [],
+        categories: options.structure?.categories ?? [],
+        properties: options.structure?.properties ?? [],
       });
     }),
     http.get("/api/v1/projects/{projectId}/resolve", ({ query, response }) => {

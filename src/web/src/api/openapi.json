@@ -757,6 +757,54 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/pages/{id}/properties/preview": {
+      "post": {
+        "tags": [
+          "Pages"
+        ],
+        "operationId": "PreviewPageProperties",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagePreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageProperties"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/projects/{projectId}/categories": {
       "get": {
         "tags": [
@@ -2211,6 +2259,42 @@
           }
         }
       },
+      "FallbackItem": {
+        "required": [
+          "value",
+          "origin",
+          "sources",
+          "candidates"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonNode"
+              }
+            ]
+          },
+          "origin": {
+            "$ref": "#/components/schemas/ValueOrigin"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConflictCandidateItem"
+            }
+          }
+        }
+      },
       "FolderInspection": {
         "required": [
           "status",
@@ -2328,6 +2412,24 @@
           }
         }
       },
+      "PagePreviewRequest": {
+        "required": [
+          "categories",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PagePropertyValue"
+            }
+          }
+        }
+      },
       "PageProperties": {
         "required": [
           "categories",
@@ -2357,7 +2459,8 @@
           "origin",
           "sources",
           "candidates",
-          "violations"
+          "violations",
+          "fallback"
         ],
         "type": "object",
         "properties": {
@@ -2404,6 +2507,16 @@
             "items": {
               "$ref": "#/components/schemas/ViolationItem"
             }
+          },
+          "fallback": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FallbackItem"
+              }
+            ]
           }
         }
       },

@@ -29,9 +29,14 @@ public sealed record ViolationItem(JsonObject Rule, int? Index);
 /// <summary>A category providing a value in a conflict (« PNJ (Non) / Montagnard (Oui) »).</summary>
 public sealed record ConflictCandidateItem(ElementId CategoryId, string CategoryName, JsonNode Value);
 
+/// <summary>What a property would be without the value the page defines (« Rétablir la valeur héritée »).</summary>
+public sealed record FallbackItem(
+    JsonNode? Value, ValueOrigin Origin, IReadOnlyList<CategorySummary> Sources, IReadOnlyList<ConflictCandidateItem> Candidates);
+
 /// <summary>
 /// A property of a page after inheritance (F04.R4): <c>value</c> is the effective value (null in a conflict),
-/// <c>ownValue</c> the one the page defines, <c>sources</c> the categories it comes from (« via PNJ »).
+/// <c>ownValue</c> the one the page defines, <c>sources</c> the categories it comes from (« via PNJ »),
+/// <c>fallback</c> what it would be without <c>ownValue</c> (null when the page is the only source).
 /// </summary>
 public sealed record PagePropertyItem(
     PropertyDefinitionItem Property,
@@ -40,13 +45,20 @@ public sealed record PagePropertyItem(
     ValueOrigin Origin,
     IReadOnlyList<CategorySummary> Sources,
     IReadOnlyList<ConflictCandidateItem> Candidates,
-    IReadOnlyList<ViolationItem> Violations);
+    IReadOnlyList<ViolationItem> Violations,
+    FallbackItem? Fallback);
 
 /// <summary>Categories and resolved properties of a page.</summary>
 public sealed record PageProperties(IReadOnlyList<CategorySummary> Categories, IReadOnlyList<PagePropertyItem> Properties);
 
 /// <summary>A value the page defines itself, sent with its content.</summary>
 public sealed record PagePropertyValue(ElementId PropertyId, JsonNode Value);
+
+/// <summary>
+/// What the page editor would save: its categories and the values it defines. The answer is the resolution that
+/// saving would give (nothing is written); values that do not parse yet are ignored.
+/// </summary>
+public sealed record PagePreviewRequest(IReadOnlyList<ElementId> Categories, IReadOnlyList<PagePropertyValue> Properties);
 
 public sealed record CreateCategoryRequest(ElementId ParentId, string Name, int? Index = null, ElementId? ParentCategoryId = null, string? Description = null);
 

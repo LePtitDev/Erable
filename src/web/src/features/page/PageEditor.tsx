@@ -14,7 +14,13 @@ import { useTranslation } from "react-i18next";
 import { api, unwrap } from "../../shared/api/client";
 import { errorCode, errorMessage } from "../../shared/api/errors";
 import { queryKeys } from "../../shared/api/keys";
-import { pageContentQuery, resolveQuery, savePageContent } from "../../shared/api/pages";
+import {
+  pageContentQuery,
+  pageQuery,
+  resolveQuery,
+  savePageContent,
+  type PageView as PageData,
+} from "../../shared/api/pages";
 import type { ElementDetails } from "../../shared/api/tree";
 import { ClockContext, useFormatters } from "../../shared/i18n/format";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
@@ -29,7 +35,10 @@ import { useInsertPalette } from "../palette/useInsertPalette";
 import { approveClose, useWindowStore } from "../../shared/native/native";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
+import { CategoryChips } from "../properties/PagePropertiesView";
 import styles from "./PageEditor.module.css";
+import { PageStructurePanel } from "./PageStructurePanel";
+import { structureOf, usePageStructure } from "./usePageStructure";
 import { useEditorUploads } from "./useEditorUploads";
 
 interface PageEditorProps {
@@ -43,9 +52,13 @@ interface PageEditorProps {
 export function PageEditor({ projectId, element, focusTitle }: PageEditorProps) {
   const { t } = useTranslation();
   const content = useQuery(pageContentQuery(projectId, element.id));
+  // The categories and values come with the page view: wait for a fresh copy, the editor keeps its own draft after.
+  const page = useQuery({ ...pageQuery(projectId, element.id), refetchOnMount: "always" });
   const now = useContext(ClockContext);
   const draft = usePageDraft(projectId, element.id, now);
-  if (!content.isSuccess || !draft.loaded) return <p aria-busy="true">{t("common.loading")}</p>;
+  if (!content.isSuccess || !page.isFetchedAfterMount || !page.isSuccess || !draft.loaded) {
+    return <p aria-busy="true">{t("common.loading")}</p>;
+  }
   return (
     <EditorScreen
       key={element.id}
@@ -55,6 +68,7 @@ export function PageEditor({ projectId, element, focusTitle }: PageEditorProps) 
       saved={content.data.markdown}
       revision={content.data.revision}
       draft={draft}
+      page={page.data}
     />
   );
 }
@@ -70,10 +84,12 @@ function EditorScreen({
   saved: initialSaved,
   revision: initialRevision,
   draft,
+  page,
 }: PageEditorProps & {
   readonly saved: string;
   readonly revision: number;
   readonly draft: ReturnType<typeof usePageDraft>;
+  readonly page: PageData;
 }) {
   const { t } = useTranslation();
   const format = useFormatters();
@@ -107,7 +123,20 @@ function EditorScreen({
   const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
   const leaving = useRef(false);
 
-  const dirty = doc !== saved.markdown || title.trim() !== saved.name;
+  const structure = usePageStructure(projectId, element.id, page);
+  const dirty = doc !== saved.markdown || title.trim() !== saved.name || structure.dirty;
+
+  // F05.R6: the status bar counts the validation errors of the values, never blocking the save.
+  const setValidationErrors = useShellStore((s) => s.setValidationErrors);
+  useEffect(() => {
+    setValidationErrors(structure.errors);
+  }, [structure.errors, setValidationErrors]);
+  useEffect(
+    () => () => {
+      setValidationErrors(0);
+    },
+    [setValidationErrors],
+  );
 
   // F16.R3: the desktop shell asks before closing the window while there are unsaved changes.
   const setUnsavedChanges = useWindowStore((s) => s.setUnsavedChanges);
@@ -185,8 +214,17 @@ function EditorScreen({
     setError(null);
     try {
       let revision = saved.revision;
-      if (doc !== saved.markdown) {
-        revision = (await savePageContent(projectId, element.id, doc, revision)).revision;
+      if (doc !== saved.markdown || structure.dirty) {
+        revision = (
+          await savePageContent(
+            projectId,
+            element.id,
+            doc,
+            revision,
+            structure.dirty ? structureOf(structure.draft) : undefined,
+          )
+        ).revision;
+        structure.markSaved();
       }
       const name = title.trim();
       if (name !== "" && name !== saved.name) {
@@ -212,7 +250,19 @@ function EditorScreen({
     } finally {
       setSaving(false);
     }
-  }, [saving, uploads.pending, saved, doc, title, projectId, element.id, draft, client, t]);
+  }, [
+    saving,
+    uploads.pending,
+    saved,
+    doc,
+    title,
+    structure,
+    projectId,
+    element.id,
+    draft,
+    client,
+    t,
+  ]);
 
   const saveAndClose = useCallback(async () => {
     if (await save()) finish();
@@ -278,6 +328,7 @@ function EditorScreen({
             }}
           />
           <span className={styles["chip"]}>{t("shell.mode.edit")}</span>
+          <CategoryChips projectId={projectId} categories={structure.categories} />
           <span className={styles["draftState"]} role="status">
             {draftSavedAt !== null && dirty
               ? t("editor.draftSaved", { when: format.relative(draftSavedAt) })
@@ -409,24 +460,34 @@ function EditorScreen({
         </span>
       </div>
 
-      <section className={styles["surface"]} aria-label={t("editor.content")}>
-        <MarkdownEditor
-          ref={editor}
-          initial={initialSaved}
-          label={t("editor.content")}
-          placeholderText={t("editor.placeholder")}
-          targets={targets}
-          rawIds={rawIds}
-          onChange={onChange}
-          onCursor={(line, column) => {
-            setCursor({ line, column });
-          }}
-          onSave={() => void saveAndClose()}
-          onUpdate={palette.onUpdate}
-          extensions={extensions}
+      <div className={styles["body"]}>
+        <section className={styles["surface"]} aria-label={t("editor.content")}>
+          <MarkdownEditor
+            ref={editor}
+            initial={initialSaved}
+            label={t("editor.content")}
+            placeholderText={t("editor.placeholder")}
+            targets={targets}
+            rawIds={rawIds}
+            onChange={onChange}
+            onCursor={(line, column) => {
+              setCursor({ line, column });
+            }}
+            onSave={() => void saveAndClose()}
+            onUpdate={palette.onUpdate}
+            extensions={extensions}
+          />
+          {palette.popup !== null && <PalettePopup {...palette.popup} />}
+        </section>
+        <PageStructurePanel
+          projectId={projectId}
+          pageId={element.id}
+          properties={structure.properties}
+          draft={structure.draft}
+          onDraft={structure.setDraft}
+          attachments={page.attachments}
         />
-        {palette.popup !== null && <PalettePopup {...palette.popup} />}
-      </section>
+      </div>
 
       <Dialog
         open={confirmCancel}

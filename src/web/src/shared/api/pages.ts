@@ -62,17 +62,60 @@ export function pageContentQuery(projectId: ElementId, id: ElementId) {
   });
 }
 
-/** Saves the Markdown of a page if it is still at `revision` (optimistic concurrency; 409 otherwise). */
+/** The categories of a page and every value it defines (full replacement), saved with its content (M2-06). */
+export interface PageStructure {
+  readonly categories: readonly ElementId[];
+  readonly properties: readonly { readonly propertyId: ElementId; readonly value: unknown }[];
+}
+
+/**
+ * Saves the Markdown of a page if it is still at `revision` (optimistic concurrency; 409 otherwise). With
+ * `structure`, its categories and own values are replaced in the same revision.
+ */
 export function savePageContent(
   projectId: ElementId,
   id: ElementId,
   markdown: string,
   revision: number,
+  structure?: PageStructure,
 ) {
   return unwrap(
     api.PUT("/api/v1/projects/{projectId}/pages/{id}/content", {
       params: { path: { projectId, id }, header: { "If-Match": `"${String(revision)}"` } },
-      body: { markdown },
+      body: {
+        markdown,
+        ...(structure === undefined
+          ? {}
+          : {
+              categories: [...structure.categories],
+              properties: structure.properties.map((p) => ({
+                propertyId: p.propertyId,
+                value: p.value as never,
+              })),
+            }),
+      },
     }),
   );
+}
+
+/** What saving the structure would give, without saving it: the live panel of the editor (M2-06). */
+export function pagePreviewQuery(projectId: ElementId, id: ElementId, structure: PageStructure) {
+  return queryOptions({
+    queryKey: [...queryKeys.page(projectId, id), "preview", JSON.stringify(structure)],
+    queryFn: ({ signal }) =>
+      unwrap(
+        api.POST("/api/v1/projects/{projectId}/pages/{id}/properties/preview", {
+          params: { path: { projectId, id } },
+          body: {
+            categories: [...structure.categories],
+            properties: structure.properties.map((p) => ({
+              propertyId: p.propertyId,
+              value: p.value as never,
+            })),
+          },
+          signal,
+        }),
+      ),
+    staleTime: 0,
+  });
 }

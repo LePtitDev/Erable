@@ -34,6 +34,7 @@ public static class StructureEndpoints
         properties.MapPut("/{id}", UpdateProperty).WithName("UpdateProperty");
 
         project.MapGet("/pages/{id}/properties", GetPageProperties).WithName("GetPageProperties").WithTags("Pages");
+        project.MapPost("/pages/{id}/properties/preview", PreviewPageProperties).WithName("PreviewPageProperties").WithTags("Pages");
         return project;
     }
 
@@ -259,10 +260,41 @@ public static class StructureEndpoints
         return PagePropertiesOf(service, id) is { } properties ? TypedResults.Ok(properties) : Problems.ElementNotFound(id);
     }
 
-    /// <summary>Categories and resolved properties of a live page; null otherwise.</summary>
-    internal static PageProperties? PagePropertiesOf(ProjectService service, ElementId pageId)
+    /// <summary>Resolution of a page as the editor would save it, for the live panel (nothing is written).</summary>
+    private static Results<Ok<PageProperties>, ProblemHttpResult> PreviewPageProperties(
+        ElementId projectId, ElementId id, PagePreviewRequest request, ProjectWorkspace workspace)
     {
-        var state = service.LoadStructure([pageId]);
+        if (workspace.Find(projectId) is not { } service)
+        {
+            return Problems.ProjectNotOpen(projectId);
+        }
+
+        var state = service.LoadStructure([id]);
+        if (state.Tree.Find(id) is not { Kind: ElementKind.Page })
+        {
+            return Problems.ElementNotFound(id);
+        }
+
+        var values = new List<(ElementId, PropertyValue)>();
+        foreach (var item in request.Properties.DistinctBy(p => p.PropertyId))
+        {
+            if (state.Definitions.TryGetValue(item.PropertyId, out var definition)
+                && PropertyValues.FromJson(JsonSerializer.SerializeToElement(item.Value), definition.Type, definition.Options) is { IsSuccess: true } parsed)
+            {
+                values.Add((item.PropertyId, parsed.Value));
+            }
+        }
+
+        state.Overlay(id, request.Categories, values);
+        return TypedResults.Ok(PagePropertiesOf(state, id)!);
+    }
+
+    /// <summary>Categories and resolved properties of a live page; null otherwise.</summary>
+    internal static PageProperties? PagePropertiesOf(ProjectService service, ElementId pageId) =>
+        PagePropertiesOf(service.LoadStructure([pageId]), pageId);
+
+    private static PageProperties? PagePropertiesOf(StructureState state, ElementId pageId)
+    {
         if (state.Tree.Find(pageId) is not { Kind: ElementKind.Page })
         {
             return null;
@@ -275,12 +307,29 @@ public static class StructureEndpoints
                 Json(r.OwnValue),
                 Json(r.Resolution.EffectiveValue),
                 r.Origin,
-                r.Resolution is Resolution<PropertyValue>.Inherited inherited ? [.. inherited.Sources.Select(s => Summary(state, s))] : [],
-                r.Resolution is Resolution<PropertyValue>.Conflict conflict
-                    ? [.. conflict.Candidates.Select(c => new ConflictCandidateItem(c.CategoryId, NameOf(state, c.CategoryId), PropertyValues.ToJson(c.Value)))]
-                    : [],
-                Violations(r.Violations)))]);
+                SourcesOf(state, r.Resolution),
+                CandidatesOf(state, r.Resolution),
+                Violations(r.Violations),
+                r.Fallback is { } fallback
+                    ? new FallbackItem(Json(fallback.EffectiveValue), OriginOf(fallback), SourcesOf(state, fallback), CandidatesOf(state, fallback))
+                    : null))]);
     }
+
+    private static ValueOrigin OriginOf(Resolution<PropertyValue> resolution) => resolution switch
+    {
+        Resolution<PropertyValue>.Own => ValueOrigin.Own,
+        Resolution<PropertyValue>.Inherited => ValueOrigin.Inherited,
+        Resolution<PropertyValue>.FromDefinition => ValueOrigin.Default,
+        _ => ValueOrigin.Conflict,
+    };
+
+    private static CategorySummary[] SourcesOf(StructureState state, Resolution<PropertyValue> resolution) =>
+        resolution is Resolution<PropertyValue>.Inherited inherited ? [.. inherited.Sources.Select(s => Summary(state, s))] : [];
+
+    private static ConflictCandidateItem[] CandidatesOf(StructureState state, Resolution<PropertyValue> resolution) =>
+        resolution is Resolution<PropertyValue>.Conflict conflict
+            ? [.. conflict.Candidates.Select(c => new ConflictCandidateItem(c.CategoryId, NameOf(state, c.CategoryId), PropertyValues.ToJson(c.Value)))]
+            : [];
 
     // ─── Mapping ────────────────────────────────────────────────────────────
 

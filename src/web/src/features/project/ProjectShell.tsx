@@ -210,6 +210,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
   const tree = useQuery(treeQuery(projectId));
   const mode = useShellStore((s) => s.mode);
   const cursor = useShellStore((s) => s.cursor);
+  const validationErrors = useShellStore((s) => s.validationErrors);
   const counts = tree.data?.counts;
   return (
     <footer className={styles["statusBar"]}>
@@ -229,6 +230,11 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
       )}
       {cursor !== null && (
         <span className={styles["cursor"]}>{t("shell.status.cursor", cursor)}</span>
+      )}
+      {mode === "edit" && validationErrors > 0 && (
+        <span className={styles["errors"]} role="status">
+          {t("shell.status.errors", { count: validationErrors })}
+        </span>
       )}
       <span className={styles["mode"]}>{t(`shell.mode.${mode}`)}</span>
     </footer>

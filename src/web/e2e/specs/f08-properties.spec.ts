@@ -1,5 +1,6 @@
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
+import { PagePropertiesPanel } from "../pages/PagePropertiesPanel";
 import { PropertyViewPage } from "../pages/PropertyViewPage";
 import { TreePanel } from "../pages/TreePanel";
 import { expectNoSeriousViolations } from "../support/a11y";
@@ -55,6 +56,22 @@ test.describe("F08 · Properties and validation", () => {
     await expect(view.title).toHaveText("Poids");
     await expect(view.article.getByText("float", { exact: true })).toBeVisible();
     await expect(view.rules.getByRole("listitem")).toHaveText(["> 0"]);
+
+    // Offered by « Ajouter une propriété » on a page, and validated there.
+    const panel = new PagePropertiesPanel(page);
+    await page.goto(`${reference.url(chroniques.orsen)}?edit=true`);
+    await panel.addPropertyButton.click();
+    const dialog = page.getByRole("dialog", { name: t("category.addPropertyTitle") });
+    await dialog
+      .getByRole("combobox", { name: t("category.column.property") })
+      .selectOption({ label: "Poids" });
+    await dialog
+      .getByRole("textbox", { name: t("property.valueOf", { name: "Poids" }) })
+      .fill("-2");
+    await dialog.getByRole("button", { name: t("category.addProperty") }).click();
+    await expect(panel.field("Poids")).toContainText(
+      t("property.violation.greater_than", { value: 0 }),
+    );
   });
 
   test("E2E-08-03 · Rules offered by type @pr", async ({ page, reference }) => {
@@ -106,6 +123,33 @@ test.describe("F08 · Properties and validation", () => {
     await expect(view.outOfRules.getByRole("listitem")).toHaveCount(1);
     await expect(view.outOfRules).toContainText("Dragon des Cimes");
     await expect(view.outOfRules).not.toContainText("Ilsa Varenne");
+
+    const panel = new PagePropertiesPanel(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(panel.row("Niveau")).toContainText("72");
+    await expect(panel.outOfRulesBadge).toHaveCount(0);
+    await page.goto(reference.url(chroniques.dragon));
+    await expect(panel.outOfRulesBadge).toBeVisible();
+  });
+
+  test("E2E-08-06 · Entry by type on a page @pr", async ({ page, reference }) => {
+    const panel = new PagePropertiesPanel(page);
+    await page.goto(`${reference.url(chroniques.orsen)}?edit=true`);
+
+    await expect(panel.field("Hostile").getByRole("switch", { name: "Hostile" })).toBeVisible();
+    await expect(panel.field("Rôle").getByRole("combobox", { name: "Rôle" })).toBeVisible();
+    const region = panel.field("Région").getByRole("combobox", { name: "Région" });
+    await expect(region.getByRole("option")).toHaveText(["—", "Col gelé", "Hautbois"]);
+
+    await panel.addPropertyButton.click();
+    const dialog = page.getByRole("dialog", { name: t("category.addPropertyTitle") });
+    await dialog
+      .getByRole("combobox", { name: t("category.column.property") })
+      .selectOption({ label: "Âge" });
+    const age = dialog.getByRole("textbox", { name: t("property.valueOf", { name: "Âge" }) });
+    await age.clear();
+    await age.pressSequentially("ab12");
+    await expect(age).toHaveValue("12");
   });
 
   test("E2E-08-07 · The match rule on a string @nightly", async ({ page, reference }) => {
@@ -142,6 +186,11 @@ test.describe("F08 · Properties and validation", () => {
     await expect(view.article.getByRole("list", { name: t("property.options") })).not.toContainText(
       "Marchande",
     );
+
+    // Pages keep their value: it is stored by option key.
+    const panel = new PagePropertiesPanel(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(panel.row("Rôle")).toContainText("Négociante");
   });
 
   test("E2E-08-09 · Remove a used enum option @nightly", async ({ page, reference }) => {
@@ -199,5 +248,9 @@ test.describe("F08 · Properties and validation", () => {
     await expect(view.outOfRulesTitle(2)).toBeVisible();
     await page.goto(reference.url(chroniques.pnj));
     await expect(page.getByRole("row", { name: /^Niveau\b/ })).toContainText("≥ 1, ≤ 60");
+
+    const panel = new PagePropertiesPanel(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(panel.row("Niveau")).toContainText("72");
   });
 });

@@ -228,7 +228,9 @@
       "properties_other": "{{count}} properties",
       "links_one": "{{count}} link type",
       "links_other": "{{count}} link types",
-      "cursor": "Ln {{line}}, Col {{column}}"
+      "cursor": "Ln {{line}}, Col {{column}}",
+      "errors_one": "{{count}} validation error",
+      "errors_other": "{{count}} validation errors"
     },
     "mode": {
       "read": "Reading",
@@ -305,7 +307,34 @@
     "subPages": "Sub-pages",
     "newSubPage": "New sub-page",
     "newSubPageName": "New page",
-    "sidePanel": "Page panel"
+    "sidePanel": "Page panel",
+    "propertiesTitle": "Properties",
+    "valueCount_one": "{{count}} value",
+    "valueCount_other": "{{count}} values",
+    "noProperties": "No property.",
+    "via": "via {{categories}}",
+    "outOfRules": "out of rules",
+    "outOfRulesHint": "At least one value breaks the rules of its property.",
+    "conflict": "In conflict: {{candidates}}",
+    "resolveConflict": "Resolve the conflict of {{name}}",
+    "inheritedFrom": "Value inherited from the category {{categories}}",
+    "fromDefault": "Default value of the property",
+    "restoreInherited": "Restore the inherited value",
+    "removeValue": "Remove the value of {{name}}",
+    "addProperty": "Add a property",
+    "categoriesLabel": "Categories of the page",
+    "categoriesTitle": "Categories",
+    "noCategories": "No category.",
+    "addCategory": "Add a category",
+    "addCategoryButton": "Add the category",
+    "removeCategory": "Remove the category {{name}}",
+    "chooseCategory": "Choose a category",
+    "tabs": {
+      "label": "Panel sections",
+      "properties": "Properties",
+      "categories": "Categories",
+      "files": "Files"
+    }
   },
   "reference": {
     "broken": {
@@ -535,7 +564,8 @@
       "title": "Type change impossible",
       "explain": "These existing values cannot be converted to the new type. Fix them or keep the current type.",
       "pages": "Pages whose value cannot be converted"
-    }
+    },
+    "valueOf": "Value of {{name}}"
   },
   "category": {
     "description": "Description",

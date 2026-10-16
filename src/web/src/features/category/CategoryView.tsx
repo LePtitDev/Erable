@@ -19,11 +19,11 @@ import type { ElementDetails } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
 import type { PropertyValue } from "../../shared/properties/types";
 import { Button } from "../../shared/ui/Button";
-import { Dialog } from "../../shared/ui/Dialog";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { ElementHeader } from "../project/ElementHeader";
 import { readValue, toDefinition, typeName, type Definition } from "../properties/definitions";
 import { usePropertyFormat } from "../properties/format";
+import { AddPropertyDialog } from "../properties/AddPropertyDialog";
 import { ValueEditor } from "../properties/ValueEditor";
 import { loopOf } from "./inheritance";
 import styles from "./CategoryView.module.css";
@@ -522,6 +522,7 @@ function PropertyTable({
       {editing && (
         <AddPropertyDialog
           projectId={projectId}
+          valueLabel={(name) => t("category.valueOf", { name })}
           open={adding}
           definitions={definitions.filter(
             (d) => !rows.some((r) => r.definition.id === d.id && r.own),
@@ -536,85 +537,6 @@ function PropertyTable({
         />
       )}
     </section>
-  );
-}
-
-function AddPropertyDialog({
-  projectId,
-  open,
-  definitions,
-  onClose,
-  onAdd,
-}: {
-  readonly projectId: ElementId;
-  readonly open: boolean;
-  readonly definitions: readonly Definition[];
-  readonly onClose: () => void;
-  readonly onAdd: (id: ElementId, value: PropertyValue) => void;
-}) {
-  const { t } = useTranslation();
-  const selectId = useId();
-  const [selected, setSelected] = useState<ElementId | null>(null);
-  const [value, setValue] = useState<PropertyValue | undefined>(undefined);
-  const definition = definitions.find((d) => d.id === selected);
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) onClose();
-      }}
-      title={t("category.addPropertyTitle")}
-      footer={
-        <>
-          <Button onClick={onClose}>{t("common.cancel")}</Button>
-          <Button
-            variant="primary"
-            disabled={definition === undefined || value === undefined}
-            onClick={() => {
-              if (definition !== undefined && value !== undefined) {
-                onAdd(definition.id, value);
-                setSelected(null);
-                setValue(undefined);
-              }
-            }}
-          >
-            {t("category.addProperty")}
-          </Button>
-        </>
-      }
-    >
-      <div className={styles["dialogBody"]}>
-        <label htmlFor={selectId} className={styles["label"]}>
-          {t("category.column.property")}
-        </label>
-        <select
-          id={selectId}
-          className={styles["select"]}
-          value={selected ?? ""}
-          onChange={(event) => {
-            const id = event.target.value === "" ? null : (event.target.value as ElementId);
-            setSelected(id);
-            setValue(definitions.find((d) => d.id === id)?.default);
-          }}
-        >
-          <option value="">{t("property.empty")}</option>
-          {definitions.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-        {definition !== undefined && (
-          <ValueEditor
-            projectId={projectId}
-            definition={definition}
-            label={t("category.valueOf", { name: definition.name })}
-            value={value}
-            onChange={setValue}
-          />
-        )}
-      </div>
-    </Dialog>
   );
 }
 

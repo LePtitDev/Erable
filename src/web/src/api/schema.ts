@@ -502,6 +502,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/pages/{id}/properties/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PreviewPageProperties"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/properties": {
     parameters: {
       query?: never;
@@ -750,6 +766,12 @@ export interface components {
       key: string;
       label: string;
     };
+    FallbackItem: {
+      candidates: components["schemas"]["ConflictCandidateItem"][];
+      origin: components["schemas"]["ValueOrigin"];
+      sources: components["schemas"]["CategorySummary"][];
+      value: null | components["schemas"]["JsonNode"];
+    };
     FolderInspection: {
       /** Format: int32 */
       formatVersion: null | number;
@@ -781,12 +803,17 @@ export interface components {
       /** Format: int64 */
       revision: number;
     };
+    PagePreviewRequest: {
+      categories: unknown[];
+      properties: components["schemas"]["PagePropertyValue"][];
+    };
     PageProperties: {
       categories: components["schemas"]["CategorySummary"][];
       properties: components["schemas"]["PagePropertyItem"][];
     };
     PagePropertyItem: {
       candidates: components["schemas"]["ConflictCandidateItem"][];
+      fallback: null | components["schemas"]["FallbackItem"];
       origin: components["schemas"]["ValueOrigin"];
       ownValue: null | components["schemas"]["JsonNode"];
       property: components["schemas"]["PropertyDefinitionItem"];
@@ -1889,6 +1916,33 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageProperties"];
+        };
+      };
+    };
+  };
+  PreviewPageProperties: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PagePreviewRequest"];
+      };
+    };
     responses: {
       /** @description OK */
       200: {

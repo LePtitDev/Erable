@@ -163,6 +163,12 @@
   opacity: 1;
 }
 
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
 .surface {
   flex: 1;
   min-height: 0;

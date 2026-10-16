@@ -2,6 +2,7 @@ import type {
   CategoryListItem,
   CategoryPageItem,
   CategoryView,
+  PagePropertyItem,
   PropertyDefinitionItem,
   PropertyView,
 } from "../shared/api/structure";
@@ -275,4 +276,41 @@ export function mockProperty(
     }),
   );
   return writes;
+}
+
+/** The properties of Ilsa Varenne as the backend resolves them (E2E-05-12, E2E-07-05, E2E-08-08). */
+export function ilsaStructure(): {
+  categories: { id: ElementId; name: string }[];
+  properties: PagePropertyItem[];
+} {
+  return {
+    categories: [{ id: s.pnj, name: "PNJ" }],
+    properties: [
+      {
+        property: definitions.hostile,
+        ownValue: null,
+        value: false,
+        origin: "inherited",
+        sources: [{ id: s.pnj, name: "PNJ" }],
+        candidates: [],
+        violations: [],
+        fallback: null,
+      },
+      {
+        property: definitions.niveau,
+        ownValue: 72,
+        value: 72,
+        origin: "own",
+        sources: [],
+        candidates: [],
+        violations: [{ rule: { op: "less_or_equal", value: 60 }, index: null }],
+        fallback: {
+          value: 10,
+          origin: "inherited",
+          sources: [{ id: s.pnj, name: "PNJ" }],
+          candidates: [],
+        },
+      },
+    ],
+  };
 }

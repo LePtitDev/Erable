@@ -228,7 +228,9 @@
       "properties_other": "{{count}} Eigenschaften",
       "links_one": "{{count}} Verknüpfungstyp",
       "links_other": "{{count}} Verknüpfungstypen",
-      "cursor": "Z {{line}}, Sp {{column}}"
+      "cursor": "Z {{line}}, Sp {{column}}",
+      "errors_one": "{{count}} Validierungsfehler",
+      "errors_other": "{{count}} Validierungsfehler"
     },
     "mode": {
       "read": "Lesen",
@@ -305,7 +307,34 @@
     "subPages": "Unterseiten",
     "newSubPage": "Neue Unterseite",
     "newSubPageName": "Neue Seite",
-    "sidePanel": "Seitenleiste der Seite"
+    "sidePanel": "Seitenleiste der Seite",
+    "propertiesTitle": "Eigenschaften",
+    "valueCount_one": "{{count}} Wert",
+    "valueCount_other": "{{count}} Werte",
+    "noProperties": "Keine Eigenschaft.",
+    "via": "über {{categories}}",
+    "outOfRules": "außerhalb der Regeln",
+    "outOfRulesHint": "Mindestens ein Wert verstößt gegen die Regeln seiner Eigenschaft.",
+    "conflict": "Im Konflikt: {{candidates}}",
+    "resolveConflict": "Konflikt von {{name}} lösen",
+    "inheritedFrom": "Von der Kategorie {{categories}} geerbter Wert",
+    "fromDefault": "Standardwert der Eigenschaft",
+    "restoreInherited": "Geerbten Wert wiederherstellen",
+    "removeValue": "Wert von {{name}} entfernen",
+    "addProperty": "Eigenschaft hinzufügen",
+    "categoriesLabel": "Kategorien der Seite",
+    "categoriesTitle": "Kategorien",
+    "noCategories": "Keine Kategorie.",
+    "addCategory": "Kategorie hinzufügen",
+    "addCategoryButton": "Kategorie hinzufügen",
+    "removeCategory": "Kategorie {{name}} entfernen",
+    "chooseCategory": "Kategorie wählen",
+    "tabs": {
+      "label": "Bereiche des Panels",
+      "properties": "Eigenschaften",
+      "categories": "Kategorien",
+      "files": "Dateien"
+    }
   },
   "reference": {
     "broken": {
@@ -535,7 +564,8 @@
       "title": "Typänderung nicht möglich",
       "explain": "Diese vorhandenen Werte lassen sich nicht in den neuen Typ umwandeln. Korrigieren Sie sie oder behalten Sie den aktuellen Typ.",
       "pages": "Seiten, deren Wert nicht umwandelbar ist"
-    }
+    },
+    "valueOf": "Wert von {{name}}"
   },
   "category": {
     "description": "Beschreibung",
