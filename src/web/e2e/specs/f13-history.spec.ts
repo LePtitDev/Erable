@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
 import { EditorPage } from "../pages/EditorPage";
@@ -6,7 +7,7 @@ import { PageViewPage } from "../pages/PageViewPage";
 import { t } from "../support/i18n";
 
 /** Hautbois saved three times: four revisions in all (the reference project holds the first). */
-async function editThreeTimes(page: import("@playwright/test").Page, url: string) {
+async function editThreeTimes(page: Page, url: string) {
   const editor = new EditorPage(page);
   await page.goto(url);
   for (const text of ["Un puits.", "Une tour.", "Un marché."]) {
