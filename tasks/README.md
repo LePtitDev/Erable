@@ -76,7 +76,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | ID | Tâche | Dépend de | Statut |
 |---|---|---|---|
 | [M4-01](M4-01-accounts-auth.md) | Comptes, authentification, rôles, multi-projets | M2-03 | review |
-| [M4-02](M4-02-authorization-matrix.md) | Matrice d'autorisation générée | M4-01 | todo |
+| [M4-02](M4-02-authorization-matrix.md) | Matrice d'autorisation générée | M4-01 | review |
 | [M4-03](M4-03-signalr-events.md) | Événements temps réel | M4-01 | todo |
 | [M4-04](M4-04-presence.md) | Présence | M4-03 | todo |
 | [M4-05](M4-05-concurrent-editing.md) | Concurrence optimiste et fusion à trois voies | M4-03, M3-05 | todo |

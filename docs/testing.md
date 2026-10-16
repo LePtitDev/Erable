@@ -129,6 +129,7 @@ Un wiki local doit survivre à une coupure de courant.
 
 - **Un test par endpoint** pour le cas nominal et les erreurs (404, 409, 422), avec des réponses au format `ProblemDetails`.
 - **Matrice d'autorisation générée** : le test énumère *tous* les endpoints exposés via l'`EndpointDataSource` et les appelle avec chaque rôle (anonyme, lecteur, éditeur, administrateur, membre d'un autre projet). Un nouvel endpoint sans règle d'autorisation explicite **fait échouer la suite**. C'est la protection contre le bug de sécurité le plus courant : l'endpoint oublié.
+  *Mise en œuvre (M4-02)* : la règle de chaque endpoint est sa métadonnée `AccessRule` ; `AuthorizationMatrix` (tests/Erable.Server.Tests) la compare au comportement réel pour six profils et refuse tout endpoint sans règle ; un second contrôle vérifie que les écritures d'un projet exigent un éditeur (sauf liste d'exceptions).
 - **Contrat** : le document OpenAPI est comparé à un instantané versionné (bibliothèque **Verify**). Une modification de l'API apparaît dans la revue de code sous forme de diff lisible ; une suppression de champ dans `/api/v1` est refusée.
 - **Concurrence** : deux clients enregistrent la même page depuis la même révision → l'un reçoit `409` avec la version courante ; N écritures parallèles sur des pages différentes → aucune perte.
 - **SignalR** : deux clients connectés au hub ; une modification par A produit `ElementChanged` chez B, mais pas chez un client d'un autre projet. Présence : connexion, départ, déconnexion brutale (le fantôme disparaît après expiration).

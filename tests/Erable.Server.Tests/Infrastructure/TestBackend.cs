@@ -74,7 +74,8 @@ public sealed class TestBackend : IAsyncDisposable
         Func<ErableHostOptions, ErableHostOptions>? configure = null,
         ILoggerProvider? logger = null,
         Action<IServiceCollection>? services = null,
-        bool skipDefaultAdmin = false)
+        bool skipDefaultAdmin = false,
+        Action<WebApplication>? beforeStart = null)
     {
         var ct = TestContext.Current.CancellationToken;
         var webRoot = TempDirectory.Create("erable-web-");
@@ -111,6 +112,7 @@ public sealed class TestBackend : IAsyncDisposable
                 builder.Logging.ClearProviders().SetMinimumLevel(LogLevel.Trace).AddProvider(logger);
             }
         });
+        beforeStart?.Invoke(app);
         await app.StartAsync(ct);
 
         HttpClient client;
