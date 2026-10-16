@@ -494,6 +494,8 @@ public sealed partial class ProjectService
                 };
             case ElementKind.PropertyDefinition when StructureRepository.GetDefinition(connection, element.Id) is { } definition:
                 return snapshot with { Definition = DefinitionJson(definition) };
+            case ElementKind.LinkType when LinkRepository.GetType(connection, element.Id) is { } linkType:
+                return snapshot with { LinkType = new LinkTypeSnapshot(linkType.Description, linkType.InverseName) };
             default:
                 return snapshot;
         }

@@ -108,6 +108,23 @@
         "tooLong": "Die Beschreibung ist zu lang."
       },
       "notFound": "Diese Eigenschaft existiert nicht mehr."
+    },
+    "link": {
+      "type": {
+        "description": {
+          "tooLong": "Die Beschreibung des Verknüpfungstyps ist zu lang."
+        },
+        "inverse": {
+          "invalid": "Die umgekehrte Bezeichnung ist zu lang oder enthält Steuerzeichen."
+        },
+        "notFound": "Dieser Verknüpfungstyp existiert nicht mehr."
+      },
+      "page": {
+        "invalid": "Eine Verknüpfung verbindet zwei Seiten."
+      },
+      "self": "Eine Seite kann nicht mit sich selbst verknüpft werden.",
+      "duplicate": "Diese Verknüpfung existiert bereits.",
+      "notFound": "Diese Verknüpfung existiert nicht mehr."
     }
   },
   "home": {
@@ -251,7 +268,8 @@
       "page": "Name der neuen Seite",
       "folder": "Name des neuen Ordners",
       "category": "Name der neuen Kategorie",
-      "property": "Name der neuen Eigenschaft"
+      "property": "Name der neuen Eigenschaft",
+      "linkType": "Name des neuen Verknüpfungstyps"
     },
     "cut": "Verschieben…",
     "cutShortcut": "Strg+X",
@@ -268,7 +286,8 @@
       "invalidParent": "Dieser Ort kann dieses Element nicht enthalten."
     },
     "newCategory": "Neue Kategorie",
-    "newProperty": "Neue Eigenschaft"
+    "newProperty": "Neue Eigenschaft",
+    "newLinkType": "Neuer Verknüpfungstyp"
   },
   "kinds": {
     "root": "Wurzel",
@@ -333,7 +352,8 @@
       "label": "Bereiche des Panels",
       "properties": "Eigenschaften",
       "categories": "Kategorien",
-      "files": "Dateien"
+      "files": "Dateien",
+      "links": "Verknüpfungen"
     }
   },
   "reference": {
@@ -604,5 +624,30 @@
     "searchSoon": "Verfügbar mit dem Suchbildschirm.",
     "seeInSearch_one": "Die Seite in der Suche anzeigen",
     "seeInSearch_other": "Die {{count}} Seiten in der Suche anzeigen"
+  },
+  "links": {
+    "description": "Beschreibung",
+    "noDescription": "Keine Beschreibung.",
+    "inverse": "Umgekehrte Bezeichnung",
+    "noInverse": "Keine: eingehende Verknüpfungen behalten die Bezeichnung des Typs.",
+    "inverseHint": "Wird auf der verknüpften Seite eingehend angezeigt („Schüler von“ für „Mentor von“). Leer lassen, um dieselbe Bezeichnung zu behalten.",
+    "usage_one": "{{count}} Verknüpfung verwendet diesen Typ.",
+    "usage_other": "{{count}} Verknüpfungen verwenden diesen Typ.",
+    "editing": "Verknüpfungstyp bearbeiten",
+    "title": "Verknüpfungen",
+    "link": "Verknüpfen",
+    "linkTitle": "Diese Seite verknüpfen",
+    "type": "Verknüpfungstyp",
+    "target": "Verknüpfte Seite",
+    "confirm": "Verknüpfen",
+    "outgoing": "Ausgehende Verknüpfungen",
+    "noOutgoing": "Keine ausgehende Verknüpfung.",
+    "incoming_one": "{{count}} eingehende Verknüpfung",
+    "incoming_other": "{{count}} eingehende Verknüpfungen",
+    "noIncoming": "Keine eingehende Verknüpfung.",
+    "mentions": "Implizite Verweise · {{count}}",
+    "mentionsList": "Seiten, die diese Seite erwähnen",
+    "noMentions": "Keine andere Seite erwähnt diese in ihrem Text.",
+    "remove": "Verknüpfung {{label}} · {{name}} löschen"
   }
 }

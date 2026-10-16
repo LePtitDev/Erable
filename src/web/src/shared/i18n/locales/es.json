@@ -108,6 +108,23 @@
         "tooLong": "La descripción es demasiado larga."
       },
       "notFound": "Esta propiedad ya no existe."
+    },
+    "link": {
+      "type": {
+        "description": {
+          "tooLong": "La descripción del tipo de enlace es demasiado larga."
+        },
+        "inverse": {
+          "invalid": "La etiqueta inversa es demasiado larga o contiene caracteres de control."
+        },
+        "notFound": "Este tipo de enlace ya no existe."
+      },
+      "page": {
+        "invalid": "Un enlace une dos páginas."
+      },
+      "self": "Una página no puede enlazarse consigo misma.",
+      "duplicate": "Este enlace ya existe.",
+      "notFound": "Este enlace ya no existe."
     }
   },
   "home": {
@@ -256,7 +273,8 @@
       "page": "Nombre de la nueva página",
       "folder": "Nombre de la nueva carpeta",
       "category": "Nombre de la nueva categoría",
-      "property": "Nombre de la nueva propiedad"
+      "property": "Nombre de la nueva propiedad",
+      "linkType": "Nombre del nuevo tipo de enlace"
     },
     "cut": "Mover…",
     "cutShortcut": "Ctrl+X",
@@ -273,7 +291,8 @@
       "invalidParent": "Esta ubicación no puede contener este elemento."
     },
     "newCategory": "Nueva categoría",
-    "newProperty": "Nueva propiedad"
+    "newProperty": "Nueva propiedad",
+    "newLinkType": "Nuevo tipo de enlace"
   },
   "kinds": {
     "root": "Raíz",
@@ -339,7 +358,8 @@
       "label": "Secciones del panel",
       "properties": "Propiedades",
       "categories": "Categorías",
-      "files": "Archivos"
+      "files": "Archivos",
+      "links": "Enlaces"
     }
   },
   "reference": {
@@ -614,5 +634,32 @@
     "seeInSearch_one": "Ver la página en la búsqueda",
     "seeInSearch_other": "Ver las {{count}} páginas en la búsqueda",
     "seeInSearch_many": "Ver las {{count}} páginas en la búsqueda"
+  },
+  "links": {
+    "description": "Descripción",
+    "noDescription": "Sin descripción.",
+    "inverse": "Etiqueta inversa",
+    "noInverse": "Ninguna: los enlaces entrantes conservan la etiqueta del tipo.",
+    "inverseHint": "Se muestra en la página enlazada, en el lado entrante («Alumno de» para «Mentor de»). Déjela vacía para conservar la misma etiqueta.",
+    "usage_one": "{{count}} enlace usa este tipo.",
+    "usage_other": "{{count}} enlaces usan este tipo.",
+    "usage_many": "{{count}} enlaces usan este tipo.",
+    "editing": "Edición del tipo de enlace",
+    "title": "Enlaces",
+    "link": "Enlazar",
+    "linkTitle": "Enlazar esta página",
+    "type": "Tipo de enlace",
+    "target": "Página enlazada",
+    "confirm": "Enlazar",
+    "outgoing": "Enlaces salientes",
+    "noOutgoing": "Ningún enlace saliente.",
+    "incoming_one": "{{count}} enlace entrante",
+    "incoming_other": "{{count}} enlaces entrantes",
+    "incoming_many": "{{count}} enlaces entrantes",
+    "noIncoming": "Ningún enlace entrante.",
+    "mentions": "Referencias implícitas · {{count}}",
+    "mentionsList": "Páginas que mencionan esta página",
+    "noMentions": "Ninguna otra página menciona esta en su texto.",
+    "remove": "Eliminar el enlace {{label}} · {{name}}"
   }
 }

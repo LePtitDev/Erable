@@ -108,6 +108,23 @@
         "tooLong": "La description est trop longue."
       },
       "notFound": "Cette propriété n’existe plus."
+    },
+    "link": {
+      "type": {
+        "description": {
+          "tooLong": "La description du type de lien est trop longue."
+        },
+        "inverse": {
+          "invalid": "Le libellé inverse est trop long ou contient des caractères de contrôle."
+        },
+        "notFound": "Ce type de lien n’existe plus."
+      },
+      "page": {
+        "invalid": "Un lien relie deux pages."
+      },
+      "self": "Une page ne peut pas être liée à elle-même.",
+      "duplicate": "Ce lien existe déjà.",
+      "notFound": "Ce lien n’existe plus."
     }
   },
   "home": {
@@ -256,7 +273,8 @@
       "page": "Nom de la nouvelle page",
       "folder": "Nom du nouveau dossier",
       "category": "Nom de la nouvelle catégorie",
-      "property": "Nom de la nouvelle propriété"
+      "property": "Nom de la nouvelle propriété",
+      "linkType": "Nom du nouveau type de lien"
     },
     "cut": "Déplacer…",
     "cutShortcut": "Ctrl+X",
@@ -273,7 +291,8 @@
       "invalidParent": "Cet emplacement ne peut pas contenir cet élément."
     },
     "newCategory": "Nouvelle catégorie",
-    "newProperty": "Nouvelle propriété"
+    "newProperty": "Nouvelle propriété",
+    "newLinkType": "Nouveau type de lien"
   },
   "kinds": {
     "root": "Racine",
@@ -339,7 +358,8 @@
       "label": "Sections du panneau",
       "properties": "Propriétés",
       "categories": "Catégories",
-      "files": "Fichiers"
+      "files": "Fichiers",
+      "links": "Liens"
     }
   },
   "reference": {
@@ -614,5 +634,32 @@
     "seeInSearch_one": "Voir la page dans la recherche",
     "seeInSearch_other": "Voir les {{count}} pages dans la recherche",
     "seeInSearch_many": "Voir les {{count}} pages dans la recherche"
+  },
+  "links": {
+    "description": "Description",
+    "noDescription": "Aucune description.",
+    "inverse": "Libellé inverse",
+    "noInverse": "Aucun : les liens entrants gardent le libellé du type.",
+    "inverseHint": "Affiché sur la page liée, côté entrant (« Élève de » pour « Mentor de »). Laisser vide pour garder le même libellé.",
+    "usage_one": "{{count}} lien utilise ce type.",
+    "usage_other": "{{count}} liens utilisent ce type.",
+    "usage_many": "{{count}} liens utilisent ce type.",
+    "editing": "Modification du type de lien",
+    "title": "Liens",
+    "link": "Lier",
+    "linkTitle": "Lier cette page",
+    "type": "Type de lien",
+    "target": "Page liée",
+    "confirm": "Lier",
+    "outgoing": "Liens sortants",
+    "noOutgoing": "Aucun lien sortant.",
+    "incoming_one": "{{count}} lien entrant",
+    "incoming_other": "{{count}} liens entrants",
+    "incoming_many": "{{count}} liens entrants",
+    "noIncoming": "Aucun lien entrant.",
+    "mentions": "Références implicites · {{count}}",
+    "mentionsList": "Pages qui mentionnent cette page",
+    "noMentions": "Aucune autre page ne mentionne celle-ci dans son texte.",
+    "remove": "Supprimer le lien {{label}} · {{name}}"
   }
 }

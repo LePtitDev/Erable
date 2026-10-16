@@ -108,6 +108,23 @@
         "tooLong": "The description is too long."
       },
       "notFound": "This property no longer exists."
+    },
+    "link": {
+      "type": {
+        "description": {
+          "tooLong": "The description of the link type is too long."
+        },
+        "inverse": {
+          "invalid": "The inverse label is too long or holds control characters."
+        },
+        "notFound": "This link type no longer exists."
+      },
+      "page": {
+        "invalid": "A link joins two pages."
+      },
+      "self": "A page cannot be linked to itself.",
+      "duplicate": "This link already exists.",
+      "notFound": "This link no longer exists."
     }
   },
   "home": {
@@ -251,7 +268,8 @@
       "page": "Name of the new page",
       "folder": "Name of the new folder",
       "category": "Name of the new category",
-      "property": "Name of the new property"
+      "property": "Name of the new property",
+      "linkType": "Name of the new link type"
     },
     "cut": "Move…",
     "cutShortcut": "Ctrl+X",
@@ -268,7 +286,8 @@
       "invalidParent": "This location cannot contain this element."
     },
     "newCategory": "New category",
-    "newProperty": "New property"
+    "newProperty": "New property",
+    "newLinkType": "New link type"
   },
   "kinds": {
     "root": "Root",
@@ -333,7 +352,8 @@
       "label": "Panel sections",
       "properties": "Properties",
       "categories": "Categories",
-      "files": "Files"
+      "files": "Files",
+      "links": "Links"
     }
   },
   "reference": {
@@ -604,5 +624,30 @@
     "searchSoon": "Available with the Search screen.",
     "seeInSearch_one": "See the page in the search",
     "seeInSearch_other": "See the {{count}} pages in the search"
+  },
+  "links": {
+    "description": "Description",
+    "noDescription": "No description.",
+    "inverse": "Inverse label",
+    "noInverse": "None: incoming links keep the label of the type.",
+    "inverseHint": "Shown on the linked page, on the incoming side (“Pupil of” for “Mentor of”). Leave empty to keep the same label.",
+    "usage_one": "{{count}} link uses this type.",
+    "usage_other": "{{count}} links use this type.",
+    "editing": "Editing the link type",
+    "title": "Links",
+    "link": "Link",
+    "linkTitle": "Link this page",
+    "type": "Link type",
+    "target": "Linked page",
+    "confirm": "Link",
+    "outgoing": "Outgoing links",
+    "noOutgoing": "No outgoing link.",
+    "incoming_one": "{{count}} incoming link",
+    "incoming_other": "{{count}} incoming links",
+    "noIncoming": "No incoming link.",
+    "mentions": "Implicit references · {{count}}",
+    "mentionsList": "Pages mentioning this page",
+    "noMentions": "No other page mentions this one in its text.",
+    "remove": "Delete the link {{label}} · {{name}}"
   }
 }

@@ -773,6 +773,16 @@ function ContextMenu({
               {t("explorer.newProperty")}
             </DropdownMenu.Item>
           )}
+          {node !== undefined && canContain(index, node.id, "linkType") && (
+            <DropdownMenu.Item
+              className={styles["menuItem"]}
+              onSelect={() => {
+                onCreate("linkType", node.id);
+              }}
+            >
+              {t("explorer.newLinkType")}
+            </DropdownMenu.Item>
+          )}
           {node !== undefined && canContain(index, node.id, "folder") && (
             <DropdownMenu.Item
               className={styles["menuItem"]}

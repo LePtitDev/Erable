@@ -40,6 +40,7 @@ public static class ProjectEndpoints
         project.MapPut("/pages/{id}/content", SavePageContent).WithName("SavePageContent").WithTags("Pages");
         project.MapAttachmentEndpoints();
         project.MapStructureEndpoints();
+        project.MapLinkEndpoints();
 
         var me = api.MapGroup("/me").WithTags("Me");
         me.MapGet("/", GetMe).WithName("GetMe");

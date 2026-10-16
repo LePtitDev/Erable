@@ -7,6 +7,7 @@ import type {
   PropertyView,
 } from "../shared/api/structure";
 import { HttpResponse } from "msw";
+import type { BacklinkItem, LinkTypeView, PageLinksView } from "../shared/api/links";
 import { requireElementId, type ElementId } from "../shared/ids/elementId";
 import { roots } from "../shared/ids/roots";
 import { details, ids } from "./projectMocks";
@@ -89,7 +90,8 @@ export function structureNodes(): TreeNodeItem[] {
   ): TreeNodeItem => ({
     id,
     kind,
-    parentId: kind === "category" ? roots.categories : roots.properties,
+    parentId:
+      kind === "category" ? roots.categories : kind === "linkType" ? roots.links : roots.properties,
     name,
     sortOrder: order,
     duplicateName: false,
@@ -104,6 +106,7 @@ export function structureNodes(): TreeNodeItem[] {
     node(s.hostile, "propertyDefinition", "Hostile", 2),
     node(s.role, "propertyDefinition", "Rôle", 3),
     node(s.propRegion, "propertyDefinition", "Région", 4),
+    node(linkIds.mentor, "linkType", "Mentor de", 1),
   ];
 }
 
@@ -312,5 +315,64 @@ export function ilsaStructure(): {
         },
       },
     ],
+  };
+}
+
+export const linkIds = {
+  mentor: requireElementId("8000000000000041"),
+  ally: requireElementId("8000000000000042"),
+};
+
+/** Mocks the link endpoints for a page; returns the recorded writes. */
+export function mockLinks(
+  options: {
+    readonly outgoing?: PageLinksView["outgoing"];
+    readonly incoming?: PageLinksView["incoming"];
+    readonly mentions?: BacklinkItem[];
+  } = {},
+) {
+  const writes = { created: [] as unknown[], deleted: [] as string[], updated: [] as unknown[] };
+  const type = (id: ElementId, name: string, inverseName: string | null) => ({
+    id,
+    name,
+    description: "",
+    inverseName,
+    linkCount: 0,
+  });
+  server.use(
+    http.get("/api/v1/projects/{projectId}/link-types", ({ response }) =>
+      response(200).json([
+        type(linkIds.ally, "Allié de", "Allié de"),
+        type(linkIds.mentor, "Mentor de", "Élève de"),
+      ]),
+    ),
+    http.get("/api/v1/projects/{projectId}/pages/{id}/links", ({ response }) =>
+      response(200).json({ outgoing: options.outgoing ?? [], incoming: options.incoming ?? [] }),
+    ),
+    http.get("/api/v1/projects/{projectId}/elements/{id}/backlinks", ({ response }) =>
+      response(200).json(options.mentions ?? []),
+    ),
+    http.post("/api/v1/projects/{projectId}/links", async ({ request, response }) => {
+      const body = await request.json();
+      writes.created.push(body);
+      return response(201).json({ id: ids.project, ...body });
+    }),
+    http.delete("/api/v1/projects/{projectId}/links/{id}", ({ params, response }) => {
+      writes.deleted.push(params.id);
+      return response(204).empty();
+    }),
+  );
+  return writes;
+}
+
+/** The screen of the « Mentor de » link type. */
+export function mentorView(nodes: readonly TreeNodeItem[]): LinkTypeView {
+  const node = nodes.find((n) => n.id === linkIds.mentor);
+  if (node === undefined) throw new Error("Mentor de is not in the nodes.");
+  return {
+    element: details(node, nodes),
+    description: "Un personnage qui en forme un autre.",
+    inverseName: "Élève de",
+    linkCount: 0,
   };
 }

@@ -174,9 +174,11 @@ public static class Chroniques
         p.Classified("Col gelé", ["Catégorie Région"]);
         p.Classified("Le Col gelé", ["Quête"]);
         p.Classified("Ordre du Givre", ["Faction"]);
-        p.WithLinkType("Allié de");
-        p.WithLinkType("Situé à");
-        p.WithLinkType("Mentor de");
+        p.WithLinkType("Allié de", description: "Deux personnages qui se soutiennent.", inverse: "Allié de");
+        p.WithLinkType("Situé à", description: "Un élément qui se trouve en un lieu.", inverse: "Lieu de");
+        p.WithLinkType("Mentor de", description: "Un personnage qui forme un autre.", inverse: "Élève de");
+        p.WithLink("Allié de", "Ilsa Varenne", "Capitaine Orsen");
+        p.WithLink("Situé à", "Ilsa Varenne", "Hautbois");
         foreach (var key in StructureKeys)
         {
             p.Stamped(key, Date(2026, 3, 10, 9, 30), "camille");

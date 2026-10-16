@@ -58,6 +58,9 @@ public static class DoctorCodes
     public const string ValueInvalid = "value.invalid";
     public const string ValueUnknownProperty = "value.unknownProperty";
     public const string DerivedOutOfSync = "derived.outOfSync";
+
+    /// <summary>A link whose source, target or type does not exist or is not of the right kind.</summary>
+    public const string LinkDangling = "link.dangling";
 }
 
 /// <summary>
@@ -283,6 +286,20 @@ public static class ProjectDoctor
             """))
         {
             findings.Add(new(DoctorCodes.StructureRowMissing, DoctorSeverity.Error, $"The {kind} has no row of its own (description, definition…).", ElementId.FromInt64(id)));
+        }
+
+        foreach (var (id, source, target, type) in connection.Query<(long Id, long Source, long Target, long Type)>(
+            """
+            SELECT l.id, l.source_id, l.target_id, l.link_type_id FROM links l
+            WHERE l.source_id NOT IN (SELECT id FROM elements WHERE kind = 'page')
+               OR l.target_id NOT IN (SELECT id FROM elements WHERE kind = 'page')
+               OR l.link_type_id NOT IN (SELECT id FROM elements WHERE kind = 'linkType')
+            ORDER BY l.id
+            """))
+        {
+            findings.Add(new(DoctorCodes.LinkDangling, DoctorSeverity.Error,
+                $"Link {ElementId.FromInt64(id)} refers to a missing page or link type ({ElementId.FromInt64(source)} → {ElementId.FromInt64(target)}, type {ElementId.FromInt64(type)}).",
+                ElementId.FromInt64(source)));
         }
 
         var state = StructureState.Load(connection, null);

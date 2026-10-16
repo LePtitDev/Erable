@@ -422,6 +422,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/link-types": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListLinkTypes"];
+    put?: never;
+    post: operations["CreateLinkType"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/link-types/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetLinkType"];
+    put: operations["UpdateLinkType"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/links": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CreateLink"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/links/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["DeleteLink"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/pages": {
     parameters: {
       query?: never;
@@ -479,6 +543,22 @@ export interface paths {
     };
     get: operations["GetPageContent"];
     put: operations["SavePageContent"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/pages/{id}/links": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetPageLinks"];
+    put?: never;
     post?: never;
     delete?: never;
     options?: never;
@@ -706,6 +786,19 @@ export interface components {
       name: string;
       parentId: components["schemas"]["ElementId"];
     };
+    CreateLinkRequest: {
+      linkTypeId: components["schemas"]["ElementId"];
+      sourceId: components["schemas"]["ElementId"];
+      targetId: components["schemas"]["ElementId"];
+    };
+    CreateLinkTypeRequest: {
+      description?: null | string;
+      /** Format: int32 */
+      index?: null | number;
+      inverseName?: null | string;
+      name: string;
+      parentId: components["schemas"]["ElementId"];
+    };
     CreatePageRequest: {
       /** Format: int32 */
       index?: null | number;
@@ -791,6 +884,27 @@ export interface components {
     JsonObject: {
       [key: string]: unknown;
     };
+    LinkItem: {
+      id: components["schemas"]["ElementId"];
+      linkTypeId: components["schemas"]["ElementId"];
+      sourceId: components["schemas"]["ElementId"];
+      targetId: components["schemas"]["ElementId"];
+    };
+    LinkTypeItem: {
+      description: string;
+      id: components["schemas"]["ElementId"];
+      inverseName: null | string;
+      /** Format: int32 */
+      linkCount: number;
+      name: string;
+    };
+    LinkTypeView: {
+      description: string;
+      element: components["schemas"]["ElementDetails"];
+      inverseName: null | string;
+      /** Format: int32 */
+      linkCount: number;
+    };
     NativeEvent: {
       path?: null | string;
       type: string;
@@ -802,6 +916,18 @@ export interface components {
       markdown: string;
       /** Format: int64 */
       revision: number;
+    };
+    PageLinkItem: {
+      id: components["schemas"]["ElementId"];
+      label: string;
+      linkTypeId: components["schemas"]["ElementId"];
+      pageId: components["schemas"]["ElementId"];
+      pageName: string;
+      typeName: string;
+    };
+    PageLinksView: {
+      incoming: components["schemas"]["PageLinkItem"][];
+      outgoing: components["schemas"]["PageLinkItem"][];
     };
     PagePreviewRequest: {
       categories: unknown[];
@@ -970,6 +1096,10 @@ export interface components {
       name?: null | string;
       /** Format: element-id */
       parentId?: ElementId | null;
+    };
+    UpdateLinkTypeRequest: {
+      description: string;
+      inverseName: null | string;
     };
     UpdatePropertyRequest: {
       default: null | components["schemas"]["JsonNode"];
@@ -1774,6 +1904,151 @@ export interface operations {
       };
     };
   };
+  ListLinkTypes: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LinkTypeItem"][];
+        };
+      };
+    };
+  };
+  CreateLinkType: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateLinkTypeRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LinkTypeView"];
+        };
+      };
+    };
+  };
+  GetLinkType: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LinkTypeView"];
+        };
+      };
+    };
+  };
+  UpdateLinkType: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateLinkTypeRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LinkTypeView"];
+        };
+      };
+    };
+  };
+  CreateLink: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateLinkRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LinkItem"];
+        };
+      };
+    };
+  };
+  DeleteLink: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   CreatePage: {
     parameters: {
       query?: never;
@@ -1901,6 +2176,29 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PageSavedResult"];
+        };
+      };
+    };
+  };
+  GetPageLinks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageLinksView"];
         };
       };
     };

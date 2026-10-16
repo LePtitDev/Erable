@@ -100,6 +100,7 @@ public static class ProjectSeeder
                 }
 
                 SeedStructure(connection, transaction, builder);
+                SeedLinks(connection, transaction, builder, defaultTime);
                 StructureState.Load(connection, null).WriteDerived(connection, transaction, null, null);
 
                 // Revisions last: their snapshots hold the categories, values and definitions written above.
@@ -150,7 +151,8 @@ public static class ProjectSeeder
                     StructureRepository.UpsertDefinition(connection, transaction, definition);
                     break;
                 case ElementKind.LinkType:
-                    connection.Execute("INSERT INTO link_types (id, description, inverse_name) VALUES (@Id, '', NULL)", new { Id = entry.Id.ToInt64() }, transaction);
+                    LinkRepository.UpsertType(connection, transaction,
+                        new LinkTypeRecord(entry.Id, entry.LinkType?.Description ?? string.Empty, entry.LinkType?.Inverse));
                     break;
                 default:
                     break;
@@ -172,6 +174,18 @@ public static class ProjectSeeder
             {
                 StructureRepository.ReplacePageCategories(connection, transaction, entry.Id, [.. page.Categories.Select(builder.IdOf)]);
             }
+        }
+    }
+
+    private static void SeedLinks(SqliteConnection connection, SqliteTransaction transaction, ProjectBuilder builder, DateTimeOffset at)
+    {
+        var next = 1L;
+        foreach (var link in builder.Links)
+        {
+            // Deterministic link IDs, so that a regenerated reference project stays identical.
+            LinkRepository.InsertLink(connection, transaction, new LinkRecord(
+                ElementId.FromInt64(0x4C1A000000000000L + next++), builder.IdOf(link.Source), builder.IdOf(link.LinkType), builder.IdOf(link.Target),
+                at, KnownUsers.Local));
         }
     }
 

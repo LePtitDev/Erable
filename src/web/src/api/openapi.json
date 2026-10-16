@@ -805,6 +805,44 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/pages/{id}/links": {
+      "get": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "GetPageLinks",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageLinksView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/projects/{projectId}/categories": {
       "get": {
         "tags": [
@@ -1260,6 +1298,232 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/link-types": {
+      "get": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "ListLinkTypes",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LinkTypeItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "CreateLinkType",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLinkTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/link-types/{id}": {
+      "get": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "GetLinkType",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "UpdateLinkType",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLinkTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkTypeView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/links": {
+      "post": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "CreateLink",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/links/{id}": {
+      "delete": {
+        "tags": [
+          "Links"
+        ],
+        "operationId": "DeleteLink",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -2013,6 +2277,59 @@
           }
         }
       },
+      "CreateLinkRequest": {
+        "required": [
+          "sourceId",
+          "linkTypeId",
+          "targetId"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "linkTypeId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "targetId": {
+            "$ref": "#/components/schemas/ElementId"
+          }
+        }
+      },
+      "CreateLinkTypeRequest": {
+        "required": [
+          "parentId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "index": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "inverseName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CreatePageRequest": {
         "required": [
           "parentId",
@@ -2368,6 +2685,87 @@
         "type": "object",
         "additionalProperties": { }
       },
+      "LinkItem": {
+        "required": [
+          "id",
+          "sourceId",
+          "linkTypeId",
+          "targetId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "sourceId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "linkTypeId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "targetId": {
+            "$ref": "#/components/schemas/ElementId"
+          }
+        }
+      },
+      "LinkTypeItem": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "inverseName",
+          "linkCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "inverseName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "linkCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LinkTypeView": {
+        "required": [
+          "element",
+          "description",
+          "inverseName",
+          "linkCount"
+        ],
+        "type": "object",
+        "properties": {
+          "element": {
+            "$ref": "#/components/schemas/ElementDetails"
+          },
+          "description": {
+            "type": "string"
+          },
+          "inverseName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "linkCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "NativeEvent": {
         "required": [
           "type"
@@ -2409,6 +2807,58 @@
           "revision": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "PageLinkItem": {
+        "required": [
+          "id",
+          "linkTypeId",
+          "typeName",
+          "label",
+          "pageId",
+          "pageName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "linkTypeId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "typeName": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "pageId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "pageName": {
+            "type": "string"
+          }
+        }
+      },
+      "PageLinksView": {
+        "required": [
+          "outgoing",
+          "incoming"
+        ],
+        "type": "object",
+        "properties": {
+          "outgoing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PageLinkItem"
+            }
+          },
+          "incoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PageLinkItem"
+            }
           }
         }
       },
@@ -3160,6 +3610,24 @@
           }
         }
       },
+      "UpdateLinkTypeRequest": {
+        "required": [
+          "description",
+          "inverseName"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "inverseName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "UpdatePropertyRequest": {
         "required": [
           "key",
@@ -3301,6 +3769,9 @@
     },
     {
       "name": "Attachments"
+    },
+    {
+      "name": "Links"
     },
     {
       "name": "Categories"

@@ -27,6 +27,7 @@ public static class Project
 public sealed partial class ProjectBuilder
 {
     private readonly List<Entry> _entries = [];
+    private readonly List<LinkSpec> _links = [];
     private readonly Dictionary<string, ElementId> _ids = new(StringComparer.Ordinal);
     private Func<string, ElementId> _idFactory = _ => ElementId.NewRandom();
 
@@ -104,8 +105,22 @@ public sealed partial class ProjectBuilder
         return this;
     }
 
-    public ProjectBuilder WithLinkType(string name, string? under = null, string? id = null, string? key = null) =>
+    public ProjectBuilder WithLinkType(
+        string name, string? under = null, string? id = null, string? key = null, string description = "", string? inverse = null)
+    {
         Add(name, ElementKind.LinkType, under ?? "Liens", id, null, null, key);
+        _entries[^1] = _entries[^1] with { LinkType = new LinkTypeSpec(description, inverse) };
+        return this;
+    }
+
+    /// <summary>A typed link between two pages already declared (builder keys).</summary>
+    public ProjectBuilder WithLink(string linkType, string source, string target)
+    {
+        _links.Add(new LinkSpec(linkType, source, target));
+        return this;
+    }
+
+    public IReadOnlyList<LinkSpec> Links => _links;
 
     /// <summary>Creation and last modification of an element already declared (defaults: the seeding time, <c>local</c>).</summary>
     public ProjectBuilder Stamped(string name, DateTimeOffset createdAt, string createdBy, DateTimeOffset? updatedAt = null, string? updatedBy = null)
@@ -189,6 +204,12 @@ public sealed partial class ProjectBuilder
     /// <summary>Categories and own values of a page.</summary>
     public sealed record PageSpec(IReadOnlyList<string> Categories, IReadOnlyDictionary<string, string> Values);
 
+    /// <summary>Description and inverse label of a link type.</summary>
+    public sealed record LinkTypeSpec(string Description, string? Inverse);
+
+    /// <summary>A typed link between two pages (builder keys).</summary>
+    public sealed record LinkSpec(string LinkType, string Source, string Target);
+
     /// <summary>Who created and last modified an element, and when.</summary>
     public sealed record Stamp(DateTimeOffset CreatedAt, string CreatedBy, DateTimeOffset UpdatedAt, string UpdatedBy);
 
@@ -204,5 +225,7 @@ public sealed partial class ProjectBuilder
         public PropertySpec? Property { get; init; }
 
         public PageSpec? Page { get; init; }
+
+        public LinkTypeSpec? LinkType { get; init; }
     }
 }

@@ -73,6 +73,14 @@ export class TreePanel {
     await this.page.keyboard.press("Enter");
   }
 
+  /** Creates a link type from the context menu of the Liens root. */
+  async newLinkType(name: string) {
+    await this.root("Liens").click({ button: "right" });
+    await this.page.getByRole("menuitem", { name: t("explorer.newLinkType") }).click();
+    await this.tree.getByRole("textbox", { name: t("explorer.newName.linkType") }).fill(name);
+    await this.page.keyboard.press("Enter");
+  }
+
   async rename(name: string, newName: string) {
     await this.item(name).click();
     await this.tree.press("F2");

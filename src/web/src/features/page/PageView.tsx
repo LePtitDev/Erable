@@ -21,6 +21,7 @@ import {
 } from "../properties/PagePropertiesView";
 import { hasViolations, toPageProperty } from "../properties/pageProperties";
 import { defaultLayout, type Layout } from "../project/layout";
+import { PageLinksPanel } from "../links/PageLinksPanel";
 import { AttachmentsPanel } from "./AttachmentsPanel";
 import { anchorsOf, definitionsOf } from "./markdown/markdownSupport";
 import { MarkdownView } from "./markdown/MarkdownView";
@@ -122,6 +123,7 @@ export function PageView({
       {sidePanelOpen && page.isSuccess && (
         <aside id="page-side-panel" className={styles["side"]} aria-label={t("page.sidePanel")}>
           <PagePropertiesView projectId={projectId} properties={properties} />
+          <PageLinksPanel projectId={projectId} pageId={element.id} />
           <Toc markdown={page.data.markdown} hasSubPages={page.data.subPages.length > 0} />
           <AttachmentsPanel
             projectId={projectId}

@@ -19,10 +19,11 @@ import {
   type StructureDraft,
 } from "../properties/pageProperties";
 import { ValueEditor } from "../properties/ValueEditor";
+import { PageLinksPanel } from "../links/PageLinksPanel";
 import { AttachmentsPanel } from "./AttachmentsPanel";
 import styles from "./PageStructurePanel.module.css";
 
-const tabs = ["properties", "categories", "files"] as const;
+const tabs = ["properties", "categories", "links", "files"] as const;
 
 interface PanelProps {
   readonly projectId: ElementId;
@@ -63,6 +64,9 @@ export function PageStructurePanel(props: PanelProps) {
       </Tabs.Content>
       <Tabs.Content value="categories" className={styles["content"]}>
         <CategoriesTab {...props} />
+      </Tabs.Content>
+      <Tabs.Content value="links" className={styles["content"]}>
+        <PageLinksPanel projectId={props.projectId} pageId={props.pageId} />
       </Tabs.Content>
       <Tabs.Content value="files" className={styles["content"]}>
         <AttachmentsPanel

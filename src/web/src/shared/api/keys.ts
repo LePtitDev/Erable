@@ -26,6 +26,11 @@ export const queryKeys = {
   properties: (projectId: ElementId) => ["projects", projectId, "properties"] as const,
   property: (projectId: ElementId, id: ElementId) =>
     ["projects", projectId, "properties", id] as const,
+  linkTypes: (projectId: ElementId) => ["projects", projectId, "link-types"] as const,
+  linkType: (projectId: ElementId, id: ElementId) =>
+    ["projects", projectId, "link-types", id] as const,
+  pageLinks: (projectId: ElementId, id: ElementId) =>
+    ["projects", projectId, "pages", id, "links"] as const,
   /** Everything that shows names or structure of a project: after a rename or a move. */
   projectContent: (projectId: ElementId) => ["projects", projectId] as const,
 };

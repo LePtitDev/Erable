@@ -23,6 +23,9 @@ public sealed record RevisionSnapshot(
     /// <summary>Description and parent of a category.</summary>
     public CategorySnapshot? Category { get; init; }
 
+    /// <summary>Description and inverse label of a link type.</summary>
+    public LinkTypeSnapshot? LinkType { get; init; }
+
     /// <summary>Definition of a property (key, type, default, rules, options).</summary>
     public JsonObject? Definition { get; init; }
 
@@ -56,3 +59,6 @@ public sealed record AttachmentSnapshot(string FileName, string Mime, long Size,
 
 /// <summary>Stored fields of a category kept in its revisions.</summary>
 public sealed record CategorySnapshot(string Description, ElementId? ParentCategoryId);
+
+/// <summary>Stored fields of a link type kept in its revisions.</summary>
+public sealed record LinkTypeSnapshot(string Description, string? InverseName);

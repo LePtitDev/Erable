@@ -29,7 +29,7 @@ export class PagePropertiesPanel {
     return this.page.getByRole("group", { name, exact: true }).first();
   }
 
-  async openTab(tab: "properties" | "categories" | "files") {
+  async openTab(tab: "properties" | "categories" | "links" | "files") {
     await this.page.getByRole("tab", { name: t(`page.tabs.${tab}`) }).click();
   }
 

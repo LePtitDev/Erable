@@ -70,4 +70,25 @@ public static class ErrorCodes
 
     /// <summary>A value is given for a property that does not exist (or is in the trash).</summary>
     public const string PropertyNotFound = "property.notFound";
+
+    /// <summary>The description of a link type is too long.</summary>
+    public const string LinkTypeDescriptionTooLong = "link.type.description.tooLong";
+
+    /// <summary>The inverse label of a link type is too long or malformed.</summary>
+    public const string LinkTypeInverseInvalid = "link.type.inverse.invalid";
+
+    /// <summary>The link type does not exist (or is in the trash).</summary>
+    public const string LinkTypeNotFound = "link.type.notFound";
+
+    /// <summary>An end of a link is not a live page.</summary>
+    public const string LinkPageInvalid = "link.page.invalid";
+
+    /// <summary>A page cannot be linked to itself.</summary>
+    public const string LinkSelf = "link.self";
+
+    /// <summary>The same link (source, type, target) already exists.</summary>
+    public const string LinkDuplicate = "link.duplicate";
+
+    /// <summary>The link does not exist.</summary>
+    public const string LinkNotFound = "link.notFound";
 }
