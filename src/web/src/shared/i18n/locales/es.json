@@ -383,7 +383,14 @@
     "loadMore": "Mostrar más resultados",
     "activity": "Actividad reciente",
     "inAttachment": "Adjunto de {{page}}",
-    "violation": "{{property}}: {{message}}"
+    "violation": "{{property}}: {{message}}",
+    "quick": {
+      "title": "Búsqueda rápida",
+      "field": "Ir a un elemento por su nombre",
+      "escape": "Esc para cerrar",
+      "results": "Resultados",
+      "advanced": "Búsqueda avanzada"
+    }
   },
   "kinds": {
     "root": "Raíz",

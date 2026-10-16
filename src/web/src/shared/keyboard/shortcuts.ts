@@ -12,6 +12,8 @@ export interface Shortcut {
 export const shortcuts = {
   /** Not Alt+Space (window menu, PowerToys, non-breaking space on macOS): §A-11.3. */
   openPalette: { other: "Ctrl-Space", mac: "Mod-Shift-k" },
+  /** Quick search (F10.R1); the same on every platform: ⌘K on macOS. */
+  quickSearch: { other: "Mod-k", mac: "Mod-k" },
   save: { other: "Mod-s", mac: "Mod-s" },
 } as const satisfies Record<string, Shortcut>;
 

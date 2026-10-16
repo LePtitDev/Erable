@@ -376,7 +376,14 @@
     "loadMore": "Weitere Ergebnisse anzeigen",
     "activity": "Letzte Aktivität",
     "inAttachment": "Anhang von {{page}}",
-    "violation": "{{property}}: {{message}}"
+    "violation": "{{property}}: {{message}}",
+    "quick": {
+      "title": "Schnellsuche",
+      "field": "Element nach Namen öffnen",
+      "escape": "Esc zum Schließen",
+      "results": "Ergebnisse",
+      "advanced": "Erweiterte Suche"
+    }
   },
   "kinds": {
     "root": "Wurzel",

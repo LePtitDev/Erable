@@ -1,12 +1,51 @@
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
 import { EditorPage } from "../pages/EditorPage";
+import { QuickSearchPage } from "../pages/QuickSearchPage";
 import { SearchPage } from "../pages/SearchPage";
 import { TreePanel } from "../pages/TreePanel";
 import { expectNoSeriousViolations } from "../support/a11y";
 import { t } from "../support/i18n";
 
 test.describe("F10 · Search and filters", () => {
+  test("E2E-10-01 · Quick search @pr @desktop", async ({ page, reference }) => {
+    const quick = new QuickSearchPage(page);
+    await page.goto(reference.url(chroniques.hautbois));
+    await expect(page.getByRole("main")).toBeVisible();
+
+    await quick.open();
+    await quick.field.fill("ilsa");
+
+    await expect(quick.options.first()).toContainText("Ilsa Varenne");
+    await expect(quick.options.first()).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Enter");
+
+    await expect(quick.dialog).toBeHidden();
+    await expect(page).toHaveURL(reference.url(chroniques.ilsa));
+    await expect(page.getByRole("heading", { level: 1, name: "Ilsa Varenne" })).toBeVisible();
+  });
+
+  test("E2E-10-01 · Quick search offers the recent elements and the advanced search @pr", async ({
+    page,
+    reference,
+  }) => {
+    const quick = new QuickSearchPage(page);
+    await page.goto(reference.url(chroniques.hautbois));
+    await expect(page.getByRole("main")).toBeVisible();
+    await page.clock.runFor(2500);
+    await page.goto(reference.url(chroniques.pnj));
+    await expect(page.getByRole("main")).toBeVisible();
+
+    await quick.open();
+    await expect(quick.options.first()).toContainText("Hautbois");
+    await quick.field.fill("col gele");
+    await page.keyboard.press("Control+Enter");
+
+    await expect(quick.dialog).toBeHidden();
+    await expect(page).toHaveURL(/\/search\?q=col(%20|\+)gele/);
+    await expect(new SearchPage(page).field).toHaveValue("col gele");
+  });
+
   test("E2E-10-02 · Full text ignores accents @pr", async ({ page, reference }) => {
     const search = new SearchPage(page);
     await search.goto(reference.id);

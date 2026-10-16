@@ -383,7 +383,14 @@
     "loadMore": "Afficher plus de résultats",
     "activity": "Activité récente",
     "inAttachment": "Pièce jointe de {{page}}",
-    "violation": "{{property}} : {{message}}"
+    "violation": "{{property}} : {{message}}",
+    "quick": {
+      "title": "Recherche rapide",
+      "field": "Aller à un élément par son nom",
+      "escape": "Échap pour fermer",
+      "results": "Résultats",
+      "advanced": "Recherche avancée"
+    }
   },
   "kinds": {
     "root": "Racine",

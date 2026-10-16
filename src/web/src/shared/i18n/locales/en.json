@@ -376,7 +376,14 @@
     "loadMore": "Show more results",
     "activity": "Recent activity",
     "inAttachment": "Attachment of {{page}}",
-    "violation": "{{property}}: {{message}}"
+    "violation": "{{property}}: {{message}}",
+    "quick": {
+      "title": "Quick search",
+      "field": "Go to an element by name",
+      "escape": "Esc to close",
+      "results": "Results",
+      "advanced": "Advanced search"
+    }
   },
   "kinds": {
     "root": "Root",

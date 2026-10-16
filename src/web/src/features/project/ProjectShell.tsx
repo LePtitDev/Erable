@@ -12,6 +12,7 @@ import { useWindowStore } from "../../shared/native/native";
 import { useSetTheme } from "../../shared/theme/useSetTheme";
 import { useSystemDark } from "../../shared/theme/useSystemDark";
 import { Logo } from "../../shared/ui/Logo";
+import { QuickSearch } from "../search/QuickSearch";
 import { PreferencesDialog } from "../home/PreferencesDialog";
 import { Explorer } from "../explorer/Explorer";
 import { NotFoundScreen } from "./ErrorScreens";
@@ -49,6 +50,27 @@ function ShellFrame({
   const { t } = useTranslation();
   const layout = useUiState<Layout>("layout", defaultLayout);
   const [preferences, setPreferences] = useState(false);
+  const [quickSearch, setQuickSearch] = useState(false);
+
+  // Ctrl+K (⌘K) opens the quick search from anywhere, the editor included (F10.R1).
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (
+        event.key.toLowerCase() === "k" &&
+        (event.ctrlKey || event.metaKey) &&
+        !event.altKey &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        setQuickSearch(true);
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => {
+      window.removeEventListener("keydown", onKey, true);
+    };
+  }, []);
 
   // Document and window title (DesktopWindow): the project while it is shown.
   const setWindowProject = useWindowStore((s) => s.setProjectName);
@@ -74,6 +96,9 @@ function ShellFrame({
         }}
         onPreferences={() => {
           setPreferences(true);
+        }}
+        onSearch={() => {
+          setQuickSearch(true);
         }}
       />
       <div className={styles["body"]}>
@@ -104,6 +129,7 @@ function ShellFrame({
       </div>
       <StatusBar projectId={projectId} />
       <PreferencesDialog open={preferences} onOpenChange={setPreferences} />
+      <QuickSearch projectId={projectId} open={quickSearch} onOpenChange={setQuickSearch} />
     </div>
   );
 }
@@ -114,12 +140,14 @@ function TopBar({
   explorerOpen,
   onToggleExplorer,
   onPreferences,
+  onSearch,
 }: {
   readonly projectId: ElementId;
   readonly projectName: string;
   readonly explorerOpen: boolean;
   readonly onToggleExplorer: () => void;
   readonly onPreferences: () => void;
+  readonly onSearch: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -169,12 +197,11 @@ function TopBar({
           <ArrowRight aria-hidden size={18} />
         </button>
       </div>
-      {/* Quick search arrives with M3-02; the field is shown, inactive. */}
-      <div className={styles["search"]} aria-disabled="true" title={t("common.soon")}>
+      <button type="button" className={styles["search"]} onClick={onSearch}>
         <Search aria-hidden size={16} />
         <span className={styles["searchText"]}>{t("shell.search")}</span>
         <kbd className={styles["kbd"]}>{t("shell.searchShortcut")}</kbd>
-      </div>
+      </button>
       <div className={styles["right"]}>
         {/* Presence avatars arrive with M4-04. */}
         <button
