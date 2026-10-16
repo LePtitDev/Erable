@@ -1,6 +1,7 @@
 import { request as playwrightRequest } from "@playwright/test";
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
+import { EditorPage } from "../pages/EditorPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RecentPanel } from "../pages/RecentPanel";
 import { TreePanel } from "../pages/TreePanel";
@@ -154,5 +155,36 @@ test.describe("F11 · Views belong to each user", () => {
     await expect(malo.getByRole("complementary", { name: t("search.activity") })).toContainText(
       "Hautbois",
     );
+  });
+});
+
+test.describe("F14 · Live updates", () => {
+  test.use({ user: "camille" });
+
+  test("E2E-14-06 · Changes propagate without reloading @multi @server", async ({
+    page,
+    reference,
+    openAs,
+  }) => {
+    const malo = await openAs("malo");
+    await malo.goto(reference.url(chroniques.hautbois));
+    await expect(malo.getByRole("heading", { level: 1, name: "Hautbois" })).toBeVisible();
+    // The link is up before camille writes: nothing is replayed to a client that was not listening.
+    await expect(malo.getByRole("status").filter({ hasText: /synchronisé/ })).toBeVisible();
+
+    const editor = new EditorPage(page);
+    await page.goto(reference.url(chroniques.hautbois));
+    await editor.open();
+    await editor.toEnd();
+    await editor.type("\n\nUn nouveau puits.");
+    await editor.save();
+    await expect(page.getByRole("button", { name: t("page.edit") })).toBeVisible();
+
+    await expect(malo.getByText("Un nouveau puits.")).toBeVisible();
+
+    await page.goto(`/p/${reference.id}`);
+    await new TreePanel(page).newFolder("Quartier du port");
+
+    await expect(new TreePanel(malo).item("Quartier du port")).toBeVisible();
   });
 });

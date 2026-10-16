@@ -18,4 +18,7 @@ internal static partial class ServerLog
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Endpoint {Endpoint} declares no access rule.")]
     public static partial void UndeclaredAccess(ILogger logger, string? endpoint);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "The events of a write in project {ProjectId} ({Endpoint}) were not sent.")]
+    public static partial void EventNotSent(ILogger logger, Exception exception, ElementId projectId, string endpoint);
 }

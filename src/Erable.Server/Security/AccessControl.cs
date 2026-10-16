@@ -227,6 +227,12 @@ internal sealed class AccessControlMiddleware(
             token = cookie;
             fromCookie = true;
         }
+        else if (context.Request.Path.StartsWithSegments("/hubs", StringComparison.Ordinal)
+            && context.Request.Query["access_token"].ToString() is { Length: > 0 } queryToken)
+        {
+            // Browsers cannot set a header on a WebSocket: a bearer token travels in the query string, for the hubs only.
+            token = queryToken;
+        }
 
         if (token is null || accounts.Authenticate(token) is not { } session)
         {

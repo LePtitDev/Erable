@@ -159,11 +159,11 @@ function EditorScreen({
   }, [closeRequests]);
 
   useEffect(() => {
-    setMode("edit");
+    setMode("edit", element.id);
     return () => {
       setMode("read");
     };
-  }, [setMode]);
+  }, [setMode, element.id]);
 
   // Resolve the names of every ID of the text, in one call, refreshed when the set of IDs changes.
   const ids = useMemo(() => {

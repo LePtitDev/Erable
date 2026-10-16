@@ -6,6 +6,7 @@ using Erable.Server.Accounts;
 using Erable.Server.Api;
 using Erable.Server.Native;
 using Erable.Server.Projects;
+using Erable.Server.Realtime;
 using Erable.Server.Security;
 using Erable.Server.Spa;
 using Erable.Server.Users;
@@ -94,6 +95,18 @@ public static class ErableHost
         }
 #endif
         builder.Services.AddProblemDetails();
+        builder.Services.AddSignalR(hub =>
+        {
+            // A browser closed without a goodbye (power cut, network lost) leaves its presence for at most this long.
+            hub.KeepAliveInterval = TimeSpan.FromSeconds(5);
+            hub.ClientTimeoutInterval = TimeSpan.FromSeconds(15);
+        }).AddJsonProtocol(json =>
+        {
+            json.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            json.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        });
+        builder.Services.AddSingleton<ProjectConnections>();
+        builder.Services.AddSingleton<ProjectEvents>();
         builder.Services.AddOpenApi(ApiRoutes.OpenApiDocumentName, openApi =>
         {
             openApi.AddDocumentTransformer((document, _, _) =>
@@ -239,11 +252,16 @@ public static class ErableHost
         // After the static files, which need no identity: the session lookups are for API and shell requests only.
         app.UseMiddleware<AccessControlMiddleware>();
 
+        // Wraps the endpoints below: once a write of a project is answered, its events go out to the other clients.
+        app.UseMiddleware<ProjectEventsMiddleware>();
+
         app.MapOpenApi(ApiRoutes.OpenApiPattern).PublicAccess();
         app.MapInfoEndpoints();
         app.MapSessionEndpoints();
         app.MapSelfTestEndpoints();
         app.MapGroup(ApiRoutes.V1).MapAuthEndpoints().MapProjectEndpoints();
+        // The hub itself needs a signed-in user; joining a project checks the membership.
+        app.MapHub<ProjectHub>(ApiRoutes.ProjectHub).RequireSignIn();
         app.MapNativeEndpoints(options);
 
         if (TestEndpointsCompiled && options.TestMode)

@@ -47,6 +47,9 @@ public sealed class TestBackend : IAsyncDisposable
 
     public IServiceProvider Services => _app.Services;
 
+    /// <summary>The in-memory server (server mode): SignalR clients connect through its handler.</summary>
+    public Microsoft.AspNetCore.TestHost.TestServer Server => _app.GetTestServer();
+
     public AccountService Accounts => _app.Services.GetRequiredService<AccountService>();
 
     /// <summary>A client with no credentials (server mode).</summary>

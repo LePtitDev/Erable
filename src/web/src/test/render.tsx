@@ -4,11 +4,15 @@ import { render, type RenderOptions } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import { ClockContext, type Clock } from "../shared/i18n/format";
+import { RealtimeContext, type ConnectToProject } from "../shared/realtime/RealtimeContext";
 import { testI18n } from "./i18n";
 
 /** Default test clock: 13 October 2026, 10:00 Europe/Paris (docs/features.md §1.4). */
 export const testNow = new Date("2026-10-13T08:00:00Z");
 const testClock: Clock = () => testNow;
+
+/** No server to listen to in unit tests: the connection starts and stops without doing anything. */
+const noRealtime: ConnectToProject = () => Promise.resolve(() => Promise.resolve());
 
 /** Renders a component with the providers the app installs (fresh query cache, no retries, frozen clock). */
 export function renderWithProviders(ui: ReactElement, options?: RenderOptions) {
@@ -16,7 +20,9 @@ export function renderWithProviders(ui: ReactElement, options?: RenderOptions) {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <I18nextProvider i18n={testI18n}>
       <ClockContext value={testClock}>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <RealtimeContext value={noRealtime}>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </RealtimeContext>
       </ClockContext>
     </I18nextProvider>
   );

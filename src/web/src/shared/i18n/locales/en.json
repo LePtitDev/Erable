@@ -302,7 +302,13 @@
       "cursor": "Ln {{line}}, Col {{column}}",
       "errors_one": "{{count}} validation error",
       "errors_other": "{{count}} validation errors",
-      "readOnly": "Read-only"
+      "readOnly": "Read-only",
+      "connection": {
+        "connecting": "Connecting…",
+        "connected": "Connected to {{server}} · in sync",
+        "reconnecting": "Connection lost · reconnecting…",
+        "disconnected": "Offline"
+      }
     },
     "mode": {
       "read": "Reading",

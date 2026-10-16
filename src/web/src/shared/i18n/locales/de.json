@@ -302,7 +302,13 @@
       "cursor": "Z {{line}}, Sp {{column}}",
       "errors_one": "{{count}} Validierungsfehler",
       "errors_other": "{{count}} Validierungsfehler",
-      "readOnly": "Schreibgeschützt"
+      "readOnly": "Schreibgeschützt",
+      "connection": {
+        "connecting": "Verbindung wird hergestellt…",
+        "connected": "Verbunden mit {{server}} · synchronisiert",
+        "reconnecting": "Verbindung verloren · neue Verbindung…",
+        "disconnected": "Offline"
+      }
     },
     "mode": {
       "read": "Lesen",

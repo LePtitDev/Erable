@@ -307,7 +307,13 @@
       "errors_one": "{{count}} erreur de validation",
       "errors_other": "{{count}} erreurs de validation",
       "errors_many": "{{count}} erreurs de validation",
-      "readOnly": "Lecture seule"
+      "readOnly": "Lecture seule",
+      "connection": {
+        "connecting": "Connexion…",
+        "connected": "Connecté à {{server}} · synchronisé",
+        "reconnecting": "Connexion perdue · reconnexion…",
+        "disconnected": "Hors ligne"
+      }
     },
     "mode": {
       "read": "Lecture",

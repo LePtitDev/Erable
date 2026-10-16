@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { ElementId } from "../../shared/ids/elementId";
 
 export type ShellMode = "read" | "edit";
 
@@ -9,7 +10,9 @@ interface ShellState {
   readonly cursor: { readonly line: number; readonly column: number } | null;
   /** Validation errors of the page being edited, shown in the status bar (F05.R6). */
   readonly validationErrors: number;
-  setMode: (mode: ShellMode) => void;
+  /** The page being edited, if any: the real-time events leave it alone (M4-03). */
+  readonly editingId: ElementId | null;
+  setMode: (mode: ShellMode, editingId?: ElementId) => void;
   setValidationErrors: (count: number) => void;
   setCursor: (cursor: { line: number; column: number } | null) => void;
 }
@@ -19,8 +22,13 @@ export const useShellStore = create<ShellState>()((set) => ({
   mode: "read",
   cursor: null,
   validationErrors: 0,
-  setMode: (mode) => {
-    set({ mode, ...(mode === "read" ? { cursor: null } : {}) });
+  editingId: null,
+  setMode: (mode, editingId) => {
+    set({
+      mode,
+      editingId: mode === "edit" ? (editingId ?? null) : null,
+      ...(mode === "read" ? { cursor: null } : {}),
+    });
   },
   setValidationErrors: (validationErrors) => {
     set({ validationErrors });

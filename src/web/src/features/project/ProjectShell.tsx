@@ -20,6 +20,8 @@ import { ApiError } from "../../shared/api/client";
 import { apiInfoQuery } from "../../shared/api/queries";
 import { AccessDeniedScreen, NotFoundScreen } from "./ErrorScreens";
 import { accessOf, ProjectAccessContext, useCanEdit } from "./access";
+import { useConnectionStore } from "../../shared/realtime/connectionStore";
+import { useProjectEvents } from "./useProjectEvents";
 import styles from "./ProjectShell.module.css";
 import { Splitter } from "./Splitter";
 import { useShellStore } from "./shellStore";
@@ -62,6 +64,8 @@ function ShellFrame({
 }) {
   const { t } = useTranslation();
   const layout = useUiState<Layout>("layout", defaultLayout);
+  // What the others do shows up without reloading (M4-03).
+  useProjectEvents(projectId);
   const [preferences, setPreferences] = useState(false);
   const [quickSearch, setQuickSearch] = useState(false);
 
@@ -240,6 +244,32 @@ function TopBar({
   );
 }
 
+/** « Connecté à … · synchronisé » on a server (M4-03); « Local » on the desktop, which has nobody to sync with. */
+function ConnectionStatus() {
+  const { t } = useTranslation();
+  const info = useQuery(apiInfoQuery);
+  const state = useConnectionStore((s) => s.state);
+  if (info.data?.mode !== "server") {
+    return (
+      <span className={styles["connection"]}>
+        <span className={styles["dot"]} aria-hidden />
+        {t("shell.status.local")}
+      </span>
+    );
+  }
+  const lost = state === "reconnecting" || state === "disconnected";
+  return (
+    <span
+      className={`${styles["connection"] ?? ""} ${lost ? (styles["lost"] ?? "") : ""}`}
+      role="status"
+      data-connection={state}
+    >
+      <span className={styles["dot"]} aria-hidden />
+      {t(`shell.status.connection.${state}`, { server: globalThis.location.host })}
+    </span>
+  );
+}
+
 function StatusBar({ projectId }: { readonly projectId: ElementId }) {
   const { t } = useTranslation();
   const tree = useQuery(treeQuery(projectId));
@@ -250,10 +280,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
   const counts = tree.data?.counts;
   return (
     <footer className={styles["statusBar"]}>
-      <span className={styles["connection"]}>
-        <span className={styles["dot"]} aria-hidden />
-        {t("shell.status.local")}
-      </span>
+      <ConnectionStatus />
       {counts !== undefined && (
         <span>
           {[
