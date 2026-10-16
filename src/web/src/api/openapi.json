@@ -910,6 +910,123 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/search": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "operationId": "Search",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "NameOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "SubCategories",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "where",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "Modified",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "OutOfRules",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResultPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/projects/{projectId}/categories": {
       "get": {
         "tags": [
@@ -2955,6 +3072,22 @@
         "type": "object",
         "additionalProperties": { }
       },
+      "KindCount": {
+        "required": [
+          "kind",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "LinkItem": {
         "required": [
           "id",
@@ -3757,6 +3890,144 @@
           }
         }
       },
+      "SearchHitItem": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "path",
+          "title",
+          "excerpt",
+          "categories",
+          "updatedAt",
+          "updatedBy",
+          "updatedByName",
+          "issues",
+          "attachment"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PathItem"
+            }
+          },
+          "title": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TextSegmentItem"
+            }
+          },
+          "excerpt": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TextSegmentItem"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorySummary"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "updatedByName": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchIssueItem"
+            }
+          },
+          "attachment": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AttachmentItem"
+              }
+            ]
+          }
+        }
+      },
+      "SearchIssueItem": {
+        "required": [
+          "propertyId",
+          "propertyName",
+          "rule",
+          "index"
+        ],
+        "type": "object",
+        "properties": {
+          "propertyId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "propertyName": {
+            "type": "string"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/JsonObject"
+          },
+          "index": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "SearchResultPage": {
+        "required": [
+          "hits",
+          "total",
+          "facets",
+          "nextCursor"
+        ],
+        "type": "object",
+        "properties": {
+          "hits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchHitItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "facets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KindCount"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "SelfTestReport": {
         "required": [
           "steps",
@@ -3834,6 +4105,21 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "TextSegmentItem": {
+        "required": [
+          "text",
+          "hit"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "hit": {
+            "type": "boolean"
           }
         }
       },
@@ -4138,6 +4424,9 @@
     },
     {
       "name": "Links"
+    },
+    {
+      "name": "Search"
     },
     {
       "name": "Categories"

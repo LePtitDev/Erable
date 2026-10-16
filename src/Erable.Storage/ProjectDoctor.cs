@@ -59,6 +59,9 @@ public static class DoctorCodes
     public const string ValueUnknownProperty = "value.unknownProperty";
     public const string DerivedOutOfSync = "derived.outOfSync";
 
+    /// <summary>The full-text index (<c>search_fts</c>) differs from the names and texts it indexes, or is damaged.</summary>
+    public const string SearchOutOfSync = "search.outOfSync";
+
     /// <summary>A link whose source, target or type does not exist or is not of the right kind.</summary>
     public const string LinkDangling = "link.dangling";
 }
@@ -128,6 +131,7 @@ public static class ProjectDoctor
         CheckTree(project, findings);
         CheckPages(project, fix, findings);
         CheckStructure(project, fix, findings);
+        CheckSearch(project, fix, findings);
         CheckBlobs(project, fix, closed, findings);
         return Report(project, findings);
     }
@@ -167,6 +171,17 @@ public static class ProjectDoctor
     private static bool CheckIntegrity(OpenedProject project, List<DoctorFinding> findings)
     {
         using var connection = project.Database.OpenConnection();
+        // A pooled connection may hold a stale picture of the full-text index after a write by another connection, and
+        // PRAGMA integrity_check would report it as corrupted. Reading it through FTS5 itself refreshes the picture; a real
+        // corruption still shows up in the pragma.
+        try
+        {
+            connection.Execute("INSERT INTO search_fts (search_fts) VALUES ('integrity-check');");
+        }
+        catch (SqliteException)
+        {
+        }
+
         var messages = connection.Query<string>($"PRAGMA integrity_check({MaxIntegrityMessages});").ToList();
         if (messages is not ["ok"])
         {
@@ -342,6 +357,44 @@ public static class ProjectDoctor
             findings.Add(new(DoctorCodes.DerivedOutOfSync, DoctorSeverity.Warning,
                 "The resolved values or validation issues differ from the categories and values.", Fixable: true, Fixed: fix));
         }
+    }
+
+    /// <summary>The full-text index must hold exactly what <c>search_source</c> defines; fix rebuilds it.</summary>
+    private static void CheckSearch(OpenedProject project, bool fix, List<DoctorFinding> findings)
+    {
+        using var connection = project.Database.OpenConnection();
+        var damaged = false;
+        try
+        {
+            connection.Execute("INSERT INTO search_fts (search_fts) VALUES ('integrity-check');");
+        }
+        catch (SqliteException)
+        {
+            damaged = true;
+        }
+
+        var expected = connection.Query<(long Id, string Name, string Body)>("SELECT id, name, body FROM search_source ORDER BY id").ToList();
+        var stored = damaged
+            ? []
+            : connection.Query<(long Id, string Name, string Body)>("SELECT rowid, name, plain_text FROM search_fts ORDER BY rowid").ToList();
+        if (!damaged && expected.SequenceEqual(stored))
+        {
+            return;
+        }
+
+        if (fix)
+        {
+            project.Database.WriteAsync((c, t) =>
+            {
+                c.Execute("DELETE FROM search_fts;", transaction: t);
+                c.Execute("INSERT INTO search_fts (rowid, name, plain_text) SELECT id, name, body FROM search_source;", transaction: t);
+                return 0;
+            }).GetAwaiter().GetResult();
+        }
+
+        findings.Add(new(DoctorCodes.SearchOutOfSync, DoctorSeverity.Warning,
+            damaged ? "The full-text index is damaged." : "The full-text index differs from the names and texts of the elements.",
+            Fixable: true, Fixed: fix));
     }
 
     private static void CheckBlobs(OpenedProject project, bool fix, bool closed, List<DoctorFinding> findings)

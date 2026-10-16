@@ -1,6 +1,7 @@
 using System.Reflection;
 using Dapper;
 using Erable.Core;
+using Erable.Core.Search;
 using Microsoft.Data.Sqlite;
 
 namespace Erable.Storage;
@@ -13,6 +14,12 @@ public sealed class ProjectDatabase : IDisposable
 {
     /// <summary>How long a connection waits for a lock held by another connection.</summary>
     private const int BusyTimeoutMs = 5000;
+
+    /// <summary>SQL function folding case and accents (<see cref="TextFolding"/>).</summary>
+    public const string FoldFunction = "erable_fold";
+
+    /// <summary>SQL collation ordering by folded text.</summary>
+    public const string FoldCollation = "ERABLE_FOLD";
 
     private readonly SemaphoreSlim _writeGate = new(1, 1);
     private readonly string _connectionString;
@@ -78,6 +85,9 @@ public sealed class ProjectDatabase : IDisposable
         connection.Open();
         // Durability first: a wiki write is rare and small; FULL survives a power cut with the last commit.
         connection.Execute($"PRAGMA busy_timeout = {BusyTimeoutMs}; PRAGMA synchronous = FULL;");
+        // Folding of search (F10.R2): the sort by name and the « contains » condition ignore case and accents.
+        connection.CreateFunction<string?, string>(FoldFunction, text => TextFolding.Fold(text), isDeterministic: true);
+        connection.CreateCollation(FoldCollation, (a, b) => string.CompareOrdinal(TextFolding.Fold(a), TextFolding.Fold(b)));
         return connection;
     }
 

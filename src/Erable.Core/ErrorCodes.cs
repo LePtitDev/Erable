@@ -97,4 +97,10 @@ public static class ErrorCodes
 
     /// <summary>An attachment cannot come back while its page is in the trash: restore the page first.</summary>
     public const string TrashParentDeleted = "trash.parent.deleted";
+
+    /// <summary>A property condition of a search is malformed, or its operator does not apply to the property.</summary>
+    public const string SearchConditionInvalid = "search.condition.invalid";
+
+    /// <summary>The cursor of a search page is not one this server issued.</summary>
+    public const string SearchCursorInvalid = "search.cursor.invalid";
 }

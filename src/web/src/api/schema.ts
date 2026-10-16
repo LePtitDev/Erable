@@ -662,6 +662,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["Search"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/trash": {
     parameters: {
       query?: never;
@@ -968,6 +984,11 @@ export interface components {
     JsonObject: {
       [key: string]: unknown;
     };
+    KindCount: {
+      /** Format: int32 */
+      count: number;
+      kind: components["schemas"]["ElementKind"];
+    };
     LinkItem: {
       id: components["schemas"]["ElementId"];
       linkTypeId: components["schemas"]["ElementId"];
@@ -1155,6 +1176,35 @@ export interface components {
       markdown: string;
       properties?: null | components["schemas"]["PagePropertyValue"][];
     };
+    SearchHitItem: {
+      attachment: null | components["schemas"]["AttachmentItem"];
+      categories: components["schemas"]["CategorySummary"][];
+      excerpt: components["schemas"]["TextSegmentItem"][];
+      id: components["schemas"]["ElementId"];
+      issues: components["schemas"]["SearchIssueItem"][];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+      path: components["schemas"]["PathItem"][];
+      title: components["schemas"]["TextSegmentItem"][];
+      /** Format: date-time */
+      updatedAt: string;
+      updatedBy: string;
+      updatedByName: string;
+    };
+    SearchIssueItem: {
+      /** Format: int32 */
+      index: null | number;
+      propertyId: components["schemas"]["ElementId"];
+      propertyName: string;
+      rule: components["schemas"]["JsonObject"];
+    };
+    SearchResultPage: {
+      facets: components["schemas"]["KindCount"][];
+      hits: components["schemas"]["SearchHitItem"][];
+      nextCursor: null | string;
+      /** Format: int32 */
+      total: number;
+    };
     SelfTestReport: {
       /** Format: double */
       readyAtMs: number;
@@ -1174,6 +1224,10 @@ export interface components {
       eventId?: null | string;
       eventType?: null | string;
       reconnectionInterval?: null | string;
+    };
+    TextSegmentItem: {
+      hit: boolean;
+      text: string;
     };
     /** @enum {string} */
     ThemePreference: "light" | "dark" | "system";
@@ -2527,6 +2581,40 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ResolveResult"];
+        };
+      };
+    };
+  };
+  Search: {
+    parameters: {
+      query?: {
+        category?: string[];
+        Cursor?: string;
+        kind?: string[];
+        Limit?: number;
+        Modified?: string;
+        NameOnly?: boolean;
+        OutOfRules?: boolean;
+        q?: string;
+        Sort?: string;
+        SubCategories?: boolean;
+        where?: string[];
+      };
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SearchResultPage"];
         };
       };
     };

@@ -48,6 +48,13 @@ public sealed class LegacyProjectTests
         project.Repository.GetIncomingReferences(Orsen).Select(r => r.SourceId).ShouldBe([Ilsa]);
         project.Repository.GetAttachments(Ilsa).Single().FileName.ShouldBe("portrait_ilsa.txt");
         project.Repository.LoadTree().FindAnomalies().ShouldBeEmpty();
+        // The full-text index (format v4) is filled by the migration, so that an older project is searchable at once.
+        new ProjectService(project, new FakeTimeProvider(Now))
+            .Search(new Erable.Core.Search.SearchRequest("presentation", false, Erable.Core.Search.SearchFilter.None, Erable.Core.Search.SearchSort.Relevance, 0, 10))
+            .Hits.Select(h => h.Element.Id).ShouldBe([Ilsa]);
+        new ProjectService(project, new FakeTimeProvider(Now))
+            .Search(new Erable.Core.Search.SearchRequest("capitaine", true, Erable.Core.Search.SearchFilter.None, Erable.Core.Search.SearchSort.Relevance, 0, 10))
+            .Hits.Select(h => h.Element.Id).ShouldBe([Orsen]);
         // The frozen projects are written by hand: their search text is not the analyzer's (a derived index, rebuilt by fix).
         ProjectDoctor.Diagnose(project, fix: false).Findings
             .Where(f => f.Severity != DoctorSeverity.Info && f.Code != DoctorCodes.IndexOutOfSync).Select(f => f.Code).ShouldBeEmpty();

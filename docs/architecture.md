@@ -276,12 +276,12 @@ refs            (source_id, target_id, anchor, is_embed)    -- index dérivé du
 attachments     (id PK, page_id, file_name, mime, size, sha256)
 validation_issues (owner_id, property_id, rule_index, rule_op, rule_json, item_index)  -- dérivée
 user_activity   (user_id, element_id, last_viewed_at)       -- « récemment consultées »
-search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacritics 2')
+search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacritics 2')   -- tenue par triggers depuis la vue search_source (format v4)
 ```
 
 - **Historique** : chaque enregistrement crée une révision (instantané JSON compressé de l'élément). C'est peu coûteux sur du texte et indispensable dès qu'il y a plusieurs éditeurs (consulter, comparer, restaurer). « Récemment modifiées » découle directement de cette table.
 - **Corbeille** : suppression logique (`deleted_at`), vidée manuellement ou après N jours (le vidage automatique n'est pas implémenté, voir tasks/M2-08). Une suppression est une **entrée** : `deleted_root` désigne l'élément supprimé par l'utilisateur et porte la même valeur pour tout ce qui l'accompagne (sous-pages, contenu d'un dossier, pièces jointes) ; un élément supprimé plus tôt garde sa propre entrée. Restaurer remet l'entrée entière, à son emplacement d'origine ou, si le parent n'existe plus, à la racine de son type. `deleted_orphan` vaut 1 quand le parent de l'entrée a été effacé définitivement (il est alors rattaché à la racine). Le vidage supprime les lignes et leurs dépendances (valeurs, liens, révisions, pièces jointes) puis les blobs que plus rien ne référence.
-- `remove_diacritics` : « col gele » trouve « Col gelé ».
+- `remove_diacritics` : « col gele » trouve « Col gelé ». **Index de recherche** (format v4) : la vue `search_source` définit ce qui est cherchable (éléments vivants hors racines ; nom + texte brut d'une page, ou description d'une catégorie, d'une propriété, d'un type de lien) et des triggers recopient chaque écriture dans `search_fts`, dans sa transaction ; `erable doctor --fix` le reconstruit. Le texte saisi n'atteint jamais FTS5 tel quel (mots entre guillemets, dernier mot en préfixe).
 - **Conventions de stockage** : ID en `INTEGER` signé ; dates en texte UTC ISO 8601 à la milliseconde (`2026-10-13T08:00:00.000Z`), triables et lisibles ; types d'élément en texte (`page`, `folder`…) ; tables `STRICT`. Le propriétaire d'une pièce jointe est le parent de son élément (pas de colonne `page_id` en double) ; `revisions.blob_sha256` garde en vie le blob d'une révision de pièce jointe face au ramasse-miettes.
 
 ### 7.5 Ce que ce choix ne fait pas bien
