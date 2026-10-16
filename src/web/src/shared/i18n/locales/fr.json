@@ -137,6 +137,35 @@
       "parent": {
         "deleted": "La page de cette pièce jointe est dans la corbeille : restaurez-la d’abord."
       }
+    },
+    "auth": {
+      "invalidCredentials": "Identifiant ou mot de passe incorrect",
+      "tooManyAttempts": "Trop de tentatives échouées. Réessayez dans quelques minutes.",
+      "required": "Vous devez vous connecter.",
+      "unavailable": "Ce serveur n’a pas de comptes."
+    },
+    "access": {
+      "forbidden": "Votre rôle dans ce projet ne permet pas cette action.",
+      "crossOrigin": "Requête refusée : elle ne provient pas de ce site."
+    },
+    "account": {
+      "login": {
+        "invalid": "L’identifiant compte 2 à 32 caractères : lettres minuscules, chiffres, « . », « _ » ou « - ».",
+        "taken": "Cet identifiant est déjà utilisé."
+      },
+      "name": {
+        "invalid": "Le nom affiché doit comporter 1 à 80 caractères."
+      },
+      "password": {
+        "invalid": "Le mot de passe doit comporter au moins 8 caractères."
+      },
+      "notFound": "Ce compte n’existe pas."
+    },
+    "feature": {
+      "folderProjects": "Ce serveur héberge lui-même ses projets : un dossier ne peut pas être indiqué."
+    },
+    "request": {
+      "folderRequired": "Indiquez le dossier du projet."
     }
   },
   "home": {
@@ -161,7 +190,8 @@
       "languageHint": "Langue dans laquelle les pages sont rédigées. Elle ne pourra plus être changée.",
       "location": "Emplacement",
       "folder": "Dossier du projet : {{folder}}",
-      "create": "Créer le projet"
+      "create": "Créer le projet",
+      "serverHint": "Le projet est hébergé par le serveur ; vous en serez l’administrateur."
     },
     "open": {
       "title": "Ouvrir un dossier…",
@@ -203,6 +233,11 @@
       "description": "Ce projet a été créé avec une version plus ancienne d’Erable (format {{from}}). Pour l’ouvrir, il doit être converti au format {{to}}.",
       "backup": "Une sauvegarde de la base, « erable.db.bak-… », est créée à côté du projet avant toute modification. Si la migration échoue, elle est remise en place et le projet reste tel qu’il était.",
       "confirm": "Sauvegarder et migrer"
+    },
+    "server": {
+      "title": "Projets du serveur",
+      "empty": "Vous n’êtes membre d’aucun projet pour le moment. Demandez à un administrateur de vous ajouter.",
+      "role": "Votre rôle : {{role}}"
     }
   },
   "help": {
@@ -271,7 +306,8 @@
       "links_many": "{{count}} types de liens",
       "errors_one": "{{count}} erreur de validation",
       "errors_other": "{{count}} erreurs de validation",
-      "errors_many": "{{count}} erreurs de validation"
+      "errors_many": "{{count}} erreurs de validation",
+      "readOnly": "Lecture seule"
     },
     "mode": {
       "read": "Lecture",
@@ -850,5 +886,28 @@
     "emptyDescription_many": "Cette action est définitive : {{count}} éléments et leur contenu seront supprimés pour toujours.",
     "emptyType": "Pour confirmer, tapez le nom du projet : {{name}}",
     "emptyConfirm": "Vider définitivement"
+  },
+  "auth": {
+    "title": "Connexion",
+    "subtitle": "Connectez-vous pour accéder à vos projets.",
+    "login": "Identifiant",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "logout": "Se déconnecter",
+    "userMenu": "Compte de {{name}}",
+    "signedInAs": "Connecté en tant que {{name}}",
+    "expired": {
+      "title": "Session expirée",
+      "description": "Votre session a expiré. Reconnectez-vous pour continuer : vos modifications non enregistrées sont conservées."
+    }
+  },
+  "accessDenied": {
+    "title": "Accès refusé",
+    "description": "Vous n’avez pas accès à ce projet. Demandez à un administrateur du projet de vous y ajouter."
+  },
+  "roles": {
+    "reader": "Lecteur",
+    "editor": "Éditeur",
+    "admin": "Administrateur"
   }
 }

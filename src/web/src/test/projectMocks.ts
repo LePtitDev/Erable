@@ -122,7 +122,12 @@ export function mockProject(
   });
   server.use(
     http.get("/api/v1/me", ({ response }) =>
-      response(200).json({ id: "local", name: "Arthur", defaultProjectsFolder: "/w" }),
+      response(200).json({
+        id: "local",
+        name: "Arthur",
+        defaultProjectsFolder: "/w",
+        isServerAdmin: true,
+      }),
     ),
     http.get("/api/v1/me/recent-projects", ({ response }) => response(200).json([])),
     http.get("/api/v1/projects/{projectId}/trash", ({ response }) => response(200).json([])),
@@ -154,6 +159,7 @@ export function mockProject(
         contentLanguage: "fr",
         formatVersion: 1,
         createdAt: "2026-03-10T09:00:00.000Z",
+        myRole: "admin",
       }),
     ),
     http.get("/api/v1/projects/{projectId}/tree", ({ response }) =>

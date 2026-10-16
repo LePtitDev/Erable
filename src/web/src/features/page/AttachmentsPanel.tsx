@@ -12,6 +12,7 @@ import {
 } from "../../shared/native/native";
 import { extensionOf } from "../../shared/ui/fileNames";
 import { DeleteDialog } from "../trash/DeleteDialog";
+import { useCanEdit } from "../project/access";
 import styles from "./PageView.module.css";
 import { useUploader } from "./useUploader";
 
@@ -44,6 +45,7 @@ export function AttachmentsPanel({
   const [running, setRunning] = useState<readonly Running[]>([]);
   const [errors, setErrors] = useState<readonly string[]>([]);
   const desktop = useIsDesktop();
+  const canEdit = useCanEdit();
   const [deleting, setDeleting] = useState<ElementId | null>(null);
 
   const native = (action: () => Promise<unknown>) => {
@@ -76,25 +78,29 @@ export function AttachmentsPanel({
         <h2 id="attachments-title" className={styles["panelTitle"]}>
           {t("attachments.title")}
         </h2>
-        <button
-          type="button"
-          className={styles["panelAction"]}
-          aria-label={t("attachments.addLabel")}
-          onClick={() => picker.current?.click()}
-        >
-          <Plus aria-hidden size={14} />
-          {t("attachments.add")}
-        </button>
-        <input
-          ref={picker}
-          type="file"
-          multiple
-          hidden
-          onChange={(e) => {
-            add([...(e.target.files ?? [])]);
-            e.target.value = "";
-          }}
-        />
+        {canEdit && (
+          <>
+            <button
+              type="button"
+              className={styles["panelAction"]}
+              aria-label={t("attachments.addLabel")}
+              onClick={() => picker.current?.click()}
+            >
+              <Plus aria-hidden size={14} />
+              {t("attachments.add")}
+            </button>
+            <input
+              ref={picker}
+              type="file"
+              multiple
+              hidden
+              onChange={(e) => {
+                add([...(e.target.files ?? [])]);
+                e.target.value = "";
+              }}
+            />
+          </>
+        )}
       </div>
       {errors.length > 0 && (
         <div role="alert" className={styles["panelError"]}>
@@ -125,17 +131,19 @@ export function AttachmentsPanel({
                 <span className={styles["attachmentSize"]}>{format.size(a.size)}</span>
               </span>
               <span className={styles["attachmentActions"]}>
-                <button
-                  type="button"
-                  className={styles["fileAction"]}
-                  aria-label={t("attachments.delete", { name: a.fileName })}
-                  title={t("attachments.delete", { name: a.fileName })}
-                  onClick={() => {
-                    setDeleting(a.id);
-                  }}
-                >
-                  <Trash2 aria-hidden size={14} />
-                </button>
+                {canEdit && (
+                  <button
+                    type="button"
+                    className={styles["fileAction"]}
+                    aria-label={t("attachments.delete", { name: a.fileName })}
+                    title={t("attachments.delete", { name: a.fileName })}
+                    onClick={() => {
+                      setDeleting(a.id);
+                    }}
+                  >
+                    <Trash2 aria-hidden size={14} />
+                  </button>
+                )}
                 {desktop && (
                   <>
                     <button

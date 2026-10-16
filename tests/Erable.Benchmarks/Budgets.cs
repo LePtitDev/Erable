@@ -65,11 +65,18 @@ internal static class Budgets
             Port = 0,
             WebRootPath = web.FullName,
             DataDirectory = data.FullName,
+            FolderProjects = true,
+            BootstrapAdminLogin = "bench",
+            BootstrapAdminPassword = "bench-password-2026",
         }, builder => builder.Logging.ClearProviders().SetMinimumLevel(LogLevel.Warning));
         await app.StartAsync().ConfigureAwait(false);
         try
         {
             using var http = new HttpClient { BaseAddress = ErableHost.GetListeningUri(app), Timeout = TimeSpan.FromMinutes(2) };
+            using var login = await http.PostAsJsonAsync("/api/v1/auth/login", new { login = "bench", password = "bench-password-2026", issueToken = true }).ConfigureAwait(false);
+            login.EnsureSuccessStatusCode();
+            var token = (await login.Content.ReadFromJsonAsync<JsonObject>().ConfigureAwait(false))!["token"]!.GetValue<string>();
+            http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var failures = 0;
 
             var opening = Stopwatch.StartNew();

@@ -19,6 +19,7 @@ import type { ElementId } from "../../shared/ids/elementId";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
 import { KindBadge } from "../../shared/ui/KindBadge";
+import { useCanEdit } from "../project/access";
 import styles from "./TrashView.module.css";
 
 /**
@@ -27,6 +28,7 @@ import styles from "./TrashView.module.css";
  */
 export function TrashView() {
   const { t } = useTranslation();
+  const canEdit = useCanEdit();
   const client = useQueryClient();
   const format = useFormatters();
   const { projectId } = useParams({ from: "/p/$projectId/trash" });
@@ -68,16 +70,18 @@ export function TrashView() {
           </h1>
           <p className={styles["muted"]}>{t("trash.intro")}</p>
         </div>
-        <Button
-          variant="danger"
-          disabled={entries.length === 0}
-          onClick={() => {
-            setEmptying(true);
-          }}
-        >
-          <Trash2 aria-hidden size={16} />
-          {t("trash.emptyAction")}
-        </Button>
+        {canEdit && (
+          <Button
+            variant="danger"
+            disabled={entries.length === 0}
+            onClick={() => {
+              setEmptying(true);
+            }}
+          >
+            <Trash2 aria-hidden size={16} />
+            {t("trash.emptyAction")}
+          </Button>
+        )}
       </header>
       {restored !== null && (
         <p role="status" className={styles["notice"]}>
@@ -126,26 +130,30 @@ export function TrashView() {
                     : t("trash.parentGone")}
                 </span>
               </div>
-              <Button
-                size="sm"
-                aria-label={t("trash.restoreLabel", { name: entry.name })}
-                onClick={() => {
-                  restore(entry);
-                }}
-              >
-                <RotateCcw aria-hidden size={14} />
-                {t("trash.restore")}
-              </Button>
-              <Button
-                size="sm"
-                variant="danger"
-                aria-label={t("trash.purgeLabel", { name: entry.name })}
-                onClick={() => {
-                  setPurging(entry);
-                }}
-              >
-                {t("trash.purge")}
-              </Button>
+              {canEdit && (
+                <>
+                  <Button
+                    size="sm"
+                    aria-label={t("trash.restoreLabel", { name: entry.name })}
+                    onClick={() => {
+                      restore(entry);
+                    }}
+                  >
+                    <RotateCcw aria-hidden size={14} />
+                    {t("trash.restore")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    aria-label={t("trash.purgeLabel", { name: entry.name })}
+                    onClick={() => {
+                      setPurging(entry);
+                    }}
+                  >
+                    {t("trash.purge")}
+                  </Button>
+                </>
+              )}
             </li>
           ))}
         </ul>

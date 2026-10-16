@@ -1,7 +1,11 @@
 using System.Security.Cryptography;
+using System.Net.Http.Headers;
+using Erable.Server.Accounts;
 using Erable.Server.Hosting;
 using Erable.Server.Security;
+using Erable.Storage;
 using Erable.Testing;
+using Shouldly;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +20,11 @@ namespace Erable.Server.Tests.Infrastructure;
 /// </summary>
 public sealed class TestBackend : IAsyncDisposable
 {
+    /// <summary>The server administrator of a server-mode backend: the default client is signed in as this account.</summary>
+    public const string AdminLogin = "admin";
+
+    public const string AdminPassword = "admin-password-2026";
+
     public const string IndexHtml = "<!doctype html><html><body><div id=\"root\"></div></body></html>";
 
     private readonly WebApplication _app;
@@ -38,6 +47,24 @@ public sealed class TestBackend : IAsyncDisposable
 
     public IServiceProvider Services => _app.Services;
 
+    public AccountService Accounts => _app.Services.GetRequiredService<AccountService>();
+
+    /// <summary>A client with no credentials (server mode).</summary>
+    public HttpClient NewAnonymousClient() => _app.GetTestClient();
+
+    /// <summary>Creates the account if needed and returns a client signed in as it (bearer token, server mode).</summary>
+    public HttpClient ClientFor(string login, bool serverAdmin = false)
+    {
+        if (Accounts.Store.GetAccount(login) is null)
+        {
+            Accounts.CreateAccount(login, char.ToUpperInvariant(login[0]) + login[1..], "password-" + login, serverAdmin).IsSuccess.ShouldBeTrue();
+        }
+
+        var client = _app.GetTestClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Accounts.StartSession(login, ServerStore.SessionKindBearer).Token);
+        return client;
+    }
+
     /// <summary>Base address of a real listening backend (desktop mode only).</summary>
     public Uri BaseAddress => ErableHost.GetListeningUri(_app);
 
@@ -46,7 +73,8 @@ public sealed class TestBackend : IAsyncDisposable
     public static async Task<TestBackend> StartAsync(
         Func<ErableHostOptions, ErableHostOptions>? configure = null,
         ILoggerProvider? logger = null,
-        Action<IServiceCollection>? services = null)
+        Action<IServiceCollection>? services = null,
+        bool skipDefaultAdmin = false)
     {
         var ct = TestContext.Current.CancellationToken;
         var webRoot = TempDirectory.Create("erable-web-");
@@ -58,6 +86,8 @@ public sealed class TestBackend : IAsyncDisposable
             Mode = HostMode.Server,
             WebRootPath = webRoot.Path,
             DataDirectory = data.Path,
+            // The tests of the project API create and open projects by path, as the desktop does.
+            FolderProjects = true,
             FixturesDirectory = RepositoryPaths.Combine("spec", "projects"),
         };
         options = configure?.Invoke(options) ?? options;
@@ -92,6 +122,14 @@ public sealed class TestBackend : IAsyncDisposable
         else
         {
             client = app.GetTestClient();
+            if (skipDefaultAdmin)
+            {
+                return new TestBackend(app, webRoot, data, app.GetTestClient(), options);
+            }
+
+            var accounts = app.Services.GetRequiredService<AccountService>();
+            accounts.CreateAccount(AdminLogin, "Admin", AdminPassword, isServerAdmin: true).IsSuccess.ShouldBeTrue();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accounts.StartSession(AdminLogin, ServerStore.SessionKindBearer).Token);
         }
 
         return new TestBackend(app, webRoot, data, client, options);

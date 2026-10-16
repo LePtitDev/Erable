@@ -41,6 +41,8 @@ public static class ErableCli
                 Port = parseResult.GetValue(port),
                 Address = parseResult.GetRequiredValue(address),
                 MaxAttachmentSize = parseResult.GetValue(maxAttachment) * 1024 * 1024,
+                BootstrapAdminLogin = Environment.GetEnvironmentVariable("ERABLE_ADMIN_LOGIN"),
+                BootstrapAdminPassword = Environment.GetEnvironmentVariable("ERABLE_ADMIN_PASSWORD"),
                 TestMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1",
                 FixturesDirectory = Environment.GetEnvironmentVariable("ERABLE_TEST_FIXTURES"),
             };

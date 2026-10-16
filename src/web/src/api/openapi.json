@@ -71,6 +71,49 @@
         }
       }
     },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Logout",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/v1/projects": {
       "get": {
         "tags": [
@@ -2496,7 +2539,8 @@
           "appVersion",
           "apiVersion",
           "formatVersion",
-          "mode"
+          "mode",
+          "folderProjects"
         ],
         "type": "object",
         "properties": {
@@ -2512,6 +2556,9 @@
           },
           "mode": {
             "$ref": "#/components/schemas/HostMode"
+          },
+          "folderProjects": {
+            "type": "boolean"
           }
         }
       },
@@ -2950,7 +2997,10 @@
         "type": "object",
         "properties": {
           "folder": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
             "type": "string"
@@ -3022,7 +3072,8 @@
         "required": [
           "id",
           "name",
-          "defaultProjectsFolder"
+          "defaultProjectsFolder",
+          "isServerAdmin"
         ],
         "type": "object",
         "properties": {
@@ -3034,6 +3085,9 @@
           },
           "defaultProjectsFolder": {
             "type": "string"
+          },
+          "isServerAdmin": {
+            "type": "boolean"
           }
         }
       },
@@ -3543,6 +3597,25 @@
           }
         }
       },
+      "LoginRequest": {
+        "required": [
+          "login",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "issueToken": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
       "NativeEvent": {
         "required": [
           "type"
@@ -3874,6 +3947,14 @@
           }
         }
       },
+      "ProjectRole": {
+        "enum": [
+          "reader",
+          "editor",
+          "admin"
+        ],
+        "type": "string"
+      },
       "ProjectSummary": {
         "required": [
           "id",
@@ -3881,7 +3962,8 @@
           "folder",
           "contentLanguage",
           "formatVersion",
-          "createdAt"
+          "createdAt",
+          "myRole"
         ],
         "type": "object",
         "properties": {
@@ -3904,6 +3986,9 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "myRole": {
+            "$ref": "#/components/schemas/ProjectRole"
           }
         }
       },
@@ -4666,6 +4751,37 @@
           }
         }
       },
+      "SessionResult": {
+        "required": [
+          "id",
+          "name",
+          "isServerAdmin",
+          "expiresAt",
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isServerAdmin": {
+            "type": "boolean"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "token": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "SseItemOfNativeEvent": {
         "type": "object",
         "properties": {
@@ -5052,6 +5168,9 @@
   "tags": [
     {
       "name": "erable"
+    },
+    {
+      "name": "Auth"
     },
     {
       "name": "Projects"

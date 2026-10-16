@@ -14,6 +14,7 @@ import type { ElementId } from "../../shared/ids/elementId";
 import { Button } from "../../shared/ui/Button";
 import categoryStyles from "../category/CategoryView.module.css";
 import { ElementHeader } from "../project/ElementHeader";
+import { useCanEdit } from "../project/access";
 import styles from "./LinkTypeView.module.css";
 
 interface Draft {
@@ -33,6 +34,7 @@ export function LinkTypeView({
   readonly edit?: boolean;
 }) {
   const { t } = useTranslation();
+  const canEdit = useCanEdit();
   const view = useQuery(linkTypeQuery(projectId, element.id));
   const titleId = useId();
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -54,7 +56,7 @@ export function LinkTypeView({
         kind
         titleId={titleId}
         actions={
-          draft === null ? (
+          draft === null && canEdit ? (
             <Button
               variant="primary"
               onClick={() => {

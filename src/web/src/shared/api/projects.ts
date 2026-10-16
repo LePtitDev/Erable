@@ -14,6 +14,11 @@ export const meQuery = queryOptions({
   staleTime: Infinity,
 });
 
+export const projectListQuery = queryOptions({
+  queryKey: queryKeys.projectList,
+  queryFn: ({ signal }) => unwrap(api.GET("/api/v1/projects", { signal })),
+});
+
 export const recentProjectsQuery = queryOptions({
   queryKey: queryKeys.recentProjects,
   queryFn: ({ signal }) => unwrap(api.GET("/api/v1/me/recent-projects", { signal })),
@@ -70,11 +75,12 @@ export function useOpenProject() {
 export function useCreateProject() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (body: { folder: string; name: string; contentLanguage: string }) =>
+    mutationFn: (body: { folder: string | null; name: string; contentLanguage: string }) =>
       unwrap(api.POST("/api/v1/projects", { body })),
     onSuccess: (project) => {
       client.setQueryData(queryKeys.project(project.id), project);
       void client.invalidateQueries({ queryKey: queryKeys.recentProjects });
+      void client.invalidateQueries({ queryKey: queryKeys.projectList });
     },
   });
 }

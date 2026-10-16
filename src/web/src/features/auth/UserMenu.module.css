@@ -1,0 +1,53 @@
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.trigger {
+  padding: 0;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.menu {
+  z-index: 60;
+  min-width: 200px;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-pop);
+}
+
+.who {
+  padding: var(--space-1-5) var(--space-2-5);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-2-5);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-md);
+  outline: none;
+  cursor: default;
+}
+
+.item[data-highlighted] {
+  background: var(--color-hover);
+}

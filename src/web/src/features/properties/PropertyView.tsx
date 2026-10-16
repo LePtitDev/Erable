@@ -36,6 +36,7 @@ import { Dialog } from "../../shared/ui/Dialog";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import categoryStyles from "../category/CategoryView.module.css";
 import { ElementHeader } from "../project/ElementHeader";
+import { useCanEdit } from "../project/access";
 import { readValue, toDefinition, typeName, type Definition } from "./definitions";
 import { rawRule, usePropertyFormat } from "./format";
 import { RulesEditor } from "./RulesEditor";
@@ -122,6 +123,7 @@ export function PropertyView({
   readonly edit?: boolean;
 }) {
   const { t } = useTranslation();
+  const canEdit = useCanEdit();
   const view = useQuery(propertyQuery(projectId, element.id));
   const titleId = useId();
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -166,7 +168,7 @@ export function PropertyView({
           )
         }
         actions={
-          draft === null ? (
+          draft === null && canEdit ? (
             <Button
               variant="primary"
               onClick={() => {

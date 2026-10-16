@@ -1,4 +1,6 @@
 using Erable.Core;
+using Erable.Core.Accounts;
+using Erable.Server.Security;
 using Erable.Core.Attachments;
 using Erable.Server.Hosting;
 using Erable.Server.Native;
@@ -29,19 +31,19 @@ public static class NativeEndpoints
     public static IEndpointRouteBuilder MapNativeEndpoints(this IEndpointRouteBuilder endpoints, ErableHostOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        var native = endpoints.MapGroup(ApiRoutes.V1 + "/native").WithTags("Native");
+        var native = endpoints.MapGroup(ApiRoutes.V1 + "/native").WithTags("Native").RequireSignIn();
         native.MapPost("/pick-folder", PickFolder).WithName("PickFolder");
         native.MapPut("/window", UpdateWindow).WithName("UpdateWindow");
         native.MapPost("/window/close", CloseWindow).WithName("CloseWindow");
         native.MapGet("/events", Events).WithName("NativeEvents");
 
         var project = endpoints.MapGroup(ApiRoutes.V1 + "/projects/{projectId}").WithTags("Attachments");
-        project.MapPost("/attachments/{id}/open", OpenAttachment).WithName("OpenAttachmentWithSystem");
-        project.MapPost("/attachments/{id}/reveal", RevealAttachment).WithName("RevealAttachment");
+        project.MapPost("/attachments/{id}/open", OpenAttachment).WithName("OpenAttachmentWithSystem").RequireProjectRole(ProjectRole.Reader);
+        project.MapPost("/attachments/{id}/reveal", RevealAttachment).WithName("RevealAttachment").RequireProjectRole(ProjectRole.Reader);
 
         if (options.Mode == HostMode.Desktop)
         {
-            endpoints.MapPost(InstanceRegistry.ActivatePath, Activate).ExcludeFromDescription();
+            endpoints.MapPost(InstanceRegistry.ActivatePath, Activate).ExcludeFromDescription().PublicAccess();
         }
 
         return endpoints;

@@ -1,4 +1,6 @@
 using Erable.Core;
+using Erable.Core.Accounts;
+using Erable.Server.Security;
 using Erable.Core.Elements;
 using Erable.Server.Projects;
 using Erable.Server.Users;
@@ -29,7 +31,7 @@ public static class RecentEndpoints
         ArgumentNullException.ThrowIfNull(project);
         var me = project.MapGroup("/me").WithTags("Recent");
         me.MapGet("/recent", GetRecent).WithName("GetRecent");
-        me.MapPost("/views", RecordView).WithName("RecordView");
+        me.MapPost("/views", RecordView).WithName("RecordView").RequireProjectRole(ProjectRole.Reader);
         return project;
     }
 

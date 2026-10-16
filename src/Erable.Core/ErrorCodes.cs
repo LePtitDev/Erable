@@ -109,4 +109,21 @@ public static class ErrorCodes
 
     /// <summary>Only the revisions of a live page can be restored.</summary>
     public const string RevisionNotRestorable = "revision.notRestorable";
+
+    // ─── Accounts and access (M4-01) ────────────────────────────────────────
+
+    public const string AccountLoginInvalid = "account.login.invalid";
+    public const string AccountNameInvalid = "account.name.invalid";
+    public const string AccountPasswordInvalid = "account.password.invalid";
+
+    /// <summary>Another account already has this login.</summary>
+    public const string AccountLoginTaken = "account.login.taken";
+
+    public const string AccountNotFound = "account.notFound";
+
+    /// <summary>The project must keep at least one administrator (M4-08).</summary>
+    public const string MemberLastAdmin = "member.lastAdmin";
+
+    public const string MemberNotFound = "member.notFound";
+    public const string MemberRoleInvalid = "member.role.invalid";
 }

@@ -31,11 +31,38 @@ function isProblem(value: unknown): value is ProblemDetails {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/**
+ * Called when a signed-in session turns out to have expired (a 401 on an ordinary call). Resolves to true once the
+ * user signed in again: the call is then replayed, so that a save in progress is not lost (E2E-14-09).
+ */
+export type UnauthorizedHandler = (request: Request) => Promise<boolean>;
+
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+  onUnauthorized = handler;
+}
+
+/** A request whose body can be sent twice: no body, or a small one. Uploads (multipart) are not replayed. */
+function canReplay(request: Request): boolean {
+  return (
+    request.body === null || !(request.headers.get("content-type") ?? "").startsWith("multipart/")
+  );
+}
+
+async function apiFetch(request: Request): Promise<Response> {
+  const handler = onUnauthorized;
+  const replay = handler !== null && canReplay(request) ? request.clone() : null;
+  const response = await globalThis.fetch(request);
+  if (response.status !== 401 || handler === null || replay === null) return response;
+  return (await handler(request)) ? globalThis.fetch(replay) : response;
+}
+
 /** The single API client of the SPA. Same origin in every mode: the backend serves the SPA. */
 export const api = createClient<paths>({
   baseUrl: globalThis.location.origin,
   // Resolved at call time so that interceptors installed later (MSW in tests) are honoured.
-  fetch: (request) => globalThis.fetch(request),
+  fetch: apiFetch,
 });
 
 /**

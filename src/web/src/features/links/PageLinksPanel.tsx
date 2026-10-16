@@ -17,6 +17,7 @@ import { treeQuery } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
+import { useCanEdit } from "../project/access";
 import styles from "./PageLinksPanel.module.css";
 
 /**
@@ -37,6 +38,7 @@ export function PageLinksPanel({
   const backlinks = useQuery(backlinksQuery(projectId, pageId));
   const [linking, setLinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const canEdit = useCanEdit();
 
   const refresh = () => client.invalidateQueries({ queryKey: queryKeys.projectContent(projectId) });
 
@@ -59,15 +61,17 @@ export function PageLinksPanel({
         <h2 id="page-links" className={styles["title"]}>
           {t("links.title")}
         </h2>
-        <Button
-          size="sm"
-          onClick={() => {
-            setLinking(true);
-          }}
-        >
-          <Plus aria-hidden size={14} />
-          {t("links.link")}
-        </Button>
+        {canEdit && (
+          <Button
+            size="sm"
+            onClick={() => {
+              setLinking(true);
+            }}
+          >
+            <Plus aria-hidden size={14} />
+            {t("links.link")}
+          </Button>
+        )}
       </div>
       {error !== null && (
         <p role="alert" className={styles["error"]}>
@@ -136,6 +140,7 @@ function LinkList({
   readonly onRemove: (link: PageLinkItem) => void;
 }) {
   const { t } = useTranslation();
+  const canEdit = useCanEdit();
   const headingId = useId();
   return (
     <>
@@ -159,16 +164,18 @@ function LinkList({
                   {link.pageName}
                 </Link>
               </span>
-              <button
-                type="button"
-                className={styles["remove"]}
-                aria-label={t("links.remove", { label: link.label, name: link.pageName })}
-                onClick={() => {
-                  onRemove(link);
-                }}
-              >
-                <X aria-hidden size={14} />
-              </button>
+              {canEdit && (
+                <button
+                  type="button"
+                  className={styles["remove"]}
+                  aria-label={t("links.remove", { label: link.label, name: link.pageName })}
+                  onClick={() => {
+                    onRemove(link);
+                  }}
+                >
+                  <X aria-hidden size={14} />
+                </button>
+              )}
             </li>
           ))}
         </ul>

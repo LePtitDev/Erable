@@ -13,12 +13,16 @@ import { useCountView } from "../recent/useCountView";
 import { CategoryView } from "../category/CategoryView";
 import { LinkTypeView } from "../links/LinkTypeView";
 import { PropertyView } from "../properties/PropertyView";
+import { useCanEdit } from "./access";
 
 /** `/p/:projectId/e/:elementId`: the kind of the element chooses the view (docs/architecture.md §3.1, F03.R3). */
 export function ElementRoute() {
   const { t } = useTranslation();
   const { projectId, elementId } = useParams({ from: "/p/$projectId/e/$elementId" });
-  const { edit } = useSearch({ from: "/p/$projectId/e/$elementId" });
+  const { edit: editRequested } = useSearch({ from: "/p/$projectId/e/$elementId" });
+  // A reader following an edit link reads instead (F14.R1).
+  const canEdit = useCanEdit();
+  const edit = editRequested === true && canEdit;
   const enabled = projectId !== null && elementId !== null;
   const element = useQuery({
     ...elementQuery(projectId ?? ("" as never), elementId ?? ("" as never)),
@@ -62,7 +66,7 @@ export function ElementRoute() {
           key={element.data.id}
           projectId={projectId}
           element={element.data}
-          edit={edit === true}
+          edit={edit}
         />
       );
     case "propertyDefinition":
@@ -71,7 +75,7 @@ export function ElementRoute() {
           key={element.data.id}
           projectId={projectId}
           element={element.data}
-          edit={edit === true}
+          edit={edit}
         />
       );
     case "linkType":
@@ -80,7 +84,7 @@ export function ElementRoute() {
           key={element.data.id}
           projectId={projectId}
           element={element.data}
-          edit={edit === true}
+          edit={edit}
         />
       );
     case "attachment":

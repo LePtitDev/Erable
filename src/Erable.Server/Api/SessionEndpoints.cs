@@ -42,7 +42,8 @@ public static class SessionEndpoints
                 });
                 return TypedResults.NoContent();
             })
-            .WithName("CreateDesktopSession");
+            .WithName("CreateDesktopSession")
+            .PublicAccess();
         return endpoints;
     }
 }

@@ -19,6 +19,7 @@ import { Button } from "../../shared/ui/Button";
 import { useAuthorName } from "../project/authors";
 import { NotFoundScreen } from "../project/ErrorScreens";
 import { DiffView } from "./DiffView";
+import { useCanEdit } from "../project/access";
 import styles from "./History.module.css";
 
 /** `/p/:projectId/e/:elementId/history`: the revisions of a page, compared two by two and restorable (F13). */
@@ -39,6 +40,7 @@ function History({
   const client = useQueryClient();
   const format = useFormatters();
   const authorName = useAuthorName();
+  const canEdit = useCanEdit();
   const navigate = useNavigate({ from: "/p/$projectId/e/$elementId/history" });
   const { from, to } = useSearch({ from: "/p/$projectId/e/$elementId/history" });
   const element = useQuery(elementQuery(projectId, elementId));
@@ -146,7 +148,7 @@ function History({
                   <time dateTime={revision.at}>{format.dateTime(new Date(revision.at))}</time>
                 </span>
               </span>
-              {isPage && revision.revision !== latest && (
+              {canEdit && isPage && revision.revision !== latest && (
                 <Button
                   size="sm"
                   onClick={() => {

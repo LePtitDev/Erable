@@ -47,6 +47,7 @@ import {
   type TreeRow,
 } from "./treeModel";
 import { useTreeMutations, type CreatableKind } from "./useTreeMutations";
+import { useCanEdit } from "../project/access";
 
 /** Above this many visible rows, only the rows on screen are rendered (budget: 10 000 elements, docs/testing.md §11). */
 const virtualizeFrom = 200;
@@ -79,6 +80,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const tree = useQuery(treeQuery(projectId));
   const state = useUiState<{ expanded: string[] }>(`tree-${projectId}`, { expanded: rootIds });
   const { update, create } = useTreeMutations(projectId);
+  const canEdit = useCanEdit();
 
   const index = useMemo(() => indexTree(tree.data?.nodes ?? []), [tree.data]);
   const expanded = useMemo(
@@ -292,11 +294,11 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         return;
       case "Delete":
         handled();
-        if (row.node.kind !== "root") setDeleting(row.node.id);
+        if (canEdit && row.node.kind !== "root") setDeleting(row.node.id);
         return;
       case "F2":
         handled();
-        if (row.node.kind !== "root") setEditing({ mode: "rename", id: row.node.id });
+        if (canEdit && row.node.kind !== "root") setEditing({ mode: "rename", id: row.node.id });
         return;
       case "Escape":
         if (cut !== null) {
@@ -305,12 +307,12 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         }
         return;
     }
-    if (ctrl && event.key.toLowerCase() === "x" && row.node.kind !== "root") {
+    if (canEdit && ctrl && event.key.toLowerCase() === "x" && row.node.kind !== "root") {
       handled();
       setCut(row.node.id);
       return;
     }
-    if (ctrl && event.key.toLowerCase() === "v") {
+    if (canEdit && ctrl && event.key.toLowerCase() === "v") {
       handled();
       paste(row.node.id);
       return;
@@ -333,7 +335,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   // ─── Drag and drop (HTML5, WebKit checked by the M0-08 spike) ─────────────
 
   const onDragStart = (event: DragEvent, node: TreeNodeItem) => {
-    if (node.kind === "root") {
+    if (node.kind === "root" || !canEdit) {
       event.preventDefault();
       return;
     }
@@ -375,7 +377,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const onContextMenu = (event: MouseEvent, node: TreeNodeItem) => {
     event.preventDefault();
     setFocusedId(node.id);
-    setMenu({ x: event.clientX, y: event.clientY, id: node.id });
+    if (canEdit) setMenu({ x: event.clientX, y: event.clientY, id: node.id });
   };
 
   const counts = tree.data?.counts;
@@ -425,14 +427,14 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         style={{
           paddingLeft: `calc(${String(row.level - 1)} * var(--space-4) + var(--space-1-5))`,
         }}
-        draggable={!isRoot && !isEditing}
+        draggable={canEdit && !isRoot && !isEditing}
         onClick={() => {
           setFocusedId(node.id);
           treeRef.current?.focus();
           if (node.id !== creatingId) open(node);
         }}
         onDoubleClick={() => {
-          if (!isRoot) setEditing({ mode: "rename", id: node.id });
+          if (canEdit && !isRoot) setEditing({ mode: "rename", id: node.id });
         }}
         onContextMenu={(e) => {
           onContextMenu(e, node);
@@ -508,28 +510,32 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
       <div className={styles["header"]}>
         <h2 className={styles["title"]}>{t("explorer.title")}</h2>
         <div className={styles["tools"]}>
-          <button
-            type="button"
-            className={styles["tool"]}
-            aria-label={t("explorer.newPage")}
-            title={t("explorer.newPage")}
-            onClick={() => {
-              startCreate("page");
-            }}
-          >
-            <FilePlus aria-hidden size={16} />
-          </button>
-          <button
-            type="button"
-            className={styles["tool"]}
-            aria-label={t("explorer.newFolder")}
-            title={t("explorer.newFolder")}
-            onClick={() => {
-              startCreate("folder");
-            }}
-          >
-            <FolderPlus aria-hidden size={16} />
-          </button>
+          {canEdit && (
+            <>
+              <button
+                type="button"
+                className={styles["tool"]}
+                aria-label={t("explorer.newPage")}
+                title={t("explorer.newPage")}
+                onClick={() => {
+                  startCreate("page");
+                }}
+              >
+                <FilePlus aria-hidden size={16} />
+              </button>
+              <button
+                type="button"
+                className={styles["tool"]}
+                aria-label={t("explorer.newFolder")}
+                title={t("explorer.newFolder")}
+                onClick={() => {
+                  startCreate("folder");
+                }}
+              >
+                <FolderPlus aria-hidden size={16} />
+              </button>
+            </>
+          )}
           <button
             type="button"
             className={styles["tool"]}

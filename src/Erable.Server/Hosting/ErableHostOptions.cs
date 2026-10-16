@@ -42,4 +42,32 @@ public sealed record ErableHostOptions
 
     /// <summary>Clock used by the whole backend; tests replace it.</summary>
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
+
+    /// <summary>
+    /// Lets API callers create or open projects at a path of this machine (the desktop way). Always on in desktop mode;
+    /// off in server mode, where projects live under <c>data/projects</c>; on in test mode, where the e2e tests drive the
+    /// home screen of the local application against a server backend. Null picks that default.
+    /// </summary>
+    public bool? FolderProjects { get; init; }
+
+    public bool FolderProjectsEnabled => FolderProjects ?? (Mode == HostMode.Desktop || TestMode);
+
+    /// <summary>How long a login session lasts without activity (it is renewed while in use).</summary>
+    public TimeSpan SessionLifetime { get; init; } = TimeSpan.FromHours(12);
+
+    /// <summary>Failed logins tolerated for one login name within <see cref="LoginWindow"/> before it is locked out.</summary>
+    public int LoginMaxFailures { get; init; } = 5;
+
+    /// <summary>Failed logins tolerated from one address within <see cref="LoginWindow"/>.</summary>
+    public int LoginMaxFailuresPerAddress { get; init; } = 40;
+
+    public TimeSpan LoginWindow { get; init; } = TimeSpan.FromMinutes(15);
+
+    /// <summary>Forces the <c>Secure</c> flag of the cookie (TLS ends at a reverse proxy); otherwise set when the request is HTTPS.</summary>
+    public bool CookieSecure { get; init; }
+
+    /// <summary>First server administrator, created at startup when no account exists (<c>ERABLE_ADMIN_LOGIN</c> / <c>ERABLE_ADMIN_PASSWORD</c>).</summary>
+    public string? BootstrapAdminLogin { get; init; }
+
+    public string? BootstrapAdminPassword { get; init; }
 }

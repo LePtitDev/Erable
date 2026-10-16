@@ -1,5 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { FileQuestionMark, TriangleAlert } from "lucide-react";
+import { FileQuestionMark, Lock, TriangleAlert } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { parseElementId } from "../../shared/ids/elementId";
 import styles from "./ErrorScreens.module.css";
@@ -36,6 +36,28 @@ export function NotFoundScreen({ project = false }: { readonly project?: boolean
         </Link>
       </div>
       {!project && <p className={styles["hint"]}>{t("notFound.searchHint")}</p>}
+    </section>
+  );
+}
+
+/**
+ * « Accès refusé » (E2E-14-04): the project exists or not, the user is not a member of it. The screen never says
+ * which, and shows nothing of the project (F14.R2).
+ */
+export function AccessDeniedScreen() {
+  const { t } = useTranslation();
+  return (
+    <section className={styles["screen"]} aria-labelledby="access-denied-title">
+      <Lock aria-hidden size={40} className={styles["icon"]} />
+      <h1 id="access-denied-title" className={styles["title"]}>
+        {t("accessDenied.title")}
+      </h1>
+      <p className={styles["text"]}>{t("accessDenied.description")}</p>
+      <div className={styles["actions"]}>
+        <Link to="/" className={styles["primary"]}>
+          {t("notFound.home")}
+        </Link>
+      </div>
     </section>
   );
 }

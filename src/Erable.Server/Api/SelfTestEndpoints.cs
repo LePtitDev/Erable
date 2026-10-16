@@ -1,4 +1,5 @@
 using Erable.Server.Hosting;
+using Erable.Server.Security;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Erable.Server.Api;
@@ -49,7 +50,8 @@ public static class SelfTestEndpoints
                     ? TypedResults.NoContent()
                     : TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, title: "Report already received.");
             })
-            .WithName("ReportSelfTest");
+            .WithName("ReportSelfTest")
+            .PublicAccess();
         return endpoints;
     }
 }

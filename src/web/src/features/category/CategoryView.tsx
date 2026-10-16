@@ -22,6 +22,7 @@ import { Button } from "../../shared/ui/Button";
 import { emptySearch, toSearchParams } from "../search/searchState";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { ElementHeader } from "../project/ElementHeader";
+import { useCanEdit } from "../project/access";
 import { readValue, toDefinition, typeName, type Definition } from "../properties/definitions";
 import { usePropertyFormat } from "../properties/format";
 import { AddPropertyDialog } from "../properties/AddPropertyDialog";
@@ -50,6 +51,7 @@ export function CategoryView({
   readonly edit?: boolean;
 }) {
   const { t } = useTranslation();
+  const canEdit = useCanEdit();
   const view = useQuery(categoryQuery(projectId, element.id));
   const titleId = useId();
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -71,7 +73,7 @@ export function CategoryView({
         kind
         titleId={titleId}
         actions={
-          draft === null ? (
+          draft === null && canEdit ? (
             <Button
               variant="primary"
               onClick={() => {

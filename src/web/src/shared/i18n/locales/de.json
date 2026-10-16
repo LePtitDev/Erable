@@ -137,6 +137,35 @@
       "parent": {
         "deleted": "Die Seite dieses Anhangs liegt im Papierkorb: Stellen Sie sie zuerst wieder her."
       }
+    },
+    "auth": {
+      "invalidCredentials": "Benutzername oder Passwort falsch",
+      "tooManyAttempts": "Zu viele fehlgeschlagene Versuche. Versuchen Sie es in einigen Minuten erneut.",
+      "required": "Sie müssen sich anmelden.",
+      "unavailable": "Dieser Server hat keine Konten."
+    },
+    "access": {
+      "forbidden": "Ihre Rolle in diesem Projekt erlaubt diese Aktion nicht.",
+      "crossOrigin": "Anfrage abgelehnt: Sie stammt nicht von dieser Website."
+    },
+    "account": {
+      "login": {
+        "invalid": "Ein Benutzername hat 2 bis 32 Zeichen: Kleinbuchstaben, Ziffern, „.“, „_“ oder „-“.",
+        "taken": "Dieser Benutzername ist bereits vergeben."
+      },
+      "name": {
+        "invalid": "Der Anzeigename muss 1 bis 80 Zeichen lang sein."
+      },
+      "password": {
+        "invalid": "Das Passwort muss mindestens 8 Zeichen lang sein."
+      },
+      "notFound": "Dieses Konto existiert nicht."
+    },
+    "feature": {
+      "folderProjects": "Dieser Server hostet seine Projekte selbst: Ein Ordner kann nicht angegeben werden."
+    },
+    "request": {
+      "folderRequired": "Geben Sie den Projektordner an."
     }
   },
   "home": {
@@ -161,7 +190,8 @@
       "languageHint": "Sprache, in der die Seiten verfasst werden. Sie kann später nicht geändert werden.",
       "location": "Speicherort",
       "folder": "Projektordner: {{folder}}",
-      "create": "Projekt anlegen"
+      "create": "Projekt anlegen",
+      "serverHint": "Das Projekt wird vom Server gehostet; Sie werden sein Administrator."
     },
     "open": {
       "title": "Ordner öffnen…",
@@ -203,6 +233,11 @@
       "description": "Dieses Projekt wurde mit einer älteren Version von Erable erstellt (Format {{from}}). Zum Öffnen muss es in das Format {{to}} umgewandelt werden.",
       "backup": "Neben dem Projekt wird vor jeder Änderung eine Sicherung der Datenbank, „erable.db.bak-…“, angelegt. Schlägt die Migration fehl, wird sie wiederhergestellt und das Projekt bleibt unverändert.",
       "confirm": "Sichern und migrieren"
+    },
+    "server": {
+      "title": "Serverprojekte",
+      "empty": "Sie sind noch in keinem Projekt Mitglied. Bitten Sie einen Administrator, Sie hinzuzufügen.",
+      "role": "Ihre Rolle: {{role}}"
     }
   },
   "help": {
@@ -266,7 +301,8 @@
       "links_other": "{{count}} Verknüpfungstypen",
       "cursor": "Z {{line}}, Sp {{column}}",
       "errors_one": "{{count}} Validierungsfehler",
-      "errors_other": "{{count}} Validierungsfehler"
+      "errors_other": "{{count}} Validierungsfehler",
+      "readOnly": "Schreibgeschützt"
     },
     "mode": {
       "read": "Lesen",
@@ -826,5 +862,28 @@
     "emptyDescription_other": "Das ist endgültig: {{count}} Elemente und ihr Inhalt werden für immer gelöscht.",
     "emptyType": "Geben Sie zur Bestätigung den Namen des Projekts ein: {{name}}",
     "emptyConfirm": "Endgültig leeren"
+  },
+  "auth": {
+    "title": "Anmeldung",
+    "subtitle": "Melden Sie sich an, um auf Ihre Projekte zuzugreifen.",
+    "login": "Benutzername",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "logout": "Abmelden",
+    "userMenu": "Konto von {{name}}",
+    "signedInAs": "Angemeldet als {{name}}",
+    "expired": {
+      "title": "Sitzung abgelaufen",
+      "description": "Ihre Sitzung ist abgelaufen. Melden Sie sich erneut an, um fortzufahren: Ihre nicht gespeicherten Änderungen bleiben erhalten."
+    }
+  },
+  "accessDenied": {
+    "title": "Zugriff verweigert",
+    "description": "Sie haben keinen Zugriff auf dieses Projekt. Bitten Sie einen Projektadministrator, Sie hinzuzufügen."
+  },
+  "roles": {
+    "reader": "Leser",
+    "editor": "Bearbeiter",
+    "admin": "Administrator"
   }
 }

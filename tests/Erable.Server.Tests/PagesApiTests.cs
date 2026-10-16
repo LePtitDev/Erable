@@ -44,7 +44,7 @@ public sealed class PagesApiTests
             .ReadAsync<PageView>();
 
         view.Element.Name.ShouldBe("Ilsa Varenne");
-        view.Element.CreatedBy.ShouldBe("local");
+        view.Element.CreatedBy.ShouldBe(TestBackend.AdminLogin);
         view.Markdown.ShouldBe("## Présentation\n\nCartographe.");
         view.SubPages.Select(p => p.Name).ShouldBe(["Dialogues", "Inventaire"]);
         view.Attachments.ShouldBeEmpty();
@@ -88,7 +88,7 @@ public sealed class PagesApiTests
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var saved = await response.ReadAsync<PageSavedResult>();
         saved.Revision.ShouldBe(2);
-        saved.UpdatedBy.ShouldBe("local");
+        saved.UpdatedBy.ShouldBe(TestBackend.AdminLogin);
         var backlinks = await (await backend.Client.GetAsync(Url($"/api/v1/projects/{project.Id}/elements/{orsen.Id}/backlinks"), TestContext.Current.CancellationToken))
             .ReadAsync<BacklinkItem[]>();
         backlinks.Single().SourceId.ShouldBe(ilsa.Id);

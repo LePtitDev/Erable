@@ -146,6 +146,7 @@ async function openTrash(entries: TrashEntryView[]) {
         formatVersion: 3,
         contentLanguage: "fr",
         createdAt: "2026-03-10T09:00:00.000Z",
+        myRole: "admin",
       }),
     ),
     http.post("/api/v1/projects/{projectId}/trash/{id}/restore", ({ params, response }) => {

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Erable.Core;
 using Erable.Server.Hosting;
+using Erable.Server.Security;
 
 namespace Erable.Server.Api;
 
@@ -9,7 +10,8 @@ namespace Erable.Server.Api;
 /// <param name="ApiVersion">REST API version, e.g. <c>v1</c>.</param>
 /// <param name="FormatVersion">Latest project <c>formatVersion</c> supported.</param>
 /// <param name="Mode">How this backend is hosted.</param>
-public sealed record ApiInfo(string AppVersion, string ApiVersion, int FormatVersion, HostMode Mode);
+/// <param name="FolderProjects">Projects may be created or opened at a path of the machine running the backend (desktop; never a real server).</param>
+public sealed record ApiInfo(string AppVersion, string ApiVersion, int FormatVersion, HostMode Mode, bool FolderProjects);
 
 public static class InfoEndpoints
 {
@@ -22,8 +24,9 @@ public static class InfoEndpoints
     public static IEndpointRouteBuilder MapInfoEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapGet("/api/info", (ErableHostOptions options) =>
-                TypedResults.Ok(new ApiInfo(AppVersion, ApiVersion, ProjectFormat.CurrentVersion, options.Mode)))
-            .WithName("GetInfo");
+                TypedResults.Ok(new ApiInfo(AppVersion, ApiVersion, ProjectFormat.CurrentVersion, options.Mode, options.FolderProjectsEnabled)))
+            .WithName("GetInfo")
+            .PublicAccess();
         return endpoints;
     }
 }

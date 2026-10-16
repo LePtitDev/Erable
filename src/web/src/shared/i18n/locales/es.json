@@ -137,6 +137,35 @@
       "parent": {
         "deleted": "La página de este archivo adjunto está en la papelera: restáurela primero."
       }
+    },
+    "auth": {
+      "invalidCredentials": "Usuario o contraseña incorrectos",
+      "tooManyAttempts": "Demasiados intentos fallidos. Inténtelo de nuevo en unos minutos.",
+      "required": "Debe iniciar sesión.",
+      "unavailable": "Este servidor no tiene cuentas."
+    },
+    "access": {
+      "forbidden": "Su rol en este proyecto no permite esta acción.",
+      "crossOrigin": "Solicitud rechazada: no procede de este sitio."
+    },
+    "account": {
+      "login": {
+        "invalid": "Un usuario tiene de 2 a 32 caracteres: minúsculas, dígitos, «.», «_» o «-».",
+        "taken": "Este usuario ya está en uso."
+      },
+      "name": {
+        "invalid": "El nombre mostrado debe tener de 1 a 80 caracteres."
+      },
+      "password": {
+        "invalid": "La contraseña debe tener al menos 8 caracteres."
+      },
+      "notFound": "Esta cuenta no existe."
+    },
+    "feature": {
+      "folderProjects": "Este servidor aloja sus propios proyectos: no se puede indicar una carpeta."
+    },
+    "request": {
+      "folderRequired": "Indique la carpeta del proyecto."
     }
   },
   "home": {
@@ -161,7 +190,8 @@
       "languageHint": "Idioma en el que se redactan las páginas. No se podrá cambiar después.",
       "location": "Ubicación",
       "folder": "Carpeta del proyecto: {{folder}}",
-      "create": "Crear el proyecto"
+      "create": "Crear el proyecto",
+      "serverHint": "El proyecto lo aloja el servidor; usted será su administrador."
     },
     "open": {
       "title": "Abrir una carpeta…",
@@ -203,6 +233,11 @@
       "description": "Este proyecto se creó con una versión anterior de Erable (formato {{from}}). Para abrirlo, debe convertirse al formato {{to}}.",
       "backup": "Antes de cualquier cambio se crea, junto al proyecto, una copia de seguridad de la base de datos, «erable.db.bak-…». Si la migración falla, se restaura y el proyecto queda como estaba.",
       "confirm": "Copiar y migrar"
+    },
+    "server": {
+      "title": "Proyectos del servidor",
+      "empty": "Todavía no es miembro de ningún proyecto. Pida a un administrador que lo añada.",
+      "role": "Su rol: {{role}}"
     }
   },
   "help": {
@@ -271,7 +306,8 @@
       "links_many": "{{count}} tipos de enlace",
       "errors_one": "{{count}} error de validación",
       "errors_other": "{{count}} errores de validación",
-      "errors_many": "{{count}} errores de validación"
+      "errors_many": "{{count}} errores de validación",
+      "readOnly": "Solo lectura"
     },
     "mode": {
       "read": "Lectura",
@@ -850,5 +886,28 @@
     "emptyDescription_many": "Es definitivo: {{count}} elementos y su contenido se eliminarán para siempre.",
     "emptyType": "Para confirmar, escriba el nombre del proyecto: {{name}}",
     "emptyConfirm": "Vaciar definitivamente"
+  },
+  "auth": {
+    "title": "Iniciar sesión",
+    "subtitle": "Inicie sesión para acceder a sus proyectos.",
+    "login": "Usuario",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "userMenu": "Cuenta de {{name}}",
+    "signedInAs": "Sesión iniciada como {{name}}",
+    "expired": {
+      "title": "Sesión caducada",
+      "description": "Su sesión ha caducado. Vuelva a iniciar sesión para continuar: sus cambios sin guardar se conservan."
+    }
+  },
+  "accessDenied": {
+    "title": "Acceso denegado",
+    "description": "No tiene acceso a este proyecto. Pida a un administrador del proyecto que lo añada."
+  },
+  "roles": {
+    "reader": "Lector",
+    "editor": "Editor",
+    "admin": "Administrador"
   }
 }

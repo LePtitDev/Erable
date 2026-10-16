@@ -24,6 +24,8 @@ import { OpenFolderDialog } from "./OpenFolderDialog";
 import { PreferencesDialog } from "./PreferencesDialog";
 import { useWindowStore } from "../../shared/native/native";
 import { RecentProjects } from "./RecentProjects";
+import { ServerProjects } from "./ServerProjects";
+import { UserMenu } from "../auth/UserMenu";
 
 type OpenDialog = "new" | "open" | "preferences" | "help" | null;
 
@@ -33,6 +35,11 @@ export function HomeScreen() {
   const navigate = useNavigate();
   const info = useQuery(apiInfoQuery);
   const me = useQuery(meQuery);
+  // On a server (M4-01): the projects are the ones the user is a member of; only a server administrator creates
+  // one, and a path of the machine means nothing unless the backend was told to open folders.
+  const server = info.data?.mode === "server";
+  const folders = info.data?.folderProjects !== false;
+  const canCreate = !server || me.data?.isServerAdmin === true;
   const [dialog, setDialog] = useState<OpenDialog>(null);
   const [droppedFolder, setDroppedFolder] = useState<string | null>(null);
 
@@ -143,6 +150,7 @@ export function HomeScreen() {
         <div className={styles["settings"]}>
           <LanguageSwitcher />
           <ThemeSwitcher />
+          {server && <UserMenu />}
         </div>
       </aside>
 
@@ -155,61 +163,70 @@ export function HomeScreen() {
         </header>
 
         <div className={styles["actions"]}>
-          <button
-            type="button"
-            className={`${styles["action"] ?? ""} ${styles["actionPrimary"] ?? ""}`}
-            onClick={() => {
-              setDialog("new");
-            }}
-          >
-            <FolderPlus aria-hidden size={22} />
-            <span className={styles["actionText"]}>
-              <span className={styles["actionTitle"]}>{t("home.new.title")}</span>
-              <span className={styles["actionHint"]}>{t("home.new.hint")}</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            className={styles["action"]}
-            onClick={() => {
-              setDialog("open");
-            }}
-            aria-keyshortcuts="Control+O"
-          >
-            <FolderOpen aria-hidden size={22} />
-            <span className={styles["actionText"]}>
-              <span className={styles["actionTitle"]}>{t("home.open.title")}</span>
-              <span className={styles["actionHint"]}>{t("home.open.hint")}</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            className={styles["action"]}
-            disabled
-            aria-describedby="server-soon"
-          >
-            <Server aria-hidden size={22} />
-            <span className={styles["actionText"]}>
-              <span className={styles["actionTitle"]}>{t("home.connect.title")}</span>
-              <span className={styles["actionHint"]} id="server-soon">
-                {t("home.connect.hint")} · {t("common.soon")}
+          {canCreate && (
+            <button
+              type="button"
+              className={`${styles["action"] ?? ""} ${styles["actionPrimary"] ?? ""}`}
+              onClick={() => {
+                setDialog("new");
+              }}
+            >
+              <FolderPlus aria-hidden size={22} />
+              <span className={styles["actionText"]}>
+                <span className={styles["actionTitle"]}>{t("home.new.title")}</span>
+                <span className={styles["actionHint"]}>{t("home.new.hint")}</span>
               </span>
-            </span>
-          </button>
+            </button>
+          )}
+          {folders && (
+            <button
+              type="button"
+              className={styles["action"]}
+              onClick={() => {
+                setDialog("open");
+              }}
+              aria-keyshortcuts="Control+O"
+            >
+              <FolderOpen aria-hidden size={22} />
+              <span className={styles["actionText"]}>
+                <span className={styles["actionTitle"]}>{t("home.open.title")}</span>
+                <span className={styles["actionHint"]}>{t("home.open.hint")}</span>
+              </span>
+            </button>
+          )}
+          {!server && (
+            <button
+              type="button"
+              className={styles["action"]}
+              disabled
+              aria-describedby="server-soon"
+            >
+              <Server aria-hidden size={22} />
+              <span className={styles["actionText"]}>
+                <span className={styles["actionTitle"]}>{t("home.connect.title")}</span>
+                <span className={styles["actionHint"]} id="server-soon">
+                  {t("home.connect.hint")} · {t("common.soon")}
+                </span>
+              </span>
+            </button>
+          )}
         </div>
 
-        <RecentProjects onOpened={opened} />
+        {server && <ServerProjects />}
+        {folders && <RecentProjects onOpened={opened} />}
 
-        <div className={styles["dropZone"]}>
-          <FolderOpen aria-hidden size={20} />
-          {t("home.dropZone")}
-        </div>
+        {folders && (
+          <div className={styles["dropZone"]}>
+            <FolderOpen aria-hidden size={20} />
+            {t("home.dropZone")}
+          </div>
+        )}
       </main>
 
       <NewProjectDialog open={dialog === "new"} onOpenChange={close} onCreated={opened} />
       <OpenFolderDialog
         key={droppedFolder ?? "picker"}
-        open={dialog === "open"}
+        open={folders && dialog === "open"}
         onOpenChange={(open) => {
           if (!open) setDroppedFolder(null);
           close(open);

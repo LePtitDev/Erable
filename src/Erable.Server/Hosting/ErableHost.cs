@@ -2,12 +2,14 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Erable.Core;
+using Erable.Server.Accounts;
 using Erable.Server.Api;
 using Erable.Server.Native;
 using Erable.Server.Projects;
 using Erable.Server.Security;
 using Erable.Server.Spa;
 using Erable.Server.Users;
+using Erable.Storage;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Json;
@@ -70,8 +72,18 @@ public static class ErableHost
         builder.Services.AddSingleton<UserProfiles>();
         builder.Services.AddScoped(services =>
             services.GetRequiredService<UserProfiles>().For(services.GetRequiredService<IHttpContextAccessor>().HttpContext));
+        if (options.Mode == HostMode.Server)
+        {
+            builder.Services.AddSingleton(_ => ServerStore.OpenOrCreate(options.DataDirectory
+                ?? throw new InvalidOperationException("Server mode needs a data directory.")));
+        }
+
+        builder.Services.AddSingleton<AccountService>();
+        builder.Services.AddSingleton<LoginThrottle>();
         builder.Services.AddSingleton<UserDirectory>();
         builder.Services.AddSingleton<ProjectWorkspace>();
+        builder.Services.AddSingleton<ProjectCatalog>();
+        builder.Services.AddHostedService<ServerStartup>();
         builder.Services.AddSingleton<AttachmentSettings>();
         builder.Services.AddSingleton<WindowCoordinator>();
         builder.Services.AddSingleton<InstanceRegistry>();
@@ -224,11 +236,14 @@ public static class ErableHost
             },
         });
 
-        app.MapOpenApi(ApiRoutes.OpenApiPattern);
+        // After the static files, which need no identity: the session lookups are for API and shell requests only.
+        app.UseMiddleware<AccessControlMiddleware>();
+
+        app.MapOpenApi(ApiRoutes.OpenApiPattern).PublicAccess();
         app.MapInfoEndpoints();
         app.MapSessionEndpoints();
         app.MapSelfTestEndpoints();
-        app.MapGroup(ApiRoutes.V1).MapProjectEndpoints();
+        app.MapGroup(ApiRoutes.V1).MapAuthEndpoints().MapProjectEndpoints();
         app.MapNativeEndpoints(options);
 
         if (TestEndpointsCompiled && options.TestMode)
@@ -239,13 +254,13 @@ public static class ErableHost
         // Unknown API routes are real 404s, never the SPA shell.
         foreach (var prefix in ApiRoutes.NonSpaPrefixes)
         {
-            app.MapFallback(prefix + "/{**path}", () => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound));
+            app.MapFallback(prefix + "/{**path}", () => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound)).PublicAccess();
         }
 
         // The SPA shell is rendered per request (theme attribute); an explicit endpoint also takes precedence
         // over the static file middleware for /index.html.
-        app.MapGet("/index.html", SpaIndexEndpoint.HandleAsync).ExcludeFromDescription();
-        app.MapFallback(SpaIndexEndpoint.HandleAsync);
+        app.MapGet("/index.html", SpaIndexEndpoint.HandleAsync).ExcludeFromDescription().PublicAccess();
+        app.MapFallback(SpaIndexEndpoint.HandleAsync).PublicAccess();
     }
 
     private static void MapTestEndpoints(WebApplication app)

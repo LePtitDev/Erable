@@ -14,6 +14,7 @@ import { Button } from "../../shared/ui/Button";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { useTreeMutations } from "../explorer/useTreeMutations";
 import { ElementHeader } from "../project/ElementHeader";
+import { useCanEdit } from "../project/access";
 import {
   CategoryChips,
   OutOfRulesBadge,
@@ -43,6 +44,7 @@ export function PageView({
   const project = useQuery(projectQuery(projectId));
   const layout = useUiState<Layout>("layout", defaultLayout);
   const navigate = useNavigate();
+  const canEdit = useCanEdit();
 
   useEffect(() => {
     performance.mark("erable:page-open");
@@ -105,19 +107,21 @@ export function PageView({
                 <History aria-hidden size={16} />
                 {t("history.button")}
               </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  void navigate({
-                    to: "/p/$projectId/e/$elementId",
-                    params: { projectId, elementId: element.id },
-                    search: { edit: true },
-                  });
-                }}
-              >
-                <Pencil aria-hidden size={16} />
-                {t("page.edit")}
-              </Button>
+              {canEdit && (
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    void navigate({
+                      to: "/p/$projectId/e/$elementId",
+                      params: { projectId, elementId: element.id },
+                      search: { edit: true },
+                    });
+                  }}
+                >
+                  <Pencil aria-hidden size={16} />
+                  {t("page.edit")}
+                </Button>
+              )}
             </>
           }
         />
@@ -210,6 +214,7 @@ function SubPages({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { create } = useTreeMutations(projectId);
+  const canEdit = useCanEdit();
   return (
     <section aria-labelledby={subPagesAnchor} className={styles["subPages"]}>
       <h2
@@ -230,28 +235,30 @@ function SubPages({
             {sub.name}
           </Link>
         ))}
-        <button
-          type="button"
-          className={styles["newSub"]}
-          disabled={create.isPending}
-          onClick={() => {
-            create.mutate(
-              { kind: "page", parentId: pageId, name: t("page.newSubPageName") },
-              {
-                onSuccess: (created) => {
-                  void navigate({
-                    to: "/p/$projectId/e/$elementId",
-                    params: { projectId, elementId: created.id },
-                    search: { edit: true, focus: "title" },
-                  });
+        {canEdit && (
+          <button
+            type="button"
+            className={styles["newSub"]}
+            disabled={create.isPending}
+            onClick={() => {
+              create.mutate(
+                { kind: "page", parentId: pageId, name: t("page.newSubPageName") },
+                {
+                  onSuccess: (created) => {
+                    void navigate({
+                      to: "/p/$projectId/e/$elementId",
+                      params: { projectId, elementId: created.id },
+                      search: { edit: true, focus: "title" },
+                    });
+                  },
                 },
-              },
-            );
-          }}
-        >
-          <Plus aria-hidden size={18} />
-          {t("page.newSubPage")}
-        </button>
+              );
+            }}
+          >
+            <Plus aria-hidden size={18} />
+            {t("page.newSubPage")}
+          </button>
+        )}
       </div>
     </section>
   );

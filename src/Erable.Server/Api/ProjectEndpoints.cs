@@ -1,5 +1,8 @@
 using System.Text.Json.Nodes;
 using Erable.Core;
+using Erable.Core.Accounts;
+using Erable.Server.Accounts;
+using Erable.Server.Security;
 using Erable.Core.Elements;
 using Erable.Core.Projects;
 using Erable.Core.Tree;
@@ -21,13 +24,14 @@ public static class ProjectEndpoints
         ArgumentNullException.ThrowIfNull(api);
 
         var projects = api.MapGroup("/projects").WithTags("Projects");
-        projects.MapGet("/", ListOpen).WithName("ListOpenProjects");
-        projects.MapPost("/", Create).WithName("CreateProject");
-        projects.MapPost("/open", Open).WithName("OpenProject");
-        projects.MapPost("/inspect", Inspect).WithName("InspectFolder");
-        projects.MapGet("/{projectId}", Get).WithName("GetProject");
+        projects.MapGet("/", ListOpen).WithName("ListOpenProjects").RequireSignIn();
+        projects.MapPost("/", Create).WithName("CreateProject").RequireServerAdmin();
+        projects.MapPost("/open", Open).WithName("OpenProject").RequireServerAdmin();
+        projects.MapPost("/inspect", Inspect).WithName("InspectFolder").RequireServerAdmin();
+        projects.MapGet("/{projectId}", Get).WithName("GetProject").RequireProjectRole(ProjectRole.Reader);
 
         var project = projects.MapGroup("/{projectId}");
+        project.WithProjectDefaults();
         project.MapGet("/tree", GetTree).WithName("GetTree").WithTags("Tree");
         project.MapGet("/elements/{id}", GetElement).WithName("GetElement").WithTags("Elements");
         project.MapPatch("/elements/{id}", UpdateElement).WithName("UpdateElement").WithTags("Elements");
@@ -46,7 +50,7 @@ public static class ProjectEndpoints
         project.MapRecentEndpoints();
         project.MapHistoryEndpoints();
 
-        var me = api.MapGroup("/me").WithTags("Me");
+        var me = api.MapGroup("/me").WithTags("Me").RequireSignIn();
         me.MapGet("/", GetMe).WithName("GetMe");
         me.MapGet("/recent-projects", ListRecent).WithName("ListRecentProjects");
         me.MapDelete("/recent-projects/{projectId}", RemoveRecent).WithName("RemoveRecentProject");
@@ -61,30 +65,83 @@ public static class ProjectEndpoints
 
     // ─── Projects ───────────────────────────────────────────────────────────
 
-    private static Ok<ProjectSummary[]> ListOpen(ProjectWorkspace workspace) =>
-        TypedResults.Ok(workspace.OpenProjects.Select(p => Summary(p.Project)).ToArray());
+    /// <summary>The projects the user may open: all the open ones on the desktop, the ones they are a member of on a server (F14.R2).</summary>
+    private static Ok<ProjectSummary[]> ListOpen(
+        ProjectWorkspace workspace, AccountService accounts, ErableHostOptions options, UserProfiles profiles, HttpContext http)
+    {
+        var userId = CurrentUser.Id(http);
+        var open = workspace.OpenProjects;
+#if ERABLE_TEST_ENDPOINTS
+        // The e2e tests share one backend: a test sees the projects of its own slot only.
+        if (options.TestMode && profiles.TestSlotOf(http) is { } slot
+            && http.RequestServices.GetService<Testing.TestSlots>() is { } slots)
+        {
+            var mine = slots.Of(slot);
+            open = open.Where(p => mine.Contains(p.Project.Manifest.ProjectId));
+        }
+#else
+        _ = profiles;
+#endif
+        var summaries = open
+            .Select(p => (Service: p, Role: accounts.RoleOf(p.Project.Manifest.ProjectId, userId)))
+            .Where(p => p.Role is not null)
+            .Select(p => Summary(p.Service.Project, p.Role!.Value, options))
+            .ToArray();
+        return TypedResults.Ok(summaries);
+    }
 
     private static Results<Created<ProjectSummary>, ProblemHttpResult> Create(
-        CreateProjectRequest request, ProjectWorkspace workspace, UserProfile profile)
+        CreateProjectRequest request, ProjectWorkspace workspace, ProjectCatalog catalog, UserProfile profile, ErableHostOptions options,
+        HttpContext http)
     {
-        var created = workspace.Create(request.Folder, request.Name, request.ContentLanguage, profile);
+        var userId = CurrentUser.Id(http);
+        Result<ProjectService> created;
+        if (request.Folder is { Length: > 0 } folder)
+        {
+            if (!options.FolderProjectsEnabled)
+            {
+                return Problems.FolderProjectsDisabled();
+            }
+
+            created = workspace.Create(folder, request.Name, request.ContentLanguage, profile, userId);
+            if (created.IsSuccess)
+            {
+                catalog.Register(created.Value, userId);
+            }
+        }
+        else if (catalog.Enabled)
+        {
+            created = catalog.Create(request.Name, request.ContentLanguage, userId, profile);
+        }
+        else
+        {
+            return Problems.Problem(StatusCodes.Status422UnprocessableEntity, "request.folderRequired", "A project folder is required.");
+        }
+
         if (!created.IsSuccess)
         {
             return Problems.From(created.Error);
         }
 
-        var summary = Summary(created.Value.Project);
+        var summary = Summary(created.Value.Project, ProjectRole.Admin, options);
         return TypedResults.Created($"/api/v1/projects/{summary.Id}", summary);
     }
 
     private static async Task<Results<Ok<ProjectSummary>, ProblemHttpResult>> Open(
-        OpenProjectRequest request, ProjectWorkspace workspace, UserProfile profile, ErableHostOptions options, INativeBridge bridge,
-        HttpContext http)
+        OpenProjectRequest request, ProjectWorkspace workspace, ProjectCatalog catalog, AccountService accounts, UserProfile profile,
+        ErableHostOptions options, INativeBridge bridge, HttpContext http)
     {
+        if (!options.FolderProjectsEnabled)
+        {
+            return Problems.FolderProjectsDisabled();
+        }
+
         var opened = workspace.Open(request.Folder, profile, request.ConfirmMigration);
         if (opened.IsSuccess)
         {
-            return TypedResults.Ok(Summary(opened.Value.Project));
+            var userId = CurrentUser.Id(http);
+            catalog.Register(opened.Value, userId);
+            return TypedResults.Ok(Summary(opened.Value.Project, accounts.RoleOf(opened.Value.Project.Manifest.ProjectId, userId) ?? ProjectRole.Admin, options));
         }
 
         // F16.R2: the project is open in another window of the application, which comes to the front.
@@ -97,14 +154,22 @@ public static class ProjectEndpoints
         return Problems.From(opened.Error);
     }
 
-    private static Ok<FolderInspection> Inspect(InspectFolderRequest request)
+    private static Results<Ok<FolderInspection>, ProblemHttpResult> Inspect(InspectFolderRequest request, ErableHostOptions options)
     {
+        if (!options.FolderProjectsEnabled)
+        {
+            return Problems.FolderProjectsDisabled();
+        }
+
         var (status, manifest) = ProjectStore.Inspect(request.Folder);
         return TypedResults.Ok(new FolderInspection(status, manifest?.Name, manifest?.ProjectId, manifest?.FormatVersion));
     }
 
-    private static Results<Ok<ProjectSummary>, ProblemHttpResult> Get(ElementId projectId, ProjectWorkspace workspace) =>
-        workspace.Find(projectId) is { } service ? TypedResults.Ok(Summary(service.Project)) : Problems.ProjectNotOpen(projectId);
+    private static Results<Ok<ProjectSummary>, ProblemHttpResult> Get(
+        ElementId projectId, ProjectWorkspace workspace, AccountService accounts, ErableHostOptions options, HttpContext http) =>
+        workspace.Find(projectId) is { } service
+            ? TypedResults.Ok(Summary(service.Project, accounts.RoleOf(projectId, CurrentUser.Id(http)) ?? ProjectRole.Reader, options))
+            : Problems.ProjectNotOpen(projectId);
 
     // ─── Tree and elements ──────────────────────────────────────────────────
 
@@ -328,7 +393,7 @@ public static class ProjectEndpoints
         var folder = profiles.TestSlotOf(http) is { } slot
             ? Path.Combine(options.DataDirectory ?? Path.GetTempPath(), "e2e", slot, "projects")
             : DefaultProjectsFolder(options);
-        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id), folder));
+        return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id), folder, http.User.IsServerAdmin()));
     }
 
     /// <summary>Desktop: <c>Documents/Erable</c>; server: <c>&lt;data&gt;/projects</c> (docs/architecture.md §7.1).</summary>
@@ -422,9 +487,10 @@ public static class ProjectEndpoints
 
     // ─── Mapping ────────────────────────────────────────────────────────────
 
-    private static ProjectSummary Summary(OpenedProject project) => new(
-        project.Manifest.ProjectId, project.Manifest.Name, project.Folder, project.Manifest.ContentLanguage,
-        project.Manifest.FormatVersion, project.Manifest.CreatedAt);
+    /// <summary>The server path of a project is shown only where paths mean something to the user (desktop, test mode).</summary>
+    private static ProjectSummary Summary(OpenedProject project, ProjectRole role, ErableHostOptions options) => new(
+        project.Manifest.ProjectId, project.Manifest.Name, options.FolderProjectsEnabled ? project.Folder : string.Empty,
+        project.Manifest.ContentLanguage, project.Manifest.FormatVersion, project.Manifest.CreatedAt, role);
 
     internal static ElementDetails Details(ElementWithPath found, ProjectService service, UserDirectory users)
     {
@@ -460,12 +526,13 @@ public static class ProjectEndpoints
     }
 }
 
-/// <summary>Who makes the request. Desktop and M1 server mode have one local user; accounts arrive with M4-01.</summary>
+
 public static class CurrentUser
 {
+    /// <summary>The signed-in account, or the local user on the desktop.</summary>
     public static string Id(HttpContext context)
     {
-        _ = context;
-        return KnownUsers.Local;
+        ArgumentNullException.ThrowIfNull(context);
+        return context.User.AccountId() ?? KnownUsers.Local;
     }
 }

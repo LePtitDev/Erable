@@ -3,6 +3,7 @@ import { useId, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
 import { meQuery, useCreateProject, type ProjectSummary } from "../../shared/api/projects";
+import { apiInfoQuery } from "../../shared/api/queries";
 import { interfaceLanguages, nativeNames, pickLanguage } from "../../shared/i18n/languages";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
@@ -32,6 +33,8 @@ export function NewProjectDialog({
   const { t, i18n } = useTranslation();
   const ids = { name: useId(), language: useId(), location: useId() };
   const me = useQuery(meQuery);
+  // A server hosts the project itself: the user gives a name, not a place (M4-01).
+  const hosted = useQuery(apiInfoQuery).data?.folderProjects === false;
   const create = useCreateProject();
   const [name, setName] = useState(defaultName);
   const [language, setLanguage] = useState<string>(pickLanguage([i18n.language]));
@@ -41,13 +44,13 @@ export function NewProjectDialog({
   const target = folder ?? joinPath(parent, folderNameOf(name));
   const valid =
     name.trim() !== "" &&
-    (folder !== undefined || (parent.trim() !== "" && folderNameOf(name) !== ""));
+    (hosted || folder !== undefined || (parent.trim() !== "" && folderNameOf(name) !== ""));
 
   const submit = (event: SyntheticEvent) => {
     event.preventDefault();
     if (!valid) return;
     create.mutate(
-      { folder: target, name: name.trim(), contentLanguage: language },
+      { folder: hosted ? null : target, name: name.trim(), contentLanguage: language },
       {
         onSuccess: (project) => {
           setName("");
@@ -105,7 +108,7 @@ export function NewProjectDialog({
           </select>
           <p className={field["hint"]}>{t("home.new.languageHint")}</p>
         </div>
-        {folder === undefined && (
+        {folder === undefined && !hosted && (
           <div className={field["field"]}>
             <label htmlFor={ids.location} className={field["label"]}>
               {t("home.new.location")}
@@ -120,7 +123,9 @@ export function NewProjectDialog({
             />
           </div>
         )}
-        <p className={field["hint"]}>{t("home.new.folder", { folder: target })}</p>
+        <p className={field["hint"]}>
+          {hosted ? t("home.new.serverHint") : t("home.new.folder", { folder: target })}
+        </p>
         {create.isError && (
           <p role="alert" className={field["error"]}>
             {errorMessage(t, create.error)}

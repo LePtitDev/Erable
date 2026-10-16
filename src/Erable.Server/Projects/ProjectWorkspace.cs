@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Erable.Core;
+using Erable.Core.Projects;
 using Erable.Storage;
 
 namespace Erable.Server.Projects;
@@ -26,12 +27,12 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
     }
 
     /// <summary>Creates a project, opens it and puts it first in the recent projects of <paramref name="profile"/>.</summary>
-    public Result<ProjectService> Create(string folder, string name, string contentLanguage, UserProfile profile)
+    public Result<ProjectService> Create(string folder, string name, string contentLanguage, UserProfile? profile, string author = KnownUsers.Local)
     {
-        ArgumentNullException.ThrowIfNull(profile);
+        
         lock (_gate)
         {
-            var created = ProjectStore.Create(folder, name, contentLanguage, clock);
+            var created = ProjectStore.Create(folder, name, contentLanguage, clock, author);
             return created.IsSuccess ? Register(created.Value, profile) : created.Error;
         }
     }
@@ -40,16 +41,16 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
     /// Opens a project, or returns it when this backend already has it open. An older project is migrated only when
     /// <paramref name="migrate"/> carries the confirmation of the user (F01.R3).
     /// </summary>
-    public Result<ProjectService> Open(string folder, UserProfile profile, bool migrate = false)
+    public Result<ProjectService> Open(string folder, UserProfile? profile, bool migrate = false)
     {
-        ArgumentNullException.ThrowIfNull(profile);
+        
         lock (_gate)
         {
             var full = Path.GetFullPath(folder);
             var already = _open.Values.FirstOrDefault(p => string.Equals(p.Project.Folder, full, StringComparison.OrdinalIgnoreCase));
             if (already is not null)
             {
-                profile.RecordOpened(already.Project, clock.GetUtcNow());
+                profile?.RecordOpened(already.Project, clock.GetUtcNow());
                 return already;
             }
 
@@ -86,7 +87,7 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
         }
     }
 
-    private Result<ProjectService> Register(OpenedProject project, UserProfile profile)
+    private Result<ProjectService> Register(OpenedProject project, UserProfile? profile)
     {
         if (_open.TryGetValue(project.Manifest.ProjectId, out var other))
         {
@@ -102,7 +103,7 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
         project.Blobs.DeleteTemporaryFiles();
         service.CollectGarbageAsync().GetAwaiter().GetResult();
         _open[project.Manifest.ProjectId] = service;
-        profile.RecordOpened(project, clock.GetUtcNow());
+        profile?.RecordOpened(project, clock.GetUtcNow());
         return service;
     }
 }

@@ -5,17 +5,19 @@ using Erable.Server.Hosting;
 namespace Erable.Server.Users;
 
 /// <summary>
-/// Display names of the authors recorded in projects (<c>createdBy</c>, <c>updatedBy</c>). Until accounts exist (M4),
-/// the only known user is the local one; test mode also knows the users of <c>spec/projects/users.json</c>, the authors
+/// Display names of the authors recorded in projects (<c>createdBy</c>, <c>updatedBy</c>): the accounts of the server (M4-01), else
+/// the local user; test mode also knows the users of <c>spec/projects/users.json</c>, the authors
 /// of the reference project. An unknown author is shown by its identifier.
 /// </summary>
 public sealed class UserDirectory
 {
     private readonly Dictionary<string, string> _names = new(StringComparer.Ordinal);
+    private readonly Accounts.AccountService _accounts;
 
-    public UserDirectory(ErableHostOptions options)
+    public UserDirectory(ErableHostOptions options, Accounts.AccountService accounts)
     {
         ArgumentNullException.ThrowIfNull(options);
+        _accounts = accounts;
         _names[KnownUsers.Local] = LocalName();
         if (ErableHost.TestEndpointsCompiled && options.TestMode && options.FixturesDirectory is { } fixtures)
         {
@@ -30,7 +32,7 @@ public sealed class UserDirectory
     public string NameOf(string userId)
     {
         ArgumentNullException.ThrowIfNull(userId);
-        return _names.TryGetValue(userId, out var name) ? name : userId;
+        return _accounts.DisplayNameOf(userId) ?? (_names.TryGetValue(userId, out var name) ? name : userId);
     }
 
     /// <summary>The OS account name: a local install has no other identity (« Bonjour, Arthur », M1-08).</summary>

@@ -8,7 +8,9 @@ internal static class OpenApiExport
 {
     public static async Task<int> RunAsync(FileInfo output, CancellationToken cancellationToken)
     {
-        var options = new ErableHostOptions { Mode = HostMode.Server, Port = 0, EnvironmentName = "Production" };
+        // A throw-away data folder: the server creates its accounts database there.
+        using var data = new TempFolder();
+        var options = new ErableHostOptions { Mode = HostMode.Server, Port = 0, EnvironmentName = "Production", DataDirectory = data.Path };
         await using var app = ErableHost.Build(options, builder => builder.Logging.ClearProviders());
         await app.StartAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -25,6 +27,23 @@ internal static class OpenApiExport
         finally
         {
             await app.StopAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+}
+
+internal sealed class TempFolder : IDisposable
+{
+    public string Path { get; } = Directory.CreateTempSubdirectory("erable-openapi-").FullName;
+
+    public void Dispose()
+    {
+        try
+        {
+            Directory.Delete(Path, recursive: true);
+        }
+        catch (IOException)
+        {
+            // A leftover temporary folder is harmless.
         }
     }
 }

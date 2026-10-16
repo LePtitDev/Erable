@@ -137,6 +137,35 @@
       "parent": {
         "deleted": "The page of this attachment is in the trash: restore it first."
       }
+    },
+    "auth": {
+      "invalidCredentials": "Incorrect login or password",
+      "tooManyAttempts": "Too many failed attempts. Try again in a few minutes.",
+      "required": "You need to sign in.",
+      "unavailable": "This server has no accounts."
+    },
+    "access": {
+      "forbidden": "Your role in this project does not allow this action.",
+      "crossOrigin": "Request refused: it does not come from this site."
+    },
+    "account": {
+      "login": {
+        "invalid": "A login is 2 to 32 characters: lowercase letters, digits, “.”, “_” or “-”.",
+        "taken": "This login is already taken."
+      },
+      "name": {
+        "invalid": "The display name must be 1 to 80 characters."
+      },
+      "password": {
+        "invalid": "The password must be at least 8 characters."
+      },
+      "notFound": "This account does not exist."
+    },
+    "feature": {
+      "folderProjects": "This server hosts its own projects: a folder cannot be given."
+    },
+    "request": {
+      "folderRequired": "Give the project folder."
     }
   },
   "home": {
@@ -161,7 +190,8 @@
       "languageHint": "Language the pages are written in. It cannot be changed later.",
       "location": "Location",
       "folder": "Project folder: {{folder}}",
-      "create": "Create project"
+      "create": "Create project",
+      "serverHint": "The project is hosted by the server; you will be its administrator."
     },
     "open": {
       "title": "Open a folder…",
@@ -203,6 +233,11 @@
       "description": "This project was created with an older version of Erable (format {{from}}). To open it, it must be converted to format {{to}}.",
       "backup": "A backup of the database, “erable.db.bak-…”, is made next to the project before anything changes. If the migration fails, it is put back and the project stays as it was.",
       "confirm": "Back up and migrate"
+    },
+    "server": {
+      "title": "Server projects",
+      "empty": "You are not a member of any project yet. Ask an administrator to add you.",
+      "role": "Your role: {{role}}"
     }
   },
   "help": {
@@ -266,7 +301,8 @@
       "links_other": "{{count}} link types",
       "cursor": "Ln {{line}}, Col {{column}}",
       "errors_one": "{{count}} validation error",
-      "errors_other": "{{count}} validation errors"
+      "errors_other": "{{count}} validation errors",
+      "readOnly": "Read-only"
     },
     "mode": {
       "read": "Reading",
@@ -826,5 +862,28 @@
     "emptyDescription_other": "This is final: {{count}} elements and their content will be deleted for good.",
     "emptyType": "To confirm, type the name of the project: {{name}}",
     "emptyConfirm": "Empty for good"
+  },
+  "auth": {
+    "title": "Sign in",
+    "subtitle": "Sign in to reach your projects.",
+    "login": "Login",
+    "password": "Password",
+    "submit": "Sign in",
+    "logout": "Sign out",
+    "userMenu": "Account of {{name}}",
+    "signedInAs": "Signed in as {{name}}",
+    "expired": {
+      "title": "Session expired",
+      "description": "Your session has expired. Sign in again to carry on: your unsaved changes are kept."
+    }
+  },
+  "accessDenied": {
+    "title": "Access denied",
+    "description": "You do not have access to this project. Ask a project administrator to add you."
+  },
+  "roles": {
+    "reader": "Reader",
+    "editor": "Editor",
+    "admin": "Administrator"
   }
 }

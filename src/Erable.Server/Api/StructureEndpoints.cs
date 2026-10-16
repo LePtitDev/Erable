@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Erable.Core;
+using Erable.Core.Accounts;
+using Erable.Server.Security;
 using Erable.Core.Categories;
 using Erable.Core.Elements;
 using Erable.Core.Properties;
@@ -34,7 +36,7 @@ public static class StructureEndpoints
         properties.MapPut("/{id}", UpdateProperty).WithName("UpdateProperty");
 
         project.MapGet("/pages/{id}/properties", GetPageProperties).WithName("GetPageProperties").WithTags("Pages");
-        project.MapPost("/pages/{id}/properties/preview", PreviewPageProperties).WithName("PreviewPageProperties").WithTags("Pages");
+        project.MapPost("/pages/{id}/properties/preview", PreviewPageProperties).WithName("PreviewPageProperties").WithTags("Pages").RequireProjectRole(ProjectRole.Reader);
         return project;
     }
 

@@ -3,7 +3,7 @@ import { Link, Outlet, useParams, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Moon, PanelLeft, Search, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { initialsOf, meQuery, projectQuery } from "../../shared/api/projects";
+import { projectQuery } from "../../shared/api/projects";
 import { treeQuery } from "../../shared/api/tree";
 import { useUiState } from "../../shared/api/uiState";
 import type { ElementId } from "../../shared/ids/elementId";
@@ -15,7 +15,11 @@ import { Logo } from "../../shared/ui/Logo";
 import { QuickSearch } from "../search/QuickSearch";
 import { PreferencesDialog } from "../home/PreferencesDialog";
 import { Explorer } from "../explorer/Explorer";
-import { NotFoundScreen } from "./ErrorScreens";
+import { UserMenu } from "../auth/UserMenu";
+import { ApiError } from "../../shared/api/client";
+import { apiInfoQuery } from "../../shared/api/queries";
+import { AccessDeniedScreen, NotFoundScreen } from "./ErrorScreens";
+import { accessOf, ProjectAccessContext, useCanEdit } from "./access";
 import styles from "./ProjectShell.module.css";
 import { Splitter } from "./Splitter";
 import { useShellStore } from "./shellStore";
@@ -32,11 +36,20 @@ export function ProjectShell() {
     ...projectQuery(projectId ?? ("" as ElementId)),
     enabled: projectId !== null,
   });
+  const info = useQuery(apiInfoQuery);
   if (projectId === null || project.isError) {
-    return <NotFoundScreen project />;
+    // On a server a 404 also means « not yours »: one screen for both, nothing of the project shown (F14.R2).
+    const denied =
+      info.data?.mode === "server" &&
+      project.error instanceof ApiError &&
+      project.error.status === 404;
+    return denied ? <AccessDeniedScreen /> : <NotFoundScreen project />;
   }
+  // Until the role is known the user reads: the edit buttons never flash up for a reader.
   return (
-    <ShellFrame projectId={projectId} projectName={project.data?.name ?? t("common.loading")} />
+    <ProjectAccessContext value={accessOf(project.data?.myRole ?? "reader")}>
+      <ShellFrame projectId={projectId} projectName={project.data?.name ?? t("common.loading")} />
+    </ProjectAccessContext>
   );
 }
 
@@ -151,7 +164,6 @@ function TopBar({
 }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const me = useQuery(meQuery);
   const preference = useThemeStore((s) => s.preference);
   const setPreference = useSetTheme();
   const systemDark = useSystemDark();
@@ -222,11 +234,7 @@ function TopBar({
         >
           {dark ? <Sun aria-hidden size={18} /> : <Moon aria-hidden size={18} />}
         </button>
-        {me.isSuccess && (
-          <span className={styles["avatar"]} title={me.data.name}>
-            {initialsOf(me.data.name)}
-          </span>
-        )}
+        <UserMenu />
       </div>
     </header>
   );
@@ -238,6 +246,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
   const mode = useShellStore((s) => s.mode);
   const cursor = useShellStore((s) => s.cursor);
   const validationErrors = useShellStore((s) => s.validationErrors);
+  const canEdit = useCanEdit();
   const counts = tree.data?.counts;
   return (
     <footer className={styles["statusBar"]}>
@@ -263,6 +272,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
           {t("shell.status.errors", { count: validationErrors })}
         </span>
       )}
+      {!canEdit && <span role="status">{t("shell.status.readOnly")}</span>}
       <span className={styles["mode"]}>{t(`shell.mode.${mode}`)}</span>
     </footer>
   );

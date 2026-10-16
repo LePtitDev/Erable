@@ -1,4 +1,5 @@
 using Erable.Core;
+using Erable.Core.Accounts;
 using Erable.Core.Attachments;
 using Erable.Core.Elements;
 using Erable.Storage;
@@ -8,11 +9,12 @@ namespace Erable.Server.Api;
 // Request and response bodies of /api/v1. They are the API contract: the TypeScript client is generated from them
 // (CLAUDE.md §6.9). Element IDs are always strings in JSON (ElementIdJsonConverter).
 
-/// <summary>An open project.</summary>
+/// <summary>An open project, with the role of the caller in it.</summary>
 public sealed record ProjectSummary(
-    ElementId Id, string Name, string Folder, string ContentLanguage, int FormatVersion, DateTimeOffset CreatedAt);
+    ElementId Id, string Name, string Folder, string ContentLanguage, int FormatVersion, DateTimeOffset CreatedAt, ProjectRole MyRole);
 
-public sealed record CreateProjectRequest(string Folder, string Name, string ContentLanguage);
+/// <param name="Folder">Where to create the project; omitted on a server, which hosts it under its own data folder.</param>
+public sealed record CreateProjectRequest(string? Folder, string Name, string ContentLanguage);
 
 /// <param name="ConfirmMigration">The user accepted the migration of an older project (F01.R3, M2-09).</param>
 public sealed record OpenProjectRequest(string Folder, bool ConfirmMigration = false);
@@ -55,7 +57,7 @@ public sealed record ElementDetails(
     string UpdatedByName);
 
 /// <summary>The user making the request, and where their new projects go by default.</summary>
-public sealed record CurrentUserInfo(string Id, string Name, string DefaultProjectsFolder);
+public sealed record CurrentUserInfo(string Id, string Name, string DefaultProjectsFolder, bool IsServerAdmin);
 
 /// <summary>Rename (<c>name</c>), move (<c>parentId</c>) and/or reorder (<c>index</c> among the new siblings).</summary>
 public sealed record UpdateElementRequest(string? Name = null, ElementId? ParentId = null, int? Index = null);

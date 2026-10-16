@@ -17,6 +17,7 @@ function mockHome(recent: { name: string; status: "project" | "missing" | "tooNe
         apiVersion: "v1",
         formatVersion: 1,
         mode: "desktop",
+        folderProjects: true,
       }),
     ),
     http.get("/api/v1/me", ({ response }) =>
@@ -24,6 +25,7 @@ function mockHome(recent: { name: string; status: "project" | "missing" | "tooNe
         id: "local",
         name: "Arthur",
         defaultProjectsFolder: "C:\\Users\\arthur\\Documents\\Erable",
+        isServerAdmin: true,
       }),
     ),
     http.get("/api/v1/me/recent-projects", ({ response }) =>
@@ -98,6 +100,7 @@ describe("HomeScreen", () => {
           contentLanguage: "en",
           formatVersion: 1,
           createdAt: "2026-10-13T08:00:00.000Z",
+          myRole: "admin",
         });
       }),
       http.get("/api/v1/projects/{projectId}", ({ response }) =>
@@ -163,6 +166,7 @@ describe("HomeScreen", () => {
       folder: "C:/Anciens/Atlas",
       formatVersion: 3,
       contentLanguage: "fr",
+      myRole: "admin" as const,
       createdAt: "2026-03-10T09:00:00.000Z",
     };
 

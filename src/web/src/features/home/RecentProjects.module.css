@@ -105,6 +105,7 @@
 }
 
 .name {
+  text-decoration: none;
   padding: 0;
   border: 0;
   background: none;
@@ -117,7 +118,8 @@
 }
 
 /* The whole row is the click target of an available project. */
-button.name::after {
+button.name::after,
+a.name::after {
   position: absolute;
   inset: 0;
   content: "";

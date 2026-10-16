@@ -34,6 +34,9 @@ public static class Problems
     public static ProblemHttpResult ProjectNotOpen(ElementId projectId) =>
         Problem(StatusCodes.Status404NotFound, ProjectNotFound, $"Project {projectId} is not open.");
 
+    public static ProblemHttpResult FolderProjectsDisabled() =>
+        Problem(StatusCodes.Status404NotFound, "feature.folderProjects", "This server hosts its projects itself; paths are not used.");
+
     public static ProblemHttpResult ElementNotFound(ElementId id) =>
         Problem(StatusCodes.Status404NotFound, ErrorCodes.ElementNotFound, $"Element {id} does not exist.");
 

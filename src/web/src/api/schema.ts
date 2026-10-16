@@ -54,6 +54,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["Login"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/logout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["Logout"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me": {
     parameters: {
       query?: never;
@@ -877,6 +909,7 @@ export interface components {
     ApiInfo: {
       apiVersion: string;
       appVersion: string;
+      folderProjects: boolean;
       /** Format: int32 */
       formatVersion: number;
       mode: components["schemas"]["HostMode"];
@@ -984,7 +1017,7 @@ export interface components {
     };
     CreateProjectRequest: {
       contentLanguage: string;
-      folder: string;
+      folder: null | string;
       name: string;
     };
     CreatePropertyRequest: {
@@ -1002,6 +1035,7 @@ export interface components {
     CurrentUserInfo: {
       defaultProjectsFolder: string;
       id: string;
+      isServerAdmin: boolean;
       name: string;
     };
     DeleteImpactView: {
@@ -1132,6 +1166,12 @@ export interface components {
       /** Format: int32 */
       linkCount: number;
     };
+    LoginRequest: {
+      /** @default false */
+      issueToken: boolean;
+      login: string;
+      password: string;
+    };
     NativeEvent: {
       path?: null | string;
       type: string;
@@ -1206,6 +1246,8 @@ export interface components {
     PickFolderRequest: {
       title: string;
     };
+    /** @enum {string} */
+    ProjectRole: "reader" | "editor" | "admin";
     ProjectSummary: {
       contentLanguage: string;
       /** Format: date-time */
@@ -1214,6 +1256,7 @@ export interface components {
       /** Format: int32 */
       formatVersion: number;
       id: components["schemas"]["ElementId"];
+      myRole: components["schemas"]["ProjectRole"];
       name: string;
     };
     ProjectTree: {
@@ -1390,6 +1433,14 @@ export interface components {
       name: string;
       ok: boolean;
     };
+    SessionResult: {
+      /** Format: date-time */
+      expiresAt: string;
+      id: string;
+      isServerAdmin: boolean;
+      name: string;
+      token: null | string;
+    };
     SseItemOfNativeEvent: {
       data?: components["schemas"]["NativeEvent"];
       eventId?: null | string;
@@ -1537,6 +1588,48 @@ export interface operations {
       header: {
         "X-Erable-Session": string;
       };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  Login: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LoginRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResult"];
+        };
+      };
+    };
+  };
+  Logout: {
+    parameters: {
+      query?: never;
+      header?: never;
       path?: never;
       cookie?: never;
     };
