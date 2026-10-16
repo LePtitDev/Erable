@@ -221,12 +221,6 @@
   border-top: 1px solid var(--color-border);
 }
 
-.recentEmpty {
-  margin: 0;
-  color: var(--color-text-faint);
-  font-size: var(--text-sm);
-}
-
 .menuAnchor {
   position: fixed;
   width: 0;

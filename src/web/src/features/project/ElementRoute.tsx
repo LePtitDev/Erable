@@ -9,6 +9,7 @@ import { NotFoundScreen } from "./ErrorScreens";
 import { FolderView } from "./FolderView";
 import { GenericElementView } from "./GenericElementView";
 import { PageRoute } from "../page/PageRoute";
+import { useCountView } from "../recent/useCountView";
 import { CategoryView } from "../category/CategoryView";
 import { LinkTypeView } from "../links/LinkTypeView";
 import { PropertyView } from "../properties/PropertyView";
@@ -31,6 +32,13 @@ export function ElementRoute() {
       recordLastElement(projectId, elementId).catch(() => undefined);
     }
   }, [found, projectId, elementId]);
+
+  // Roots and attachments are not listed among the viewed elements.
+  useCountView(
+    projectId,
+    elementId,
+    found && element.data.kind !== "root" && element.data.kind !== "attachment",
+  );
 
   if (
     !enabled ||

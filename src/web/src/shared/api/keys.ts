@@ -34,6 +34,10 @@ export const queryKeys = {
     ["projects", projectId, "link-types", id] as const,
   pageLinks: (projectId: ElementId, id: ElementId) =>
     ["projects", projectId, "pages", id, "links"] as const,
+  /** Recently viewed (own) and edited (shared) elements; below `projectContent`, so any content change refreshes it. */
+  recent: (projectId: ElementId) => ["projects", projectId, "me", "recent"] as const,
+  search: (projectId: ElementId, query: unknown) =>
+    ["projects", projectId, "search", query] as const,
   /** Everything that shows names or structure of a project: after a rename or a move. */
   projectContent: (projectId: ElementId) => ["projects", projectId] as const,
 };

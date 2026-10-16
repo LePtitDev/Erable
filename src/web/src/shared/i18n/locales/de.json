@@ -297,7 +297,6 @@
     "cutHint": "„{{name}}“ wird verschoben: Ziel wählen, dann Strg+V (Esc zum Abbrechen).",
     "duplicate": "Ein anderes Element trägt am selben Ort diesen Namen.",
     "recent": "Zuletzt angesehen",
-    "recentSoon": "Zuletzt angesehene Elemente erscheinen hier.",
     "refused": {
       "root": "Wurzeln werden nicht verschoben.",
       "crossRoot": "Ein Element bleibt unter seiner eigenen Wurzel.",
@@ -307,6 +306,12 @@
     "newCategory": "Neue Kategorie",
     "newProperty": "Neue Eigenschaft",
     "newLinkType": "Neuer Verknüpfungstyp"
+  },
+  "recent": {
+    "viewed": "Angesehen",
+    "edited": "Geändert",
+    "emptyViewed": "Zuletzt angesehene Elemente erscheinen hier.",
+    "emptyEdited": "Keine aktuellen Änderungen."
   },
   "kinds": {
     "root": "Wurzel",

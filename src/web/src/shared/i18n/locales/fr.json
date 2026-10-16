@@ -302,7 +302,6 @@
     "cutHint": "« {{name}} » sera déplacé : choisissez la destination puis Ctrl+V (Échap pour annuler).",
     "duplicate": "Un autre élément porte ce nom au même endroit.",
     "recent": "Récemment consultées",
-    "recentSoon": "Les éléments consultés récemment apparaîtront ici.",
     "refused": {
       "root": "Les racines ne se déplacent pas.",
       "crossRoot": "Un élément reste sous sa propre racine.",
@@ -312,6 +311,12 @@
     "newCategory": "Nouvelle catégorie",
     "newProperty": "Nouvelle propriété",
     "newLinkType": "Nouveau type de lien"
+  },
+  "recent": {
+    "viewed": "Consultées",
+    "edited": "Modifiées",
+    "emptyViewed": "Les éléments consultés récemment apparaîtront ici.",
+    "emptyEdited": "Aucune modification récente."
   },
   "kinds": {
     "root": "Racine",

@@ -1849,6 +1849,77 @@
         }
       }
     },
+    "/api/v1/projects/{projectId}/me/recent": {
+      "get": {
+        "tags": [
+          "Recent"
+        ],
+        "operationId": "GetRecent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentActivityView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/me/views": {
+      "post": {
+        "tags": [
+          "Recent"
+        ],
+        "operationId": "RecordView",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordViewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -2826,6 +2897,38 @@
           }
         }
       },
+      "EditedItem": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "editedAt",
+          "editedBy",
+          "editedByName"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "editedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "editedBy": {
+            "type": "string"
+          },
+          "editedByName": {
+            "type": "string"
+          }
+        }
+      },
       "ElementDetails": {
         "required": [
           "id",
@@ -3679,6 +3782,27 @@
           }
         }
       },
+      "RecentActivityView": {
+        "required": [
+          "viewed",
+          "edited"
+        ],
+        "type": "object",
+        "properties": {
+          "viewed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ViewedItem"
+            }
+          },
+          "edited": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EditedItem"
+            }
+          }
+        }
+      },
       "RecentProjectItem": {
         "required": [
           "projectId",
@@ -3719,6 +3843,17 @@
         }
       },
       "RecordLastElementRequest": {
+        "required": [
+          "elementId"
+        ],
+        "type": "object",
+        "properties": {
+          "elementId": {
+            "$ref": "#/components/schemas/ElementId"
+          }
+        }
+      },
+      "RecordViewRequest": {
         "required": [
           "elementId"
         ],
@@ -4367,6 +4502,30 @@
         ],
         "type": "string"
       },
+      "ViewedItem": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "viewedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "viewedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ViolationItem": {
         "required": [
           "rule",
@@ -4436,6 +4595,9 @@
     },
     {
       "name": "Trash"
+    },
+    {
+      "name": "Recent"
     },
     {
       "name": "Me"

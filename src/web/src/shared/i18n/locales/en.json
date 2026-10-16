@@ -297,7 +297,6 @@
     "cutHint": "“{{name}}” will be moved: pick the destination, then Ctrl+V (Esc to cancel).",
     "duplicate": "Another element has this name at the same place.",
     "recent": "Recently viewed",
-    "recentSoon": "Recently viewed elements will appear here.",
     "refused": {
       "root": "Roots are not moved.",
       "crossRoot": "An element stays under its own root.",
@@ -307,6 +306,12 @@
     "newCategory": "New category",
     "newProperty": "New property",
     "newLinkType": "New link type"
+  },
+  "recent": {
+    "viewed": "Viewed",
+    "edited": "Edited",
+    "emptyViewed": "Recently viewed elements will appear here.",
+    "emptyEdited": "No recent changes."
   },
   "kinds": {
     "root": "Root",

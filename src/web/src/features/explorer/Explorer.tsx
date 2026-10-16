@@ -31,6 +31,7 @@ import { useUiState } from "../../shared/api/uiState";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
 import { roots } from "../../shared/ids/roots";
 import { KindBadge } from "../../shared/ui/KindBadge";
+import { RecentViewedPanel } from "../recent/RecentViewedPanel";
 import { DeleteDialog } from "../trash/DeleteDialog";
 import styles from "./Explorer.module.css";
 import {
@@ -51,6 +52,7 @@ import { useTreeMutations, type CreatableKind } from "./useTreeMutations";
 const virtualizeFrom = 200;
 const rowHeight = 30;
 const dragType = "application/x-erable-element";
+const recentHeadingId = "recent-viewed";
 
 type Editing =
   | { readonly mode: "rename"; readonly id: ElementId }
@@ -617,11 +619,11 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
           }
         }}
       />
-      <section aria-labelledby="recent-viewed" className={styles["recent"]}>
-        <h2 id="recent-viewed" className={styles["title"]}>
+      <section aria-labelledby={recentHeadingId} className={styles["recent"]}>
+        <h2 id={recentHeadingId} className={styles["title"]}>
           {t("explorer.recent")}
         </h2>
-        <p className={styles["recentEmpty"]}>{t("explorer.recentSoon")}</p>
+        <RecentViewedPanel projectId={projectId} headingId={recentHeadingId} />
       </section>
       <ContextMenu
         menu={menu}

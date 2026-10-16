@@ -112,6 +112,7 @@ export function mockProject(
     patches: [] as { id: string; body: unknown }[],
     created: [] as unknown[],
     uiState: [] as unknown[],
+    views: [] as unknown[],
   };
   const counts = () => ({
     pages: nodes.filter((x) => x.kind === "page").length,
@@ -125,6 +126,13 @@ export function mockProject(
     ),
     http.get("/api/v1/me/recent-projects", ({ response }) => response(200).json([])),
     http.get("/api/v1/projects/{projectId}/trash", ({ response }) => response(200).json([])),
+    http.get("/api/v1/projects/{projectId}/me/recent", ({ response }) =>
+      response(200).json({ viewed: [], edited: [] }),
+    ),
+    http.post("/api/v1/projects/{projectId}/me/views", async ({ request, response }) => {
+      writes.views.push(await request.json());
+      return response(204).empty();
+    }),
     http.put("/api/v1/me/recent-projects/{projectId}/last-element", ({ response }) =>
       response(204).empty(),
     ),

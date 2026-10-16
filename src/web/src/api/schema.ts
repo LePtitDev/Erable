@@ -502,6 +502,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/me/recent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetRecent"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/me/views": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["RecordView"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/pages": {
     parameters: {
       query?: never;
@@ -924,6 +956,15 @@ export interface components {
       /** Format: int32 */
       values: number;
     };
+    EditedItem: {
+      /** Format: date-time */
+      editedAt: string;
+      editedBy: string;
+      editedByName: string;
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+    };
     ElementDetails: {
       /** Format: date-time */
       createdAt: string;
@@ -1126,6 +1167,10 @@ export interface components {
       /** Format: int32 */
       removed: number;
     };
+    RecentActivityView: {
+      edited: components["schemas"]["EditedItem"][];
+      viewed: components["schemas"]["ViewedItem"][];
+    };
     RecentProjectItem: {
       folder: string;
       lastElementId: null | components["schemas"]["ElementId"];
@@ -1136,6 +1181,9 @@ export interface components {
       status: components["schemas"]["FolderStatus"];
     };
     RecordLastElementRequest: {
+      elementId: components["schemas"]["ElementId"];
+    };
+    RecordViewRequest: {
       elementId: components["schemas"]["ElementId"];
     };
     ResolvedItem: {
@@ -1287,6 +1335,13 @@ export interface components {
     };
     /** @enum {string} */
     ValueOrigin: "own" | "inherited" | "default" | "conflict";
+    ViewedItem: {
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+      /** Format: date-time */
+      viewedAt: string;
+    };
     ViolationItem: {
       /** Format: int32 */
       index: null | number;
@@ -2249,6 +2304,54 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  GetRecent: {
+    parameters: {
+      query?: {
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecentActivityView"];
+        };
+      };
+    };
+  };
+  RecordView: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordViewRequest"];
+      };
+    };
     responses: {
       /** @description No Content */
       204: {
