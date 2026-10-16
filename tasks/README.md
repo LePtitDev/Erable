@@ -60,7 +60,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M2-06](M2-06-page-properties-panel.md) | Propriétés sur la page (lecture et édition) | M2-03, M1-12 | review |
 | [M2-07](M2-07-typed-links.md) | Types de liens et liens | M2-03 | review |
 | [M2-08](M2-08-trash.md) | Suppression et corbeille | M2-03, M1-10 | review |
-| [M2-09](M2-09-format-migration.md) | Migration de format à l'ouverture | M2-03, M1-08 | todo |
+| [M2-09](M2-09-format-migration.md) | Migration de format à l'ouverture | M2-03, M1-08 | review |
 
 ### M3 — Retrouver
 | ID | Tâche | Dépend de | Statut |

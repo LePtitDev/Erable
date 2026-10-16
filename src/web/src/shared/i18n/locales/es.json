@@ -37,7 +37,11 @@
       "languageInvalid": "Idioma de contenido no admitido.",
       "inaccessible": "No se puede acceder a esta carpeta (permisos insuficientes).",
       "duplicateId": "Otro proyecto abierto tiene el mismo identificador (¿carpeta copiada?).",
-      "notFound": "Este proyecto no está abierto."
+      "notFound": "Este proyecto no está abierto.",
+      "migration": {
+        "failed": "La migración falló: el proyecto volvió a su estado original, no se modificó nada.",
+        "required": "Este proyecto debe migrarse antes de abrirlo."
+      }
     },
     "element": {
       "name": {
@@ -193,7 +197,13 @@
         "invalid": "Ilegible"
       }
     },
-    "dropZone": "Arrastre aquí la carpeta de un proyecto para abrirla"
+    "dropZone": "Arrastre aquí la carpeta de un proyecto para abrirla",
+    "migrate": {
+      "title": "¿Migrar el proyecto?",
+      "description": "Este proyecto se creó con una versión anterior de Erable (formato {{from}}). Para abrirlo, debe convertirse al formato {{to}}.",
+      "backup": "Antes de cualquier cambio se crea, junto al proyecto, una copia de seguridad de la base de datos, «erable.db.bak-…». Si la migración falla, se restaura y el proyecto queda como estaba.",
+      "confirm": "Copiar y migrar"
+    }
   },
   "help": {
     "title": "Ayuda y atajos",

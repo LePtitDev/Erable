@@ -37,7 +37,11 @@
       "languageInvalid": "Langue de contenu non prise en charge.",
       "inaccessible": "Ce dossier n’est pas accessible (droits insuffisants).",
       "duplicateId": "Un autre projet ouvert a le même identifiant (dossier copié ?).",
-      "notFound": "Ce projet n’est pas ouvert."
+      "notFound": "Ce projet n’est pas ouvert.",
+      "migration": {
+        "failed": "La migration a échoué : le projet a été remis dans son état d’origine, rien n’a été modifié.",
+        "required": "Ce projet doit être migré avant d’être ouvert."
+      }
     },
     "element": {
       "name": {
@@ -193,7 +197,13 @@
         "invalid": "Illisible"
       }
     },
-    "dropZone": "Glissez un dossier de projet ici pour l’ouvrir"
+    "dropZone": "Glissez un dossier de projet ici pour l’ouvrir",
+    "migrate": {
+      "title": "Migrer le projet ?",
+      "description": "Ce projet a été créé avec une version plus ancienne d’Erable (format {{from}}). Pour l’ouvrir, il doit être converti au format {{to}}.",
+      "backup": "Une sauvegarde de la base, « erable.db.bak-… », est créée à côté du projet avant toute modification. Si la migration échoue, elle est remise en place et le projet reste tel qu’il était.",
+      "confirm": "Sauvegarder et migrer"
+    }
   },
   "help": {
     "title": "Aide et raccourcis",

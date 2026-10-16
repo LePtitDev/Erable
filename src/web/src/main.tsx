@@ -30,11 +30,13 @@ const [i18n, launch] = await Promise.all([
 if (launch.openFolder !== null) {
   try {
     const project = await unwrap(
-      api.POST("/api/v1/projects/open", { body: { folder: launch.openFolder } }),
+      api.POST("/api/v1/projects/open", {
+        body: { folder: launch.openFolder, confirmMigration: false },
+      }),
     );
     history.replaceState(history.state, "", `/p/${project.id}`);
   } catch (error) {
-    // The home screen shows instead; the recent list tells why the folder cannot open.
+    // The home screen shows instead (an older project waits there for its migration to be confirmed).
     console.error("The project given on the command line could not be opened", error);
   }
 }

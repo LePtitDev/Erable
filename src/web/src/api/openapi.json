@@ -3061,6 +3061,10 @@
         "properties": {
           "folder": {
             "type": "string"
+          },
+          "confirmMigration": {
+            "type": "boolean",
+            "default": false
           }
         }
       },

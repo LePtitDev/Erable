@@ -36,8 +36,11 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
         }
     }
 
-    /// <summary>Opens a project, or returns it when this backend already has it open.</summary>
-    public Result<ProjectService> Open(string folder, UserProfile profile)
+    /// <summary>
+    /// Opens a project, or returns it when this backend already has it open. An older project is migrated only when
+    /// <paramref name="migrate"/> carries the confirmation of the user (F01.R3).
+    /// </summary>
+    public Result<ProjectService> Open(string folder, UserProfile profile, bool migrate = false)
     {
         ArgumentNullException.ThrowIfNull(profile);
         lock (_gate)
@@ -50,7 +53,7 @@ public sealed class ProjectWorkspace(TimeProvider clock) : IDisposable
                 return already;
             }
 
-            var opened = ProjectStore.Open(full, clock);
+            var opened = ProjectStore.Open(full, clock, migrate);
             return opened.IsSuccess ? Register(opened.Value, profile) : opened.Error;
         }
     }

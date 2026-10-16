@@ -156,6 +156,108 @@ describe("HomeScreen", () => {
     expect(opened).toBe(false);
   });
 
+  describe("an older project (F01.R3, E2E-01-05)", () => {
+    const summary = {
+      id: atlasId,
+      name: "Atlas",
+      folder: "C:/Anciens/Atlas",
+      formatVersion: 3,
+      contentLanguage: "fr",
+      createdAt: "2026-03-10T09:00:00.000Z",
+    };
+
+    function mockOlderProject(failure?: { status: number; code: string }) {
+      mockHome();
+      const bodies: { folder: string; confirmMigration: boolean }[] = [];
+      server.use(
+        http.post("/api/v1/projects/inspect", ({ response }) =>
+          response(200).json({
+            status: "project",
+            name: "Atlas",
+            projectId: atlasId,
+            formatVersion: 1,
+          }),
+        ),
+        http.post("/api/v1/projects/open", async ({ request, response }) => {
+          const body = await request.json();
+          bodies.push(body);
+          if (!body.confirmMigration) {
+            return response.untyped(
+              HttpResponse.json(
+                { status: 409, code: "project.migration.required", fromVersion: 1, toVersion: 3 },
+                { status: 409 },
+              ),
+            );
+          }
+          if (failure !== undefined) {
+            return response.untyped(HttpResponse.json(failure, { status: failure.status }));
+          }
+          return response(200).json(summary);
+        }),
+      );
+      return bodies;
+    }
+
+    async function openOlder() {
+      const user = userEvent.setup();
+      const rendered = await renderApp("/");
+      await screen.findByRole("heading", { level: 1, name: "Bonjour, Arthur" });
+      await user.keyboard("{Control>}o{/Control}");
+      const dialog = screen.getByRole("dialog", { name: "Ouvrir un dossier" });
+      await user.type(within(dialog).getByLabelText("Dossier"), "C:/Anciens/Atlas");
+      await user.click(within(dialog).getByRole("button", { name: "Ouvrir" }));
+      return { user, ...rendered };
+    }
+
+    it("asks before migrating and opens nothing until confirmed", async () => {
+      const bodies = mockOlderProject();
+      await openOlder();
+
+      const confirm = await screen.findByRole("alertdialog", { name: "Migrer le projet ?" });
+
+      expect(confirm).toHaveTextContent("format 1");
+      expect(confirm).toHaveTextContent("format 3");
+      expect(confirm).toHaveTextContent("erable.db.bak-");
+      expect(bodies).toEqual([{ folder: "C:/Anciens/Atlas", confirmMigration: false }]);
+    });
+
+    it("migrates and opens the project once confirmed", async () => {
+      const bodies = mockOlderProject();
+      const { user, router } = await openOlder();
+
+      const confirm = await screen.findByRole("alertdialog", { name: "Migrer le projet ?" });
+      await user.click(within(confirm).getByRole("button", { name: "Sauvegarder et migrer" }));
+
+      await waitFor(() => {
+        expect(router.state.location.pathname.startsWith(`/p/${atlasId}`)).toBe(true);
+      });
+      expect(bodies.at(-1)).toEqual({ folder: "C:/Anciens/Atlas", confirmMigration: true });
+    });
+
+    it("leaves the project alone when the user declines", async () => {
+      const bodies = mockOlderProject();
+      const { user } = await openOlder();
+
+      const confirm = await screen.findByRole("alertdialog", { name: "Migrer le projet ?" });
+      await user.click(within(confirm).getByRole("button", { name: "Annuler" }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole("alertdialog")).toBeNull();
+      });
+      expect(bodies).toHaveLength(1);
+    });
+
+    it("says the project was put back when the migration fails", async () => {
+      mockOlderProject({ status: 500, code: "project.migration.failed" });
+      const { user } = await openOlder();
+
+      const confirm = await screen.findByRole("alertdialog", { name: "Migrer le projet ?" });
+      await user.click(within(confirm).getByRole("button", { name: "Sauvegarder et migrer" }));
+
+      expect(await screen.findByRole("alert")).toHaveTextContent("remis dans son état d’origine");
+    });
+  });
+
   it("offers to create a project in a folder without manifest, writing nothing first (F01.R1)", async () => {
     mockHome();
     let created = false;

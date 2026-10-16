@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ElementId } from "../ids/elementId";
-import { api, unwrap, type Rebrand, type Schemas } from "./client";
+import { api, ApiError, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
 export type ProjectSummary = Rebrand<Schemas["ProjectSummary"]>;
@@ -33,10 +33,33 @@ export function inspectFolder(folder: string): Promise<FolderInspection> {
   return unwrap(api.POST("/api/v1/projects/inspect", { body: { folder } }));
 }
 
+/** What an older project needs before it opens: the formats involved (F01.R3, M2-09). */
+export interface MigrationNeed {
+  readonly fromVersion: number;
+  readonly toVersion: number;
+}
+
+/** The migration the backend asks to confirm, or null when the failure is something else. */
+export function migrationRequired(error: unknown): MigrationNeed | null {
+  if (!(error instanceof ApiError) || error.problem?.["code"] !== "project.migration.required") {
+    return null;
+  }
+  const { fromVersion, toVersion } = error.problem;
+  return typeof fromVersion === "number" && typeof toVersion === "number"
+    ? { fromVersion, toVersion }
+    : null;
+}
+
 export function useOpenProject() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (folder: string) => unwrap(api.POST("/api/v1/projects/open", { body: { folder } })),
+    mutationFn: ({
+      folder,
+      confirmMigration = false,
+    }: {
+      folder: string;
+      confirmMigration?: boolean;
+    }) => unwrap(api.POST("/api/v1/projects/open", { body: { folder, confirmMigration } })),
     onSuccess: (project) => {
       client.setQueryData(queryKeys.project(project.id), project);
       void client.invalidateQueries({ queryKey: queryKeys.recentProjects });

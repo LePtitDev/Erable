@@ -159,10 +159,13 @@ public static class ProjectStore
 
     /// <summary>
     /// Opens a project. Nothing is written when the folder is not a project or is too new (F01.R1, F01.R3). An older
-    /// project is migrated after a backup of its database (<c>erable.db.bak-…</c>); the confirmation asked to the
-    /// user arrives with M2-09.
+    /// project is migrated only when <paramref name="migrate"/> says the user confirmed (otherwise the answer is
+    /// <see cref="StorageErrors.MigrationRequired"/>, nothing touched): a consistent backup of the database comes first
+    /// (<c>erable.db.bak-…</c>), then the migrations, then the doctor; if anything fails the backup is put back and the
+    /// project is exactly as it was (F01.R3, M2-09).
     /// </summary>
-    public static Result<OpenedProject> Open(string folder, TimeProvider clock)
+    /// <param name="onMigrationStep">Called with each schema version reached during a migration (test seam for failures).</param>
+    public static Result<OpenedProject> Open(string folder, TimeProvider clock, bool migrate = true, Action<int>? onMigrationStep = null)
     {
         ArgumentNullException.ThrowIfNull(folder);
         ArgumentNullException.ThrowIfNull(clock);
@@ -203,21 +206,35 @@ public static class ProjectStore
                 return TooNew(schemaVersion);
             }
 
-            string? backup = null;
             if (schemaVersion < ProjectFormat.CurrentVersion)
             {
-                backup = database.Backup(clock.GetUtcNow());
-                using (var connection = database.OpenConnection())
+                if (!migrate)
                 {
-                    Migrations.Apply(connection, schemaVersion);
+                    database.Dispose();
+                    acquired.Value.Dispose();
+                    return new DomainError(
+                        StorageErrors.MigrationRequired,
+                        $"The project uses format {schemaVersion}; it must be migrated to {ProjectFormat.CurrentVersion}.",
+                        new Dictionary<string, object?>(StringComparer.Ordinal)
+                        {
+                            ["fromVersion"] = schemaVersion,
+                            ["toVersion"] = ProjectFormat.CurrentVersion,
+                        });
                 }
 
-                manifest = manifest with { FormatVersion = ProjectFormat.CurrentVersion };
-                ManifestFile.Write(folder, manifest);
+                var migrated = Migrate(folder, manifest, database, acquired.Value, schemaVersion, clock, onMigrationStep);
+                if (!migrated.IsSuccess)
+                {
+                    acquired.Value.Dispose();
+                    return migrated.Error;
+                }
+
+                Directory.CreateDirectory(Path.Combine(folder, ProjectFiles.Blobs));
+                return migrated.Value;
             }
 
             Directory.CreateDirectory(Path.Combine(folder, ProjectFiles.Blobs));
-            return new OpenedProject(folder, manifest, database, acquired.Value, backup);
+            return new OpenedProject(folder, manifest, database, acquired.Value, null);
         }
         catch
         {
@@ -225,6 +242,70 @@ public static class ProjectStore
             acquired.Value.Dispose();
             throw;
         }
+    }
+
+    /// <summary>
+    /// Backup, migrations, manifest, then a check by the doctor. On any failure the database is closed and replaced by
+    /// the backup, the manifest is put back, and the error says so; the lock stays with the caller.
+    /// </summary>
+    private static Result<OpenedProject> Migrate(
+        string folder, ProjectManifest original, ProjectDatabase database, ProjectLock projectLock, int from, TimeProvider clock,
+        Action<int>? onStep)
+    {
+        var backup = database.Backup(clock.GetUtcNow());
+        var manifestWritten = false;
+        try
+        {
+            using (var connection = database.OpenConnection())
+            {
+                Migrations.Apply(connection, from, onStep);
+            }
+
+            var migrated = original with { FormatVersion = ProjectFormat.CurrentVersion };
+            ManifestFile.Write(folder, migrated);
+            manifestWritten = true;
+
+            var project = new OpenedProject(folder, migrated, database, projectLock, backup);
+            if (ProjectDoctor.Diagnose(project, fix: false).Findings.FirstOrDefault(f => f.Severity == DoctorSeverity.Error) is { } problem)
+            {
+                throw new InvalidDataException($"The migrated project does not pass the check ({problem.Code}: {problem.Message}).");
+            }
+
+            return project;
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            database.Dispose();
+            var extensions = new Dictionary<string, object?>(StringComparer.Ordinal) { ["fromVersion"] = from };
+            try
+            {
+                RestoreDatabase(Path.Combine(folder, ProjectFiles.Database), backup);
+                if (manifestWritten)
+                {
+                    ManifestFile.Write(folder, original);
+                }
+            }
+            catch (Exception restore) when (restore is IOException or UnauthorizedAccessException)
+            {
+                // The safety copy is the only intact version left: say where it is.
+                extensions["backup"] = backup;
+            }
+
+            return new DomainError(
+                StorageErrors.MigrationFailed, $"The migration failed and the project was restored: {ex.Message}", extensions);
+        }
+    }
+
+    /// <summary>Puts the backup back as the database (leftovers of the write-ahead log removed), then deletes the backup.</summary>
+    private static void RestoreDatabase(string databasePath, string backup)
+    {
+        foreach (var suffix in new[] { "-wal", "-shm" })
+        {
+            File.Delete(databasePath + suffix);
+        }
+
+        File.Copy(backup, databasePath, overwrite: true);
+        File.Delete(backup);
     }
 
     private static DomainError TooNew(int version) => new(

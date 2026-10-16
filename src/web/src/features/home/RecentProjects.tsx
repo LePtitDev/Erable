@@ -6,7 +6,6 @@ import { errorMessage } from "../../shared/api/errors";
 import {
   initialsOf,
   recentProjectsQuery,
-  useOpenProject,
   useRemoveRecentProject,
   type ProjectSummary,
   type RecentProject,
@@ -15,6 +14,7 @@ import { useFormatters } from "../../shared/i18n/format";
 import type { ElementId } from "../../shared/ids/elementId";
 import { Button } from "../../shared/ui/Button";
 import styles from "./RecentProjects.module.css";
+import { useMigratingOpen } from "./useMigratingOpen";
 
 interface RecentProjectsProps {
   readonly onOpened: (project: ProjectSummary, lastElementId?: ElementId | null) => void;
@@ -25,7 +25,7 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
   const { t } = useTranslation();
   const format = useFormatters();
   const recent = useQuery(recentProjectsQuery);
-  const open = useOpenProject();
+  const open = useMigratingOpen();
   const remove = useRemoveRecentProject();
   const [filter, setFilter] = useState("");
 
@@ -38,10 +38,8 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
   );
 
   const openRecent = (project: RecentProject) => {
-    open.mutate(project.folder, {
-      onSuccess: (summary) => {
-        onOpened(summary, project.lastElementId);
-      },
+    open.open(project.folder, (summary) => {
+      onOpened(summary, project.lastElementId);
     });
   };
 
@@ -65,11 +63,12 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
         </label>
       </div>
 
-      {open.isError && (
+      {open.error !== null && (
         <p role="alert" className={styles["error"]}>
           {errorMessage(t, open.error)}
         </p>
       )}
+      {open.dialog}
 
       {recent.isSuccess && recent.data.length === 0 && (
         <p className={styles["empty"]}>{t("home.recent.empty")}</p>
@@ -95,7 +94,7 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
                       onClick={() => {
                         openRecent(project);
                       }}
-                      disabled={open.isPending}
+                      disabled={open.pending}
                     >
                       {project.name}
                     </button>

@@ -37,7 +37,11 @@
       "languageInvalid": "Unsupported content language.",
       "inaccessible": "This folder cannot be accessed (insufficient permissions).",
       "duplicateId": "Another open project has the same identifier (copied folder?).",
-      "notFound": "This project is not open."
+      "notFound": "This project is not open.",
+      "migration": {
+        "failed": "The migration failed: the project was put back in its original state, nothing was changed.",
+        "required": "This project must be migrated before it opens."
+      }
     },
     "element": {
       "name": {
@@ -193,7 +197,13 @@
         "invalid": "Unreadable"
       }
     },
-    "dropZone": "Drop a project folder here to open it"
+    "dropZone": "Drop a project folder here to open it",
+    "migrate": {
+      "title": "Migrate the project?",
+      "description": "This project was created with an older version of Erable (format {{from}}). To open it, it must be converted to format {{to}}.",
+      "backup": "A backup of the database, “erable.db.bak-…”, is made next to the project before anything changes. If the migration fails, it is put back and the project stays as it was.",
+      "confirm": "Back up and migrate"
+    }
   },
   "help": {
     "title": "Help and shortcuts",

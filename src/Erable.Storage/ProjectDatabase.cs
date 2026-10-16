@@ -155,15 +155,20 @@ public static class Migrations
     /// <summary>Schema version produced by this build; equals the project <c>formatVersion</c>.</summary>
     public static int LatestVersion => All.Count;
 
-    public static void Apply(SqliteConnection connection, int fromVersion)
+    /// <param name="onApplied">Called after each migration is committed, with the version reached (test seam).</param>
+    public static void Apply(SqliteConnection connection, int fromVersion, Action<int>? onApplied = null)
     {
         ArgumentNullException.ThrowIfNull(connection);
         foreach (var (version, _, sql) in All.Where(m => m.Version > fromVersion))
         {
-            using var transaction = connection.BeginTransaction(deferred: false);
-            connection.Execute(sql, transaction: transaction);
-            connection.Execute($"PRAGMA user_version = {version};", transaction: transaction);
-            transaction.Commit();
+            using (var transaction = connection.BeginTransaction(deferred: false))
+            {
+                connection.Execute(sql, transaction: transaction);
+                connection.Execute($"PRAGMA user_version = {version};", transaction: transaction);
+                transaction.Commit();
+            }
+
+            onApplied?.Invoke(version);
         }
     }
 

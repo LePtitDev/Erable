@@ -37,7 +37,11 @@
       "languageInvalid": "Nicht unterstützte Inhaltssprache.",
       "inaccessible": "Auf diesen Ordner kann nicht zugegriffen werden (fehlende Rechte).",
       "duplicateId": "Ein anderes geöffnetes Projekt hat dieselbe Kennung (kopierter Ordner?).",
-      "notFound": "Dieses Projekt ist nicht geöffnet."
+      "notFound": "Dieses Projekt ist nicht geöffnet.",
+      "migration": {
+        "failed": "Die Migration ist fehlgeschlagen: Das Projekt wurde in den ursprünglichen Zustand zurückversetzt, nichts wurde geändert.",
+        "required": "Dieses Projekt muss vor dem Öffnen migriert werden."
+      }
     },
     "element": {
       "name": {
@@ -193,7 +197,13 @@
         "invalid": "Nicht lesbar"
       }
     },
-    "dropZone": "Ziehen Sie einen Projektordner hierher, um ihn zu öffnen"
+    "dropZone": "Ziehen Sie einen Projektordner hierher, um ihn zu öffnen",
+    "migrate": {
+      "title": "Projekt migrieren?",
+      "description": "Dieses Projekt wurde mit einer älteren Version von Erable erstellt (Format {{from}}). Zum Öffnen muss es in das Format {{to}} umgewandelt werden.",
+      "backup": "Neben dem Projekt wird vor jeder Änderung eine Sicherung der Datenbank, „erable.db.bak-…“, angelegt. Schlägt die Migration fehl, wird sie wiederhergestellt und das Projekt bleibt unverändert.",
+      "confirm": "Sichern und migrieren"
+    }
   },
   "help": {
     "title": "Hilfe und Tastenkürzel",

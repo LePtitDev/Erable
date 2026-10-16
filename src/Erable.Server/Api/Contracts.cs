@@ -14,7 +14,8 @@ public sealed record ProjectSummary(
 
 public sealed record CreateProjectRequest(string Folder, string Name, string ContentLanguage);
 
-public sealed record OpenProjectRequest(string Folder);
+/// <param name="ConfirmMigration">The user accepted the migration of an older project (F01.R3, M2-09).</param>
+public sealed record OpenProjectRequest(string Folder, bool ConfirmMigration = false);
 
 public sealed record InspectFolderRequest(string Folder);
 

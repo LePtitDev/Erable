@@ -1,4 +1,6 @@
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
@@ -63,6 +65,50 @@ test.describe("F01 · Home and projects", () => {
       t("home.open.status.tooNew", { version: 99 }),
     );
     expect(fingerprint(reference.folder)).toEqual(before);
+  });
+
+  test("E2E-01-05 · Migrate a project of an older format @nightly", async ({
+    home,
+    page,
+    freshProfile,
+  }) => {
+    expect(freshProfile.slot).not.toBe("");
+    const legacy = join(
+      import.meta.dirname,
+      "..",
+      "..",
+      "..",
+      "..",
+      "spec",
+      "projects",
+      "legacy",
+      "v1",
+    );
+    const folder = mkdtempSync(join(tmpdir(), "erable-legacy-"));
+    cpSync(legacy, folder, { recursive: true });
+    // Tests share one backend: a copy of the frozen project needs an identifier of its own.
+    const manifest = join(folder, "erable.json");
+    const projectId = randomBytes(8).toString("hex").toUpperCase();
+    writeFileSync(
+      manifest,
+      JSON.stringify({ ...(JSON.parse(readFileSync(manifest, "utf8")) as object), projectId }),
+    );
+    await home.goto();
+
+    await home.openFolder(folder);
+    const confirm = page.getByRole("alertdialog", { name: t("home.migrate.title") });
+    await expect(confirm).toBeVisible();
+    // Nothing is written before the user confirms.
+    expect(readdirSync(folder).some((name) => name.startsWith("erable.db.bak-"))).toBe(false);
+    await confirm.getByRole("button", { name: t("home.migrate.confirm") }).click();
+
+    await expect(page.getByRole("tree", { name: t("explorer.title") })).toBeVisible();
+    expect(readdirSync(folder).some((name) => name.startsWith("erable.db.bak-"))).toBe(true);
+    await page.goto(`/p/${projectId}/e/${chroniques.ilsa}`);
+    // The references of the page are resolved: the link carries the name of its target.
+    await expect(page.getByRole("link", { name: "Capitaine Orsen" }).first()).toBeVisible();
+    await page.request.post(`/_test/close?projectId=${projectId}`);
+    rmSync(folder, { recursive: true, force: true });
   });
 
   test("M1-17 · Opening a folder lands on the project, not on an element named after its path @pr", async ({

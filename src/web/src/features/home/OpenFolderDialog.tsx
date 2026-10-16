@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
 import {
   inspectFolder,
-  useOpenProject,
   type FolderInspection,
   type ProjectSummary,
 } from "../../shared/api/projects";
@@ -13,6 +12,7 @@ import { Dialog } from "../../shared/ui/Dialog";
 import field from "../../shared/ui/Field.module.css";
 import { NewProjectDialog } from "./NewProjectDialog";
 import { baseName } from "./projectPath";
+import { useMigratingOpen } from "./useMigratingOpen";
 
 interface OpenFolderDialogProps {
   readonly open: boolean;
@@ -36,7 +36,7 @@ export function OpenFolderDialog({
 }: OpenFolderDialogProps) {
   const { t } = useTranslation();
   const id = useId();
-  const openProject = useOpenProject();
+  const opener = useMigratingOpen();
   // Keyed by the dropped folder in HomeScreen: a new drop is a new dialog.
   const [folder, setFolder] = useState(initialFolder ?? "");
   const [inspection, setInspection] = useState<FolderInspection | null>(null);
@@ -46,7 +46,7 @@ export function OpenFolderDialog({
   const reset = () => {
     setInspection(null);
     setFailure(null);
-    openProject.reset();
+    opener.reset();
   };
 
   const inspectAndOpen = async (path: string) => {
@@ -56,12 +56,9 @@ export function OpenFolderDialog({
       const result = await inspectFolder(path);
       setInspection(result);
       if (result.status === "project") {
-        // Not `onSuccess: onOpened`: the mutation passes its variables (the path) as a second argument, which
-        // onOpened would take for the element to show.
-        openProject.mutate(path, {
-          onSuccess: (project) => {
-            onOpened(project);
-          },
+        // An older project asks for its migration first (F01.R3).
+        opener.open(path, (project) => {
+          onOpened(project);
         });
       } else if (result.status === "notAProject") {
         setCreateIn(path);
@@ -108,7 +105,7 @@ export function OpenFolderDialog({
 
   const message =
     failure ??
-    (openProject.isError ? errorMessage(t, openProject.error) : null) ??
+    (opener.error === null ? null : errorMessage(t, opener.error)) ??
     (inspection === null || inspection.status === "project" || inspection.status === "notAProject"
       ? null
       : t(`home.open.status.${inspection.status}`, { version: inspection.formatVersion ?? "?" }));
@@ -157,13 +154,14 @@ export function OpenFolderDialog({
             <Button
               type="submit"
               variant="primary"
-              disabled={folder.trim() === "" || openProject.isPending}
+              disabled={folder.trim() === "" || opener.pending}
             >
               {t("home.open.submit")}
             </Button>
           </div>
         </form>
       </Dialog>
+      {opener.dialog}
       {createIn !== null && (
         <NewProjectDialog
           key={createIn}

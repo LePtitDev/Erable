@@ -73,4 +73,16 @@ public static class StorageErrors
 
     /// <summary>The folder cannot be read or written.</summary>
     public const string Inaccessible = "project.inaccessible";
+
+    /// <summary>
+    /// An older project needs its format migrated, which only happens once the user confirmed (F01.R3, M2-09);
+    /// <c>fromVersion</c> and <c>toVersion</c> in the extensions.
+    /// </summary>
+    public const string MigrationRequired = "project.migration.required";
+
+    /// <summary>
+    /// The migration failed and the project is back to its original state (<c>backup</c> in the extensions when the
+    /// safety copy was kept because the restoration itself failed).
+    /// </summary>
+    public const string MigrationFailed = "project.migration.failed";
 }

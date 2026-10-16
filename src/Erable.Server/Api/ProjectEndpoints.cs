@@ -78,7 +78,7 @@ public static class ProjectEndpoints
         OpenProjectRequest request, ProjectWorkspace workspace, UserProfile profile, ErableHostOptions options, INativeBridge bridge,
         HttpContext http)
     {
-        var opened = workspace.Open(request.Folder, profile);
+        var opened = workspace.Open(request.Folder, profile, request.ConfirmMigration);
         if (opened.IsSuccess)
         {
             return TypedResults.Ok(Summary(opened.Value.Project));

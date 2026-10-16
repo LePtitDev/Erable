@@ -994,6 +994,8 @@ export interface components {
       type: string;
     };
     OpenProjectRequest: {
+      /** @default false */
+      confirmMigration: boolean;
       folder: string;
     };
     PageContent: {
