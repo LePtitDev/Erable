@@ -902,6 +902,86 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/servers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListServers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["ForgetServer"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/projects": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListServerProjects"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/connect": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["ConnectServer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/probe": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["ProbeServer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -983,6 +1063,11 @@ export interface components {
       categoryId: components["schemas"]["ElementId"];
       categoryName: string;
       value: components["schemas"]["JsonNode"];
+    };
+    ConnectServerRequest: {
+      login: string;
+      password: string;
+      url: string;
     };
     CreateCategoryRequest: {
       description?: null | string;
@@ -1257,6 +1342,9 @@ export interface components {
     PickFolderRequest: {
       title: string;
     };
+    ProbeServerRequest: {
+      url: string;
+    };
     /** @enum {string} */
     ProjectRole: "reader" | "editor" | "admin";
     ProjectSummary: {
@@ -1320,6 +1408,13 @@ export interface components {
     };
     RecordViewRequest: {
       elementId: components["schemas"]["ElementId"];
+    };
+    RemoteProject: {
+      contentLanguage: string;
+      id: components["schemas"]["ElementId"];
+      myRole: components["schemas"]["ProjectRole"];
+      name: string;
+      serverId: string;
     };
     ResolvedItem: {
       attachment?: null | components["schemas"]["AttachmentItem"];
@@ -1443,6 +1538,34 @@ export interface components {
       durationMs: number;
       name: string;
       ok: boolean;
+    };
+    ServerItem: {
+      connected: boolean;
+      id: string;
+      /** Format: date-time */
+      lastUsedAt: string;
+      name: string;
+      projectIds: unknown[];
+      url: string;
+      userId: null | string;
+      userName: null | string;
+    };
+    ServerList: {
+      servers: components["schemas"]["ServerItem"][];
+      tokensSurviveRestart: boolean;
+    };
+    ServerProbe: {
+      appApiVersion: string;
+      /** Format: int32 */
+      appFormatVersion: number;
+      appVersion: string;
+      compatible: boolean;
+      host: string;
+      serverApiVersion: string;
+      serverAppVersion: string;
+      /** Format: int32 */
+      serverFormatVersion: number;
+      url: string;
     };
     SessionResult: {
       /** Format: date-time */
@@ -3208,6 +3331,116 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ProjectSummary"];
+        };
+      };
+    };
+  };
+  ListServers: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerList"];
+        };
+      };
+    };
+  };
+  ForgetServer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ListServerProjects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RemoteProject"][];
+        };
+      };
+    };
+  };
+  ConnectServer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConnectServerRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerItem"];
+        };
+      };
+    };
+  };
+  ProbeServer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProbeServerRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerProbe"];
         };
       };
     };

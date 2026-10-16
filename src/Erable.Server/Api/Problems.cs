@@ -46,6 +46,11 @@ public static class Problems
         StorageErrors.Locked or StorageErrors.AlreadyExists or StorageErrors.MigrationRequired or "project.duplicateId" => StatusCodes.Status409Conflict,
         StorageErrors.MigrationFailed => StatusCodes.Status500InternalServerError,
         "page.revisionConflict" => StatusCodes.Status409Conflict,
+        "auth.invalidCredentials" or "auth.required" => StatusCodes.Status401Unauthorized,
+        "auth.tooManyAttempts" => StatusCodes.Status429TooManyRequests,
+        "server.invalidUrl" => StatusCodes.Status400BadRequest,
+        "server.notFound" => StatusCodes.Status404NotFound,
+        "server.unreachable" or "server.notErable" => StatusCodes.Status502BadGateway,
         ErrorCodes.PropertyKeyTaken or ErrorCodes.LinkDuplicate => StatusCodes.Status409Conflict,
         StorageErrors.Inaccessible => StatusCodes.Status403Forbidden,
         // Everything else is a request that a business rule refuses.

@@ -35,7 +35,7 @@ function isProblem(value: unknown): value is ProblemDetails {
  * Called when a signed-in session turns out to have expired (a 401 on an ordinary call). Resolves to true once the
  * user signed in again: the call is then replayed, so that a save in progress is not lost (E2E-14-09).
  */
-export type UnauthorizedHandler = (request: Request) => Promise<boolean>;
+export type UnauthorizedHandler = (request: Request, response: Response) => Promise<boolean>;
 
 let onUnauthorized: UnauthorizedHandler | null = null;
 
@@ -55,7 +55,7 @@ async function apiFetch(request: Request): Promise<Response> {
   const replay = handler !== null && canReplay(request) ? request.clone() : null;
   const response = await globalThis.fetch(request);
   if (response.status !== 401 || handler === null || replay === null) return response;
-  return (await handler(request)) ? globalThis.fetch(replay) : response;
+  return (await handler(request, response)) ? globalThis.fetch(replay) : response;
 }
 
 /** The single API client of the SPA. Same origin in every mode: the backend serves the SPA. */

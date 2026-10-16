@@ -8,6 +8,7 @@ using Erable.Server.Native;
 using Erable.Server.Projects;
 using Erable.Server.Realtime;
 using Erable.Server.Security;
+using Erable.Server.Servers;
 using Erable.Server.Spa;
 using Erable.Server.Users;
 using Erable.Storage;
@@ -82,6 +83,16 @@ public static class ErableHost
 
         builder.Services.AddSingleton<AccountService>();
         builder.Services.AddSingleton<LoginThrottle>();
+        if (options.Mode == HostMode.Desktop)
+        {
+            // The servers the application connects to (M4-07): their registry, the vault of their tokens, the forwarding.
+            builder.Services.AddHttpForwarder();
+            builder.Services.TryAddSingleton<ISecretStore>(services =>
+                SecretStores.Create(services.GetRequiredService<UserProfiles>().Default.Directory));
+            builder.Services.AddSingleton<ServerRegistry>();
+            builder.Services.AddSingleton<RemoteServers>();
+        }
+
         builder.Services.AddSingleton<UserDirectory>();
         builder.Services.AddSingleton<ProjectWorkspace>();
         builder.Services.AddSingleton<ProjectCatalog>();
@@ -308,6 +319,12 @@ public static class ErableHost
             },
         });
 
+        if (options.Mode == HostMode.Desktop)
+        {
+            // The projects of a server are forwarded before any local rule applies to them.
+            app.UseMiddleware<RemoteProxyMiddleware>();
+        }
+
         // After the static files, which need no identity: the session lookups are for API and shell requests only.
         app.UseMiddleware<AccessControlMiddleware>();
 
@@ -322,6 +339,8 @@ public static class ErableHost
         // The hub itself needs a signed-in user; joining a project checks the membership.
         app.MapHub<ProjectHub>(ApiRoutes.ProjectHub).RequireSignIn();
         app.MapNativeEndpoints(options);
+        app.MapServersEndpoints();
+
 
         if (TestEndpointsCompiled && options.TestMode)
         {

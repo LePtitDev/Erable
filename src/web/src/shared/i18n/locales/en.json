@@ -167,6 +167,14 @@
     },
     "request": {
       "folderRequired": "Give the project folder."
+    },
+    "server": {
+      "unreachable": "This server does not answer. Check the address and your connection.",
+      "notErable": "This address does not answer like an Erable server.",
+      "incompatible": "This server uses a version of Erable that is not compatible with this application.",
+      "invalidUrl": "Enter the address of the server, for example https://wiki.example.org.",
+      "notFound": "This server is no longer in the list.",
+      "unavailable": "Connecting to a server is done from the desktop application."
     }
   },
   "home": {
@@ -925,6 +933,30 @@
       "title": "Properties changed on both sides",
       "mine": "Keep my value: {{value}}",
       "theirs": "Keep {{names}}’s value: {{value}}"
+    }
+  },
+  "servers": {
+    "title": "Servers",
+    "mode": "Server",
+    "noVault": "This system has no vault for passwords: you will have to sign in again at each launch.",
+    "reconnect": "Sign in again",
+    "forget": "Remove",
+    "forgetNamed": "Remove the server {{name}}",
+    "signedOut": "Session ended: sign in again to see the projects of this server.",
+    "projectsOf": "Projects of {{name}}",
+    "connect": {
+      "title": "Connect to a server",
+      "description": "Enter the address of your team’s Erable server. Nothing else is sent before the versions are checked.",
+      "url": "Server address",
+      "next": "Continue",
+      "back": "Change address",
+      "reached": "{{host}} answers (Erable {{version}}). Enter your login.",
+      "placeholder": "https://wiki.example.org"
+    },
+    "incompatible": "{{host}} uses API {{serverApi}} (Erable {{serverApp}}) and this application understands API {{appApi}} (Erable {{appVersion}}). Update the application or the server to make them talk. Nothing else was sent to this server.",
+    "expired": {
+      "title": "Session ended on {{name}}",
+      "description": "Your session on this server has ended. Enter the password of {{user}} to carry on: your work in progress is kept."
     }
   }
 }

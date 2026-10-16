@@ -2530,6 +2530,142 @@
           }
         }
       }
+    },
+    "/api/v1/servers": {
+      "get": {
+        "tags": [
+          "Servers"
+        ],
+        "operationId": "ListServers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/servers/probe": {
+      "post": {
+        "tags": [
+          "Servers"
+        ],
+        "operationId": "ProbeServer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProbeServerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerProbe"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/servers/connect": {
+      "post": {
+        "tags": [
+          "Servers"
+        ],
+        "operationId": "ConnectServer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectServerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/servers/{serverId}/projects": {
+      "get": {
+        "tags": [
+          "Servers"
+        ],
+        "operationId": "ListServerProjects",
+        "parameters": [
+          {
+            "name": "serverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RemoteProject"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/servers/{serverId}": {
+      "delete": {
+        "tags": [
+          "Servers"
+        ],
+        "operationId": "ForgetServer",
+        "parameters": [
+          {
+            "name": "serverId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2861,6 +2997,25 @@
           },
           "value": {
             "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
+      "ConnectServerRequest": {
+        "required": [
+          "url",
+          "login",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
           }
         }
       },
@@ -4007,6 +4162,17 @@
           }
         }
       },
+      "ProbeServerRequest": {
+        "required": [
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
       "ProjectRole": {
         "enum": [
           "reader",
@@ -4277,6 +4443,33 @@
         "properties": {
           "elementId": {
             "$ref": "#/components/schemas/ElementId"
+          }
+        }
+      },
+      "RemoteProject": {
+        "required": [
+          "id",
+          "name",
+          "contentLanguage",
+          "myRole",
+          "serverId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "contentLanguage": {
+            "type": "string"
+          },
+          "myRole": {
+            "$ref": "#/components/schemas/ProjectRole"
+          },
+          "serverId": {
+            "type": "string"
           }
         }
       },
@@ -4811,6 +5004,115 @@
           }
         }
       },
+      "ServerItem": {
+        "required": [
+          "id",
+          "name",
+          "url",
+          "userId",
+          "userName",
+          "connected",
+          "lastUsedAt",
+          "projectIds"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "userId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "userName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "connected": {
+            "type": "boolean"
+          },
+          "lastUsedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectIds": {
+            "type": "array"
+          }
+        }
+      },
+      "ServerList": {
+        "required": [
+          "servers",
+          "tokensSurviveRestart"
+        ],
+        "type": "object",
+        "properties": {
+          "servers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerItem"
+            }
+          },
+          "tokensSurviveRestart": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ServerProbe": {
+        "required": [
+          "url",
+          "host",
+          "compatible",
+          "serverAppVersion",
+          "serverApiVersion",
+          "serverFormatVersion",
+          "appVersion",
+          "appApiVersion",
+          "appFormatVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "compatible": {
+            "type": "boolean"
+          },
+          "serverAppVersion": {
+            "type": "string"
+          },
+          "serverApiVersion": {
+            "type": "string"
+          },
+          "serverFormatVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "appVersion": {
+            "type": "string"
+          },
+          "appApiVersion": {
+            "type": "string"
+          },
+          "appFormatVersion": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "SessionResult": {
         "required": [
           "id",
@@ -5273,6 +5575,9 @@
     },
     {
       "name": "Native"
+    },
+    {
+      "name": "Servers"
     }
   ]
 }

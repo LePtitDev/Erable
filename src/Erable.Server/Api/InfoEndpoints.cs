@@ -17,7 +17,7 @@ public static class InfoEndpoints
 {
     public const string ApiVersion = "v1";
 
-    private static readonly string AppVersion =
+    public static readonly string AppVersion =
         typeof(InfoEndpoints).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
         ?? "0.0.0";
 

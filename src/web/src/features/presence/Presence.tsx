@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { initialsOf, meQuery } from "../../shared/api/projects";
+import { initialsOf } from "../../shared/api/projects";
+import { useCurrentUserId } from "../project/useCurrentUserId";
 import { useOtherUsers } from "./useOtherUsers";
 import type { ElementId } from "../../shared/ids/elementId";
 import {
@@ -72,9 +72,9 @@ export function ElementPresence({ elementId }: { readonly elementId: ElementId }
  */
 export function EditingBanner({ elementId }: { readonly elementId: ElementId }) {
   const { t } = useTranslation();
-  const me = useQuery(meQuery);
+  const me = useCurrentUserId();
   const users = usePresenceStore((s) => s.users);
-  const editors = editorsOf(users, elementId, me.data?.id);
+  const editors = editorsOf(users, elementId, me);
   const first = editors[0];
   if (first === undefined) return null;
   const section =

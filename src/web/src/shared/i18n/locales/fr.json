@@ -167,6 +167,14 @@
     },
     "request": {
       "folderRequired": "Indiquez le dossier du projet."
+    },
+    "server": {
+      "unreachable": "Ce serveur ne répond pas. Vérifiez l’adresse et votre connexion.",
+      "notErable": "Cette adresse ne répond pas comme un serveur Erable.",
+      "incompatible": "Ce serveur utilise une version d’Erable incompatible avec cette application.",
+      "invalidUrl": "Saisissez l’adresse du serveur, par exemple https://wiki.exemple.org.",
+      "notFound": "Ce serveur n’est plus dans la liste.",
+      "unavailable": "La connexion à un serveur se fait depuis l’application de bureau."
     }
   },
   "home": {
@@ -951,6 +959,30 @@
       "title": "Propriétés modifiées des deux côtés",
       "mine": "Garder ma valeur : {{value}}",
       "theirs": "Garder la valeur de {{names}} : {{value}}"
+    }
+  },
+  "servers": {
+    "title": "Serveurs",
+    "mode": "Serveur",
+    "noVault": "Ce système n’a pas de coffre pour les mots de passe : il faudra vous reconnecter à chaque lancement.",
+    "reconnect": "Se reconnecter",
+    "forget": "Retirer",
+    "forgetNamed": "Retirer le serveur {{name}}",
+    "signedOut": "Session terminée : reconnectez-vous pour voir les projets de ce serveur.",
+    "projectsOf": "Projets de {{name}}",
+    "connect": {
+      "title": "Se connecter à un serveur",
+      "description": "Saisissez l’adresse du serveur Erable de votre équipe. Rien d’autre n’est envoyé avant la vérification des versions.",
+      "url": "Adresse du serveur",
+      "next": "Continuer",
+      "back": "Changer d’adresse",
+      "reached": "{{host}} répond (Erable {{version}}). Saisissez votre identifiant.",
+      "placeholder": "https://wiki.exemple.org"
+    },
+    "incompatible": "{{host}} utilise l’API {{serverApi}} (Erable {{serverApp}}) et cette application comprend l’API {{appApi}} (Erable {{appVersion}}). Mettez à jour l’application ou le serveur pour les faire dialoguer. Rien d’autre n’a été envoyé à ce serveur.",
+    "expired": {
+      "title": "Session terminée sur {{name}}",
+      "description": "Votre session sur ce serveur a pris fin. Saisissez le mot de passe de {{user}} pour continuer : votre travail en cours est conservé."
     }
   }
 }

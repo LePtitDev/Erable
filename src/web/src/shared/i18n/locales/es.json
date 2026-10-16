@@ -167,6 +167,14 @@
     },
     "request": {
       "folderRequired": "Indique la carpeta del proyecto."
+    },
+    "server": {
+      "unreachable": "Este servidor no responde. Compruebe la dirección y su conexión.",
+      "notErable": "Esta dirección no responde como un servidor Erable.",
+      "incompatible": "Este servidor usa una versión de Erable incompatible con esta aplicación.",
+      "invalidUrl": "Introduzca la dirección del servidor, por ejemplo https://wiki.ejemplo.org.",
+      "notFound": "Este servidor ya no está en la lista.",
+      "unavailable": "La conexión a un servidor se hace desde la aplicación de escritorio."
     }
   },
   "home": {
@@ -951,6 +959,30 @@
       "title": "Propiedades modificadas en ambos lados",
       "mine": "Conservar mi valor: {{value}}",
       "theirs": "Conservar el valor de {{names}}: {{value}}"
+    }
+  },
+  "servers": {
+    "title": "Servidores",
+    "mode": "Servidor",
+    "noVault": "Este sistema no tiene almacén para contraseñas: tendrá que iniciar sesión de nuevo en cada arranque.",
+    "reconnect": "Iniciar sesión de nuevo",
+    "forget": "Quitar",
+    "forgetNamed": "Quitar el servidor {{name}}",
+    "signedOut": "Sesión terminada: inicie sesión de nuevo para ver los proyectos de este servidor.",
+    "projectsOf": "Proyectos de {{name}}",
+    "connect": {
+      "title": "Conectarse a un servidor",
+      "description": "Introduzca la dirección del servidor Erable de su equipo. No se envía nada más antes de comprobar las versiones.",
+      "url": "Dirección del servidor",
+      "next": "Continuar",
+      "back": "Cambiar la dirección",
+      "reached": "{{host}} responde (Erable {{version}}). Introduzca su usuario.",
+      "placeholder": "https://wiki.ejemplo.org"
+    },
+    "incompatible": "{{host}} usa la API {{serverApi}} (Erable {{serverApp}}) y esta aplicación entiende la API {{appApi}} (Erable {{appVersion}}). Actualice la aplicación o el servidor. No se ha enviado nada más a este servidor.",
+    "expired": {
+      "title": "Sesión terminada en {{name}}",
+      "description": "Su sesión en este servidor ha terminado. Introduzca la contraseña de {{user}} para continuar: su trabajo en curso se conserva."
     }
   }
 }

@@ -167,6 +167,14 @@
     },
     "request": {
       "folderRequired": "Geben Sie den Projektordner an."
+    },
+    "server": {
+      "unreachable": "Dieser Server antwortet nicht. Prüfen Sie die Adresse und Ihre Verbindung.",
+      "notErable": "Diese Adresse antwortet nicht wie ein Erable-Server.",
+      "incompatible": "Dieser Server verwendet eine mit dieser Anwendung nicht kompatible Erable-Version.",
+      "invalidUrl": "Geben Sie die Serveradresse ein, zum Beispiel https://wiki.beispiel.org.",
+      "notFound": "Dieser Server steht nicht mehr in der Liste.",
+      "unavailable": "Die Verbindung zu einem Server erfolgt über die Desktop-Anwendung."
     }
   },
   "home": {
@@ -925,6 +933,30 @@
       "title": "Auf beiden Seiten geänderte Eigenschaften",
       "mine": "Meinen Wert behalten: {{value}}",
       "theirs": "Wert von {{names}} behalten: {{value}}"
+    }
+  },
+  "servers": {
+    "title": "Server",
+    "mode": "Server",
+    "noVault": "Dieses System hat keinen Tresor für Passwörter: Sie müssen sich bei jedem Start erneut anmelden.",
+    "reconnect": "Erneut anmelden",
+    "forget": "Entfernen",
+    "forgetNamed": "Server {{name}} entfernen",
+    "signedOut": "Sitzung beendet: Melden Sie sich erneut an, um die Projekte dieses Servers zu sehen.",
+    "projectsOf": "Projekte von {{name}}",
+    "connect": {
+      "title": "Mit einem Server verbinden",
+      "description": "Geben Sie die Adresse des Erable-Servers Ihres Teams ein. Vor der Prüfung der Versionen wird nichts anderes gesendet.",
+      "url": "Serveradresse",
+      "next": "Weiter",
+      "back": "Adresse ändern",
+      "reached": "{{host}} antwortet (Erable {{version}}). Geben Sie Ihren Benutzernamen ein.",
+      "placeholder": "https://wiki.beispiel.org"
+    },
+    "incompatible": "{{host}} verwendet die API {{serverApi}} (Erable {{serverApp}}), diese Anwendung versteht die API {{appApi}} (Erable {{appVersion}}). Aktualisieren Sie die Anwendung oder den Server. An diesen Server wurde nichts anderes gesendet.",
+    "expired": {
+      "title": "Sitzung auf {{name}} beendet",
+      "description": "Ihre Sitzung auf diesem Server wurde beendet. Geben Sie das Passwort von {{user}} ein, um fortzufahren: Ihre laufende Arbeit bleibt erhalten."
     }
   }
 }

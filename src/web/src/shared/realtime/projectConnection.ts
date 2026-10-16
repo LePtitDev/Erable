@@ -104,7 +104,8 @@ export async function connectToProject(
   setConnectionState("connecting");
   const { HubConnectionBuilder, HubConnectionState, LogLevel } = await import("@microsoft/signalr");
   const connection = new HubConnectionBuilder()
-    .withUrl("/hubs/project")
+    // The project is named in the address: the desktop forwards the connection to the server that hosts it (M4-07).
+    .withUrl(`/hubs/project?projectId=${projectId}`)
     .withAutomaticReconnect({
       nextRetryDelayInMilliseconds: (context) => retryDelay(context.previousRetryCount),
     })

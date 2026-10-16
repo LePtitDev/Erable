@@ -6,6 +6,9 @@ import type { ElementId } from "../ids/elementId";
  */
 export const queryKeys = {
   me: ["me"] as const,
+  /** The servers the desktop application is connected to, and what they list (M4-07). */
+  servers: ["servers"] as const,
+  serverProjects: (serverId: string) => ["servers", serverId, "projects"] as const,
   /** The projects of the server the user belongs to (the home screen). */
   projectList: ["project-list"] as const,
   preferences: ["me", "preferences"] as const,

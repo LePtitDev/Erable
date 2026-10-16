@@ -24,10 +24,12 @@ import { OpenFolderDialog } from "./OpenFolderDialog";
 import { PreferencesDialog } from "./PreferencesDialog";
 import { useWindowStore } from "../../shared/native/native";
 import { RecentProjects } from "./RecentProjects";
+import { ConnectServerDialog } from "./ConnectServerDialog";
+import { ServersSection } from "./ServersSection";
 import { ServerProjects } from "./ServerProjects";
 import { UserMenu } from "../auth/UserMenu";
 
-type OpenDialog = "new" | "open" | "preferences" | "help" | null;
+type OpenDialog = "new" | "open" | "connect" | "preferences" | "help" | null;
 
 /** Home screen (F01, mockup « Accueil — ouvrir un projet »). */
 export function HomeScreen() {
@@ -41,6 +43,8 @@ export function HomeScreen() {
   const folders = info.data?.folderProjects !== false;
   const canCreate = !server || me.data?.isServerAdmin === true;
   const [dialog, setDialog] = useState<OpenDialog>(null);
+  // The server just connected to, shown open in the list of servers (E2E-01-06).
+  const [connectedServer, setConnectedServer] = useState<string | null>(null);
   const [droppedFolder, setDroppedFolder] = useState<string | null>(null);
 
   // F16 (E2E-16-07): a folder dropped on the window opens like « Ouvrir un dossier… », drops made elsewhere are not
@@ -198,21 +202,28 @@ export function HomeScreen() {
             <button
               type="button"
               className={styles["action"]}
-              disabled
-              aria-describedby="server-soon"
+              onClick={() => {
+                setDialog("connect");
+              }}
             >
               <Server aria-hidden size={22} />
               <span className={styles["actionText"]}>
                 <span className={styles["actionTitle"]}>{t("home.connect.title")}</span>
-                <span className={styles["actionHint"]} id="server-soon">
-                  {t("home.connect.hint")} · {t("common.soon")}
-                </span>
+                <span className={styles["actionHint"]}>{t("home.connect.hint")}</span>
               </span>
             </button>
           )}
         </div>
 
         {server && <ServerProjects />}
+        {!server && (
+          <ServersSection
+            expanded={connectedServer}
+            onConnect={() => {
+              setDialog("connect");
+            }}
+          />
+        )}
         {folders && <RecentProjects onOpened={opened} />}
 
         {folders && (
@@ -233,6 +244,14 @@ export function HomeScreen() {
         }}
         onOpened={opened}
         initialFolder={droppedFolder}
+      />
+      <ConnectServerDialog
+        open={dialog === "connect"}
+        onOpenChange={close}
+        onConnected={(connected) => {
+          setConnectedServer(connected.id);
+          setDialog(null);
+        }}
       />
       <PreferencesDialog open={dialog === "preferences"} onOpenChange={close} />
       <HelpDialog open={dialog === "help"} onOpenChange={close} />

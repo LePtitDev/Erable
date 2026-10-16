@@ -18,9 +18,11 @@ export async function logout(): Promise<void> {
 interface AuthState {
   /** The session expired while the user was working: the sign-in dialog is shown over the screen. */
   readonly reloginOpen: boolean;
+  /** The desktop application: the token of this server (by id) is no good any more, the password is asked again (M4-07). */
+  readonly remoteRelogin: string | null;
 }
 
-export const useAuthStore = create<AuthState>(() => ({ reloginOpen: false }));
+export const useAuthStore = create<AuthState>(() => ({ reloginOpen: false, remoteRelogin: null }));
 
 let waiting: { promise: Promise<boolean>; settle: (signedIn: boolean) => void } | null = null;
 
@@ -42,4 +44,29 @@ export function finishRelogin(signedIn: boolean): void {
   useAuthStore.setState({ reloginOpen: false });
   waiting?.settle(signedIn);
   waiting = null;
+}
+
+let remoteWaiting: {
+  serverId: string;
+  promise: Promise<boolean>;
+  settle: (signedIn: boolean) => void;
+} | null = null;
+
+/** Asks the password of a server again (its token ended); the calls that failed are replayed afterwards. */
+export function requestRemoteRelogin(serverId: string): Promise<boolean> {
+  if (remoteWaiting === null) {
+    let settle: (signedIn: boolean) => void = () => undefined;
+    const promise = new Promise<boolean>((resolve) => {
+      settle = resolve;
+    });
+    remoteWaiting = { serverId, promise, settle };
+    useAuthStore.setState({ remoteRelogin: serverId });
+  }
+  return remoteWaiting.promise;
+}
+
+export function finishRemoteRelogin(signedIn: boolean): void {
+  useAuthStore.setState({ remoteRelogin: null });
+  remoteWaiting?.settle(signedIn);
+  remoteWaiting = null;
 }

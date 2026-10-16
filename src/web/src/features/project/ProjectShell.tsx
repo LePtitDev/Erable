@@ -20,6 +20,7 @@ import { Notices } from "./Notices";
 import { PresenceAvatars } from "../presence/Presence";
 import { ApiError } from "../../shared/api/client";
 import { apiInfoQuery } from "../../shared/api/queries";
+import { useProjectServer } from "../../shared/api/servers";
 import { AccessDeniedScreen, NotFoundScreen } from "./ErrorScreens";
 import { accessOf, ProjectAccessContext, useCanEdit } from "./access";
 import { useConnectionStore } from "../../shared/realtime/connectionStore";
@@ -252,9 +253,11 @@ function TopBar({
 function ConnectionStatus() {
   const { t } = useTranslation();
   const info = useQuery(apiInfoQuery);
+  const { projectId } = useParams({ from: "/p/$projectId" });
+  const remote = useProjectServer(projectId);
   const state = useConnectionStore((s) => s.state);
   const editors = usePresenceStore((s) => s.users.filter((u) => u.mode === "edit").length);
-  if (info.data?.mode !== "server") {
+  if (info.data?.mode !== "server" && remote === undefined) {
     return (
       <span className={styles["connection"]}>
         <span className={styles["dot"]} aria-hidden />
@@ -270,7 +273,7 @@ function ConnectionStatus() {
       data-connection={state}
     >
       <span className={styles["dot"]} aria-hidden />
-      {t(`shell.status.connection.${state}`, { server: globalThis.location.host })}
+      {t(`shell.status.connection.${state}`, { server: remote?.name ?? globalThis.location.host })}
       {state === "connected" &&
         editors > 0 &&
         ` · ${t("shell.status.editors", { count: editors })}`}
