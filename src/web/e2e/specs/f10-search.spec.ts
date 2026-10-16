@@ -31,7 +31,7 @@ test.describe("F10 · Search and filters", () => {
   }) => {
     const quick = new QuickSearchPage(page);
     await page.goto(reference.url(chroniques.hautbois));
-    await expect(page.getByRole("main")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await page.clock.runFor(2500);
     await page.goto(reference.url(chroniques.pnj));
     await expect(page.getByRole("main")).toBeVisible();

@@ -32,7 +32,7 @@ L'écran de recherche du mockup, avec un état entièrement porté par l'URL.
 - **Texte** : la saisie est écrite dans l'URL après 250 ms de pause ou sur Entrée. Résultats : compteur annoncé (`role=status`), tri, « Afficher plus » (curseur), carte avec type, titre, chemin, extrait, catégories, auteur/date (ou type et taille pour une pièce jointe), règle enfreinte pour « Hors règles ». Colonne Consultées/Modifiées via `RecentList` (M3-04).
 - **Voir dans la recherche** (catégorie) devient un vrai lien (`cat` + `sub`) ; sans texte, l'ordre est « dernière modification ».
 - **Écart** : les paramètres de `GET search` portent maintenant des noms explicites en camelCase dans l'OpenAPI (`nameOnly`, `subCategories`…).
-- Vérification faite pendant la tâche : Vitest de `features/search` (29), Playwright Chromium + WebKit des specs F07, F10, F11 (34), lint, typecheck, format, `api:check`. La suite complète est lancée à la fin de M3 (demande de l'utilisateur) ; deux tests (`ProjectShell`, `Trash`) ont échoué une fois sous charge dans la suite complète et passent isolés : à surveiller.
+- Vérification faite pendant la tâche : Vitest de `features/search` (29), Playwright Chromium + WebKit des specs F07, F10, F11 (34), lint, typecheck, format, `api:check`. La suite complète a été lancée à la fin de M3 : sous la charge d'un passage complet, des tests Vitest d'écrans entiers dépassaient les délais par défaut (5 s par test, 1 s par `findBy`) ; `testTimeout` est passé à 20 s et `asyncUtilTimeout` à 5 s (`vitest.config.ts`, `src/test/setup.ts`). Deux passages complets consécutifs : 671 tests verts.
 - Commit proposé : `feat(web,server): add the search screen with filters in the URL (M3-03)`.
 
 ## Propositions

@@ -9,7 +9,8 @@ test.describe("F11 · Recently viewed and edited", () => {
 
     for (const id of [chroniques.pnj, chroniques.hautbois, chroniques.niveau]) {
       await page.goto(reference.url(id));
-      await expect(page.getByRole("main")).toBeVisible();
+      // The element is shown (its title is there): only then does the two-second timer run.
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       await recent.dwell();
     }
 
@@ -28,11 +29,13 @@ test.describe("F11 · Recently viewed and edited", () => {
   }) => {
     const recent = new RecentPanel(page);
     await page.goto(reference.url(chroniques.hautbois));
-    await expect(page.getByRole("main")).toBeVisible();
+    // The element is shown (its title is there): only then does the two-second timer run.
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await page.clock.runFor(1000);
 
     await page.goto(reference.url(chroniques.pnj));
-    await expect(page.getByRole("main")).toBeVisible();
+    // The element is shown (its title is there): only then does the two-second timer run.
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await recent.dwell();
 
     await expect(recent.entries).toHaveCount(1);

@@ -52,6 +52,28 @@ public sealed class RecentStorageTests : IDisposable
     }
 
     [Fact]
+    public async Task GetRecent_ClockSetBack_KeepsTheOrderOfTheViews()
+    {
+        var clock = new SettableClock { Now = Chroniques.Now };
+        var service = new ProjectService(_project, clock);
+        await service.RecordViewAsync("camille", Pnj, Ct);
+        clock.Now = Chroniques.Now.AddSeconds(5);
+        await service.RecordViewAsync("camille", Chroniques.Hautbois, Ct);
+        clock.Now = Chroniques.Now.AddDays(-1);
+
+        await service.RecordViewAsync("camille", Niveau, Ct);
+
+        service.GetRecent("camille", 10).Viewed.Select(v => v.Element.Name).ShouldBe(["Niveau", "Hautbois", "PNJ"]);
+    }
+
+    private sealed class SettableClock : TimeProvider
+    {
+        public DateTimeOffset Now { get; set; }
+
+        public override DateTimeOffset GetUtcNow() => Now;
+    }
+
+    [Fact]
     public async Task GetRecent_ViewedAgain_MovesToTheTopOnce()
     {
         await ViewAsync("camille", Pnj);

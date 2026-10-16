@@ -32,7 +32,16 @@ public sealed partial class ProjectService
                 return Result.Failure<DateTimeOffset>(new DomainError(ErrorCodes.ElementNotFound, $"Element {id} cannot be viewed."));
             }
 
+            // A view always sorts after the previous ones of the user, even if the system clock was set back (or, in the
+            // tests, reset): the order of « récemment consultées » is the order of the views, not of the clock.
             var now = clock.GetUtcNow();
+            var last = connection.ExecuteScalar<string?>(
+                "SELECT MAX(last_viewed_at) FROM user_activity WHERE user_id = @UserId", new { UserId = userId }, transaction);
+            if (last is not null && StorageFormat.ParseTimestamp(last) is var previous && previous >= now)
+            {
+                now = previous.AddMilliseconds(1);
+            }
+
             connection.Execute(
                 """
                 INSERT INTO user_activity (user_id, element_id, last_viewed_at) VALUES (@UserId, @Id, @At)
