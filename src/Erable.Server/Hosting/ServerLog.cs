@@ -16,6 +16,9 @@ internal static partial class ServerLog
     [LoggerMessage(Level = LogLevel.Error, Message = "Folder {Folder} holds project {Actual}, not the registered {Expected}.")]
     public static partial void ProjectIdMismatch(ILogger logger, string folder, ElementId actual, ElementId expected);
 
+    [LoggerMessage(Level = LogLevel.Error, Message = "The shared project in {Folder} was not opened: {Code} {Detail}")]
+    public static partial void SharedProjectNotOpened(ILogger logger, string folder, string code, string detail);
+
     [LoggerMessage(Level = LogLevel.Error, Message = "Endpoint {Endpoint} declares no access rule.")]
     public static partial void UndeclaredAccess(ILogger logger, string? endpoint);
 

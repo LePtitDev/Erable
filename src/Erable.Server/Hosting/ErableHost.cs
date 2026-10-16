@@ -11,6 +11,7 @@ using Erable.Server.Security;
 using Erable.Server.Spa;
 using Erable.Server.Users;
 using Erable.Storage;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Json;
@@ -95,6 +96,28 @@ public static class ErableHost
         }
 #endif
         builder.Services.AddProblemDetails();
+        if (options.Mode == HostMode.Server)
+        {
+            builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy
+                .SetIsOriginAllowed(origin => IsAllowedOrigin(origin, options))
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                // SignalR negotiates with credentials; the session cookie is SameSite=Strict, so it never travels cross-site.
+                .AllowCredentials()
+                .WithExposedHeaders(HeaderNames.ETag, HeaderNames.RetryAfter, HeaderNames.ContentRange, HeaderNames.AcceptRanges)));
+        }
+
+        if (options.TrustProxy)
+        {
+            builder.Services.Configure<ForwardedHeadersOptions>(forwarded =>
+            {
+                forwarded.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+                // The proxy is whatever is in front of the server (a container network): it is trusted by configuration.
+                forwarded.KnownIPNetworks.Clear();
+                forwarded.KnownProxies.Clear();
+            });
+        }
+
         builder.Services.AddSignalR(hub =>
         {
             // A browser closed without a goodbye (power cut, network lost) leaves its presence for at most this long.
@@ -202,6 +225,31 @@ public static class ErableHost
         return options.TimeProvider;
     }
 
+    /// <summary>An origin the API answers to from a browser: the public URL, the configured ones, and loopback pages if allowed.</summary>
+    internal static bool IsAllowedOrigin(string origin, ErableHostOptions options)
+    {
+        if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https"))
+        {
+            return false;
+        }
+
+        var normalized = uri.GetLeftPart(UriPartial.Authority);
+        if (options.PublicUrl is { Length: > 0 } publicUrl
+            && Uri.TryCreate(publicUrl, UriKind.Absolute, out var publicUri)
+            && string.Equals(publicUri.GetLeftPart(UriPartial.Authority), normalized, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (options.CorsOrigins.Any(o => Uri.TryCreate(o, UriKind.Absolute, out var configured)
+            && string.Equals(configured.GetLeftPart(UriPartial.Authority), normalized, StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        return options.AllowLoopbackOrigins && uri.IsLoopback;
+    }
+
     private static void Validate(ErableHostOptions options)
     {
         if (options.Mode != HostMode.Desktop)
@@ -235,7 +283,18 @@ public static class ErableHost
             app.Lifetime.ApplicationStopping.Register(registry.Unregister);
         }
 
+        if (options.TrustProxy)
+        {
+            app.UseForwardedHeaders();
+        }
+
         app.UseExceptionHandler();
+        if (options.Mode == HostMode.Server)
+        {
+            // Before the access rules: a preflight request carries no credentials.
+            app.UseCors();
+        }
+
         app.UseStatusCodePages();
 
         app.UseStaticFiles(new StaticFileOptions

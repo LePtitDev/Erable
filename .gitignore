@@ -34,3 +34,6 @@ src/web/blob-report/
 Thumbs.db
 
 BenchmarkDotNet.Artifacts/
+
+# Local deployment settings (deploy/.env.example is the template).
+deploy/.env

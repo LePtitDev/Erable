@@ -53,7 +53,9 @@ public sealed record ErableHostOptions
     public bool FolderProjectsEnabled => FolderProjects ?? (Mode == HostMode.Desktop || TestMode);
 
     /// <summary>How long a login session lasts without activity (it is renewed while in use).</summary>
-    public TimeSpan SessionLifetime { get; init; } = TimeSpan.FromHours(12);
+    public TimeSpan SessionLifetime { get; init; } = DefaultSessionLifetime;
+
+    public static readonly TimeSpan DefaultSessionLifetime = TimeSpan.FromHours(12);
 
     /// <summary>Failed logins tolerated for one login name within <see cref="LoginWindow"/> before it is locked out.</summary>
     public int LoginMaxFailures { get; init; } = 5;
@@ -79,4 +81,31 @@ public sealed record ErableHostOptions
     public string? BootstrapAdminLogin { get; init; }
 
     public string? BootstrapAdminPassword { get; init; }
+
+    /// <summary>
+    /// Room for the attachments of one project, in bytes; null for none (M4-06, docs/architecture.md §9). A server
+    /// shared by several teams sets it so that one project cannot fill the disk.
+    /// </summary>
+    public long? ProjectQuota { get; init; }
+
+    /// <summary>The address users type to reach the server (<c>https://wiki.example.org</c>): allowed by CORS, and <c>https</c> makes the cookie <c>Secure</c>.</summary>
+    public string? PublicUrl { get; init; }
+
+    /// <summary>Other origins allowed to call the API from a browser (a SPA hosted elsewhere), exact match.</summary>
+    public IReadOnlyList<string> CorsOrigins { get; init; } = [];
+
+    /// <summary>
+    /// Pages served from a loopback address may call the API (the desktop application connected to a server, M4-07):
+    /// they carry a bearer token, never a cookie.
+    /// </summary>
+    public bool AllowLoopbackOrigins { get; init; } = true;
+
+    /// <summary>The server sits behind a reverse proxy (Caddy…): trust <c>X-Forwarded-For / -Proto / -Host</c>.</summary>
+    public bool TrustProxy { get; init; }
+
+    /// <summary>
+    /// A project folder shared as it is (<c>erable serve ./MonWiki</c>): registered in the server at startup, its first
+    /// administrator being the first server administrator.
+    /// </summary>
+    public string? SharedProjectFolder { get; init; }
 }

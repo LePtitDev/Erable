@@ -1,0 +1,6 @@
+# Certificates are requested and renewed by Caddy for the domain below (it must point to this machine,
+# ports 80 and 443 open). WebSockets (SignalR) pass through reverse_proxy without any setting.
+{$ERABLE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy erable:8080
+}

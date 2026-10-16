@@ -297,6 +297,13 @@ public sealed class ProjectRepository(ProjectDatabase database)
             new { Ids = json }).Select(r => r.ToRecord())];
     }
 
+    /// <summary>Bytes of every attachment of the project, the trash included (it is still stored): what a quota counts.</summary>
+    public long GetAttachmentsTotalSize(SqliteConnection? connection = null)
+    {
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        return (connection ?? owned!).ExecuteScalar<long>("SELECT COALESCE(SUM(size), 0) FROM attachments");
+    }
+
     /// <summary>Every live attachment of the project (insert palette): those of a deleted page are excluded.</summary>
     public IReadOnlyList<AttachmentRecord> GetAllAttachments(SqliteConnection? connection = null)
     {

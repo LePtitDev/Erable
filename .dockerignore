@@ -1,0 +1,22 @@
+# Docker build context (Dockerfile): only what the image needs.
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.vite
+.git
+.github
+artifacts
+TestResults
+tests
+spikes
+mockups
+docs
+tasks
+scripts
+build
+spec
+src/Erable.Desktop
+src/web/e2e
+src/web/test-results
+src/web/playwright-report

@@ -78,7 +78,8 @@
       "tooLarge": "Die Datei überschreitet die maximal zulässige Größe.",
       "multipartRequired": "Ungültiger Datei-Upload.",
       "fileMissing": "Keine Datei empfangen.",
-      "executable": "Erable öffnet niemals ein Programm oder Skript. Zeigen Sie es im Dateimanager an, wenn Sie wissen, woher es stammt."
+      "executable": "Erable öffnet niemals ein Programm oder Skript. Zeigen Sie es im Dateimanager an, wenn Sie wissen, woher es stammt.",
+      "quotaExceeded": "Dieses Projekt hat den gesamten Platz belegt, den der Server seinen Anhängen zugesteht. Löschen Sie Dateien oder bitten Sie den Serveradministrator, das Kontingent zu erhöhen."
     },
     "native": {
       "unavailable": "Diese Aktion gibt es nur in der Desktop-Anwendung."

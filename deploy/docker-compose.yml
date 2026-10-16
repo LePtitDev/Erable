@@ -1,0 +1,46 @@
+# Erable behind Caddy (automatic TLS certificates), docs/deployment.md.
+#   1. cp deploy/.env.example deploy/.env  and fill it in
+#   2. docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d
+services:
+  erable:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      # The first administrator, created when the data volume is empty; ignored afterwards.
+      ERABLE_ADMIN_LOGIN: ${ERABLE_ADMIN_LOGIN:?set the first administrator in deploy/.env}
+      ERABLE_ADMIN_PASSWORD: ${ERABLE_ADMIN_PASSWORD:?set the first administrator in deploy/.env}
+      # What users type in their browser; https makes the session cookie Secure.
+      ERABLE_PUBLIC_URL: https://${ERABLE_DOMAIN:?set the domain in deploy/.env}
+      # Caddy terminates TLS and forwards the client address and protocol.
+      ERABLE_TRUST_PROXY: "true"
+      ERABLE_MAX_ATTACHMENT_MB: ${ERABLE_MAX_ATTACHMENT_MB:-256}
+      ERABLE_PROJECT_QUOTA_MB: ${ERABLE_PROJECT_QUOTA_MB:-0}
+    volumes:
+      - erable-data:/data
+    # Not published: only Caddy reaches it, on the compose network.
+    expose:
+      - "8080"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      erable:
+        condition: service_healthy
+    environment:
+      ERABLE_DOMAIN: ${ERABLE_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  erable-data:
+  caddy-data:
+  caddy-config:

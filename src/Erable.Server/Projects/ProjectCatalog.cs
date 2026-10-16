@@ -37,8 +37,8 @@ public sealed class ProjectCatalog(
     }
 
     /// <summary>
-    /// Records a project in the registry. The first registration makes <paramref name="creatorId"/> its administrator;
-    /// an already known project keeps its members.
+    /// Records a project in the registry. A project without any administrator gets <paramref name="creatorId"/> as one
+    /// (its creator, or the first server administrator for a project shared as it is); the other members stay.
     /// </summary>
     public void Register(ProjectService service, string creatorId)
     {
@@ -54,9 +54,8 @@ public sealed class ProjectCatalog(
             && string.Equals(Path.TrimEndingDirectorySeparator(parent), Path.TrimEndingDirectorySeparator(root), StringComparison.OrdinalIgnoreCase)
             ? Path.GetFileName(full)
             : full;
-        var known = accounts.Store.IsRegistered(projectId);
         accounts.Store.RegisterProject(new ProjectRegistration(projectId, folder, clock.GetUtcNow()));
-        if (!known && accounts.Store.CountAdmins(projectId) == 0 && accounts.Store.GetAccount(creatorId) is not null)
+        if (accounts.Store.CountAdmins(projectId) == 0 && accounts.Store.GetAccount(creatorId) is not null)
         {
             accounts.Store.SetMember(projectId, creatorId, ProjectRole.Admin);
         }

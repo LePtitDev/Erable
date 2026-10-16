@@ -78,7 +78,8 @@
       "tooLarge": "El archivo supera el tamaño máximo permitido.",
       "multipartRequired": "Envío de archivo no válido.",
       "fileMissing": "No se ha recibido ningún archivo.",
-      "executable": "Erable nunca abre un programa ni un script. Muéstrelo en el explorador si sabe de dónde viene."
+      "executable": "Erable nunca abre un programa ni un script. Muéstrelo en el explorador si sabe de dónde viene.",
+      "quotaExceeded": "Este proyecto ha usado todo el espacio que el servidor concede a sus archivos adjuntos. Elimine archivos o pida al administrador del servidor que aumente la cuota."
     },
     "native": {
       "unavailable": "Esta acción solo existe en la aplicación de escritorio."

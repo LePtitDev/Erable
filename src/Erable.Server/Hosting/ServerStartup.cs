@@ -8,7 +8,8 @@ namespace Erable.Server.Hosting;
 /// purges the expired sessions. Runs before Kestrel starts listening, so no request meets a half-ready server.
 /// </summary>
 internal sealed class ServerStartup(
-    ErableHostOptions options, AccountService accounts, ProjectCatalog catalog, TimeProvider clock, ILogger<ServerStartup> logger) : IHostedService
+    ErableHostOptions options, AccountService accounts, ProjectCatalog catalog, ProjectWorkspace workspace, TimeProvider clock, ILogger<ServerStartup> logger)
+    : IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -34,7 +35,32 @@ internal sealed class ServerStartup(
 #endif
         accounts.Store.PurgeExpiredSessions(clock.GetUtcNow());
         catalog.OpenRegistered();
+        ShareProject();
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// <c>erable serve ./MonWiki</c>: the folder is registered as a project of the server, administered by the first
+    /// server administrator, unless it already has an administrator.
+    /// </summary>
+    private void ShareProject()
+    {
+        if (options.SharedProjectFolder is not { } folder)
+        {
+            return;
+        }
+
+        var opened = workspace.Open(folder, profile: null);
+        if (!opened.IsSuccess)
+        {
+            ServerLog.SharedProjectNotOpened(logger, folder, opened.Error.Code, opened.Error.Message);
+            return;
+        }
+
+        if (accounts.Store.ListAccounts().FirstOrDefault(a => a.IsServerAdmin && !a.Disabled) is { } admin)
+        {
+            catalog.Register(opened.Value, admin.Id);
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

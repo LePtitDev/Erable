@@ -35,6 +35,9 @@ public static class ErrorCodes
     /// <summary>The file exceeds the configured maximum attachment size (F06.R5).</summary>
     public const string AttachmentTooLarge = "attachment.tooLarge";
 
+    /// <summary>The project has used the room the server grants to its attachments (M4-06).</summary>
+    public const string AttachmentQuotaExceeded = "attachment.quotaExceeded";
+
     /// <summary>The chosen parent category does not exist.</summary>
     public const string CategoryParentNotFound = "category.parent.notFound";
 

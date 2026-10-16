@@ -39,7 +39,7 @@ public static class AttachmentEndpoints
     /// <c>IFormFile</c>, which copies the upload to memory or a temporary file first).
     /// </summary>
     private static async Task<Results<Created<AttachmentItem>, ProblemHttpResult>> Upload(
-        ElementId projectId, ElementId id, HttpContext http, ProjectWorkspace workspace, AttachmentSettings settings)
+        ElementId projectId, ElementId id, HttpContext http, ProjectWorkspace workspace, AttachmentSettings settings, ErableHostOptions options)
     {
         if (workspace.Find(projectId) is not { } service)
         {
@@ -47,9 +47,17 @@ public static class AttachmentEndpoints
         }
 
         var maxSize = settings.MaxSize;
-        if (http.Request.ContentLength > maxSize + MultipartOverhead)
+        // The room left to the project (M4-06): a file that does not fit is refused as it streams in, like an oversized one.
+        var remaining = options.ProjectQuota is { } quota ? Math.Max(0, quota - service.Project.Repository.GetAttachmentsTotalSize()) : long.MaxValue;
+        var limit = Math.Min(maxSize, remaining);
+        if (remaining <= 0)
         {
-            return TooLarge(maxSize);
+            return QuotaExceeded(options.ProjectQuota!.Value);
+        }
+
+        if (http.Request.ContentLength > limit + MultipartOverhead)
+        {
+            return remaining < maxSize ? QuotaExceeded(options.ProjectQuota!.Value) : TooLarge(maxSize);
         }
 
         if (!MediaTypeHeaderValue.TryParse(http.Request.ContentType, out var contentType)
@@ -62,7 +70,7 @@ public static class AttachmentEndpoints
         // Our own limit applies to the file; the server-wide request limit (30 MB by default) must not cut it first.
         if (http.Features.Get<IHttpMaxRequestBodySizeFeature>() is { IsReadOnly: false } bodySize)
         {
-            bodySize.MaxRequestBodySize = maxSize + MultipartOverhead;
+            bodySize.MaxRequestBodySize = limit + MultipartOverhead;
         }
 
         var reader = new MultipartReader(boundary, http.Request.Body);
@@ -76,11 +84,16 @@ public static class AttachmentEndpoints
 
             var fileName = HeaderUtilities.RemoveQuotes(disposition.FileNameStar).Value
                 ?? HeaderUtilities.RemoveQuotes(disposition.FileName).Value;
-            var added = await service.AddAttachmentAsync(id, fileName, section.Body, maxSize, CurrentUser.Id(http), http.RequestAborted)
+            var added = await service.AddAttachmentAsync(id, fileName, section.Body, limit, CurrentUser.Id(http), http.RequestAborted)
                 .ConfigureAwait(false);
             if (!added.IsSuccess)
             {
-                return added.Error.Code == ErrorCodes.AttachmentTooLarge ? TooLarge(maxSize) : Problems.From(added.Error);
+                if (added.Error.Code != ErrorCodes.AttachmentTooLarge)
+                {
+                    return Problems.From(added.Error);
+                }
+
+                return remaining < maxSize ? QuotaExceeded(options.ProjectQuota!.Value) : TooLarge(maxSize);
             }
 
             return TypedResults.Created($"/api/v1/projects/{projectId}/attachments/{added.Value.Id}", AttachmentItem.From(added.Value));
@@ -119,6 +132,12 @@ public static class AttachmentEndpoints
             content, inline ? attachment.Mime : MediaTypes.OctetStream,
             entityTag: new EntityTagHeaderValue($"\"{attachment.Sha256}\""), enableRangeProcessing: true);
     }
+
+    private static ProblemHttpResult QuotaExceeded(long quota) =>
+        TypedResults.Problem(
+            statusCode: StatusCodes.Status413PayloadTooLarge,
+            detail: $"The attachments of the project may not exceed {quota} bytes.",
+            extensions: new Dictionary<string, object?>(StringComparer.Ordinal) { ["code"] = ErrorCodes.AttachmentQuotaExceeded, ["quota"] = quota });
 
     private static ProblemHttpResult TooLarge(long maxSize) =>
         TypedResults.Problem(

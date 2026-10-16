@@ -13,6 +13,7 @@ Ce fichier s'adresse aux agents IA qui implémentent le projet. Il est **priorit
 | `docs/architecture.md` | Stack, modèle de données, stockage, API, sécurité, jalons | §A-x |
 | `docs/features.md` | Fonctionnalités `Fnn`, règles `Fnn.Rn`, scénarios `E2E-nn-nn` (= critères d'acceptation) | Fnn / E2E-nn-nn |
 | `docs/testing.md` | Stratégie de test, outillage, définition de « terminé » | §T-x |
+| `docs/deployment.md` | Installer un serveur : `erable serve`, Docker, Compose + Caddy, variables `ERABLE_*` | — |
 | `mockups/Erable — Wiki local.html` | Référence visuelle des 6 écrans | Mockup |
 | `tasks/` | Plan d'implémentation, une tâche par fichier | `M<j>-<nn>` |
 
@@ -173,7 +174,9 @@ dotnet test --solution Erable.sln
 dotnet test --project tests/Erable.Core.Tests          # un seul projet
 dotnet test --solution Erable.sln -c Release           # vérifie aussi l'absence de /_test en Release
 dotnet test --project tests/Erable.Storage.Tests -- --filter-method "*GenerateChroniques" --explicit only   # régénère spec/projects/chroniques
-dotnet run --project src/Erable.Server -- serve <dossier> [--port 5080]   # ERABLE_TEST_MODE=1 pour /_test
+dotnet run --project src/Erable.Server -- serve <dossier> [--port 5080] [--lan]   # dossier de projet (partagé tel quel) ou de données ; ERABLE_ADMIN_LOGIN/ERABLE_ADMIN_PASSWORD pour le premier administrateur ; ERABLE_TEST_MODE=1 pour /_test ; réglages ERABLE_* : docs/deployment.md
+dotnet run --project src/Erable.Server -- healthcheck [--port 8080]       # code 0 si le serveur local répond (santé du conteneur)
+docker build -t erable .                                                  # image du serveur (docs/deployment.md)
 dotnet run --project src/Erable.Server -- doctor <projet> [--json] [--fix]   # intégrité d'un projet fermé (0 sain, 1 anomalies, 2 illisible)
 dotnet run --project src/Erable.Desktop                 # app desktop (après pnpm -C src/web build)
 

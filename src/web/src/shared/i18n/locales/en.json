@@ -78,7 +78,8 @@
       "tooLarge": "The file exceeds the maximum allowed size.",
       "multipartRequired": "Invalid file upload.",
       "fileMissing": "No file received.",
-      "executable": "Erable never opens a program or a script. Show it in the file manager if you know where it comes from."
+      "executable": "Erable never opens a program or a script. Show it in the file manager if you know where it comes from.",
+      "quotaExceeded": "This project has used all the room the server grants to its attachments. Delete files or ask the server administrator to raise the quota."
     },
     "native": {
       "unavailable": "This action only exists in the desktop application."
