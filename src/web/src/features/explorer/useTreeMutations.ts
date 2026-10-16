@@ -3,11 +3,11 @@ import { api, unwrap } from "../../shared/api/client";
 import { queryKeys } from "../../shared/api/keys";
 import type { ProjectTree } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
-import { createCategory } from "../../shared/api/structure";
+import { createCategory, createProperty } from "../../shared/api/structure";
 import { applyMove } from "./treeModel";
 
 /** What the explorer creates: pages and folders, and the elements of the other roots (M2). */
-export type CreatableKind = "page" | "folder" | "category";
+export type CreatableKind = "page" | "folder" | "category" | "property";
 
 interface MoveChange {
   readonly id: ElementId;
@@ -86,6 +86,11 @@ export function useTreeMutations(projectId: ElementId) {
           );
         case "category":
           return createCategory(projectId, parentId, name).then((view) => view.element);
+        case "property":
+          // Created as a string: the type is chosen right after, in the edit mode of the new property.
+          return createProperty(projectId, { parentId, name, type: "string" }).then(
+            (view) => view.element,
+          );
       }
     },
     onSuccess: refresh,

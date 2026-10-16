@@ -10,6 +10,7 @@ import { FolderView } from "./FolderView";
 import { GenericElementView } from "./GenericElementView";
 import { PageRoute } from "../page/PageRoute";
 import { CategoryView } from "../category/CategoryView";
+import { PropertyView } from "../properties/PropertyView";
 
 /** `/p/:projectId/e/:elementId`: the kind of the element chooses the view (docs/architecture.md §3.1, F03.R3). */
 export function ElementRoute() {
@@ -55,8 +56,16 @@ export function ElementRoute() {
           edit={edit === true}
         />
       );
-    case "attachment":
     case "propertyDefinition":
+      return (
+        <PropertyView
+          key={element.data.id}
+          projectId={projectId}
+          element={element.data}
+          edit={edit === true}
+        />
+      );
+    case "attachment":
     case "linkType":
       return <GenericElementView projectId={projectId} element={element.data} />;
   }

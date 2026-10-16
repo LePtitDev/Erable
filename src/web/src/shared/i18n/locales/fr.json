@@ -252,7 +252,8 @@
     "newName": {
       "page": "Nom de la nouvelle page",
       "folder": "Nom du nouveau dossier",
-      "category": "Nom de la nouvelle catégorie"
+      "category": "Nom de la nouvelle catégorie",
+      "property": "Nom de la nouvelle propriété"
     },
     "cut": "Déplacer…",
     "cutShortcut": "Ctrl+X",
@@ -268,7 +269,8 @@
       "intoDescendant": "Un élément ne peut pas aller sous l’un de ses descendants.",
       "invalidParent": "Cet emplacement ne peut pas contenir cet élément."
     },
-    "newCategory": "Nouvelle catégorie"
+    "newCategory": "Nouvelle catégorie",
+    "newProperty": "Nouvelle propriété"
   },
   "kinds": {
     "root": "Racine",
@@ -450,6 +452,96 @@
       "min_count": "Doit contenir au moins {{value}} éléments",
       "max_count": "Doit contenir au plus {{value}} éléments",
       "item": "Élément {{index}} : {{message}}"
+    },
+    "name": "Nom de la propriété",
+    "identity": "Identité",
+    "key": "Clé",
+    "keyHint": "Identifiant technique : lettres minuscules, chiffres, « _ » ou « - ». Le renommer ne casse rien : tout passe par l’ID.",
+    "description": "Description",
+    "noDescription": "Aucune description.",
+    "type": "Type de valeur",
+    "typeLabel": {
+      "bool": "Oui / non",
+      "int": "Nombre entier",
+      "float": "Nombre décimal",
+      "string": "Texte court",
+      "text": "Texte long",
+      "enum": "Liste d’options",
+      "date": "Date",
+      "ref": "Référence"
+    },
+    "typeList": "Liste de valeurs",
+    "default": "Valeur par défaut",
+    "defaultLabel": "Valeur par défaut de la propriété",
+    "options": "Options",
+    "option": "Option {{index}}",
+    "addOption": "Ajouter une option",
+    "removeOption": "Retirer l’option {{label}}",
+    "rules": "Règles de validation",
+    "noRules": "Aucune règle.",
+    "noRulesBool": "Aucune règle disponible pour un booléen.",
+    "rulesIncomplete": "Complétez ou retirez les règles marquées en rouge.",
+    "rulesHint": "Une règle incomplète n’est pas enregistrée.",
+    "addRule": "Ajouter :",
+    "removeRule": "Retirer la règle {{op}}",
+    "op": {
+      "greater_than": ">",
+      "greater_or_equal": "≥",
+      "less_than": "<",
+      "less_or_equal": "≤",
+      "between": "entre",
+      "not_equal": "≠",
+      "min_length": "longueur min.",
+      "max_length": "longueur max.",
+      "match": "motif",
+      "not_empty": "non vide",
+      "in": "parmi",
+      "after": "après",
+      "before": "avant",
+      "kind": "type d’élément",
+      "in_category": "dans la catégorie",
+      "min_count": "au moins",
+      "max_count": "au plus"
+    },
+    "ruleValue": "Valeur",
+    "ruleMin": "Borne basse",
+    "ruleMax": "Borne haute",
+    "rulePattern": "Expression régulière",
+    "ruleDate": "Date",
+    "ruleKind": "Type d’élément",
+    "ruleCategory": "Catégorie",
+    "ruleOptions": "Options autorisées",
+    "test": {
+      "title": "Tester une valeur",
+      "label": "Valeur à tester",
+      "empty": "Saisissez une valeur pour la tester.",
+      "valid": "Valide",
+      "fails": "Échoue : {{rules}}",
+      "ref": "Le test n’est pas disponible pour une référence.",
+      "result": "Résultat du test"
+    },
+    "usage": "Utilisation",
+    "usedBy": "Utilisée par",
+    "notUsed": "Aucune catégorie n’utilise cette propriété.",
+    "filled_one": "Renseignée sur {{count}} page",
+    "filled_other": "Renseignée sur {{count}} pages",
+    "filled_many": "Renseignée sur {{count}} pages",
+    "outOfRules_one": "{{count}} page hors règles",
+    "outOfRules_other": "{{count}} pages hors règles",
+    "outOfRules_many": "{{count}} pages hors règles",
+    "outOfRulesList": "Pages hors règles",
+    "allRespect": "Toutes les pages respectent les règles.",
+    "editing": "Modification de la propriété",
+    "replace": {
+      "title": "Remplacer l’option supprimée",
+      "explain": "Des pages utilisent encore une option supprimée : choisissez l’option qui la remplace.",
+      "for": "Remplacer « {{label}} » par",
+      "confirm": "Remplacer et enregistrer"
+    },
+    "blocked": {
+      "title": "Changement de type impossible",
+      "explain": "Ces valeurs existantes ne peuvent pas être converties dans le nouveau type. Corrigez-les ou gardez le type actuel.",
+      "pages": "Pages dont la valeur n’est pas convertible"
     }
   },
   "category": {

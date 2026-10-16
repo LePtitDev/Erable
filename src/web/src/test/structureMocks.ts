@@ -3,7 +3,9 @@ import type {
   CategoryPageItem,
   CategoryView,
   PropertyDefinitionItem,
+  PropertyView,
 } from "../shared/api/structure";
+import { HttpResponse } from "msw";
 import { requireElementId, type ElementId } from "../shared/ids/elementId";
 import { roots } from "../shared/ids/roots";
 import { details, ids } from "./projectMocks";
@@ -206,6 +208,71 @@ export function mockStructure(options: { readonly view?: CategoryView } = {}) {
     http.get("/api/v1/projects/{projectId}/properties", ({ response }) =>
       response(200).json(Object.values(definitions)),
     ),
+  );
+  return writes;
+}
+
+/** The property screen of Niveau, as the backend answers it (E2E-08-01). */
+export function niveauView(nodes: readonly TreeNodeItem[]): PropertyView {
+  const node = nodes.find((n) => n.id === s.niveau);
+  if (node === undefined) throw new Error("Niveau is not in the nodes.");
+  return {
+    element: details(node, nodes),
+    definition: definitions.niveau,
+    usedBy: [
+      { id: s.pnj, name: "PNJ" },
+      { id: s.marchand, name: "Marchand" },
+    ],
+    filledCount: 4,
+    violations: [
+      {
+        pageId: ids.ilsa,
+        pageName: "Ilsa Varenne",
+        value: 72,
+        violations: [{ rule: { op: "less_or_equal", value: 60 }, index: null }],
+      },
+      {
+        pageId: ids.orsen,
+        pageName: "Capitaine Orsen",
+        value: 99,
+        violations: [{ rule: { op: "less_or_equal", value: 60 }, index: null }],
+      },
+    ],
+  };
+}
+
+/** Mocks the property endpoints; returns the recorded writes. The first answer to a PUT can be a refusal. */
+export function mockProperty(
+  view: PropertyView,
+  options: { readonly refuse?: { code: string; pages: unknown[] } } = {},
+) {
+  const writes = { puts: [] as { id: string; body: unknown }[], renames: [] as unknown[] };
+  let refused = false;
+  server.use(
+    http.get("/api/v1/projects/{projectId}/properties/{id}", ({ response }) =>
+      response(200).json(view),
+    ),
+    http.put(
+      "/api/v1/projects/{projectId}/properties/{id}",
+      async ({ params, request, response }) => {
+        const body = await request.json();
+        writes.puts.push({ id: params.id, body });
+        if (options.refuse !== undefined && !refused) {
+          refused = true;
+          return response.untyped(
+            HttpResponse.json(
+              { status: 422, code: options.refuse.code, pages: options.refuse.pages },
+              { status: 422 },
+            ),
+          );
+        }
+        return response(200).json(view);
+      },
+    ),
+    http.patch("/api/v1/projects/{projectId}/elements/{id}", async ({ request, response }) => {
+      writes.renames.push(await request.json());
+      return response(200).json(view.element);
+    }),
   );
   return writes;
 }

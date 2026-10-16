@@ -56,7 +56,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M2-02](M2-02-property-rules.md) | Définitions de propriétés et moteur de règles | M2-01 | review |
 | [M2-03](M2-03-structure-storage-api.md) | Stockage et API : catégories, propriétés, valeurs | M2-02, M1-05 | review |
 | [M2-04](M2-04-category-screen.md) | Écran Catégorie | M2-03, M1-11 | review |
-| [M2-05](M2-05-property-screen.md) | Écran Propriété | M2-03, M1-11 | todo |
+| [M2-05](M2-05-property-screen.md) | Écran Propriété | M2-03, M1-11 | review |
 | [M2-06](M2-06-page-properties-panel.md) | Propriétés sur la page (lecture et édition) | M2-03, M1-12 | todo |
 | [M2-07](M2-07-typed-links.md) | Types de liens et liens | M2-03 | todo |
 | [M2-08](M2-08-trash.md) | Suppression et corbeille | M2-03, M1-10 | todo |

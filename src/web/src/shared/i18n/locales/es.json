@@ -252,7 +252,8 @@
     "newName": {
       "page": "Nombre de la nueva página",
       "folder": "Nombre de la nueva carpeta",
-      "category": "Nombre de la nueva categoría"
+      "category": "Nombre de la nueva categoría",
+      "property": "Nombre de la nueva propiedad"
     },
     "cut": "Mover…",
     "cutShortcut": "Ctrl+X",
@@ -268,7 +269,8 @@
       "intoDescendant": "Un elemento no puede ir bajo uno de sus descendientes.",
       "invalidParent": "Esta ubicación no puede contener este elemento."
     },
-    "newCategory": "Nueva categoría"
+    "newCategory": "Nueva categoría",
+    "newProperty": "Nueva propiedad"
   },
   "kinds": {
     "root": "Raíz",
@@ -450,6 +452,96 @@
       "min_count": "Debe tener al menos {{value}} elementos",
       "max_count": "Debe tener como máximo {{value}} elementos",
       "item": "Elemento {{index}}: {{message}}"
+    },
+    "name": "Nombre de la propiedad",
+    "identity": "Identidad",
+    "key": "Clave",
+    "keyHint": "Identificador técnico: letras minúsculas, cifras, «_» o «-». Renombrarla no rompe nada: todo pasa por el ID.",
+    "description": "Descripción",
+    "noDescription": "Sin descripción.",
+    "type": "Tipo de valor",
+    "typeLabel": {
+      "bool": "Sí / no",
+      "int": "Número entero",
+      "float": "Número decimal",
+      "string": "Texto corto",
+      "text": "Texto largo",
+      "enum": "Lista de opciones",
+      "date": "Fecha",
+      "ref": "Referencia"
+    },
+    "typeList": "Lista de valores",
+    "default": "Valor por defecto",
+    "defaultLabel": "Valor por defecto de la propiedad",
+    "options": "Opciones",
+    "option": "Opción {{index}}",
+    "addOption": "Añadir una opción",
+    "removeOption": "Quitar la opción {{label}}",
+    "rules": "Reglas de validación",
+    "noRules": "Ninguna regla.",
+    "noRulesBool": "Ninguna regla disponible para un booleano.",
+    "rulesIncomplete": "Complete o quite las reglas marcadas en rojo.",
+    "rulesHint": "Una regla incompleta no se guarda.",
+    "addRule": "Añadir:",
+    "removeRule": "Quitar la regla {{op}}",
+    "op": {
+      "greater_than": ">",
+      "greater_or_equal": "≥",
+      "less_than": "<",
+      "less_or_equal": "≤",
+      "between": "entre",
+      "not_equal": "≠",
+      "min_length": "longitud mín.",
+      "max_length": "longitud máx.",
+      "match": "patrón",
+      "not_empty": "no vacío",
+      "in": "una de",
+      "after": "después de",
+      "before": "antes de",
+      "kind": "tipo de elemento",
+      "in_category": "en la categoría",
+      "min_count": "al menos",
+      "max_count": "como máximo"
+    },
+    "ruleValue": "Valor",
+    "ruleMin": "Límite inferior",
+    "ruleMax": "Límite superior",
+    "rulePattern": "Expresión regular",
+    "ruleDate": "Fecha",
+    "ruleKind": "Tipo de elemento",
+    "ruleCategory": "Categoría",
+    "ruleOptions": "Opciones permitidas",
+    "test": {
+      "title": "Probar un valor",
+      "label": "Valor a probar",
+      "empty": "Escriba un valor para probarlo.",
+      "valid": "Válido",
+      "fails": "Falla: {{rules}}",
+      "ref": "La prueba no está disponible para una referencia.",
+      "result": "Resultado de la prueba"
+    },
+    "usage": "Uso",
+    "usedBy": "Usada por",
+    "notUsed": "Ninguna categoría usa esta propiedad.",
+    "filled_one": "Rellenada en {{count}} página",
+    "filled_other": "Rellenada en {{count}} páginas",
+    "filled_many": "Rellenada en {{count}} páginas",
+    "outOfRules_one": "{{count}} página fuera de las reglas",
+    "outOfRules_other": "{{count}} páginas fuera de las reglas",
+    "outOfRules_many": "{{count}} páginas fuera de las reglas",
+    "outOfRulesList": "Páginas fuera de las reglas",
+    "allRespect": "Todas las páginas cumplen las reglas.",
+    "editing": "Edición de la propiedad",
+    "replace": {
+      "title": "Reemplazar la opción eliminada",
+      "explain": "Algunas páginas aún usan una opción eliminada: elija la opción que la reemplaza.",
+      "for": "Reemplazar «{{label}}» por",
+      "confirm": "Reemplazar y guardar"
+    },
+    "blocked": {
+      "title": "Cambio de tipo imposible",
+      "explain": "Estos valores existentes no se pueden convertir al nuevo tipo. Corríjalos o mantenga el tipo actual.",
+      "pages": "Páginas cuyo valor no es convertible"
     }
   },
   "category": {

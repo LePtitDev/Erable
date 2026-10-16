@@ -151,3 +151,41 @@ export function updateProperty(projectId: ElementId, id: ElementId, body: Update
     }),
   );
 }
+
+/** Renames an element (the name of a definition is not part of its PUT). */
+export function renameElement(projectId: ElementId, id: ElementId, name: string) {
+  return unwrap(
+    api.PATCH("/api/v1/projects/{projectId}/elements/{id}", {
+      params: { path: { projectId, id } },
+      body: { name },
+    }),
+  );
+}
+
+/** A page (or category) listed by a refusal of the backend: its name and its current value as text (F08.R5, R6). */
+export interface BlockingPage {
+  readonly id: ElementId;
+  readonly name: string;
+  readonly kind: "page" | "category";
+  readonly value: string;
+}
+
+/** The `pages` extension of a refused property update, as typed objects; empty when absent or malformed. */
+export function blockingPages(problem: Record<string, unknown> | undefined): BlockingPage[] {
+  const raw = problem?.["pages"];
+  if (!Array.isArray(raw)) return [];
+  const pages: BlockingPage[] = [];
+  for (const item of raw as unknown[]) {
+    if (typeof item !== "object" || item === null) continue;
+    const { id, name, kind, value } = item as Record<string, unknown>;
+    if (typeof id === "string" && typeof name === "string") {
+      pages.push({
+        id: id as ElementId,
+        name,
+        kind: kind === "category" ? "category" : "page",
+        value: typeof value === "string" ? value : "",
+      });
+    }
+  }
+  return pages;
+}

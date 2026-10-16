@@ -248,7 +248,8 @@
     "newName": {
       "page": "Name of the new page",
       "folder": "Name of the new folder",
-      "category": "Name of the new category"
+      "category": "Name of the new category",
+      "property": "Name of the new property"
     },
     "cut": "Move…",
     "cutShortcut": "Ctrl+X",
@@ -264,7 +265,8 @@
       "intoDescendant": "An element cannot go under one of its descendants.",
       "invalidParent": "This location cannot contain this element."
     },
-    "newCategory": "New category"
+    "newCategory": "New category",
+    "newProperty": "New property"
   },
   "kinds": {
     "root": "Root",
@@ -445,6 +447,94 @@
       "min_count": "Must have at least {{value}} items",
       "max_count": "Must have at most {{value}} items",
       "item": "Item {{index}}: {{message}}"
+    },
+    "name": "Property name",
+    "identity": "Identity",
+    "key": "Key",
+    "keyHint": "Technical identifier: lowercase letters, digits, “_” or “-”. Renaming it breaks nothing: everything goes through the ID.",
+    "description": "Description",
+    "noDescription": "No description.",
+    "type": "Value type",
+    "typeLabel": {
+      "bool": "Yes / no",
+      "int": "Whole number",
+      "float": "Decimal number",
+      "string": "Short text",
+      "text": "Long text",
+      "enum": "List of options",
+      "date": "Date",
+      "ref": "Reference"
+    },
+    "typeList": "List of values",
+    "default": "Default value",
+    "defaultLabel": "Default value of the property",
+    "options": "Options",
+    "option": "Option {{index}}",
+    "addOption": "Add an option",
+    "removeOption": "Remove the option {{label}}",
+    "rules": "Validation rules",
+    "noRules": "No rule.",
+    "noRulesBool": "No rule available for a boolean.",
+    "rulesIncomplete": "Complete or remove the rules marked in red.",
+    "rulesHint": "An incomplete rule is not saved.",
+    "addRule": "Add:",
+    "removeRule": "Remove the rule {{op}}",
+    "op": {
+      "greater_than": ">",
+      "greater_or_equal": "≥",
+      "less_than": "<",
+      "less_or_equal": "≤",
+      "between": "between",
+      "not_equal": "≠",
+      "min_length": "min. length",
+      "max_length": "max. length",
+      "match": "pattern",
+      "not_empty": "not empty",
+      "in": "one of",
+      "after": "after",
+      "before": "before",
+      "kind": "element kind",
+      "in_category": "in category",
+      "min_count": "at least",
+      "max_count": "at most"
+    },
+    "ruleValue": "Value",
+    "ruleMin": "Lower bound",
+    "ruleMax": "Upper bound",
+    "rulePattern": "Regular expression",
+    "ruleDate": "Date",
+    "ruleKind": "Element kind",
+    "ruleCategory": "Category",
+    "ruleOptions": "Allowed options",
+    "test": {
+      "title": "Test a value",
+      "label": "Value to test",
+      "empty": "Type a value to test it.",
+      "valid": "Valid",
+      "fails": "Fails: {{rules}}",
+      "ref": "Testing is not available for a reference.",
+      "result": "Test result"
+    },
+    "usage": "Usage",
+    "usedBy": "Used by",
+    "notUsed": "No category uses this property.",
+    "filled_one": "Filled on {{count}} page",
+    "filled_other": "Filled on {{count}} pages",
+    "outOfRules_one": "{{count}} page out of rules",
+    "outOfRules_other": "{{count}} pages out of rules",
+    "outOfRulesList": "Pages out of rules",
+    "allRespect": "Every page respects the rules.",
+    "editing": "Editing the property",
+    "replace": {
+      "title": "Replace the removed option",
+      "explain": "Some pages still use a removed option: choose the option that replaces it.",
+      "for": "Replace “{{label}}” with",
+      "confirm": "Replace and save"
+    },
+    "blocked": {
+      "title": "Type change impossible",
+      "explain": "These existing values cannot be converted to the new type. Fix them or keep the current type.",
+      "pages": "Pages whose value cannot be converted"
     }
   },
   "category": {

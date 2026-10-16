@@ -248,7 +248,8 @@
     "newName": {
       "page": "Name der neuen Seite",
       "folder": "Name des neuen Ordners",
-      "category": "Name der neuen Kategorie"
+      "category": "Name der neuen Kategorie",
+      "property": "Name der neuen Eigenschaft"
     },
     "cut": "Verschieben…",
     "cutShortcut": "Strg+X",
@@ -264,7 +265,8 @@
       "intoDescendant": "Ein Element kann nicht unter einen seiner Nachkommen.",
       "invalidParent": "Dieser Ort kann dieses Element nicht enthalten."
     },
-    "newCategory": "Neue Kategorie"
+    "newCategory": "Neue Kategorie",
+    "newProperty": "Neue Eigenschaft"
   },
   "kinds": {
     "root": "Wurzel",
@@ -445,6 +447,94 @@
       "min_count": "Muss mindestens {{value}} Elemente enthalten",
       "max_count": "Darf höchstens {{value}} Elemente enthalten",
       "item": "Element {{index}}: {{message}}"
+    },
+    "name": "Name der Eigenschaft",
+    "identity": "Identität",
+    "key": "Schlüssel",
+    "keyHint": "Technische Kennung: Kleinbuchstaben, Ziffern, „_“ oder „-“. Eine Umbenennung bricht nichts: alles läuft über die ID.",
+    "description": "Beschreibung",
+    "noDescription": "Keine Beschreibung.",
+    "type": "Werttyp",
+    "typeLabel": {
+      "bool": "Ja / Nein",
+      "int": "Ganzzahl",
+      "float": "Dezimalzahl",
+      "string": "Kurztext",
+      "text": "Langtext",
+      "enum": "Optionsliste",
+      "date": "Datum",
+      "ref": "Verweis"
+    },
+    "typeList": "Liste von Werten",
+    "default": "Standardwert",
+    "defaultLabel": "Standardwert der Eigenschaft",
+    "options": "Optionen",
+    "option": "Option {{index}}",
+    "addOption": "Option hinzufügen",
+    "removeOption": "Option {{label}} entfernen",
+    "rules": "Validierungsregeln",
+    "noRules": "Keine Regel.",
+    "noRulesBool": "Keine Regel für einen Wahrheitswert verfügbar.",
+    "rulesIncomplete": "Vervollständigen oder entfernen Sie die rot markierten Regeln.",
+    "rulesHint": "Eine unvollständige Regel wird nicht gespeichert.",
+    "addRule": "Hinzufügen:",
+    "removeRule": "Regel {{op}} entfernen",
+    "op": {
+      "greater_than": ">",
+      "greater_or_equal": "≥",
+      "less_than": "<",
+      "less_or_equal": "≤",
+      "between": "zwischen",
+      "not_equal": "≠",
+      "min_length": "Mindestlänge",
+      "max_length": "Höchstlänge",
+      "match": "Muster",
+      "not_empty": "nicht leer",
+      "in": "einer von",
+      "after": "nach",
+      "before": "vor",
+      "kind": "Elementart",
+      "in_category": "in Kategorie",
+      "min_count": "mindestens",
+      "max_count": "höchstens"
+    },
+    "ruleValue": "Wert",
+    "ruleMin": "Untergrenze",
+    "ruleMax": "Obergrenze",
+    "rulePattern": "Regulärer Ausdruck",
+    "ruleDate": "Datum",
+    "ruleKind": "Elementart",
+    "ruleCategory": "Kategorie",
+    "ruleOptions": "Erlaubte Optionen",
+    "test": {
+      "title": "Wert testen",
+      "label": "Zu testender Wert",
+      "empty": "Geben Sie einen Wert zum Testen ein.",
+      "valid": "Gültig",
+      "fails": "Fehlgeschlagen: {{rules}}",
+      "ref": "Der Test ist für einen Verweis nicht verfügbar.",
+      "result": "Testergebnis"
+    },
+    "usage": "Verwendung",
+    "usedBy": "Verwendet von",
+    "notUsed": "Keine Kategorie verwendet diese Eigenschaft.",
+    "filled_one": "Auf {{count}} Seite ausgefüllt",
+    "filled_other": "Auf {{count}} Seiten ausgefüllt",
+    "outOfRules_one": "{{count}} Seite außerhalb der Regeln",
+    "outOfRules_other": "{{count}} Seiten außerhalb der Regeln",
+    "outOfRulesList": "Seiten außerhalb der Regeln",
+    "allRespect": "Alle Seiten erfüllen die Regeln.",
+    "editing": "Eigenschaft bearbeiten",
+    "replace": {
+      "title": "Entfernte Option ersetzen",
+      "explain": "Einige Seiten verwenden noch eine entfernte Option: Wählen Sie die ersetzende Option.",
+      "for": "„{{label}}“ ersetzen durch",
+      "confirm": "Ersetzen und speichern"
+    },
+    "blocked": {
+      "title": "Typänderung nicht möglich",
+      "explain": "Diese vorhandenen Werte lassen sich nicht in den neuen Typ umwandeln. Korrigieren Sie sie oder behalten Sie den aktuellen Typ.",
+      "pages": "Seiten, deren Wert nicht umwandelbar ist"
     }
   },
   "category": {

@@ -64,6 +64,15 @@ export class TreePanel {
     await this.page.keyboard.press("Enter");
   }
 
+  /** Creates a property from the context menu of a line (the Propriétés root or one of its folders). */
+  async newProperty(name: string, under = "Propriétés") {
+    const target = under === "Propriétés" ? this.root(under) : this.item(under);
+    await target.click({ button: "right" });
+    await this.page.getByRole("menuitem", { name: t("explorer.newProperty") }).click();
+    await this.tree.getByRole("textbox", { name: t("explorer.newName.property") }).fill(name);
+    await this.page.keyboard.press("Enter");
+  }
+
   async rename(name: string, newName: string) {
     await this.item(name).click();
     await this.tree.press("F2");

@@ -24,7 +24,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
-import { treeQuery, type TreeNodeItem } from "../../shared/api/tree";
+import { treeQuery, type ElementKind, type TreeNodeItem } from "../../shared/api/tree";
 import { useUiState } from "../../shared/api/uiState";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
 import { roots } from "../../shared/ids/roots";
@@ -175,7 +175,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const createTarget = (kind: CreatableKind): ElementId => {
     const start = focused ?? roots.pages;
     for (const candidate of [start, ...ancestorsOf(index, start).map((a) => a.id)]) {
-      if (canContain(index, candidate, kind)) return candidate;
+      if (canContain(index, candidate, elementKindOf(kind))) return candidate;
     }
     return roots.pages;
   };
@@ -211,7 +211,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
               search: { edit: true, focus: "title" },
             });
           } else if (current.kind !== "folder") {
-            // A new category opens in edit mode: parent, description, defaults (E2E-07-02).
+            // A new category or property opens in edit mode: parent, description, defaults, type (E2E-07-02).
             void navigate({
               to: "/p/$projectId/e/$elementId",
               params: { projectId, elementId: created.id },
@@ -626,7 +626,7 @@ function withCreateRow(rows: TreeRow[], editing: Editing | null, index: TreeInde
   const placeholder: TreeRow = {
     node: {
       id: createRowId,
-      kind: editing.kind,
+      kind: elementKindOf(editing.kind),
       parentId: editing.parentId,
       name: "",
       sortOrder: 0,
@@ -642,6 +642,10 @@ function withCreateRow(rows: TreeRow[], editing: Editing | null, index: TreeInde
 }
 
 /** Roots show the badge of the kind they hold. */
+function elementKindOf(kind: CreatableKind): ElementKind {
+  return kind === "property" ? "propertyDefinition" : kind;
+}
+
 function rootKindBadge(node: TreeNodeItem): TreeNodeItem["kind"] {
   if (node.kind !== "root") return node.kind;
   return node.id === roots.categories
@@ -757,6 +761,16 @@ function ContextMenu({
               }}
             >
               {t("explorer.newCategory")}
+            </DropdownMenu.Item>
+          )}
+          {node !== undefined && canContain(index, node.id, "propertyDefinition") && (
+            <DropdownMenu.Item
+              className={styles["menuItem"]}
+              onSelect={() => {
+                onCreate("property", node.id);
+              }}
+            >
+              {t("explorer.newProperty")}
             </DropdownMenu.Item>
           )}
           {node !== undefined && canContain(index, node.id, "folder") && (
