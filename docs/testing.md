@@ -233,6 +233,8 @@ Mesurés sur le projet généré **10 000 pages / 300 catégories / 50 000 réf�
 
 **Outillage (M3-06)** : `tests/Erable.Benchmarks` (Release) fournit `generate` (projet à graine fixe, `--light` pour la CI), `budgets` (p95 serveur en HTTP sur le projet généré), `bench` (BenchmarkDotNet en processus, historique `artifacts/perf/history.json`, comparaison à `spec/perf/baseline.json`, échec au-delà de +15 %) et `compare`. Les budgets du navigateur sont les tests Playwright `@perf` (`pnpm e2e:perf`, avec `ERABLE_LARGE_PROJECT` pour le grand projet). Les commandes sont dans `CLAUDE.md` §9, les mesures du jour dans `tasks/M3-06-performance.md`.
 
+**Robustesse (M4-09)** : `CrashTests` (`tests/Erable.Server.Tests/Robustness/`) lance le vrai serveur (`erable serve`) en processus fils, le tue à des instants aléatoires pendant des rafales d’écritures (sauvegardes, créations, pièces jointes), lance `erable doctor` sur le dossier puis redémarre le serveur et relit tout ce qui avait été acquitté ; `ERABLE_CRASH_ITERATIONS` (8 par défaut, 100 la nuit) et `ERABLE_CRASH_SEED` (rejeu). `Benchmarks load` est la charge NBomber. Les deux tournent chaque nuit (`.github/workflows/nightly-robustness.yml`).
+
 ---
 
 ## 12. Mesurer la qualité des tests eux-mêmes

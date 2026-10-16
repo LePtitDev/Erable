@@ -203,6 +203,10 @@ dotnet run -c Release --project tests/Erable.Benchmarks -- bench [--pages 10000]
 ERABLE_LARGE_PROJECT=<dossier généré avec --light> pnpm -C src/web e2e:perf   # budgets navigateur (arbre, page, palette, frappe) ; sans la variable, seuls les tests @perf du projet de référence tournent
 pnpm -C src/web bundle-size                # échoue au-delà de 500 Ko gzip
 
+# Robustesse (M4-09, docs/testing.md §6.1 et §11.2)
+ERABLE_CRASH_ITERATIONS=100 dotnet test --project tests/Erable.Server.Tests -- --filter-class "*CrashTests"   # tue le vrai serveur pendant des écritures (8 itérations par défaut ; ERABLE_CRASH_SEED rejoue un tirage)
+dotnet run -c Release --project tests/Erable.Benchmarks -- load [--users 50] [--minutes 10 | --seconds N] [--light] [--json fichier] [--reports dossier]   # charge NBomber (80 % lecture / 20 % écriture) ; code 1 si erreur, p95 au-delà du budget ou mémoire qui croît
+
 # Desktop
 node build/publish-desktop.mjs win-x64     # ou linux-x64, osx-arm64, osx-x64 → artifacts/desktop/
 pnpm -C src/web e2e:desktop                # Windows : E2E-16-01/02 sur le binaire publié (CDP)
