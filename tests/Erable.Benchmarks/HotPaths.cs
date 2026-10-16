@@ -134,7 +134,8 @@ internal static class HotPaths
             .AddJob(Job.ShortRun.WithToolchain(InProcessEmitToolchain.Instance))
             .AddLogger(BenchmarkDotNet.Loggers.ConsoleLogger.Default)
             .AddColumnProvider(BenchmarkDotNet.Columns.DefaultColumnProviders.Instance)
-            .WithOptions(ConfigOptions.DisableOptimizationsValidator);
+            .WithOptions(ConfigOptions.DisableOptimizationsValidator)
+            .WithArtifactsPath(Path.Combine(RepositoryPaths.Combine("artifacts"), "perf", "benchmarkdotnet"));
         var summary = BenchmarkRunner.Run<HotPathBenchmarks>(config);
 
         var results = new JsonObject();
