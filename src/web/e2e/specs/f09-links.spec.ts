@@ -3,7 +3,8 @@ import { expect, test } from "../fixtures";
 import { LinksPanel } from "../pages/LinksPanel";
 import { TreePanel } from "../pages/TreePanel";
 import { expectNoSeriousViolations } from "../support/a11y";
-import { t } from "../support/i18n";
+import { t, tp } from "../support/i18n";
+import { TrashPage } from "../pages/TrashPage";
 
 test.describe("F09 · Typed links", () => {
   test("E2E-09-01 · Create a link type @pr", async ({ page, reference }) => {
@@ -51,5 +52,19 @@ test.describe("F09 · Typed links", () => {
     await expect(links.outgoing).not.toContainText("Allié de");
     await page.goto(reference.url(chroniques.orsen));
     await expect(links.panel).not.toContainText("Allié de");
+  });
+
+  test("E2E-09-05 · Delete a link type in use @nightly", async ({ page, reference }) => {
+    const tree = new TreePanel(page);
+    const trash = new TrashPage(page);
+    await page.goto(reference.url(chroniques.ilsa));
+
+    await tree.startDelete("Situé à");
+
+    await expect(trash.dialog).toContainText(tp("trash.linksOfType", 1));
+    await trash.confirmDelete();
+    await expect(
+      page.getByRole("list", { name: t("links.outgoing") }).getByText("Situé à"),
+    ).toHaveCount(0);
   });
 });

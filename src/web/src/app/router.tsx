@@ -10,6 +10,7 @@ import { HomeScreen } from "../features/home/HomeScreen";
 import { ProjectShell } from "../features/project/ProjectShell";
 import { ProjectIndex } from "../features/project/ProjectIndex";
 import { ElementRoute } from "../features/project/ElementRoute";
+import { TrashView } from "../features/trash/TrashView";
 import { NotFoundScreen, ErrorScreen } from "../features/project/ErrorScreens";
 import { parseElementId, type ElementId } from "../shared/ids/elementId";
 
@@ -61,6 +62,13 @@ export const elementRoute = createRoute({
   component: ElementRoute,
 });
 
+/** The trash of the project (F12). */
+export const trashRoute = createRoute({
+  getParentRoute: () => projectRoute,
+  path: "/trash",
+  component: TrashView,
+});
+
 // Development-only pages: the condition is statically false in production builds, so they are tree-shaken.
 const devRoutes = import.meta.env.DEV
   ? [
@@ -74,7 +82,7 @@ const devRoutes = import.meta.env.DEV
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  projectRoute.addChildren([projectIndexRoute, elementRoute]),
+  projectRoute.addChildren([projectIndexRoute, trashRoute, elementRoute]),
   ...devRoutes,
 ]);
 

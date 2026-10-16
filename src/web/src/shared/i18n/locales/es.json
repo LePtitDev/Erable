@@ -125,6 +125,14 @@
       "self": "Una página no puede enlazarse consigo misma.",
       "duplicate": "Este enlace ya existe.",
       "notFound": "Este enlace ya no existe."
+    },
+    "trash": {
+      "entry": {
+        "notFound": "Este elemento ya no está en la papelera."
+      },
+      "parent": {
+        "deleted": "La página de este archivo adjunto está en la papelera: restáurela primero."
+      }
     }
   },
   "home": {
@@ -195,7 +203,8 @@
       "rename": "F2",
       "palette": "[[",
       "paletteShortcut": "Ctrl+Espacio",
-      "close": "Esc"
+      "close": "Esc",
+      "delete": "Supr"
     },
     "shortcuts": {
       "openFolder": "Abrir la carpeta de un proyecto",
@@ -368,7 +377,8 @@
       "unknown": "Elemento no encontrado",
       "existing": ""
     },
-    "brokenLabel": "{{text}} (enlace roto: {{reason}})"
+    "brokenLabel": "{{text}} (enlace roto: {{reason}})",
+    "restore": "Elemento eliminado — Restaurar"
   },
   "embed": {
     "missing": "Adjunto eliminado",
@@ -384,7 +394,8 @@
     "tooLarge": "«{{name}}» supera el tamaño máximo permitido ({{max}}). No se ha creado ningún adjunto.",
     "failed": "Error al subir «{{name}}»: {{reason}}",
     "openWithSystem": "Abrir {{name}} con la aplicación del sistema",
-    "reveal": "Mostrar {{name}} en el explorador de archivos"
+    "reveal": "Mostrar {{name}} en el explorador de archivos",
+    "delete": "Eliminar {{name}}"
   },
   "editor": {
     "title": "Título de la página",
@@ -661,5 +672,63 @@
     "mentionsList": "Páginas que mencionan esta página",
     "noMentions": "Ninguna otra página menciona esta en su texto.",
     "remove": "Eliminar el enlace {{label}} · {{name}}"
+  },
+  "trash": {
+    "title": "Papelera",
+    "intro": "Los elementos eliminados permanecen aquí hasta que se restauran o se vacía la papelera.",
+    "delete": "Eliminar",
+    "deleteTitle": "¿Eliminar «{{name}}»?",
+    "deleteTitleLoading": "¿Eliminar este elemento?",
+    "deleteConfirm": "Mover a la papelera",
+    "deleteHint": "El elemento va a la papelera: podrá restaurarlo.",
+    "consequences": "Consecuencias de la eliminación",
+    "referencedBy_one": "{{count}} página hace referencia a este elemento: {{names}}",
+    "referencedBy_other": "{{count}} páginas hacen referencia a este elemento: {{names}}",
+    "referencedBy_many": "{{count}} páginas hacen referencia a este elemento: {{names}}",
+    "usedElsewhere_one": "Usado en {{count}} otra página: {{names}}",
+    "usedElsewhere_other": "Usado en {{count}} otras páginas: {{names}}",
+    "usedElsewhere_many": "Usado en {{count}} otras páginas: {{names}}",
+    "cascade_one": "«{{name}}» y {{count}} subpágina irán a la papelera.",
+    "cascade_other": "«{{name}}» y {{count}} subpáginas irán a la papelera.",
+    "cascade_many": "«{{name}}» y {{count}} subpáginas irán a la papelera.",
+    "contents_one": "«{{name}}» contiene {{count}} elemento, que lo seguirá a la papelera.",
+    "contents_other": "«{{name}}» contiene {{count}} elementos, que lo seguirán a la papelera.",
+    "contents_many": "«{{name}}» contiene {{count}} elementos, que lo seguirán a la papelera.",
+    "linksOfType_one": "{{count}} enlace usa este tipo y se eliminará.",
+    "linksOfType_other": "{{count}} enlaces usan este tipo y se eliminarán.",
+    "linksOfType_many": "{{count}} enlaces usan este tipo y se eliminarán.",
+    "linksOfPage_one": "{{count}} enlace tipado se ocultará (vuelve con la página).",
+    "linksOfPage_other": "{{count}} enlaces tipados se ocultarán (vuelven con la página).",
+    "linksOfPage_many": "{{count}} enlaces tipados se ocultarán (vuelven con la página).",
+    "categoryPages_one": "{{count}} página perderá esta categoría.",
+    "categoryPages_other": "{{count}} páginas perderán esta categoría.",
+    "categoryPages_many": "{{count}} páginas perderán esta categoría.",
+    "propertyValues_one": "Se quitará el valor de {{count}} página o categoría (restaurable con la propiedad).",
+    "propertyValues_other": "Se quitarán los valores de {{count}} páginas o categorías (restaurables con la propiedad).",
+    "propertyValues_many": "Se quitarán los valores de {{count}} páginas o categorías (restaurables con la propiedad).",
+    "list": "Elementos eliminados",
+    "empty": "La papelera está vacía.",
+    "withDescendants_one": "con {{count}} elemento",
+    "withDescendants_other": "con {{count}} elementos",
+    "withDescendants_many": "con {{count}} elementos",
+    "deleted": "Eliminado {{when}} por {{who}}",
+    "originalPlace": "Ubicación original: {{path}}",
+    "parentGone": "La ubicación original ya no existe: volverá a la raíz.",
+    "restore": "Restaurar",
+    "restoreLabel": "Restaurar {{name}}",
+    "open": "Abrir",
+    "restored": "«{{name}}» se restauró en «{{parent}}».",
+    "relocated": "«{{name}}» se restauró en «{{parent}}»: su ubicación original ya no existe.",
+    "purge": "Eliminar definitivamente",
+    "purgeLabel": "Eliminar {{name}} definitivamente",
+    "purgeTitle": "¿Eliminar «{{name}}» definitivamente?",
+    "purgeDescription": "Es definitivo: el elemento ya no podrá restaurarse.",
+    "emptyAction": "Vaciar la papelera",
+    "emptyTitle": "¿Vaciar la papelera?",
+    "emptyDescription_one": "Es definitivo: {{count}} elemento y su contenido se eliminarán para siempre.",
+    "emptyDescription_other": "Es definitivo: {{count}} elementos y su contenido se eliminarán para siempre.",
+    "emptyDescription_many": "Es definitivo: {{count}} elementos y su contenido se eliminarán para siempre.",
+    "emptyType": "Para confirmar, escriba el nombre del proyecto: {{name}}",
+    "emptyConfirm": "Vaciar definitivamente"
   }
 }

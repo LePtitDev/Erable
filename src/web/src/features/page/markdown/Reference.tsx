@@ -31,12 +31,23 @@ export function Reference({
   const text = node.label ?? item.name ?? shortId(node.id);
   if (item.state !== "existing") {
     const reason = t(`reference.broken.${item.state}`);
+    const label = t("reference.brokenLabel", { text, reason });
+    if (item.state === "deleted") {
+      // F04.R2: a deleted target is still in the trash: the tooltip offers to get it back.
+      return (
+        <Link
+          to="/p/$projectId/trash"
+          params={{ projectId: context.projectId }}
+          className={styles["broken"]}
+          title={t("reference.restore")}
+          aria-label={label}
+        >
+          {text}
+        </Link>
+      );
+    }
     return (
-      <span
-        className={styles["broken"]}
-        title={reason}
-        aria-label={t("reference.brokenLabel", { text, reason })}
-      >
+      <span className={styles["broken"]} title={reason} aria-label={label}>
         {text}
       </span>
     );

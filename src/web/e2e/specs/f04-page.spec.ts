@@ -165,4 +165,25 @@ test.describe("perf · page opening", () => {
     test.info().annotations.push({ type: "page-open-ms", description: duration.toFixed(1) });
     expect(duration).toBeLessThan(200);
   });
+
+  test("E2E-04-05 · Broken link @pr", async ({ page, reference }) => {
+    const view = new PageViewPage(page);
+    const deleted = await page.request.delete(
+      `/api/v1/projects/${reference.id}/elements/${chroniques.ordreDuGivre}`,
+    );
+    expect(deleted.status()).toBe(204);
+
+    await page.goto(reference.url(chroniques.ilsa));
+
+    const broken = view.content.getByTitle(t("reference.restore"));
+    await expect(broken).toHaveText("Ordre du Givre");
+    await expect(broken).toHaveAccessibleName(
+      t("reference.brokenLabel", { text: "Ordre du Givre", reason: t("reference.broken.deleted") }),
+    );
+    // The way back is the trash.
+    await broken.click();
+    await expect(page.getByRole("region", { name: t("trash.title"), exact: true })).toContainText(
+      "Ordre du Givre",
+    );
+  });
 });

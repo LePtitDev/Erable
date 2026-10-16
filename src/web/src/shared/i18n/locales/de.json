@@ -125,6 +125,14 @@
       "self": "Eine Seite kann nicht mit sich selbst verknüpft werden.",
       "duplicate": "Diese Verknüpfung existiert bereits.",
       "notFound": "Diese Verknüpfung existiert nicht mehr."
+    },
+    "trash": {
+      "entry": {
+        "notFound": "Dieses Element befindet sich nicht mehr im Papierkorb."
+      },
+      "parent": {
+        "deleted": "Die Seite dieses Anhangs liegt im Papierkorb: Stellen Sie sie zuerst wieder her."
+      }
     }
   },
   "home": {
@@ -195,7 +203,8 @@
       "rename": "F2",
       "palette": "[[",
       "paletteShortcut": "Strg+Leertaste",
-      "close": "Esc"
+      "close": "Esc",
+      "delete": "Entf"
     },
     "shortcuts": {
       "openFolder": "Einen Projektordner öffnen",
@@ -362,7 +371,8 @@
       "unknown": "Element nicht gefunden",
       "existing": ""
     },
-    "brokenLabel": "{{text}} (defekter Link: {{reason}})"
+    "brokenLabel": "{{text}} (defekter Link: {{reason}})",
+    "restore": "Gelöschtes Element — Wiederherstellen"
   },
   "embed": {
     "missing": "Gelöschter Anhang",
@@ -378,7 +388,8 @@
     "tooLarge": "„{{name}}“ überschreitet die maximal zulässige Größe ({{max}}). Es wurde kein Anhang erstellt.",
     "failed": "Hochladen von „{{name}}“ fehlgeschlagen: {{reason}}",
     "openWithSystem": "{{name}} mit der Systemanwendung öffnen",
-    "reveal": "{{name}} im Dateimanager anzeigen"
+    "reveal": "{{name}} im Dateimanager anzeigen",
+    "delete": "{{name}} löschen"
   },
   "editor": {
     "title": "Seitentitel",
@@ -649,5 +660,53 @@
     "mentionsList": "Seiten, die diese Seite erwähnen",
     "noMentions": "Keine andere Seite erwähnt diese in ihrem Text.",
     "remove": "Verknüpfung {{label}} · {{name}} löschen"
+  },
+  "trash": {
+    "title": "Papierkorb",
+    "intro": "Gelöschte Elemente bleiben hier, bis sie wiederhergestellt oder der Papierkorb geleert wird.",
+    "delete": "Löschen",
+    "deleteTitle": "„{{name}}“ löschen?",
+    "deleteTitleLoading": "Dieses Element löschen?",
+    "deleteConfirm": "In den Papierkorb legen",
+    "deleteHint": "Das Element kommt in den Papierkorb: Sie können es wiederherstellen.",
+    "consequences": "Folgen des Löschens",
+    "referencedBy_one": "{{count}} Seite verweist auf dieses Element: {{names}}",
+    "referencedBy_other": "{{count}} Seiten verweisen auf dieses Element: {{names}}",
+    "usedElsewhere_one": "Verwendet auf {{count}} anderen Seite: {{names}}",
+    "usedElsewhere_other": "Verwendet auf {{count}} anderen Seiten: {{names}}",
+    "cascade_one": "„{{name}}“ und {{count}} Unterseite werden in den Papierkorb gelegt.",
+    "cascade_other": "„{{name}}“ und {{count}} Unterseiten werden in den Papierkorb gelegt.",
+    "contents_one": "„{{name}}“ enthält {{count}} Element, das mit in den Papierkorb kommt.",
+    "contents_other": "„{{name}}“ enthält {{count}} Elemente, die mit in den Papierkorb kommen.",
+    "linksOfType_one": "{{count}} Verknüpfung verwendet diesen Typ und wird gelöscht.",
+    "linksOfType_other": "{{count}} Verknüpfungen verwenden diesen Typ und werden gelöscht.",
+    "linksOfPage_one": "{{count}} typisierte Verknüpfung wird ausgeblendet (sie kommt mit der Seite zurück).",
+    "linksOfPage_other": "{{count}} typisierte Verknüpfungen werden ausgeblendet (sie kommen mit der Seite zurück).",
+    "categoryPages_one": "{{count}} Seite verliert diese Kategorie.",
+    "categoryPages_other": "{{count}} Seiten verlieren diese Kategorie.",
+    "propertyValues_one": "Der Wert von {{count}} Seite oder Kategorie wird entfernt (mit der Eigenschaft wiederherstellbar).",
+    "propertyValues_other": "Die Werte von {{count}} Seiten oder Kategorien werden entfernt (mit der Eigenschaft wiederherstellbar).",
+    "list": "Gelöschte Elemente",
+    "empty": "Der Papierkorb ist leer.",
+    "withDescendants_one": "mit {{count}} Element",
+    "withDescendants_other": "mit {{count}} Elementen",
+    "deleted": "Gelöscht {{when}} von {{who}}",
+    "originalPlace": "Ursprünglicher Ort: {{path}}",
+    "parentGone": "Der ursprüngliche Ort existiert nicht mehr: Das Element kommt zurück an die Wurzel.",
+    "restore": "Wiederherstellen",
+    "restoreLabel": "{{name}} wiederherstellen",
+    "open": "Öffnen",
+    "restored": "„{{name}}“ wurde unter „{{parent}}“ wiederhergestellt.",
+    "relocated": "„{{name}}“ wurde unter „{{parent}}“ wiederhergestellt: Der ursprüngliche Ort existiert nicht mehr.",
+    "purge": "Endgültig löschen",
+    "purgeLabel": "{{name}} endgültig löschen",
+    "purgeTitle": "„{{name}}“ endgültig löschen?",
+    "purgeDescription": "Das ist endgültig: Das Element kann nicht mehr wiederhergestellt werden.",
+    "emptyAction": "Papierkorb leeren",
+    "emptyTitle": "Papierkorb leeren?",
+    "emptyDescription_one": "Das ist endgültig: {{count}} Element und sein Inhalt werden für immer gelöscht.",
+    "emptyDescription_other": "Das ist endgültig: {{count}} Elemente und ihr Inhalt werden für immer gelöscht.",
+    "emptyType": "Geben Sie zur Bestätigung den Namen des Projekts ein: {{name}}",
+    "emptyConfirm": "Endgültig leeren"
   }
 }

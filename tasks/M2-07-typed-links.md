@@ -20,7 +20,7 @@ Relier explicitement deux pages par une relation nommée, visible des deux côt�
 
 ## Critères d'acceptation
 
-- [x] `E2E-09-01` à `E2E-09-04` verts. `E2E-09-05` (suppression d'un type utilisé) est livré avec la suppression elle-même, en M2-08 : le compteur « N liens utilisent ce type » est déjà exposé (`linkCount`).
+- [x] `E2E-09-01` à `E2E-09-04` verts. `E2E-09-05` (suppression d'un type utilisé) est vert depuis M2-08, qui apporte la suppression : le compteur « N liens utilisent ce type » est déjà exposé (`linkCount`).
 - [x] Tests d'intégration des endpoints (`LinksApiTests`), de stockage (`LinkStorageTests`), du domaine (`LinkTypeRulesTests`).
 
 ## Points d'attention

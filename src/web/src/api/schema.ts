@@ -384,7 +384,7 @@ export interface paths {
     get: operations["GetElement"];
     put?: never;
     post?: never;
-    delete?: never;
+    delete: operations["DeleteElement"];
     options?: never;
     head?: never;
     patch: operations["UpdateElement"];
@@ -398,6 +398,22 @@ export interface paths {
       cookie?: never;
     };
     get: operations["GetBacklinks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/elements/{id}/impact": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GetDeleteImpact"];
     put?: never;
     post?: never;
     delete?: never;
@@ -646,6 +662,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/trash": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListTrash"];
+    put?: never;
+    post?: never;
+    delete: operations["EmptyTrash"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/trash/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["PurgeTrashEntry"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/trash/{id}/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["RestoreFromTrash"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/tree": {
     parameters: {
       query?: never;
@@ -828,6 +892,22 @@ export interface components {
       id: string;
       name: string;
     };
+    DeleteImpactView: {
+      /** Format: int32 */
+      descendants: number;
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      /** Format: int32 */
+      links: number;
+      name: string;
+      /** Format: int32 */
+      pages: number;
+      referencedBy: components["schemas"]["ImpactItemView"][];
+      /** Format: int32 */
+      subPages: number;
+      /** Format: int32 */
+      values: number;
+    };
     ElementDetails: {
       /** Format: date-time */
       createdAt: string;
@@ -876,6 +956,10 @@ export interface components {
     FolderStatus: "missing" | "notAProject" | "project" | "tooNew" | "invalid";
     /** @enum {string} */
     HostMode: "desktop" | "server";
+    ImpactItemView: {
+      id: components["schemas"]["ElementId"];
+      name: string;
+    };
     InspectFolderRequest: {
       folder: string;
     };
@@ -1015,6 +1099,10 @@ export interface components {
       value: null | components["schemas"]["JsonNode"];
       violations: components["schemas"]["ViolationItem"][];
     };
+    PurgeView: {
+      /** Format: int32 */
+      removed: number;
+    };
     RecentProjectItem: {
       folder: string;
       lastElementId: null | components["schemas"]["ElementId"];
@@ -1039,6 +1127,16 @@ export interface components {
     ResolvedState: "existing" | "deleted" | "unknown";
     ResolveResult: {
       items: components["schemas"]["ResolvedItem"][];
+    };
+    RestoreView: {
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+      parentId: components["schemas"]["ElementId"];
+      parentName: string;
+      relocated: boolean;
+      /** Format: int32 */
+      restored: number;
     };
     RootCounts: {
       /** Format: int32 */
@@ -1077,6 +1175,18 @@ export interface components {
     };
     /** @enum {string} */
     ThemePreference: "light" | "dark" | "system";
+    TrashEntryView: {
+      /** Format: date-time */
+      deletedAt: string;
+      deletedBy: string;
+      /** Format: int32 */
+      descendants: number;
+      id: components["schemas"]["ElementId"];
+      kind: components["schemas"]["ElementKind"];
+      name: string;
+      parentAvailable: boolean;
+      path: components["schemas"]["PathItem"][];
+    };
     TreeNodeItem: {
       duplicateName: boolean;
       id: components["schemas"]["ElementId"];
@@ -1828,6 +1938,27 @@ export interface operations {
       };
     };
   };
+  DeleteElement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   UpdateElement: {
     parameters: {
       query?: never;
@@ -1874,6 +2005,29 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["BacklinkItem"][];
+        };
+      };
+    };
+  };
+  GetDeleteImpact: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteImpactView"];
         };
       };
     };
@@ -2371,6 +2525,96 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ResolveResult"];
+        };
+      };
+    };
+  };
+  ListTrash: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TrashEntryView"][];
+        };
+      };
+    };
+  };
+  EmptyTrash: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PurgeView"];
+        };
+      };
+    };
+  };
+  PurgeTrashEntry: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PurgeView"];
+        };
+      };
+    };
+  };
+  RestoreFromTrash: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RestoreView"];
         };
       };
     };

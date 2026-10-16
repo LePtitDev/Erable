@@ -1,4 +1,4 @@
-import { ExternalLink, FolderSearch, Plus } from "lucide-react";
+import { ExternalLink, FolderSearch, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
@@ -11,6 +11,7 @@ import {
   useIsDesktop,
 } from "../../shared/native/native";
 import { extensionOf } from "../../shared/ui/fileNames";
+import { DeleteDialog } from "../trash/DeleteDialog";
 import styles from "./PageView.module.css";
 import { useUploader } from "./useUploader";
 
@@ -43,6 +44,7 @@ export function AttachmentsPanel({
   const [running, setRunning] = useState<readonly Running[]>([]);
   const [errors, setErrors] = useState<readonly string[]>([]);
   const desktop = useIsDesktop();
+  const [deleting, setDeleting] = useState<ElementId | null>(null);
 
   const native = (action: () => Promise<unknown>) => {
     setErrors([]);
@@ -122,32 +124,45 @@ export function AttachmentsPanel({
                 </a>
                 <span className={styles["attachmentSize"]}>{format.size(a.size)}</span>
               </span>
-              {desktop && (
-                <span className={styles["attachmentActions"]}>
-                  <button
-                    type="button"
-                    className={styles["fileAction"]}
-                    aria-label={t("attachments.openWithSystem", { name: a.fileName })}
-                    title={t("attachments.openWithSystem", { name: a.fileName })}
-                    onClick={() => {
-                      native(() => openAttachmentWithSystem(projectId, a.id));
-                    }}
-                  >
-                    <ExternalLink aria-hidden size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    className={styles["fileAction"]}
-                    aria-label={t("attachments.reveal", { name: a.fileName })}
-                    title={t("attachments.reveal", { name: a.fileName })}
-                    onClick={() => {
-                      native(() => revealAttachment(projectId, a.id));
-                    }}
-                  >
-                    <FolderSearch aria-hidden size={14} />
-                  </button>
-                </span>
-              )}
+              <span className={styles["attachmentActions"]}>
+                <button
+                  type="button"
+                  className={styles["fileAction"]}
+                  aria-label={t("attachments.delete", { name: a.fileName })}
+                  title={t("attachments.delete", { name: a.fileName })}
+                  onClick={() => {
+                    setDeleting(a.id);
+                  }}
+                >
+                  <Trash2 aria-hidden size={14} />
+                </button>
+                {desktop && (
+                  <>
+                    <button
+                      type="button"
+                      className={styles["fileAction"]}
+                      aria-label={t("attachments.openWithSystem", { name: a.fileName })}
+                      title={t("attachments.openWithSystem", { name: a.fileName })}
+                      onClick={() => {
+                        native(() => openAttachmentWithSystem(projectId, a.id));
+                      }}
+                    >
+                      <ExternalLink aria-hidden size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className={styles["fileAction"]}
+                      aria-label={t("attachments.reveal", { name: a.fileName })}
+                      title={t("attachments.reveal", { name: a.fileName })}
+                      onClick={() => {
+                        native(() => revealAttachment(projectId, a.id));
+                      }}
+                    >
+                      <FolderSearch aria-hidden size={14} />
+                    </button>
+                  </>
+                )}
+              </span>
             </li>
           ))}
           {running.map((r) => (
@@ -168,6 +183,14 @@ export function AttachmentsPanel({
           ))}
         </ul>
       )}
+      <DeleteDialog
+        projectId={projectId}
+        id={deleting}
+        onClose={() => {
+          setDeleting(null);
+        }}
+        onDeleted={() => undefined}
+      />
     </section>
   );
 }

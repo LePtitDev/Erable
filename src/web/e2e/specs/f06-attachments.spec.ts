@@ -4,7 +4,7 @@ import { expect, test } from "../fixtures";
 import { AttachmentsPanel } from "../pages/AttachmentsPanel";
 import { EditorPage } from "../pages/EditorPage";
 import { PageViewPage } from "../pages/PageViewPage";
-import { t } from "../support/i18n";
+import { t, tp } from "../support/i18n";
 import { blob, pdf, png, zip } from "../support/samples";
 
 interface PageData {
@@ -203,5 +203,22 @@ test.describe("F06 · Attachments", () => {
     await expect(page.getByRole("alert").filter({ hasText: "perdu.png" })).toBeVisible();
     await expect(editor.uploads).toHaveCount(0);
     expect(await editor.shownText()).toBe(text);
+  });
+
+  test("E2E-06-06 · Delete a referenced attachment @pr", async ({ page, reference }) => {
+    const view = new PageViewPage(page);
+    await page.goto(reference.url(chroniques.hautbois));
+
+    await page
+      .getByRole("button", { name: t("attachments.delete", { name: "carte_hautbois.webp" }) })
+      .click();
+
+    const dialog = page.getByRole("alertdialog");
+    await expect(dialog).toContainText(tp("trash.usedElsewhere", 1, { names: "Ilsa Varenne" }));
+    await dialog.getByRole("button", { name: t("trash.deleteConfirm") }).click();
+    await dialog.waitFor({ state: "hidden" });
+
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(view.article.getByRole("img", { name: t("embed.missing") })).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   ChevronDown,
@@ -10,6 +10,7 @@ import {
   Folder,
   FolderPlus,
   Search,
+  Trash2,
 } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
 import {
@@ -25,10 +26,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
 import { treeQuery, type ElementKind, type TreeNodeItem } from "../../shared/api/tree";
+import { trashQuery } from "../../shared/api/trash";
 import { useUiState } from "../../shared/api/uiState";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
 import { roots } from "../../shared/ids/roots";
 import { KindBadge } from "../../shared/ui/KindBadge";
+import { DeleteDialog } from "../trash/DeleteDialog";
 import styles from "./Explorer.module.css";
 import {
   ancestorsOf,
@@ -87,6 +90,8 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const [drag, setDrag] = useState<DragState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ x: number; y: number; id: ElementId } | null>(null);
+  const [deleting, setDeleting] = useState<ElementId | null>(null);
+  const trash = useQuery(trashQuery(projectId));
   const typeahead = useRef({ text: "", at: 0 });
   const treeRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -274,6 +279,10 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
       case "Enter":
         handled();
         open(row.node);
+        return;
+      case "Delete":
+        handled();
+        if (row.node.kind !== "root") setDeleting(row.node.id);
         return;
       case "F2":
         handled();
@@ -579,6 +588,35 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
       <span id={duplicateHintId} hidden>
         {t("explorer.duplicate")}
       </span>
+      <Link
+        to="/p/$projectId/trash"
+        params={{ projectId }}
+        className={styles["trashLink"]}
+        activeProps={{ "aria-current": "page" }}
+      >
+        <Trash2 aria-hidden size={16} />
+        {t("trash.title")}
+        {(trash.data?.length ?? 0) > 0 && (
+          <span className={styles["trashCount"]}>{trash.data?.length}</span>
+        )}
+      </Link>
+      <DeleteDialog
+        projectId={projectId}
+        id={deleting}
+        onClose={() => {
+          setDeleting(null);
+          treeRef.current?.focus();
+        }}
+        onDeleted={(id) => {
+          // Showing the deleted element, or something below it: go back to the project.
+          if (
+            currentId !== null &&
+            (currentId === id || ancestorsOf(index, currentId).some((a) => a.id === id))
+          ) {
+            void navigate({ to: "/p/$projectId", params: { projectId } });
+          }
+        }}
+      />
       <section aria-labelledby="recent-viewed" className={styles["recent"]}>
         <h2 id="recent-viewed" className={styles["title"]}>
           {t("explorer.recent")}
@@ -601,6 +639,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         }}
         onCut={setCut}
         onPaste={paste}
+        onDelete={setDeleting}
       />
     </div>
   );
@@ -714,6 +753,7 @@ function ContextMenu({
   onRename,
   onCut,
   onPaste,
+  onDelete,
 }: {
   readonly menu: { x: number; y: number; id: ElementId } | null;
   readonly index: TreeIndex;
@@ -723,6 +763,7 @@ function ContextMenu({
   readonly onRename: (id: ElementId) => void;
   readonly onCut: (id: ElementId) => void;
   readonly onPaste: (id: ElementId) => void;
+  readonly onDelete: (id: ElementId) => void;
 }) {
   const { t } = useTranslation();
   const node = menu === null ? undefined : index.byId.get(menu.id);
@@ -812,6 +853,15 @@ function ContextMenu({
               >
                 {t("explorer.cut")}
                 <span className={styles["shortcut"]}>{t("explorer.cutShortcut")}</span>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                className={styles["menuItem"]}
+                onSelect={() => {
+                  onDelete(node.id);
+                }}
+              >
+                {t("trash.delete")}
+                <span className={styles["shortcut"]}>{t("help.keys.delete")}</span>
               </DropdownMenu.Item>
             </>
           )}

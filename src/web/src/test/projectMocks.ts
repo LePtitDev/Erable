@@ -124,6 +124,7 @@ export function mockProject(
       response(200).json({ id: "local", name: "Arthur", defaultProjectsFolder: "/w" }),
     ),
     http.get("/api/v1/me/recent-projects", ({ response }) => response(200).json([])),
+    http.get("/api/v1/projects/{projectId}/trash", ({ response }) => response(200).json([])),
     http.put("/api/v1/me/recent-projects/{projectId}/last-element", ({ response }) =>
       response(204).empty(),
     ),

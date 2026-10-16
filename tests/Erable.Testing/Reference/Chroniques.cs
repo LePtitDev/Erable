@@ -95,7 +95,7 @@ public static class Chroniques
             ## Lieux notables
 
             - Le comptoir d’échange de [[@Ilsa Varenne]].
-            - La garnison du [[@Capitaine Orsen]].
+            - La garnison du bourg.
             """).Stamped("Hautbois", Date(2026, 3, 10, 10, 0), "malo", Date(2026, 10, 12, 15, 0), "malo");
         p.WithAttachment("carte_hautbois.webp", "Hautbois", Asset("carte_hautbois.webp"))
             .Stamped("carte_hautbois.webp", Date(2026, 3, 10, 10, 5), "malo");

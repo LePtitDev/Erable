@@ -125,6 +125,14 @@
       "self": "A page cannot be linked to itself.",
       "duplicate": "This link already exists.",
       "notFound": "This link no longer exists."
+    },
+    "trash": {
+      "entry": {
+        "notFound": "This element is no longer in the trash."
+      },
+      "parent": {
+        "deleted": "The page of this attachment is in the trash: restore it first."
+      }
     }
   },
   "home": {
@@ -195,7 +203,8 @@
       "rename": "F2",
       "palette": "[[",
       "paletteShortcut": "Ctrl+Space",
-      "close": "Esc"
+      "close": "Esc",
+      "delete": "Del"
     },
     "shortcuts": {
       "openFolder": "Open a project folder",
@@ -362,7 +371,8 @@
       "unknown": "Element not found",
       "existing": ""
     },
-    "brokenLabel": "{{text}} (broken link: {{reason}})"
+    "brokenLabel": "{{text}} (broken link: {{reason}})",
+    "restore": "Deleted element — Restore"
   },
   "embed": {
     "missing": "Deleted attachment",
@@ -378,7 +388,8 @@
     "tooLarge": "“{{name}}” exceeds the maximum allowed size ({{max}}). No attachment was created.",
     "failed": "Upload of “{{name}}” failed: {{reason}}",
     "openWithSystem": "Open {{name}} with the system application",
-    "reveal": "Show {{name}} in the file manager"
+    "reveal": "Show {{name}} in the file manager",
+    "delete": "Delete {{name}}"
   },
   "editor": {
     "title": "Page title",
@@ -649,5 +660,53 @@
     "mentionsList": "Pages mentioning this page",
     "noMentions": "No other page mentions this one in its text.",
     "remove": "Delete the link {{label}} · {{name}}"
+  },
+  "trash": {
+    "title": "Trash",
+    "intro": "Deleted elements stay here until they are restored or the trash is emptied.",
+    "delete": "Delete",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteTitleLoading": "Delete this element?",
+    "deleteConfirm": "Move to the trash",
+    "deleteHint": "The element goes to the trash: you will be able to restore it.",
+    "consequences": "Consequences of the deletion",
+    "referencedBy_one": "{{count}} page refers to this element: {{names}}",
+    "referencedBy_other": "{{count}} pages refer to this element: {{names}}",
+    "usedElsewhere_one": "Used in {{count}} other page: {{names}}",
+    "usedElsewhere_other": "Used in {{count}} other pages: {{names}}",
+    "cascade_one": "“{{name}}” and {{count}} sub-page will be moved to the trash.",
+    "cascade_other": "“{{name}}” and {{count}} sub-pages will be moved to the trash.",
+    "contents_one": "“{{name}}” holds {{count}} element, which follows it to the trash.",
+    "contents_other": "“{{name}}” holds {{count}} elements, which follow it to the trash.",
+    "linksOfType_one": "{{count}} link uses this type and will be deleted.",
+    "linksOfType_other": "{{count}} links use this type and will be deleted.",
+    "linksOfPage_one": "{{count}} typed link will be hidden (it comes back with the page).",
+    "linksOfPage_other": "{{count}} typed links will be hidden (they come back with the page).",
+    "categoryPages_one": "{{count}} page will lose this category.",
+    "categoryPages_other": "{{count}} pages will lose this category.",
+    "propertyValues_one": "The value of {{count}} page or category will be removed (restorable with the property).",
+    "propertyValues_other": "The values of {{count}} pages or categories will be removed (restorable with the property).",
+    "list": "Deleted elements",
+    "empty": "The trash is empty.",
+    "withDescendants_one": "with {{count}} element",
+    "withDescendants_other": "with {{count}} elements",
+    "deleted": "Deleted {{when}} by {{who}}",
+    "originalPlace": "Original place: {{path}}",
+    "parentGone": "The original place no longer exists: it will go back to the root.",
+    "restore": "Restore",
+    "restoreLabel": "Restore {{name}}",
+    "open": "Open",
+    "restored": "“{{name}}” was restored under “{{parent}}”.",
+    "relocated": "“{{name}}” was restored under “{{parent}}”: its original place no longer exists.",
+    "purge": "Delete permanently",
+    "purgeLabel": "Delete {{name}} permanently",
+    "purgeTitle": "Delete “{{name}}” permanently?",
+    "purgeDescription": "This is final: the element can no longer be restored.",
+    "emptyAction": "Empty the trash",
+    "emptyTitle": "Empty the trash?",
+    "emptyDescription_one": "This is final: {{count}} element and its content will be deleted for good.",
+    "emptyDescription_other": "This is final: {{count}} elements and their content will be deleted for good.",
+    "emptyType": "To confirm, type the name of the project: {{name}}",
+    "emptyConfirm": "Empty for good"
   }
 }

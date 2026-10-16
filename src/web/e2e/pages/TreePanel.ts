@@ -88,6 +88,12 @@ export class TreePanel {
     await this.page.keyboard.press("Enter");
   }
 
+  /** Puts the line in the trash with the Delete key; the confirmation dialog stays to answer. */
+  async startDelete(name: string) {
+    await this.item(name).click();
+    await this.tree.press("Delete");
+  }
+
   /** Children of a line, by name, in order (the lines right below it with a deeper level). */
   async childrenOf(name: string): Promise<string[]> {
     return this.tree.evaluate((tree, parentName) => {

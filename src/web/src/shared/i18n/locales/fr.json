@@ -125,6 +125,14 @@
       "self": "Une page ne peut pas être liée à elle-même.",
       "duplicate": "Ce lien existe déjà.",
       "notFound": "Ce lien n’existe plus."
+    },
+    "trash": {
+      "entry": {
+        "notFound": "Cet élément n’est plus dans la corbeille."
+      },
+      "parent": {
+        "deleted": "La page de cette pièce jointe est dans la corbeille : restaurez-la d’abord."
+      }
     }
   },
   "home": {
@@ -195,7 +203,8 @@
       "rename": "F2",
       "palette": "[[",
       "paletteShortcut": "Ctrl+Espace",
-      "close": "Échap"
+      "close": "Échap",
+      "delete": "Suppr"
     },
     "shortcuts": {
       "openFolder": "Ouvrir un dossier de projet",
@@ -368,7 +377,8 @@
       "unknown": "Élément introuvable",
       "existing": ""
     },
-    "brokenLabel": "{{text}} (lien cassé : {{reason}})"
+    "brokenLabel": "{{text}} (lien cassé : {{reason}})",
+    "restore": "Élément supprimé — Restaurer"
   },
   "embed": {
     "missing": "Pièce jointe supprimée",
@@ -384,7 +394,8 @@
     "tooLarge": "« {{name}} » dépasse la taille maximale autorisée ({{max}}). Aucune pièce jointe n’a été créée.",
     "failed": "Échec du téléversement de « {{name}} » : {{reason}}",
     "openWithSystem": "Ouvrir {{name}} avec l’application du système",
-    "reveal": "Afficher {{name}} dans l’explorateur de fichiers"
+    "reveal": "Afficher {{name}} dans l’explorateur de fichiers",
+    "delete": "Supprimer {{name}}"
   },
   "editor": {
     "title": "Titre de la page",
@@ -661,5 +672,63 @@
     "mentionsList": "Pages qui mentionnent cette page",
     "noMentions": "Aucune autre page ne mentionne celle-ci dans son texte.",
     "remove": "Supprimer le lien {{label}} · {{name}}"
+  },
+  "trash": {
+    "title": "Corbeille",
+    "intro": "Les éléments supprimés restent ici jusqu’à leur restauration ou jusqu’au vidage de la corbeille.",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer « {{name}} » ?",
+    "deleteTitleLoading": "Supprimer cet élément ?",
+    "deleteConfirm": "Mettre à la corbeille",
+    "deleteHint": "L’élément va dans la corbeille : vous pourrez le restaurer.",
+    "consequences": "Conséquences de la suppression",
+    "referencedBy_one": "{{count}} page fait référence à cet élément : {{names}}",
+    "referencedBy_other": "{{count}} pages font référence à cet élément : {{names}}",
+    "referencedBy_many": "{{count}} pages font référence à cet élément : {{names}}",
+    "usedElsewhere_one": "Utilisée dans {{count}} autre page : {{names}}",
+    "usedElsewhere_other": "Utilisée dans {{count}} autres pages : {{names}}",
+    "usedElsewhere_many": "Utilisée dans {{count}} autres pages : {{names}}",
+    "cascade_one": "« {{name}} » et {{count}} sous-page seront placées dans la corbeille.",
+    "cascade_other": "« {{name}} » et {{count}} sous-pages seront placées dans la corbeille.",
+    "cascade_many": "« {{name}} » et {{count}} sous-pages seront placées dans la corbeille.",
+    "contents_one": "« {{name}} » contient {{count}} élément, qui le suivra dans la corbeille.",
+    "contents_other": "« {{name}} » contient {{count}} éléments, qui le suivront dans la corbeille.",
+    "contents_many": "« {{name}} » contient {{count}} éléments, qui le suivront dans la corbeille.",
+    "linksOfType_one": "{{count}} lien utilise ce type et sera supprimé.",
+    "linksOfType_other": "{{count}} liens utilisent ce type et seront supprimés.",
+    "linksOfType_many": "{{count}} liens utilisent ce type et seront supprimés.",
+    "linksOfPage_one": "{{count}} lien typé sera masqué (il revient avec la page).",
+    "linksOfPage_other": "{{count}} liens typés seront masqués (ils reviennent avec la page).",
+    "linksOfPage_many": "{{count}} liens typés seront masqués (ils reviennent avec la page).",
+    "categoryPages_one": "{{count}} page perdra cette catégorie.",
+    "categoryPages_other": "{{count}} pages perdront cette catégorie.",
+    "categoryPages_many": "{{count}} pages perdront cette catégorie.",
+    "propertyValues_one": "La valeur de {{count}} page ou catégorie sera retirée (restaurable avec la propriété).",
+    "propertyValues_other": "Les valeurs de {{count}} pages ou catégories seront retirées (restaurables avec la propriété).",
+    "propertyValues_many": "Les valeurs de {{count}} pages ou catégories seront retirées (restaurables avec la propriété).",
+    "list": "Éléments supprimés",
+    "empty": "La corbeille est vide.",
+    "withDescendants_one": "avec {{count}} élément",
+    "withDescendants_other": "avec {{count}} éléments",
+    "withDescendants_many": "avec {{count}} éléments",
+    "deleted": "Supprimé {{when}} par {{who}}",
+    "originalPlace": "Emplacement d’origine : {{path}}",
+    "parentGone": "L’emplacement d’origine n’existe plus : il sera replacé à la racine.",
+    "restore": "Restaurer",
+    "restoreLabel": "Restaurer {{name}}",
+    "open": "Ouvrir",
+    "restored": "« {{name}} » a été restauré sous « {{parent}} ».",
+    "relocated": "« {{name}} » a été restauré sous « {{parent}} » : son emplacement d’origine n’existe plus.",
+    "purge": "Supprimer définitivement",
+    "purgeLabel": "Supprimer définitivement {{name}}",
+    "purgeTitle": "Supprimer définitivement « {{name}} » ?",
+    "purgeDescription": "Cette action est définitive : l’élément ne pourra plus être restauré.",
+    "emptyAction": "Vider la corbeille",
+    "emptyTitle": "Vider la corbeille ?",
+    "emptyDescription_one": "Cette action est définitive : {{count}} élément et son contenu seront supprimés pour toujours.",
+    "emptyDescription_other": "Cette action est définitive : {{count}} éléments et leur contenu seront supprimés pour toujours.",
+    "emptyDescription_many": "Cette action est définitive : {{count}} éléments et leur contenu seront supprimés pour toujours.",
+    "emptyType": "Pour confirmer, tapez le nom du projet : {{name}}",
+    "emptyConfirm": "Vider définitivement"
   }
 }

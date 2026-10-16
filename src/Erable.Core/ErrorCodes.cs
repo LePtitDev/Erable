@@ -91,4 +91,10 @@ public static class ErrorCodes
 
     /// <summary>The link does not exist.</summary>
     public const string LinkNotFound = "link.notFound";
+
+    /// <summary>The entry is not (or no longer) in the trash.</summary>
+    public const string TrashEntryNotFound = "trash.entry.notFound";
+
+    /// <summary>An attachment cannot come back while its page is in the trash: restore the page first.</summary>
+    public const string TrashParentDeleted = "trash.parent.deleted";
 }

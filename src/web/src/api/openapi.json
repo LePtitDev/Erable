@@ -324,6 +324,35 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Elements"
+        ],
+        "operationId": "DeleteElement",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
       }
     },
     "/api/v1/projects/{projectId}/elements/{id}/backlinks": {
@@ -836,6 +865,44 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PageLinksView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/elements/{id}/impact": {
+      "get": {
+        "tags": [
+          "Elements"
+        ],
+        "operationId": "GetDeleteImpact",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteImpactView"
                 }
               }
             }
@@ -1524,6 +1591,143 @@
         "responses": {
           "204": {
             "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/trash": {
+      "get": {
+        "tags": [
+          "Trash"
+        ],
+        "operationId": "ListTrash",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrashEntryView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Trash"
+        ],
+        "operationId": "EmptyTrash",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurgeView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/trash/{id}/restore": {
+      "post": {
+        "tags": [
+          "Trash"
+        ],
+        "operationId": "RestoreFromTrash",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestoreView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{projectId}/trash/{id}": {
+      "delete": {
+        "tags": [
+          "Trash"
+        ],
+        "operationId": "PurgeTrashEntry",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurgeView"
+                }
+              }
+            }
           }
         }
       }
@@ -2454,6 +2658,57 @@
           }
         }
       },
+      "DeleteImpactView": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "referencedBy",
+          "subPages",
+          "descendants",
+          "links",
+          "pages",
+          "values"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "referencedBy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImpactItemView"
+            }
+          },
+          "subPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "descendants": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "links": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "values": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "ElementDetails": {
         "required": [
           "id",
@@ -2665,6 +2920,21 @@
           "server"
         ],
         "type": "string"
+      },
+      "ImpactItemView": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
       },
       "InspectFolderRequest": {
         "required": [
@@ -3260,6 +3530,18 @@
           }
         }
       },
+      "PurgeView": {
+        "required": [
+          "removed"
+        ],
+        "type": "object",
+        "properties": {
+          "removed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "RecentProjectItem": {
         "required": [
           "projectId",
@@ -3379,6 +3661,42 @@
             "items": {
               "$ref": "#/components/schemas/ResolvedItem"
             }
+          }
+        }
+      },
+      "RestoreView": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "parentId",
+          "parentName",
+          "relocated",
+          "restored"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentId": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "parentName": {
+            "type": "string"
+          },
+          "relocated": {
+            "type": "boolean"
+          },
+          "restored": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3522,6 +3840,50 @@
           "system"
         ],
         "type": "string"
+      },
+      "TrashEntryView": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "deletedAt",
+          "deletedBy",
+          "descendants",
+          "path",
+          "parentAvailable"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ElementId"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ElementKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedBy": {
+            "type": "string"
+          },
+          "descendants": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PathItem"
+            }
+          },
+          "parentAvailable": {
+            "type": "boolean"
+          }
+        }
       },
       "TreeNodeItem": {
         "required": [
@@ -3778,6 +4140,9 @@
     },
     {
       "name": "Properties"
+    },
+    {
+      "name": "Trash"
     },
     {
       "name": "Me"

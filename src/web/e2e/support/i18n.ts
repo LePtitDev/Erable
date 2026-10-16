@@ -20,3 +20,12 @@ export function t(key: string, values: Record<string, string | number> = {}): st
   }
   return text.replace(/\{\{\s*(\w+)[^}]*\}\}/g, (_, name: string) => String(values[name] ?? ""));
 }
+
+/** A plural key (`key_one` for 1, `key_other` otherwise), like i18next resolves them in French for small counts. */
+export function tp(
+  key: string,
+  count: number,
+  values: Record<string, string | number> = {},
+): string {
+  return t(`${key}_${count === 1 ? "one" : "other"}`, { count, ...values });
+}

@@ -26,6 +26,9 @@ export const queryKeys = {
   properties: (projectId: ElementId) => ["projects", projectId, "properties"] as const,
   property: (projectId: ElementId, id: ElementId) =>
     ["projects", projectId, "properties", id] as const,
+  trash: (projectId: ElementId) => ["projects", projectId, "trash"] as const,
+  deleteImpact: (projectId: ElementId, id: ElementId) =>
+    ["projects", projectId, "impact", id] as const,
   linkTypes: (projectId: ElementId) => ["projects", projectId, "link-types"] as const,
   linkType: (projectId: ElementId, id: ElementId) =>
     ["projects", projectId, "link-types", id] as const,

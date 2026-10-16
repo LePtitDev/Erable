@@ -260,7 +260,8 @@ En mode serveur, chaque projet est un dossier de ce type sous `data/projects/<pr
 
 ```sql
 elements        (id PK, kind, parent_id, name, sort_order, revision,
-                 created_at, created_by, updated_at, updated_by, deleted_at)
+                 created_at, created_by, updated_at, updated_by, deleted_at,
+                 deleted_root, deleted_by, deleted_orphan)   -- corbeille (format v3)
 page_contents   (page_id PK, markdown, plain_text)          -- plain_text pour FTS
 revisions       (element_id, revision, author, at, snapshot BLOB)  -- JSON compressé
 categories      (id PK, parent_category_id, description)
@@ -279,7 +280,7 @@ search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacriti
 ```
 
 - **Historique** : chaque enregistrement crée une révision (instantané JSON compressé de l'élément). C'est peu coûteux sur du texte et indispensable dès qu'il y a plusieurs éditeurs (consulter, comparer, restaurer). « Récemment modifiées » découle directement de cette table.
-- **Corbeille** : suppression logique (`deleted_at`), vidée manuellement ou après N jours.
+- **Corbeille** : suppression logique (`deleted_at`), vidée manuellement ou après N jours (le vidage automatique n'est pas implémenté, voir tasks/M2-08). Une suppression est une **entrée** : `deleted_root` désigne l'élément supprimé par l'utilisateur et porte la même valeur pour tout ce qui l'accompagne (sous-pages, contenu d'un dossier, pièces jointes) ; un élément supprimé plus tôt garde sa propre entrée. Restaurer remet l'entrée entière, à son emplacement d'origine ou, si le parent n'existe plus, à la racine de son type. `deleted_orphan` vaut 1 quand le parent de l'entrée a été effacé définitivement (il est alors rattaché à la racine). Le vidage supprime les lignes et leurs dépendances (valeurs, liens, révisions, pièces jointes) puis les blobs que plus rien ne référence.
 - `remove_diacritics` : « col gele » trouve « Col gelé ».
 - **Conventions de stockage** : ID en `INTEGER` signé ; dates en texte UTC ISO 8601 à la milliseconde (`2026-10-13T08:00:00.000Z`), triables et lisibles ; types d'élément en texte (`page`, `folder`…) ; tables `STRICT`. Le propriétaire d'une pièce jointe est le parent de son élément (pas de colonne `page_id` en double) ; `revisions.blob_sha256` garde en vie le blob d'une révision de pièce jointe face au ramasse-miettes.
 
