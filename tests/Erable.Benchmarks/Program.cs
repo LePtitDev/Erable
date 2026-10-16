@@ -19,7 +19,7 @@ internal static class Program
           bench [--pages N] [--update-baseline]
               BenchmarkDotNet on the hot paths (parser, property resolution, save, search); writes artifacts/perf/latest.json,
               appends to artifacts/perf/history.json and compares with spec/perf/baseline.json (exit 1 above +15 %).
-          load [--users 50] [--minutes 10 | --seconds N] [--light] [--folder <folder>] [--json <file>] [--reports <folder>]
+          load [--users 50] [--minutes 10 | --seconds N] [--think-ms 2000-6000] [--light] [--folder <folder>] [--json <file>] [--reports <folder>]
               NBomber (docs/testing.md §11.2): a team of virtual users, 80 % reading and 20 % writing, on a server; exits 1 on any
               error, a p95 over its budget or a working set that keeps growing.
           compare <latest.json> <baseline.json> [--threshold 15]

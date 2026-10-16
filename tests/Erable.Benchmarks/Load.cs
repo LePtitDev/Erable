@@ -37,6 +37,10 @@ internal static class Load
     public static async Task<int> RunAsync(Arguments arguments)
     {
         var users = arguments.Int("users") ?? 50;
+        // Thinking time between two actions of a person: 2 to 6 s by default (reading, typing); --think-ms 300-1200 is a stress run.
+        var think = arguments.Value("think-ms") is { } range && range.Split('-') is [var low, var high]
+            ? (int.Parse(low, CultureInfo.InvariantCulture), int.Parse(high, CultureInfo.InvariantCulture))
+            : (2000, 6000);
         var duration = TimeSpan.FromSeconds((arguments.Value("seconds") is { } s ? double.Parse(s, CultureInfo.InvariantCulture) : (arguments.Int("minutes") ?? 10) * 60.0));
         var generated = Program.LargeProjectFrom(arguments);
         var work = Directory.CreateTempSubdirectory("erable-load-");
@@ -51,7 +55,7 @@ internal static class Load
                 }
             }
 
-            return await MeasureAsync(folder, work.FullName, users, duration, arguments).ConfigureAwait(false);
+            return await MeasureAsync(folder, work.FullName, users, think, duration, arguments).ConfigureAwait(false);
         }
         finally
         {
@@ -66,7 +70,7 @@ internal static class Load
         }
     }
 
-    private static async Task<int> MeasureAsync(string folder, string work, int users, TimeSpan duration, Arguments arguments)
+    private static async Task<int> MeasureAsync(string folder, string work, int users, (int Low, int High) think, TimeSpan duration, Arguments arguments)
     {
         var web = Directory.CreateTempSubdirectory("erable-load-web-");
         await File.WriteAllTextAsync(Path.Combine(web.FullName, "index.html"), "<!doctype html><html></html>").ConfigureAwait(false);
@@ -129,7 +133,7 @@ internal static class Load
                 }
 
                 // Thinking time: a person reads before the next click.
-                await Task.Delay(random.Next(300, 1200)).ConfigureAwait(false);
+                await Task.Delay(random.Next(think.Low, think.High)).ConfigureAwait(false);
                 return Response.Ok();
             })
             .WithoutWarmUp()

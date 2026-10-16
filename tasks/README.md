@@ -83,7 +83,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M4-06](M4-06-server-distribution.md) | `erable serve` et image Docker | M4-01 | review |
 | [M4-07](M4-07-desktop-connected.md) | Desktop en mode connecté | M4-01, M1-17 | review |
 | [M4-08](M4-08-members-ui.md) | Gestion des membres | M4-01 | review |
-| [M4-09](M4-09-robustness-load.md) | Crash tests et charge | ✅ Tranché en M4-05 : fusion côté serveur dans Core, `architecture.md` §8.3 corrigé | in-progress |
+| [M4-09](M4-09-robustness-load.md) | Crash tests et charge | ✅ Tranché en M4-05 : fusion côté serveur dans Core, `architecture.md` §8.3 corrigé | review |
 
 ### M5 — Finition
 | ID | Tâche | Dépend de | Statut |
