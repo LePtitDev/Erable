@@ -50,6 +50,13 @@ internal sealed partial class PhotinoShell : INativeBridge
             _window.SetIconFile(icon);
         }
 
+        if (OperatingSystem.IsWindows())
+        {
+            // The window only ever talks to the in-process backend on 127.0.0.1. Without this, WebView2 resolves the
+            // system proxy (WPAD auto-detection) before the first request, which can stall the empty window for ~20 s.
+            _window.SetBrowserControlInitParameters("--no-proxy-server");
+        }
+
         _window.Load(url);
         new PhotinoApplication().Run(_window);
         _window = null;
