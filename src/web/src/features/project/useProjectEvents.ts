@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
 import { meQuery } from "../../shared/api/projects";
+import { queryKeys } from "../../shared/api/keys";
 import { serversQuery } from "../../shared/api/servers";
 import type { ElementId } from "../../shared/ids/elementId";
 import {
@@ -48,6 +49,11 @@ export function useProjectEvents(projectId: ElementId): void {
       },
       treeChanged: () => {
         void invalidateTreeChanged(client, projectId, editing());
+      },
+      membersChanged: () => {
+        // The role is part of the project summary: the edit buttons follow it.
+        void client.invalidateQueries({ queryKey: queryKeys.project(projectId), exact: true });
+        void client.invalidateQueries({ queryKey: queryKeys.members(projectId) });
       },
       resynchronize: () => {
         void invalidateAll(client, projectId, editing());

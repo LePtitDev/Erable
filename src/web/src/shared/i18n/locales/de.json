@@ -160,7 +160,8 @@
       "password": {
         "invalid": "Das Passwort muss mindestens 8 Zeichen lang sein."
       },
-      "notFound": "Dieses Konto existiert nicht."
+      "notFound": "Dieses Konto existiert nicht.",
+      "lastAdmin": "Der Server muss mindestens einen Administrator behalten."
     },
     "feature": {
       "folderProjects": "Dieser Server hostet seine Projekte selbst: Ein Ordner kann nicht angegeben werden."
@@ -175,6 +176,13 @@
       "invalidUrl": "Geben Sie die Serveradresse ein, zum Beispiel https://wiki.beispiel.org.",
       "notFound": "Dieser Server steht nicht mehr in der Liste.",
       "unavailable": "Die Verbindung zu einem Server erfolgt über die Desktop-Anwendung."
+    },
+    "member": {
+      "lastAdmin": "Ein Projekt muss mindestens einen Administrator behalten.",
+      "notFound": "Dieses Konto existiert nicht oder ist deaktiviert.",
+      "role": {
+        "invalid": "Diese Rolle existiert nicht."
+      }
     }
   },
   "home": {
@@ -957,6 +965,34 @@
     "expired": {
       "title": "Sitzung auf {{name}} beendet",
       "description": "Ihre Sitzung auf diesem Server wurde beendet. Geben Sie das Passwort von {{user}} ein, um fortzufahren: Ihre laufende Arbeit bleibt erhalten."
+    }
+  },
+  "members": {
+    "title": "Mitglieder",
+    "intro": "Wer dieses Projekt lesen, bearbeiten oder verwalten darf. Änderungen gelten sofort.",
+    "count_one": "{{count}} Mitglied",
+    "count_other": "{{count}} Mitglieder",
+    "count_many": "{{count}} Mitglieder",
+    "person": "Person",
+    "role": "Rolle",
+    "actions": "Aktionen",
+    "you": "(Sie)",
+    "disabled": "Konto deaktiviert",
+    "roleOf": "Rolle von {{name}}",
+    "remove": "Entfernen",
+    "removeNamed": "{{name}} aus dem Projekt entfernen",
+    "add": {
+      "title": "Mitglied hinzufügen",
+      "login": "Kontokennung",
+      "submit": "Hinzufügen"
+    },
+    "create": {
+      "open": "Konto erstellen",
+      "title": "Konto erstellen",
+      "description": "Die Person wird dem Projekt als „{{role}}“ hinzugefügt.",
+      "name": "Anzeigename",
+      "passwordHint": "Mindestens 8 Zeichen. Geben Sie es der Person weiter: Sie kann es ändern.",
+      "submit": "Erstellen und hinzufügen"
     }
   }
 }

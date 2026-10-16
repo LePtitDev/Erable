@@ -24,6 +24,21 @@ public sealed record ProjectRegistration(ElementId ProjectId, string Folder, Dat
 /// <summary>A member of a project, with the name to show.</summary>
 public sealed record MemberInfo(string UserId, string DisplayName, ProjectRole Role, bool Disabled);
 
+/// <summary>What a change of the members of a project came to (M4-08).</summary>
+public enum MemberChange
+{
+    Done,
+
+    /// <summary>The project would be left without an administrator.</summary>
+    LastAdministrator,
+
+    /// <summary>No active account has that login.</summary>
+    UnknownAccount,
+
+    /// <summary>The user is not a member of the project.</summary>
+    NotAMember,
+}
+
 /// <summary>
 /// <c>data/server.db</c>: accounts, sessions, hosted projects and their members (docs/architecture.md §7.1, §9).
 /// Kept apart from the projects, which stay self-contained folders. Every call opens its own connection (WAL: readers
@@ -276,6 +291,16 @@ public sealed class ServerStore : IDisposable
         }
     }
 
+    /// <summary>Ends every session of an account (it signs in again with its new rights).</summary>
+    public void EndSessionsOf(string userId)
+    {
+        lock (_writeGate)
+        {
+            using var connection = Open();
+            connection.Execute("DELETE FROM sessions WHERE user_id = @Id", new { Id = userId });
+        }
+    }
+
     // ─── Projects and members ───────────────────────────────────────────────
 
     public void RegisterProject(ProjectRegistration project)
@@ -344,6 +369,61 @@ public sealed class ServerStore : IDisposable
                 new { Project = projectId.ToInt64(), User = userId }) > 0;
         }
     }
+
+    /// <summary>
+    /// Adds a member or changes their role, refusing to take the last administrator away (<see cref="MemberRules"/>); the
+    /// check and the write are one step under the write lock, so two administrators cannot both leave.
+    /// </summary>
+    public MemberChange ChangeRole(ElementId projectId, string userId, ProjectRole role)
+    {
+        lock (_writeGate)
+        {
+            using var connection = Open();
+            if (connection.ExecuteScalar<int>("SELECT COUNT(*) FROM accounts WHERE id = @Id AND disabled = 0", new { Id = userId }) == 0)
+            {
+                return MemberChange.UnknownAccount;
+            }
+
+            if (MemberRules.LeavesNoAdministrator(RoleEntries(connection, projectId), userId, role))
+            {
+                return MemberChange.LastAdministrator;
+            }
+
+            connection.Execute(
+                "INSERT INTO memberships (project_id, user_id, role) VALUES (@Project, @User, @Role) ON CONFLICT(project_id, user_id) DO UPDATE SET role = excluded.role",
+                new { Project = projectId.ToInt64(), User = userId, Role = ProjectRoles.NameOf(role) });
+            return MemberChange.Done;
+        }
+    }
+
+    /// <summary>Removes a member, refusing to take the last administrator away.</summary>
+    public MemberChange RemoveMemberChecked(ElementId projectId, string userId)
+    {
+        lock (_writeGate)
+        {
+            using var connection = Open();
+            var entries = RoleEntries(connection, projectId);
+            if (entries.All(e => e.UserId != userId))
+            {
+                return MemberChange.NotAMember;
+            }
+
+            if (MemberRules.LeavesNoAdministrator(entries, userId, newRole: null))
+            {
+                return MemberChange.LastAdministrator;
+            }
+
+            connection.Execute("DELETE FROM memberships WHERE project_id = @Project AND user_id = @User",
+                new { Project = projectId.ToInt64(), User = userId });
+            return MemberChange.Done;
+        }
+    }
+
+    private static List<MemberRoleEntry> RoleEntries(SqliteConnection connection, ElementId projectId) =>
+        [.. connection.Query<MemberRow>(
+            "SELECT m.user_id AS UserId, a.display_name AS Name, m.role AS Role, a.disabled AS Disabled FROM memberships m JOIN accounts a ON a.id = m.user_id WHERE m.project_id = @Project",
+            new { Project = projectId.ToInt64() })
+            .Select(r => new MemberRoleEntry(r.UserId, ProjectRoles.TryParse(r.Role, out var role) ? role : ProjectRole.Reader, r.Disabled == 0))];
 
     public IReadOnlyList<MemberInfo> ListMembers(ElementId projectId)
     {

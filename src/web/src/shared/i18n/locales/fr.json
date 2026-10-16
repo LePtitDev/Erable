@@ -160,7 +160,8 @@
       "password": {
         "invalid": "Le mot de passe doit comporter au moins 8 caractères."
       },
-      "notFound": "Ce compte n’existe pas."
+      "notFound": "Ce compte n’existe pas.",
+      "lastAdmin": "Le serveur doit garder au moins un administrateur."
     },
     "feature": {
       "folderProjects": "Ce serveur héberge lui-même ses projets : un dossier ne peut pas être indiqué."
@@ -175,6 +176,13 @@
       "invalidUrl": "Saisissez l’adresse du serveur, par exemple https://wiki.exemple.org.",
       "notFound": "Ce serveur n’est plus dans la liste.",
       "unavailable": "La connexion à un serveur se fait depuis l’application de bureau."
+    },
+    "member": {
+      "lastAdmin": "Un projet doit garder au moins un administrateur.",
+      "notFound": "Ce compte n’existe pas ou est désactivé.",
+      "role": {
+        "invalid": "Ce rôle n’existe pas."
+      }
     }
   },
   "home": {
@@ -983,6 +991,34 @@
     "expired": {
       "title": "Session terminée sur {{name}}",
       "description": "Votre session sur ce serveur a pris fin. Saisissez le mot de passe de {{user}} pour continuer : votre travail en cours est conservé."
+    }
+  },
+  "members": {
+    "title": "Membres",
+    "intro": "Qui peut lire, modifier ou administrer ce projet. Les changements s’appliquent immédiatement.",
+    "count_one": "{{count}} membre",
+    "count_other": "{{count}} membres",
+    "count_many": "{{count}} membres",
+    "person": "Personne",
+    "role": "Rôle",
+    "actions": "Actions",
+    "you": "(vous)",
+    "disabled": "compte désactivé",
+    "roleOf": "Rôle de {{name}}",
+    "remove": "Retirer",
+    "removeNamed": "Retirer {{name}} du projet",
+    "add": {
+      "title": "Ajouter un membre",
+      "login": "Identifiant du compte",
+      "submit": "Ajouter"
+    },
+    "create": {
+      "open": "Créer un compte",
+      "title": "Créer un compte",
+      "description": "La personne sera ajoutée au projet avec le rôle « {{role}} ».",
+      "name": "Nom affiché",
+      "passwordHint": "Au moins 8 caractères. Communiquez-le à la personne : elle pourra le changer.",
+      "submit": "Créer et ajouter"
     }
   }
 }

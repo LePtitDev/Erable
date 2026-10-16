@@ -21,6 +21,9 @@ internal sealed class ProjectEventsMiddleware(RequestDelegate next, ProjectEvent
         "PreviewPageProperties",
         "OpenAttachmentWithSystem",
         "RevealAttachment",
+        // Told by the endpoints themselves (MembersChanged): the tree and the elements did not change.
+        "SetMember",
+        "RemoveMember",
     };
 
     public async Task InvokeAsync(HttpContext context)

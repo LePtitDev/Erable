@@ -3,6 +3,7 @@ import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
 import { EditorPage } from "../pages/EditorPage";
 import { LoginPage } from "../pages/LoginPage";
+import { MembersPage } from "../pages/MembersPage";
 import { RecentPanel } from "../pages/RecentPanel";
 import { TreePanel } from "../pages/TreePanel";
 import { t } from "../support/i18n";
@@ -215,5 +216,34 @@ test.describe("F14 · Presence", () => {
     await page.close();
     await expect(banner).toBeHidden({ timeout: 30_000 });
     await expect(malo.getByRole("img", { name: camille })).toHaveCount(0);
+  });
+});
+
+test.describe("F14 · Members", () => {
+  test.use({ user: "admin" });
+
+  test("E2E-14-10 · Manage the members @server", async ({ page, reference, openAs }) => {
+    const lea = await openAs("lea");
+    await lea.goto(reference.url(chroniques.ilsa));
+    await expect(lea.getByRole("heading", { level: 1, name: "Ilsa Varenne" })).toBeVisible();
+    await expect(lea.getByRole("button", { name: t("page.edit") })).toHaveCount(0);
+
+    const members = new MembersPage(page);
+    await members.open(reference.id);
+    await expect(members.heading).toBeVisible();
+    await expect(members.roleOf(users.lea.name)).toHaveValue("reader");
+    await members.roleOf(users.lea.name).selectOption("editor");
+    await expect(members.roleOf(users.lea.name)).toHaveValue("editor");
+
+    await lea.reload();
+    await expect(lea.getByRole("button", { name: t("page.edit") })).toBeVisible();
+
+    // An editor does not get the screen: the server refuses the list, the interface says so.
+    await lea.goto(`/p/${reference.id}/members`);
+    await expect(
+      lea.getByRole("heading", { level: 1, name: t("accessDenied.title") }),
+    ).toBeVisible();
+    const forged = await lea.request.get(`/api/v1/projects/${reference.id}/members`);
+    expect(forged.status()).toBe(403);
   });
 });

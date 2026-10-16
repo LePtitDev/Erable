@@ -54,6 +54,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/accounts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListAccounts"];
+    put?: never;
+    post: operations["CreateAccount"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/accounts/{login}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["UpdateAccount"];
+    trace?: never;
+  };
   "/api/v1/auth/login": {
     parameters: {
       query?: never;
@@ -630,6 +662,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["ListMembers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/members/{userId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["SetMember"];
+    post?: never;
+    delete: operations["RemoveMember"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/pages": {
     parameters: {
       query?: never;
@@ -986,6 +1050,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    AccountItem: {
+      /** Format: date-time */
+      createdAt: string;
+      disabled: boolean;
+      id: string;
+      isServerAdmin: boolean;
+      name: string;
+    };
     ApiInfo: {
       apiVersion: string;
       appVersion: string;
@@ -1068,6 +1140,13 @@ export interface components {
       login: string;
       password: string;
       url: string;
+    };
+    CreateAccountRequest: {
+      /** @default false */
+      isServerAdmin: boolean;
+      login: string;
+      name: string;
+      password: string;
     };
     CreateCategoryRequest: {
       description?: null | string;
@@ -1260,6 +1339,13 @@ export interface components {
       issueToken: boolean;
       login: string;
       password: string;
+    };
+    MemberItem: {
+      disabled: boolean;
+      isMe: boolean;
+      name: string;
+      role: components["schemas"]["ProjectRole"];
+      userId: string;
     };
     NativeEvent: {
       path?: null | string;
@@ -1575,6 +1661,9 @@ export interface components {
       name: string;
       token: null | string;
     };
+    SetMemberRequest: {
+      role: components["schemas"]["ProjectRole"];
+    };
     SseItemOfNativeEvent: {
       data?: components["schemas"]["NativeEvent"];
       eventId?: null | string;
@@ -1607,6 +1696,12 @@ export interface components {
       parentId: null | components["schemas"]["ElementId"];
       /** Format: int64 */
       sortOrder: number;
+    };
+    UpdateAccountRequest: {
+      disabled?: null | boolean;
+      isServerAdmin?: null | boolean;
+      name?: null | string;
+      password?: null | string;
     };
     UpdateCategoryRequest: {
       description: string;
@@ -1733,6 +1828,76 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  ListAccounts: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountItem"][];
+        };
+      };
+    };
+  };
+  CreateAccount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAccountRequest"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountItem"];
+        };
+      };
+    };
+  };
+  UpdateAccount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        login: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAccountRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountItem"];
+        };
       };
     };
   };
@@ -2805,6 +2970,76 @@ export interface operations {
         "application/json": components["schemas"]["RecordViewRequest"];
       };
     };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ListMembers: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MemberItem"][];
+        };
+      };
+    };
+  };
+  SetMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetMemberRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MemberItem"];
+        };
+      };
+    };
+  };
+  RemoveMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+        userId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
     responses: {
       /** @description No Content */
       204: {

@@ -17,6 +17,7 @@ import {
   toSearchParams,
   type SearchParams,
 } from "../features/search/searchState";
+import { MembersView } from "../features/members/MembersView";
 import { TrashView } from "../features/trash/TrashView";
 import { NotFoundScreen, ErrorScreen } from "../features/project/ErrorScreens";
 import { parseElementId, type ElementId } from "../shared/ids/elementId";
@@ -76,6 +77,13 @@ export const trashRoute = createRoute({
   component: TrashView,
 });
 
+/** The members of the project (M4-08): administrators only. */
+export const membersRoute = createRoute({
+  getParentRoute: () => projectRoute,
+  path: "/members",
+  component: MembersView,
+});
+
 /** The history of an element (F13): `?from=&to=` are the two revisions compared. */
 export const historyRoute = createRoute({
   getParentRoute: () => projectRoute,
@@ -120,6 +128,7 @@ const routeTree = rootRoute.addChildren([
   projectRoute.addChildren([
     projectIndexRoute,
     trashRoute,
+    membersRoute,
     searchRoute,
     historyRoute,
     elementRoute,

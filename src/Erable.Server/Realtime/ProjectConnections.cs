@@ -139,6 +139,21 @@ public sealed class ProjectConnections
         ];
     }
 
+    /// <summary>The projects an account is connected to, on any of its connections.</summary>
+    public IReadOnlySet<ElementId> ProjectsOf(string userId)
+    {
+        var projects = new HashSet<ElementId>();
+        foreach (var entry in _connections.Values.Where(e => e.UserId == userId))
+        {
+            lock (entry)
+            {
+                projects.UnionWith(entry.Projects.Keys);
+            }
+        }
+
+        return projects;
+    }
+
     public int Count => _connections.Count;
 
     private static string Truncate(string value) => value.Length <= MaxSectionLength ? value : value[..MaxSectionLength];

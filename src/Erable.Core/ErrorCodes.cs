@@ -127,6 +127,9 @@ public static class ErrorCodes
     /// <summary>The project must keep at least one administrator (M4-08).</summary>
     public const string MemberLastAdmin = "member.lastAdmin";
 
+    /// <summary>The server must keep at least one active administrator.</summary>
+    public const string AccountLastAdmin = "account.lastAdmin";
+
     public const string MemberNotFound = "member.notFound";
     public const string MemberRoleInvalid = "member.role.invalid";
 }

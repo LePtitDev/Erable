@@ -160,7 +160,8 @@
       "password": {
         "invalid": "The password must be at least 8 characters."
       },
-      "notFound": "This account does not exist."
+      "notFound": "This account does not exist.",
+      "lastAdmin": "The server must keep at least one administrator."
     },
     "feature": {
       "folderProjects": "This server hosts its own projects: a folder cannot be given."
@@ -175,6 +176,13 @@
       "invalidUrl": "Enter the address of the server, for example https://wiki.example.org.",
       "notFound": "This server is no longer in the list.",
       "unavailable": "Connecting to a server is done from the desktop application."
+    },
+    "member": {
+      "lastAdmin": "A project must keep at least one administrator.",
+      "notFound": "This account does not exist or is disabled.",
+      "role": {
+        "invalid": "This role does not exist."
+      }
     }
   },
   "home": {
@@ -957,6 +965,34 @@
     "expired": {
       "title": "Session ended on {{name}}",
       "description": "Your session on this server has ended. Enter the password of {{user}} to carry on: your work in progress is kept."
+    }
+  },
+  "members": {
+    "title": "Members",
+    "intro": "Who can read, edit or administer this project. Changes apply immediately.",
+    "count_one": "{{count}} member",
+    "count_other": "{{count}} members",
+    "count_many": "{{count}} members",
+    "person": "Person",
+    "role": "Role",
+    "actions": "Actions",
+    "you": "(you)",
+    "disabled": "account disabled",
+    "roleOf": "Role of {{name}}",
+    "remove": "Remove",
+    "removeNamed": "Remove {{name}} from the project",
+    "add": {
+      "title": "Add a member",
+      "login": "Account login",
+      "submit": "Add"
+    },
+    "create": {
+      "open": "Create an account",
+      "title": "Create an account",
+      "description": "The person will be added to the project as “{{role}}”.",
+      "name": "Display name",
+      "passwordHint": "At least 8 characters. Give it to the person: they can change it.",
+      "submit": "Create and add"
     }
   }
 }

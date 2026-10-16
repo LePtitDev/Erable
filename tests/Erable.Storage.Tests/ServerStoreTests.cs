@@ -179,4 +179,63 @@ public sealed class ServerStoreTests : IDisposable
         _store.RemoveMember(project, "lea").ShouldBeTrue();
         _store.RemoveMember(project, "lea").ShouldBeFalse();
     }
+
+    [Fact]
+    public void ChangeRole_UnknownOrDisabledAccount_IsRefused()
+    {
+        var project = ElementId.NewRandom();
+        _store.RegisterProject(new ProjectRegistration(project, "p", Now));
+        _store.CreateAccount(Account("lea"));
+        _store.UpdateAccount("lea", "Léa", false, disabled: true);
+
+        _store.ChangeRole(project, "personne", ProjectRole.Reader).ShouldBe(MemberChange.UnknownAccount);
+        _store.ChangeRole(project, "lea", ProjectRole.Reader).ShouldBe(MemberChange.UnknownAccount);
+    }
+
+    [Fact]
+    public void ChangeRole_TheLastAdministratorOut_IsRefusedAndNothingChanges()
+    {
+        var project = ElementId.NewRandom();
+        _store.RegisterProject(new ProjectRegistration(project, "p", Now));
+        _store.CreateAccount(Account("admin"));
+        _store.CreateAccount(Account("malo"));
+        _store.SetMember(project, "admin", ProjectRole.Admin);
+
+        _store.ChangeRole(project, "admin", ProjectRole.Editor).ShouldBe(MemberChange.LastAdministrator);
+        _store.RemoveMemberChecked(project, "admin").ShouldBe(MemberChange.LastAdministrator);
+        _store.GetRole(project, "admin").ShouldBe(ProjectRole.Admin);
+
+        // With another administrator the first one may leave.
+        _store.ChangeRole(project, "malo", ProjectRole.Admin).ShouldBe(MemberChange.Done);
+        _store.RemoveMemberChecked(project, "admin").ShouldBe(MemberChange.Done);
+        _store.GetRole(project, "admin").ShouldBeNull();
+    }
+
+    [Fact]
+    public void RemoveMemberChecked_NotAMember_ReportsIt()
+    {
+        var project = ElementId.NewRandom();
+        _store.RegisterProject(new ProjectRegistration(project, "p", Now));
+        _store.CreateAccount(Account("lea"));
+
+        _store.RemoveMemberChecked(project, "lea").ShouldBe(MemberChange.NotAMember);
+    }
+
+    [Fact]
+    public void ChangeRole_TwoAdministratorsLeavingAtOnce_OneStays()
+    {
+        // The check and the write are one step: whatever the interleaving, an administrator remains.
+        var project = ElementId.NewRandom();
+        _store.RegisterProject(new ProjectRegistration(project, "p", Now));
+        _store.CreateAccount(Account("a"));
+        _store.CreateAccount(Account("b"));
+        _store.SetMember(project, "a", ProjectRole.Admin);
+        _store.SetMember(project, "b", ProjectRole.Admin);
+
+        Parallel.Invoke(
+            () => _store.RemoveMemberChecked(project, "a"),
+            () => _store.RemoveMemberChecked(project, "b"));
+
+        _store.CountAdmins(project).ShouldBe(1);
+    }
 }

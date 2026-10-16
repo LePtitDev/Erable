@@ -37,6 +37,8 @@ export interface ProjectEventHandlers {
   readonly elementMoved: (event: ElementMovedEvent) => void;
   readonly elementDeleted: (event: ElementDeletedEvent) => void;
   readonly treeChanged: (event: TreeChangedEvent) => void;
+  /** The members or their roles changed: what the user may do, and the member list, are read again (M4-08). */
+  readonly membersChanged: (event: TreeChangedEvent) => void;
   /** The link came back after a loss: events may have been missed, everything shown must be reloaded. */
   readonly resynchronize: () => void;
 }
@@ -149,6 +151,10 @@ export async function connectToProject(
   connection.on("TreeChanged", (event: Wire) => {
     const parsed = ids(event);
     if (parsed !== null) handlers.treeChanged({ projectId: parsed.project, by: event.by });
+  });
+  connection.on("MembersChanged", (event: { projectId: string }) => {
+    const project = parseElementId(event.projectId);
+    if (project !== null) handlers.membersChanged({ projectId: project, by: "" });
   });
   connection.on(
     "PresenceChanged",

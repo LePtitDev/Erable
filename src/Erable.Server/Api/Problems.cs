@@ -47,6 +47,8 @@ public static class Problems
         StorageErrors.MigrationFailed => StatusCodes.Status500InternalServerError,
         "page.revisionConflict" => StatusCodes.Status409Conflict,
         "auth.invalidCredentials" or "auth.required" => StatusCodes.Status401Unauthorized,
+        ErrorCodes.AccountLoginTaken or ErrorCodes.AccountLastAdmin or ErrorCodes.MemberLastAdmin => StatusCodes.Status409Conflict,
+        ErrorCodes.AccountNotFound or ErrorCodes.MemberNotFound => StatusCodes.Status404NotFound,
         "auth.tooManyAttempts" => StatusCodes.Status429TooManyRequests,
         "server.invalidUrl" => StatusCodes.Status400BadRequest,
         "server.notFound" => StatusCodes.Status404NotFound,

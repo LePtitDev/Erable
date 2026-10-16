@@ -11,6 +11,7 @@ import {
   FolderPlus,
   Search,
   Trash2,
+  Users,
 } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
 import {
@@ -47,7 +48,9 @@ import {
   type TreeRow,
 } from "./treeModel";
 import { useTreeMutations, type CreatableKind } from "./useTreeMutations";
-import { useCanEdit } from "../project/access";
+import { useCanEdit, useProjectAccess } from "../project/access";
+import { apiInfoQuery } from "../../shared/api/queries";
+import { useProjectServer } from "../../shared/api/servers";
 
 /** Above this many visible rows, only the rows on screen are rendered (budget: 10 000 elements, docs/testing.md §11). */
 const virtualizeFrom = 200;
@@ -81,6 +84,10 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const state = useUiState<{ expanded: string[] }>(`tree-${projectId}`, { expanded: rootIds });
   const { update, create } = useTreeMutations(projectId);
   const canEdit = useCanEdit();
+  // Members exist where accounts do: on a server, or for a project hosted by a connected one.
+  const hosted = useQuery(apiInfoQuery).data?.folderProjects === false;
+  const remote = useProjectServer(projectId) !== undefined;
+  const showMembers = useProjectAccess().isAdmin && (hosted || remote);
 
   const index = useMemo(() => indexTree(tree.data?.nodes ?? []), [tree.data]);
   const expanded = useMemo(
@@ -616,6 +623,17 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
           <span className={styles["trashCount"]}>{trash.data?.length}</span>
         )}
       </Link>
+      {showMembers && (
+        <Link
+          to="/p/$projectId/members"
+          params={{ projectId }}
+          className={styles["trashLink"]}
+          activeProps={{ "aria-current": "page" }}
+        >
+          <Users aria-hidden size={16} />
+          {t("members.title")}
+        </Link>
+      )}
       <DeleteDialog
         projectId={projectId}
         id={deleting}

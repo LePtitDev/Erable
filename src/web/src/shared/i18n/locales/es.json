@@ -160,7 +160,8 @@
       "password": {
         "invalid": "La contraseña debe tener al menos 8 caracteres."
       },
-      "notFound": "Esta cuenta no existe."
+      "notFound": "Esta cuenta no existe.",
+      "lastAdmin": "El servidor debe conservar al menos un administrador."
     },
     "feature": {
       "folderProjects": "Este servidor aloja sus propios proyectos: no se puede indicar una carpeta."
@@ -175,6 +176,13 @@
       "invalidUrl": "Introduzca la dirección del servidor, por ejemplo https://wiki.ejemplo.org.",
       "notFound": "Este servidor ya no está en la lista.",
       "unavailable": "La conexión a un servidor se hace desde la aplicación de escritorio."
+    },
+    "member": {
+      "lastAdmin": "Un proyecto debe conservar al menos un administrador.",
+      "notFound": "Esta cuenta no existe o está desactivada.",
+      "role": {
+        "invalid": "Este rol no existe."
+      }
     }
   },
   "home": {
@@ -983,6 +991,34 @@
     "expired": {
       "title": "Sesión terminada en {{name}}",
       "description": "Su sesión en este servidor ha terminado. Introduzca la contraseña de {{user}} para continuar: su trabajo en curso se conserva."
+    }
+  },
+  "members": {
+    "title": "Miembros",
+    "intro": "Quién puede leer, editar o administrar este proyecto. Los cambios se aplican de inmediato.",
+    "count_one": "{{count}} miembro",
+    "count_other": "{{count}} miembros",
+    "count_many": "{{count}} miembros",
+    "person": "Persona",
+    "role": "Rol",
+    "actions": "Acciones",
+    "you": "(usted)",
+    "disabled": "cuenta desactivada",
+    "roleOf": "Rol de {{name}}",
+    "remove": "Quitar",
+    "removeNamed": "Quitar a {{name}} del proyecto",
+    "add": {
+      "title": "Añadir un miembro",
+      "login": "Identificador de la cuenta",
+      "submit": "Añadir"
+    },
+    "create": {
+      "open": "Crear una cuenta",
+      "title": "Crear una cuenta",
+      "description": "La persona se añadirá al proyecto con el rol «{{role}}».",
+      "name": "Nombre visible",
+      "passwordHint": "Al menos 8 caracteres. Entréguela a la persona: podrá cambiarla.",
+      "submit": "Crear y añadir"
     }
   }
 }

@@ -14,6 +14,7 @@ export const queryKeys = {
   preferences: ["me", "preferences"] as const,
   recentProjects: ["me", "recent-projects"] as const,
   project: (projectId: ElementId) => ["projects", projectId] as const,
+  members: (projectId: ElementId) => ["projects", projectId, "members"] as const,
   tree: (projectId: ElementId) => ["projects", projectId, "tree"] as const,
   element: (projectId: ElementId, id: ElementId) =>
     ["projects", projectId, "elements", id] as const,

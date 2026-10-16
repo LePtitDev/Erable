@@ -21,6 +21,9 @@ public sealed record TreeChangedEvent(ElementId ProjectId, string By);
 /// <summary>Who is in the project and what they are doing; sent whenever it changes (F14.R3).</summary>
 public sealed record PresenceChangedEvent(ElementId ProjectId, IReadOnlyList<PresenceUser> Users);
 
+/// <summary>The members of the project, or their roles, changed: a client asks again what it may do (M4-08).</summary>
+public sealed record MembersChangedEvent(ElementId ProjectId);
+
 /// <summary>What the server tells the clients of a project (docs/architecture.md §8.2).</summary>
 public interface IProjectClient
 {
@@ -33,6 +36,8 @@ public interface IProjectClient
     Task TreeChanged(TreeChangedEvent change);
 
     Task PresenceChanged(PresenceChangedEvent presence);
+
+    Task MembersChanged(MembersChangedEvent change);
 }
 
 /// <summary>Answer of <see cref="ProjectHub.JoinProject"/>: whether the client joined, and who is there.</summary>

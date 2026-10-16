@@ -46,3 +46,32 @@ public static partial class AccountRules
     [GeneratedRegex("^[a-z0-9][a-z0-9._-]*$")]
     private static partial Regex LoginPattern();
 }
+
+/// <summary>A member of a project as the rules of the members see it.</summary>
+/// <param name="Active">False for a disabled account: it cannot administer anything.</param>
+public sealed record MemberRoleEntry(string UserId, ProjectRole Role, bool Active);
+
+/// <summary>Rules on the members of a project (M4-08, F14.R1, decision Q5).</summary>
+public static class MemberRules
+{
+    /// <summary>
+    /// True when the change would take the last active administrator away from a project that has one: a project is never
+    /// left that nobody can administer. <paramref name="newRole"/> is null to remove the member.
+    /// </summary>
+    public static bool LeavesNoAdministrator(IReadOnlyCollection<MemberRoleEntry> members, string userId, ProjectRole? newRole)
+    {
+        ArgumentNullException.ThrowIfNull(members);
+        ArgumentNullException.ThrowIfNull(userId);
+        var before = members.Count(m => m is { Active: true, Role: ProjectRole.Admin });
+        if (before == 0)
+        {
+            return false;
+        }
+
+        var after = members
+            .Where(m => m.UserId != userId)
+            .Count(m => m is { Active: true, Role: ProjectRole.Admin })
+            + (newRole == ProjectRole.Admin && members.FirstOrDefault(m => m.UserId == userId) is not { Active: false } ? 1 : 0);
+        return after == 0;
+    }
+}

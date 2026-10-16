@@ -26,6 +26,17 @@ public sealed class ProjectEvents(IHubContext<ProjectHub, IProjectClient> hub, P
     public Task TreeChangedAsync(ElementId projectId, string by) =>
         Group(projectId).TreeChanged(new TreeChangedEvent(projectId, by));
 
+    public Task MembersChangedAsync(ElementId projectId) => Group(projectId).MembersChanged(new MembersChangedEvent(projectId));
+
+    /// <summary>An account was disabled: it leaves every project it was connected to.</summary>
+    public async Task RevokeEverywhereAsync(string userId)
+    {
+        foreach (var projectId in connections.ProjectsOf(userId))
+        {
+            await RevokeAsync(projectId, userId).ConfigureAwait(false);
+        }
+    }
+
     /// <summary>A member lost their access (removed, or the account was disabled): their connections leave the project now.</summary>
     public async Task RevokeAsync(ElementId projectId, string userId)
     {

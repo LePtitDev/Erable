@@ -49,6 +49,9 @@ public static class ProjectEndpoints
         project.MapSearchEndpoints();
         project.MapRecentEndpoints();
         project.MapHistoryEndpoints();
+        project.MapMemberEndpoints();
+
+        api.MapAccountEndpoints();
 
         var me = api.MapGroup("/me").WithTags("Me").RequireSignIn();
         me.MapGet("/", GetMe).WithName("GetMe");

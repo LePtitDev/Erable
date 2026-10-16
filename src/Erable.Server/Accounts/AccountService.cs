@@ -89,6 +89,59 @@ public sealed class AccountService
 
     public AccountRecord? Find(string login) => Store.GetAccount(login);
 
+    /// <summary>
+    /// Changes an account (M4-08). Disabling it, changing its password or taking its administration away ends its
+    /// sessions; the server keeps at least one active administrator.
+    /// </summary>
+    public Result<AccountRecord> UpdateAccount(string login, string? name, bool? disabled, bool? isServerAdmin, string? password)
+    {
+        var account = Store.GetAccount(login);
+        if (account is null)
+        {
+            return new DomainError(ErrorCodes.AccountNotFound, $"No account '{login}'.");
+        }
+
+        var displayName = account.DisplayName;
+        if (name is not null)
+        {
+            var normalized = AccountRules.NormalizeDisplayName(name);
+            if (!normalized.IsSuccess)
+            {
+                return normalized.Error;
+            }
+
+            displayName = normalized.Value;
+        }
+
+        if (password is not null && AccountRules.ValidatePassword(password) is { } weak)
+        {
+            return weak;
+        }
+
+        var newDisabled = disabled ?? account.Disabled;
+        var newAdmin = isServerAdmin ?? account.IsServerAdmin;
+        var losesAdministration = account.IsServerAdmin && !account.Disabled && (newDisabled || !newAdmin);
+        if (losesAdministration && Store.ListAccounts().Count(a => a.IsServerAdmin && !a.Disabled) <= 1)
+        {
+            return new DomainError(ErrorCodes.AccountLastAdmin, "The server keeps at least one administrator.");
+        }
+
+        Store.UpdateAccount(login, displayName, newAdmin, newDisabled);
+        if (password is not null)
+        {
+            Store.SetPassword(login, _hasher.HashPassword(login, password));
+        }
+
+        if (!newAdmin && account.IsServerAdmin)
+        {
+            // Rights are read at each request, but a session made with the old rights is not kept.
+            Store.EndSessionsOf(login);
+        }
+
+        Invalidate();
+        return Store.GetAccount(login)!;
+    }
+
     /// <summary>Display name of an author: the account name, or null when this id is not an account.</summary>
     public string? DisplayNameOf(string userId)
     {
