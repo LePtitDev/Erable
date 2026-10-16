@@ -200,12 +200,6 @@ public sealed partial class ProjectService
             ProjectRepository.InsertElement(connection, transaction, element);
             ProjectRepository.UpdateStructure(connection, transaction, created.Value.Changed.Where(n => n.Id != id), id, now, author);
             StructureRepository.UpsertDefinition(connection, transaction, definition.Value);
-            if (definition.Value.Default is not null)
-            {
-                // A default applies to every page.
-                StructureState.Load(connection, null).WriteDerived(connection, transaction, null, [id]);
-            }
-
             InsertRevision(connection, transaction, element, null, author, now);
             return Result.Success(element);
         }, cancellationToken);

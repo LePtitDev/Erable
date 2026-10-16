@@ -388,13 +388,13 @@ public sealed class StructureStorageTests : IDisposable
     }
 
     [Fact]
-    public async Task UpdateProperty_Default_AppliesToPagesWithoutValue()
+    public async Task UpdateProperty_Default_DoesNotAddThePropertyToPagesThatDoNotHaveIt()
     {
         var age = Definition(Age);
 
         await _service.UpdatePropertyAsync(Age, new PropertyInput(age.Key, "", "int", Json("30"), Json("[]"), []), "local", Ct);
 
-        Property(Chroniques.Hautbois, Age).Origin.ShouldBe(ValueOrigin.Default);
+        _service.LoadStructure([Chroniques.Hautbois]).ResolvePage(Chroniques.Hautbois).ShouldNotContain(p => p.Definition.Id == Age);
     }
 
     // ─── Doctor ─────────────────────────────────────────────────────────────

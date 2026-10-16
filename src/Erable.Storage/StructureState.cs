@@ -134,7 +134,7 @@ public sealed class StructureState : IRuleContext
 
     /// <summary>
     /// The properties of a page after inheritance: those it defines, those its categories provide (conflicts included),
-    /// and those whose definition has a default. Ordered by property name.
+    /// and nothing else: a default only fills the value of a property a page already has. Ordered by property name.
     /// </summary>
     public IReadOnlyList<ResolvedProperty> ResolvePage(ElementId pageId, IReadOnlyCollection<ElementId>? properties = null)
     {
@@ -142,7 +142,7 @@ public sealed class StructureState : IRuleContext
         var chains = categories.SelectMany(c => (IEnumerable<ElementId>)[c, .. Graph.Ancestors(c)]).ToHashSet();
         var relevant = Definitions.Values.Where(d =>
             (properties is null || properties.Contains(d.Id))
-            && (_values.ContainsKey((pageId, d.Id)) || d.Default is not null || chains.Any(c => _values.ContainsKey((c, d.Id)))));
+            && (_values.ContainsKey((pageId, d.Id)) || chains.Any(c => _values.ContainsKey((c, d.Id)))));
         var result = new List<ResolvedProperty>();
         foreach (var definition in relevant.OrderBy(d => d.Name, StringComparer.CurrentCultureIgnoreCase).ThenBy(d => d.Id.Value))
         {
