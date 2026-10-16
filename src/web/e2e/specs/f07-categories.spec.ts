@@ -1,5 +1,6 @@
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
+import { SearchPage } from "../pages/SearchPage";
 import { CategoryViewPage } from "../pages/CategoryViewPage";
 import { TreePanel } from "../pages/TreePanel";
 import { expectNoSeriousViolations } from "../support/a11y";
@@ -60,9 +61,16 @@ test.describe("F07 · Categories", () => {
     await expect(view.includeSubCategories).toBeChecked();
     await expect(view.pages.getByRole("link", { name: /Ilsa Varenne\s*Marchand/ })).toBeVisible();
     await expect(view.pages.getByRole("link", { name: /Capitaine Orsen\s*Garde/ })).toBeVisible();
-    // « Voir dans la recherche » arrives with the search screen (M3-03).
-    await expect(
-      view.article.getByText(t("category.seeInSearch_other", { count: 2 })),
-    ).toHaveAttribute("aria-disabled", "true");
+
+    await view.article
+      .getByRole("link", { name: t("category.seeInSearch_other", { count: 2 }) })
+      .click();
+
+    const search = new SearchPage(page);
+    await expect(page).toHaveURL(/\/search\?/);
+    await expect(search.category("PNJ")).toHaveAttribute("aria-pressed", "true");
+    await expect(search.includeSubCategories).toBeChecked();
+    // Without text the newest comes first: Ilsa changed two hours ago, Orsen on 10 October.
+    await expect(search.titles).toHaveText(["Ilsa Varenne", "Capitaine Orsen"]);
   });
 });

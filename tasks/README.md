@@ -67,7 +67,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 |---|---|---|---|
 | [M3-01](M3-01-search-backend.md) | Recherche plein texte et filtres (backend) | M2-03 | review |
 | [M3-02](M3-02-quick-search.md) | Recherche rapide Ctrl+K | M3-01 | todo |
-| [M3-03](M3-03-search-screen.md) | Écran Recherche et filtres | M3-01 | todo |
+| [M3-03](M3-03-search-screen.md) | Écran Recherche et filtres | M3-01 | review |
 | [M3-04](M3-04-recent-items.md) | Récemment consultées / modifiées | M3-01 | review |
 | [M3-05](M3-05-revision-history.md) | Historique des révisions | M1-05 | todo |
 | [M3-06](M3-06-performance.md) | Générateur de gros projets et budgets | M3-01 | todo |

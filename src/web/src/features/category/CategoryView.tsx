@@ -19,6 +19,7 @@ import type { ElementDetails } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
 import type { PropertyValue } from "../../shared/properties/types";
 import { Button } from "../../shared/ui/Button";
+import { emptySearch, toSearchParams } from "../search/searchState";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { ElementHeader } from "../project/ElementHeader";
 import { readValue, toDefinition, typeName, type Definition } from "../properties/definitions";
@@ -606,10 +607,18 @@ function CategoryPages({
           </li>
         ))}
       </ul>
-      {/* The search screen arrives with M3-03: the link is shown but not yet active. */}
-      <span className={styles["searchLink"]} aria-disabled="true" title={t("category.searchSoon")}>
+      <Link
+        to="/p/$projectId/search"
+        params={{ projectId }}
+        search={toSearchParams({
+          ...emptySearch,
+          categories: [data.element.id],
+          subCategories: includeSub,
+        })}
+        className={styles["searchLink"]}
+      >
         {t("category.seeInSearch", { count })}
-      </span>
+      </Link>
     </section>
   );
 }

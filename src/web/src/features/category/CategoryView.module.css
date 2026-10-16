@@ -373,10 +373,10 @@
 
 .searchLink {
   align-self: flex-start;
-  color: var(--color-text-faint);
+  color: var(--color-accent-text);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
-  cursor: not-allowed;
+  text-decoration: underline;
 }
 
 .visuallyHidden {

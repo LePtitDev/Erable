@@ -933,7 +933,7 @@
             }
           },
           {
-            "name": "NameOnly",
+            "name": "nameOnly",
             "in": "query",
             "schema": {
               "type": "boolean"
@@ -960,7 +960,7 @@
             }
           },
           {
-            "name": "SubCategories",
+            "name": "subCategories",
             "in": "query",
             "schema": {
               "type": "boolean"
@@ -977,35 +977,35 @@
             }
           },
           {
-            "name": "Modified",
+            "name": "modified",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "OutOfRules",
+            "name": "outOfRules",
             "in": "query",
             "schema": {
               "type": "boolean"
             }
           },
           {
-            "name": "Sort",
+            "name": "sort",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Cursor",
+            "name": "cursor",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "Limit",
+            "name": "limit",
             "in": "query",
             "schema": {
               "type": "integer",

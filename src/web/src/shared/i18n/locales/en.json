@@ -313,6 +313,71 @@
     "emptyViewed": "Recently viewed elements will appear here.",
     "emptyEdited": "No recent changes."
   },
+  "search": {
+    "title": "Search",
+    "field": "Search the project",
+    "resultsFor_one": "{{count}} result for “{{query}}”",
+    "resultsFor_other": "{{count}} results for “{{query}}”",
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results",
+    "sortBy": "Sort by",
+    "sort": {
+      "relevance": "Relevance",
+      "modified": "Last modified",
+      "name": "Name"
+    },
+    "filters": "Filters",
+    "reset": "Reset",
+    "type": "Type",
+    "kinds": {
+      "page": "Pages",
+      "folder": "Folders",
+      "category": "Categories",
+      "propertyDefinition": "Properties",
+      "linkType": "Links",
+      "attachment": "Attachments"
+    },
+    "categories": "Categories",
+    "otherCategory": "+ Other",
+    "otherCategories": "Other categories",
+    "includeSub": "Include sub-categories",
+    "properties": "Properties",
+    "addCondition": "+ Add a condition",
+    "removeCondition": "Remove the condition on {{name}}",
+    "property": "Property",
+    "operator": "Operator",
+    "value": "Value",
+    "ops": {
+      "eq": "=",
+      "ne": "≠",
+      "lt": "<",
+      "le": "≤",
+      "gt": ">",
+      "ge": "≥",
+      "contains": "contains",
+      "set": "has a value",
+      "unset": "has no value"
+    },
+    "modified": {
+      "label": "Modified",
+      "group": "Modification period",
+      "day": "24 h",
+      "week": "7 d",
+      "month": "30 d",
+      "all": "All"
+    },
+    "outOfRules": "Out of rules",
+    "none": {
+      "title": "No results",
+      "hint": "Try other words or remove some filters.",
+      "reset": "Reset the filters"
+    },
+    "loading": "Searching…",
+    "loadMore": "Show more results",
+    "activity": "Recent activity",
+    "inAttachment": "Attachment of {{page}}",
+    "violation": "{{property}}: {{message}}"
+  },
   "kinds": {
     "root": "Root",
     "folder": "Folder",
@@ -647,7 +712,6 @@
     "filter": "Filter",
     "filterLabel": "Filter the pages of the category",
     "noPages": "No page in this category.",
-    "searchSoon": "Available with the Search screen.",
     "seeInSearch_one": "See the page in the search",
     "seeInSearch_other": "See the {{count}} pages in the search"
   },

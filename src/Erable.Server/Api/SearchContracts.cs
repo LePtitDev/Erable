@@ -20,6 +20,7 @@ public sealed record SearchQueryParameters
     [FromQuery(Name = "q")]
     public string? Text { get; init; }
 
+    [FromQuery(Name = "nameOnly")]
     public bool? NameOnly { get; init; }
 
     [FromQuery(Name = "kind")]
@@ -28,19 +29,25 @@ public sealed record SearchQueryParameters
     [FromQuery(Name = "category")]
     public string[]? Categories { get; init; }
 
+    [FromQuery(Name = "subCategories")]
     public bool? SubCategories { get; init; }
 
     [FromQuery(Name = "where")]
     public string[]? Conditions { get; init; }
 
+    [FromQuery(Name = "modified")]
     public string? Modified { get; init; }
 
+    [FromQuery(Name = "outOfRules")]
     public bool? OutOfRules { get; init; }
 
+    [FromQuery(Name = "sort")]
     public string? Sort { get; init; }
 
+    [FromQuery(Name = "cursor")]
     public string? Cursor { get; init; }
 
+    [FromQuery(Name = "limit")]
     public int? Limit { get; init; }
 }
 

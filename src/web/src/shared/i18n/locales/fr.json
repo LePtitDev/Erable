@@ -318,6 +318,73 @@
     "emptyViewed": "Les éléments consultés récemment apparaîtront ici.",
     "emptyEdited": "Aucune modification récente."
   },
+  "search": {
+    "title": "Recherche",
+    "field": "Rechercher dans le projet",
+    "resultsFor_one": "{{count}} résultat pour « {{query}} »",
+    "resultsFor_many": "{{count}} résultats pour « {{query}} »",
+    "resultsFor_other": "{{count}} résultats pour « {{query}} »",
+    "results_one": "{{count}} résultat",
+    "results_many": "{{count}} résultats",
+    "results_other": "{{count}} résultats",
+    "sortBy": "Trier par",
+    "sort": {
+      "relevance": "Pertinence",
+      "modified": "Dernière modification",
+      "name": "Nom"
+    },
+    "filters": "Filtres",
+    "reset": "Réinitialiser",
+    "type": "Type",
+    "kinds": {
+      "page": "Pages",
+      "folder": "Dossiers",
+      "category": "Catégories",
+      "propertyDefinition": "Propriétés",
+      "linkType": "Liens",
+      "attachment": "Pièces jointes"
+    },
+    "categories": "Catégories",
+    "otherCategory": "+ Autre",
+    "otherCategories": "Autres catégories",
+    "includeSub": "Inclure les sous-catégories",
+    "properties": "Propriétés",
+    "addCondition": "+ Ajouter une condition",
+    "removeCondition": "Retirer la condition sur {{name}}",
+    "property": "Propriété",
+    "operator": "Opérateur",
+    "value": "Valeur",
+    "ops": {
+      "eq": "=",
+      "ne": "≠",
+      "lt": "<",
+      "le": "≤",
+      "gt": ">",
+      "ge": "≥",
+      "contains": "contient",
+      "set": "est renseignée",
+      "unset": "n’est pas renseignée"
+    },
+    "modified": {
+      "label": "Modifié",
+      "group": "Période de modification",
+      "day": "24 h",
+      "week": "7 j",
+      "month": "30 j",
+      "all": "Tout"
+    },
+    "outOfRules": "Hors règles",
+    "none": {
+      "title": "Aucun résultat",
+      "hint": "Essayez d’autres mots ou retirez des filtres.",
+      "reset": "Réinitialiser les filtres"
+    },
+    "loading": "Recherche en cours…",
+    "loadMore": "Afficher plus de résultats",
+    "activity": "Activité récente",
+    "inAttachment": "Pièce jointe de {{page}}",
+    "violation": "{{property}} : {{message}}"
+  },
   "kinds": {
     "root": "Racine",
     "folder": "Dossier",
@@ -656,7 +723,6 @@
     "filter": "Filtrer",
     "filterLabel": "Filtrer les pages de la catégorie",
     "noPages": "Aucune page dans cette catégorie.",
-    "searchSoon": "Disponible avec l’écran Recherche.",
     "seeInSearch_one": "Voir la page dans la recherche",
     "seeInSearch_other": "Voir les {{count}} pages dans la recherche",
     "seeInSearch_many": "Voir les {{count}} pages dans la recherche"

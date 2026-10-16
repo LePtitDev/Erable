@@ -1,6 +1,6 @@
 # M3-03 — Écran Recherche et filtres
 
-- **Statut** : todo
+- **Statut** : review
 - **Jalon** : M3
 - **Dépend de** : M3-01
 - **Références** : F10, Mockup « Recherche, filtres et récents »
@@ -20,12 +20,20 @@ L'écran de recherche du mockup, avec un état entièrement porté par l'URL.
 
 ## Critères d'acceptation
 
-- [ ] `E2E-10-02` à `E2E-10-11` et la partie recherche de `E2E-07-07` verts.
-- [ ] Le surlignage n'utilise jamais `dangerouslySetInnerHTML`.
+- [x] `E2E-10-02` à `E2E-10-11`, la partie recherche de `E2E-07-07` et `E2E-11-02` écrits (`f10-search.spec.ts`, `f07-categories.spec.ts`), verts en Chromium et WebKit.
+- [x] Le surlignage n'utilise jamais `dangerouslySetInnerHTML`.
 
 ## Notes d'implémentation
 
-_À remplir par l'agent : décisions, écarts, dettes, commandes de vérification, message de commit proposé._
+- **Route** `/p/:projectId/search` ; tout l'état est dans l'URL (`q`, `kind`, `cat`, `sub`, `where`, `mod`, `oor`, `sort`), lu et réécrit sous forme courte par `validateSearch` : un lien contenant un paramètre inconnu ouvre une recherche valide. Les listes sont sérialisées en JSON par le routeur (lisible, partageable). La logique (lecture, écriture, requête d'API, bascule des types) est pure : `features/search/searchState.ts`, testée y compris par propriété (aller-retour URL).
+- **Types** : sans filtre, toutes les cases sont cochées (comme le mockup) ; décocher un type garde les autres ; tout recocher ou tout décocher revient à « aucun filtre ». Les dossiers ont leur ligne (« Dossiers »), absente du mockup.
+- **Catégories** : six puces (les choisies d'abord, puis par nom) et « + Autre » pour le reste. **Propriétés** : une condition ajoutée a déjà une valeur adaptée au type (Non, 0, première option), donc filtre aussitôt ; l'éditeur de valeur est celui de la page (`ValueEditor`), sauf le booléen (liste Oui/Non, comme le mockup). Les opérateurs proposés sont ceux que le backend accepte.
+- **Surlignage** : `Highlighted` rend les segments `{text, hit}` du backend en `<mark>` ; aucun `dangerouslySetInnerHTML`, un test vérifie qu'un `<img onerror>` dans une page reste du texte.
+- **Texte** : la saisie est écrite dans l'URL après 250 ms de pause ou sur Entrée. Résultats : compteur annoncé (`role=status`), tri, « Afficher plus » (curseur), carte avec type, titre, chemin, extrait, catégories, auteur/date (ou type et taille pour une pièce jointe), règle enfreinte pour « Hors règles ». Colonne Consultées/Modifiées via `RecentList` (M3-04).
+- **Voir dans la recherche** (catégorie) devient un vrai lien (`cat` + `sub`) ; sans texte, l'ordre est « dernière modification ».
+- **Écart** : les paramètres de `GET search` portent maintenant des noms explicites en camelCase dans l'OpenAPI (`nameOnly`, `subCategories`…).
+- Vérification faite pendant la tâche : Vitest de `features/search` (29), Playwright Chromium + WebKit des specs F07, F10, F11 (34), lint, typecheck, format, `api:check`. La suite complète est lancée à la fin de M3 (demande de l'utilisateur) ; deux tests (`ProjectShell`, `Trash`) ont échoué une fois sous charge dans la suite complète et passent isolés : à surveiller.
+- Commit proposé : `feat(web,server): add the search screen with filters in the URL (M3-03)`.
 
 ## Propositions
 

@@ -2692,15 +2692,15 @@ export interface operations {
     parameters: {
       query?: {
         category?: string[];
-        Cursor?: string;
+        cursor?: string;
         kind?: string[];
-        Limit?: number;
-        Modified?: string;
-        NameOnly?: boolean;
-        OutOfRules?: boolean;
+        limit?: number;
+        modified?: string;
+        nameOnly?: boolean;
+        outOfRules?: boolean;
         q?: string;
-        Sort?: string;
-        SubCategories?: boolean;
+        sort?: string;
+        subCategories?: boolean;
         where?: string[];
       };
       header?: never;

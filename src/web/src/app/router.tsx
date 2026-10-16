@@ -10,6 +10,12 @@ import { HomeScreen } from "../features/home/HomeScreen";
 import { ProjectShell } from "../features/project/ProjectShell";
 import { ProjectIndex } from "../features/project/ProjectIndex";
 import { ElementRoute } from "../features/project/ElementRoute";
+import { SearchView } from "../features/search/SearchView";
+import {
+  parseSearchParams,
+  toSearchParams,
+  type SearchParams,
+} from "../features/search/searchState";
 import { TrashView } from "../features/trash/TrashView";
 import { NotFoundScreen, ErrorScreen } from "../features/project/ErrorScreens";
 import { parseElementId, type ElementId } from "../shared/ids/elementId";
@@ -69,6 +75,18 @@ export const trashRoute = createRoute({
   component: TrashView,
 });
 
+/**
+ * The search screen (F10): its whole state is in the URL, so that a search is a link (F10.R4). Whatever the URL
+ * says is read, then written back in its short form: a link with an unknown parameter opens a valid search.
+ */
+export const searchRoute = createRoute({
+  getParentRoute: () => projectRoute,
+  path: "/search",
+  validateSearch: (search: Record<string, unknown>): SearchParams =>
+    toSearchParams(parseSearchParams(search)),
+  component: SearchView,
+});
+
 // Development-only pages: the condition is statically false in production builds, so they are tree-shaken.
 const devRoutes = import.meta.env.DEV
   ? [
@@ -82,7 +100,7 @@ const devRoutes = import.meta.env.DEV
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  projectRoute.addChildren([projectIndexRoute, trashRoute, elementRoute]),
+  projectRoute.addChildren([projectIndexRoute, trashRoute, searchRoute, elementRoute]),
   ...devRoutes,
 ]);
 

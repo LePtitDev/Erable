@@ -318,6 +318,73 @@
     "emptyViewed": "Los elementos vistos recientemente aparecerán aquí.",
     "emptyEdited": "Sin cambios recientes."
   },
+  "search": {
+    "title": "Búsqueda",
+    "field": "Buscar en el proyecto",
+    "resultsFor_one": "{{count}} resultado para «{{query}}»",
+    "resultsFor_many": "{{count}} resultados para «{{query}}»",
+    "resultsFor_other": "{{count}} resultados para «{{query}}»",
+    "results_one": "{{count}} resultado",
+    "results_many": "{{count}} resultados",
+    "results_other": "{{count}} resultados",
+    "sortBy": "Ordenar por",
+    "sort": {
+      "relevance": "Relevancia",
+      "modified": "Última modificación",
+      "name": "Nombre"
+    },
+    "filters": "Filtros",
+    "reset": "Restablecer",
+    "type": "Tipo",
+    "kinds": {
+      "page": "Páginas",
+      "folder": "Carpetas",
+      "category": "Categorías",
+      "propertyDefinition": "Propiedades",
+      "linkType": "Enlaces",
+      "attachment": "Adjuntos"
+    },
+    "categories": "Categorías",
+    "otherCategory": "+ Otra",
+    "otherCategories": "Otras categorías",
+    "includeSub": "Incluir las subcategorías",
+    "properties": "Propiedades",
+    "addCondition": "+ Añadir una condición",
+    "removeCondition": "Quitar la condición sobre {{name}}",
+    "property": "Propiedad",
+    "operator": "Operador",
+    "value": "Valor",
+    "ops": {
+      "eq": "=",
+      "ne": "≠",
+      "lt": "<",
+      "le": "≤",
+      "gt": ">",
+      "ge": "≥",
+      "contains": "contiene",
+      "set": "tiene valor",
+      "unset": "no tiene valor"
+    },
+    "modified": {
+      "label": "Modificado",
+      "group": "Período de modificación",
+      "day": "24 h",
+      "week": "7 d",
+      "month": "30 d",
+      "all": "Todo"
+    },
+    "outOfRules": "Fuera de reglas",
+    "none": {
+      "title": "Sin resultados",
+      "hint": "Pruebe otras palabras o quite algunos filtros.",
+      "reset": "Restablecer los filtros"
+    },
+    "loading": "Buscando…",
+    "loadMore": "Mostrar más resultados",
+    "activity": "Actividad reciente",
+    "inAttachment": "Adjunto de {{page}}",
+    "violation": "{{property}}: {{message}}"
+  },
   "kinds": {
     "root": "Raíz",
     "folder": "Carpeta",
@@ -656,7 +723,6 @@
     "filter": "Filtrar",
     "filterLabel": "Filtrar las páginas de la categoría",
     "noPages": "Ninguna página en esta categoría.",
-    "searchSoon": "Disponible con la pantalla de búsqueda.",
     "seeInSearch_one": "Ver la página en la búsqueda",
     "seeInSearch_other": "Ver las {{count}} páginas en la búsqueda",
     "seeInSearch_many": "Ver las {{count}} páginas en la búsqueda"

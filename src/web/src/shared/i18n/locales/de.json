@@ -313,6 +313,71 @@
     "emptyViewed": "Zuletzt angesehene Elemente erscheinen hier.",
     "emptyEdited": "Keine aktuellen Änderungen."
   },
+  "search": {
+    "title": "Suche",
+    "field": "Im Projekt suchen",
+    "resultsFor_one": "{{count}} Ergebnis für „{{query}}“",
+    "resultsFor_other": "{{count}} Ergebnisse für „{{query}}“",
+    "results_one": "{{count}} Ergebnis",
+    "results_other": "{{count}} Ergebnisse",
+    "sortBy": "Sortieren nach",
+    "sort": {
+      "relevance": "Relevanz",
+      "modified": "Zuletzt geändert",
+      "name": "Name"
+    },
+    "filters": "Filter",
+    "reset": "Zurücksetzen",
+    "type": "Typ",
+    "kinds": {
+      "page": "Seiten",
+      "folder": "Ordner",
+      "category": "Kategorien",
+      "propertyDefinition": "Eigenschaften",
+      "linkType": "Verknüpfungen",
+      "attachment": "Anhänge"
+    },
+    "categories": "Kategorien",
+    "otherCategory": "+ Weitere",
+    "otherCategories": "Weitere Kategorien",
+    "includeSub": "Unterkategorien einschließen",
+    "properties": "Eigenschaften",
+    "addCondition": "+ Bedingung hinzufügen",
+    "removeCondition": "Bedingung für {{name}} entfernen",
+    "property": "Eigenschaft",
+    "operator": "Operator",
+    "value": "Wert",
+    "ops": {
+      "eq": "=",
+      "ne": "≠",
+      "lt": "<",
+      "le": "≤",
+      "gt": ">",
+      "ge": "≥",
+      "contains": "enthält",
+      "set": "hat einen Wert",
+      "unset": "hat keinen Wert"
+    },
+    "modified": {
+      "label": "Geändert",
+      "group": "Änderungszeitraum",
+      "day": "24 Std.",
+      "week": "7 T.",
+      "month": "30 T.",
+      "all": "Alle"
+    },
+    "outOfRules": "Regelverstöße",
+    "none": {
+      "title": "Keine Ergebnisse",
+      "hint": "Versuchen Sie andere Wörter oder entfernen Sie Filter.",
+      "reset": "Filter zurücksetzen"
+    },
+    "loading": "Suche läuft …",
+    "loadMore": "Weitere Ergebnisse anzeigen",
+    "activity": "Letzte Aktivität",
+    "inAttachment": "Anhang von {{page}}",
+    "violation": "{{property}}: {{message}}"
+  },
   "kinds": {
     "root": "Wurzel",
     "folder": "Ordner",
@@ -647,7 +712,6 @@
     "filter": "Filtern",
     "filterLabel": "Seiten der Kategorie filtern",
     "noPages": "Keine Seite in dieser Kategorie.",
-    "searchSoon": "Verfügbar mit dem Suchbildschirm.",
     "seeInSearch_one": "Die Seite in der Suche anzeigen",
     "seeInSearch_other": "Die {{count}} Seiten in der Suche anzeigen"
   },

@@ -18,7 +18,7 @@ Retrouver ce sur quoi on travaillait.
 
 ## Critères d'acceptation
 
-- [x] `E2E-11-01` vert (`f11-recent.spec.ts`, Chromium) ; `E2E-11-02` s'appuie sur l'onglet « Modifiées » de l'écran Recherche : il est écrit avec M3-03 (`E2E-11-03` en M4).
+- [x] `E2E-11-01` vert (`f11-recent.spec.ts`, Chromium) ; `E2E-11-02` (onglet « Modifiées » de l'écran Recherche) est écrit et vert avec M3-03 (`E2E-11-03` en M4).
 - [x] Le minuteur de 2 s est testé avec une horloge simulée, sans attente réelle.
 
 ## Notes d'implémentation
