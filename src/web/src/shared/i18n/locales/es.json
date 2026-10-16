@@ -313,7 +313,10 @@
         "connected": "Conectado a {{server}} · sincronizado",
         "reconnecting": "Conexión perdida · reconectando…",
         "disconnected": "Sin conexión"
-      }
+      },
+      "editors_one": "{{count}} editor",
+      "editors_many": "{{count}} editores",
+      "editors_other": "{{count}} editores"
     },
     "mode": {
       "read": "Lectura",
@@ -915,5 +918,16 @@
     "reader": "Lector",
     "editor": "Editor",
     "admin": "Administrador"
+  },
+  "presence": {
+    "online": "Personas en línea",
+    "onThisPage": "En esta página",
+    "more": "{{count}} personas más en línea",
+    "readingLabel": "{{name}} está leyendo",
+    "editingLabel": "{{name}} está editando",
+    "section": " — sección «{{section}}»",
+    "editing_one": "{{names}} también está editando esta página{{section}}. Sus cambios se fusionarán al guardar.",
+    "editing_other": "{{names}} también están editando esta página. Sus cambios se fusionarán al guardar.",
+    "editing_many": "{{names}} también están editando esta página. Sus cambios se fusionarán al guardar."
   }
 }

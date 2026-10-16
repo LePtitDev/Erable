@@ -13,6 +13,7 @@ import { analyzeMarkdown } from "../../shared/markdown/analyze";
 import { Button } from "../../shared/ui/Button";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { useTreeMutations } from "../explorer/useTreeMutations";
+import { EditingBanner, ElementPresence } from "../presence/Presence";
 import { ElementHeader } from "../project/ElementHeader";
 import { useCanEdit } from "../project/access";
 import {
@@ -95,6 +96,7 @@ export function PageView({
           }
           actions={
             <>
+              <ElementPresence elementId={element.id} />
               {toggleSidePanel}
               <Button
                 onClick={() => {
@@ -125,6 +127,7 @@ export function PageView({
             </>
           }
         />
+        <EditingBanner elementId={element.id} />
         {page.isSuccess ? (
           <PageBody
             projectId={projectId}

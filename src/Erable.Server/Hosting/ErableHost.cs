@@ -98,8 +98,8 @@ public static class ErableHost
         builder.Services.AddSignalR(hub =>
         {
             // A browser closed without a goodbye (power cut, network lost) leaves its presence for at most this long.
-            hub.KeepAliveInterval = TimeSpan.FromSeconds(5);
-            hub.ClientTimeoutInterval = TimeSpan.FromSeconds(15);
+            hub.KeepAliveInterval = options.HubKeepAlive;
+            hub.ClientTimeoutInterval = options.HubClientTimeout;
         }).AddJsonProtocol(json =>
         {
             json.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

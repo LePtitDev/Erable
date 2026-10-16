@@ -63,6 +63,15 @@ public sealed record ErableHostOptions
 
     public TimeSpan LoginWindow { get; init; } = TimeSpan.FromMinutes(15);
 
+    /// <summary>How often the hub pings its clients.</summary>
+    public TimeSpan HubKeepAlive { get; init; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// A client silent for this long is considered gone: its presence disappears from the other screens (F14.R3,
+    /// E2E-14-05: less than 30 seconds). Must be at least twice <see cref="HubKeepAlive"/>.
+    /// </summary>
+    public TimeSpan HubClientTimeout { get; init; } = TimeSpan.FromSeconds(15);
+
     /// <summary>Forces the <c>Secure</c> flag of the cookie (TLS ends at a reverse proxy); otherwise set when the request is HTTPS.</summary>
     public bool CookieSecure { get; init; }
 

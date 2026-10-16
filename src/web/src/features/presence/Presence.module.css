@@ -1,0 +1,46 @@
+.avatars {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  margin-left: calc(var(--space-1) * -1);
+  border: 2px solid var(--color-bg);
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+/* Somebody who edits shows it: a ring in the accent colour. */
+.editing {
+  border-color: var(--color-accent);
+}
+
+.more {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.banner {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-2-5) var(--space-4);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+}

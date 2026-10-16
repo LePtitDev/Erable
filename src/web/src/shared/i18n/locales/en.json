@@ -308,7 +308,9 @@
         "connected": "Connected to {{server}} · in sync",
         "reconnecting": "Connection lost · reconnecting…",
         "disconnected": "Offline"
-      }
+      },
+      "editors_one": "{{count}} editor",
+      "editors_other": "{{count}} editors"
     },
     "mode": {
       "read": "Reading",
@@ -891,5 +893,15 @@
     "reader": "Reader",
     "editor": "Editor",
     "admin": "Administrator"
+  },
+  "presence": {
+    "online": "People online",
+    "onThisPage": "On this page",
+    "more": "{{count}} more people online",
+    "readingLabel": "{{name}} is reading",
+    "editingLabel": "{{name}} is editing",
+    "section": " — section “{{section}}”",
+    "editing_one": "{{names}} is also editing this page{{section}}. Your changes will be merged when you save.",
+    "editing_other": "{{names}} are also editing this page. Your changes will be merged when you save."
   }
 }

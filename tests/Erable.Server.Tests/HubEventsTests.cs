@@ -21,56 +21,6 @@ public sealed class HubEventsTests
 
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
-    /// <summary>A client of the hub, signed in as <paramref name="login"/>; everything it receives is queued in order.</summary>
-    private sealed class HubClient : IAsyncDisposable
-    {
-        private readonly Channel<object> _events = Channel.CreateUnbounded<object>();
-
-        public HubClient(TestBackend backend, string login)
-        {
-            var token = backend.Accounts.StartSession(login, ServerStore.SessionKindBearer).Token;
-            var server = backend.Server;
-            Connection = new HubConnectionBuilder()
-                .WithUrl(new Uri(server.BaseAddress, ApiRoutes.ProjectHub), options =>
-                {
-                    options.HttpMessageHandlerFactory = _ => server.CreateHandler();
-                    options.Transports = HttpTransportType.LongPolling;
-                    options.AccessTokenProvider = () => Task.FromResult<string?>(token);
-                })
-                .Build();
-            Connection.On<ElementChangedEvent>("ElementChanged", e => _events.Writer.TryWrite(e));
-            Connection.On<ElementMovedEvent>("ElementMoved", e => _events.Writer.TryWrite(e));
-            Connection.On<ElementDeletedEvent>("ElementDeleted", e => _events.Writer.TryWrite(e));
-            Connection.On<TreeChangedEvent>("TreeChanged", e => _events.Writer.TryWrite(e));
-        }
-
-        public HubConnection Connection { get; }
-
-        public async Task<bool> JoinAsync(ElementId projectId)
-        {
-            if (Connection.State == HubConnectionState.Disconnected)
-            {
-                await Connection.StartAsync(Ct);
-            }
-
-            return (await Connection.InvokeAsync<JoinResult>("JoinProject", projectId.ToString(), Ct)).Joined;
-        }
-
-        public async Task<T> NextAsync<T>()
-        {
-            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(Ct);
-            timeout.CancelAfter(Wait);
-            var next = await _events.Reader.ReadAsync(timeout.Token);
-            return next.ShouldBeOfType<T>();
-        }
-
-        /// <summary>Reads the next event with the caller's own cancellation (to check that nothing arrives).</summary>
-        public async Task<T> NextAsyncWithToken<T>(CancellationToken cancellation) =>
-            (await _events.Reader.ReadAsync(cancellation)).ShouldBeOfType<T>();
-
-        public ValueTask DisposeAsync() => Connection.DisposeAsync();
-    }
-
     private static async Task<(TestBackend Backend, ProjectSummary Project)> StartAsync()
     {
         var backend = await TestBackend.StartAsync();

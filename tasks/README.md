@@ -78,7 +78,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M4-01](M4-01-accounts-auth.md) | Comptes, authentification, rôles, multi-projets | M2-03 | review |
 | [M4-02](M4-02-authorization-matrix.md) | Matrice d'autorisation générée | M4-01 | review |
 | [M4-03](M4-03-signalr-events.md) | Événements temps réel | M4-01 | review |
-| [M4-04](M4-04-presence.md) | Présence | M4-03 | todo |
+| [M4-04](M4-04-presence.md) | Présence | M4-03 | review |
 | [M4-05](M4-05-concurrent-editing.md) | Concurrence optimiste et fusion à trois voies | M4-03, M3-05 | todo |
 | [M4-06](M4-06-server-distribution.md) | `erable serve` et image Docker | M4-01 | todo |
 | [M4-07](M4-07-desktop-connected.md) | Desktop en mode connecté | M4-01, M1-17 | todo |

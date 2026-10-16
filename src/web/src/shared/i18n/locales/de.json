@@ -308,7 +308,9 @@
         "connected": "Verbunden mit {{server}} · synchronisiert",
         "reconnecting": "Verbindung verloren · neue Verbindung…",
         "disconnected": "Offline"
-      }
+      },
+      "editors_one": "{{count}} Bearbeiter",
+      "editors_other": "{{count}} Bearbeiter"
     },
     "mode": {
       "read": "Lesen",
@@ -891,5 +893,15 @@
     "reader": "Leser",
     "editor": "Bearbeiter",
     "admin": "Administrator"
+  },
+  "presence": {
+    "online": "Personen online",
+    "onThisPage": "Auf dieser Seite",
+    "more": "{{count}} weitere Personen online",
+    "readingLabel": "{{name}} liest",
+    "editingLabel": "{{name}} bearbeitet",
+    "section": " — Abschnitt „{{section}}“",
+    "editing_one": "{{names}} bearbeitet diese Seite ebenfalls{{section}}. Ihre Änderungen werden beim Speichern zusammengeführt.",
+    "editing_other": "{{names}} bearbeiten diese Seite ebenfalls. Ihre Änderungen werden beim Speichern zusammengeführt."
   }
 }

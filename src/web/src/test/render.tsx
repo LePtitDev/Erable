@@ -12,7 +12,8 @@ export const testNow = new Date("2026-10-13T08:00:00Z");
 const testClock: Clock = () => testNow;
 
 /** No server to listen to in unit tests: the connection starts and stops without doing anything. */
-const noRealtime: ConnectToProject = () => Promise.resolve(() => Promise.resolve());
+const noRealtime: ConnectToProject = () =>
+  Promise.resolve({ setPresence: () => undefined, stop: () => Promise.resolve() });
 
 /** Renders a component with the providers the app installs (fresh query cache, no retries, frozen clock). */
 export function renderWithProviders(ui: ReactElement, options?: RenderOptions) {

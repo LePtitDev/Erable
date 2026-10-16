@@ -188,3 +188,32 @@ test.describe("F14 · Live updates", () => {
     await expect(new TreePanel(malo).item("Quartier du port")).toBeVisible();
   });
 });
+
+test.describe("F14 · Presence", () => {
+  test.use({ user: "camille" });
+
+  test("E2E-14-05 · Presence @multi @server", async ({ page, reference, openAs }) => {
+    const malo = await openAs("malo");
+    await malo.goto(reference.url(chroniques.ilsa));
+    await expect(malo.getByRole("heading", { level: 1, name: "Ilsa Varenne" })).toBeVisible();
+    await expect(malo.getByRole("status").filter({ hasText: /synchronisé/ })).toBeVisible();
+
+    // Camille edits the section « Histoire »: the cursor is in its first paragraph.
+    const editor = new EditorPage(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await editor.open();
+    await editor.content.getByText("Née à Hautbois").click();
+
+    const camille = t("presence.editingLabel", { name: users.camille.name });
+    await expect(malo.getByRole("img", { name: camille }).first()).toHaveText("CR");
+    const banner = malo.getByRole("status").filter({
+      hasText: "Camille R. modifie aussi cette page — section « Histoire »",
+    });
+    await expect(banner).toBeVisible();
+
+    // She closes the tab without saving: the banner goes away on its own, well within 30 seconds.
+    await page.close();
+    await expect(banner).toBeHidden({ timeout: 30_000 });
+    await expect(malo.getByRole("img", { name: camille })).toHaveCount(0);
+  });
+});

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { useShellStore } from "./shellStore";
 import { useTranslation } from "react-i18next";
 import { ApiError } from "../../shared/api/client";
 import { recordLastElement } from "../../shared/api/projects";
@@ -30,6 +31,14 @@ export function ElementRoute() {
   });
 
   const found = element.isSuccess && !element.data.deleted;
+  // The others see which element this user is on (presence, F14.R3).
+  const setViewing = useShellStore((s) => s.setViewing);
+  useEffect(() => {
+    setViewing(enabled ? elementId : null);
+    return () => {
+      setViewing(null);
+    };
+  }, [enabled, elementId, setViewing]);
   useEffect(() => {
     if (found && projectId !== null && elementId !== null) {
       // Best effort: the home screen reopens the project here (E2E-01-02).

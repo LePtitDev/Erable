@@ -16,11 +16,13 @@ import { QuickSearch } from "../search/QuickSearch";
 import { PreferencesDialog } from "../home/PreferencesDialog";
 import { Explorer } from "../explorer/Explorer";
 import { UserMenu } from "../auth/UserMenu";
+import { PresenceAvatars } from "../presence/Presence";
 import { ApiError } from "../../shared/api/client";
 import { apiInfoQuery } from "../../shared/api/queries";
 import { AccessDeniedScreen, NotFoundScreen } from "./ErrorScreens";
 import { accessOf, ProjectAccessContext, useCanEdit } from "./access";
 import { useConnectionStore } from "../../shared/realtime/connectionStore";
+import { usePresenceStore } from "../../shared/realtime/presenceStore";
 import { useProjectEvents } from "./useProjectEvents";
 import styles from "./ProjectShell.module.css";
 import { Splitter } from "./Splitter";
@@ -219,7 +221,7 @@ function TopBar({
         <kbd className={styles["kbd"]}>{t("shell.searchShortcut")}</kbd>
       </button>
       <div className={styles["right"]}>
-        {/* Presence avatars arrive with M4-04. */}
+        <PresenceAvatars />
         <button
           type="button"
           className={styles["textButton"]}
@@ -249,6 +251,7 @@ function ConnectionStatus() {
   const { t } = useTranslation();
   const info = useQuery(apiInfoQuery);
   const state = useConnectionStore((s) => s.state);
+  const editors = usePresenceStore((s) => s.users.filter((u) => u.mode === "edit").length);
   if (info.data?.mode !== "server") {
     return (
       <span className={styles["connection"]}>
@@ -266,6 +269,9 @@ function ConnectionStatus() {
     >
       <span className={styles["dot"]} aria-hidden />
       {t(`shell.status.connection.${state}`, { server: globalThis.location.host })}
+      {state === "connected" &&
+        editors > 0 &&
+        ` · ${t("shell.status.editors", { count: editors })}`}
     </span>
   );
 }

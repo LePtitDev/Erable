@@ -35,6 +35,8 @@ import { useInsertPalette } from "../palette/useInsertPalette";
 import { approveClose, useWindowStore } from "../../shared/native/native";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
+import { EditingBanner } from "../presence/Presence";
+import { sectionAt } from "../editor/section";
 import { CategoryChips } from "../properties/PagePropertiesView";
 import styles from "./PageEditor.module.css";
 import { PageStructurePanel } from "./PageStructurePanel";
@@ -105,6 +107,8 @@ function EditorScreen({
   const filePicker = useRef<HTMLInputElement>(null);
   const setMode = useShellStore((s) => s.setMode);
   const setCursor = useShellStore((s) => s.setCursor);
+  const setSection = useShellStore((s) => s.setSection);
+  const cursorLine = useShellStore((s) => s.cursor?.line ?? null);
 
   const [saved, setSaved] = useState({
     markdown: initialSaved,
@@ -164,6 +168,17 @@ function EditorScreen({
       setMode("read");
     };
   }, [setMode, element.id]);
+
+  // The section under the cursor is told to the others (« modifie aussi cette page — section « Histoire » »): a short
+  // delay, so that moving about the text does not flood the network.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSection(cursorLine === null ? null : sectionAt(doc, cursorLine));
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [doc, cursorLine, setSection]);
 
   // Resolve the names of every ID of the text, in one call, refreshed when the set of IDs changes.
   const ids = useMemo(() => {
@@ -354,6 +369,7 @@ function EditorScreen({
         </div>
       </header>
 
+      <EditingBanner elementId={element.id} />
       {offerDraft && draft.draft !== null && (
         <div role="alert" className={styles["banner"]}>
           <span>
