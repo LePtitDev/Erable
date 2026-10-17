@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit Erable</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f5f1; --surface: #ffffff; --surface-2: #f0efe9; --border: #e2e0d8;
+  --text: #1c1f1d; --muted: #5d635f; --accent: #2f7d5b; --accent-soft: #e3f1ea;
+  --red: #b3261e; --red-soft: #fbe9e7; --orange: #a35a00; --orange-soft: #fdf0dc;
+  --yellow: #7a6400; --yellow-soft: #fbf5d6; --green: #2b7a3d; --green-soft: #e4f3e7;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141716; --surface: #1c201e; --surface-2: #232825; --border: #2f3532;
+    --text: #e7ebe8; --muted: #9aa39e; --accent: #6cc79c; --accent-soft: #1f3a2d;
+    --red: #ff8a80; --red-soft: #3a1f1d; --orange: #ffb84d; --orange-soft: #3a2c16;
+    --yellow: #e6cf5c; --yellow-soft: #34301a; --green: #7ed492; --green-soft: #1d3324;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141716; --surface: #1c201e; --surface-2: #232825; --border: #2f3532;
+  --text: #e7ebe8; --muted: #9aa39e; --accent: #6cc79c; --accent-soft: #1f3a2d;
+  --red: #ff8a80; --red-soft: #3a1f1d; --orange: #ffb84d; --orange-soft: #3a2c16;
+  --yellow: #e6cf5c; --yellow-soft: #34301a; --green: #7ed492; --green-soft: #1d3324;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.55 "IBM Plex Sans", system-ui, sans-serif;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 64px; }
+header.top {
+  position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+}
+header.top .wrap { display: flex; align-items: center; gap: 16px; padding-top: 10px; padding-bottom: 10px; }
+.brand { font-weight: 700; letter-spacing: .2px; white-space: nowrap; }
+.brand span { color: var(--accent); }
+nav.toc { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+nav.toc a {
+  color: var(--muted); text-decoration: none; font-size: 13px; padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+}
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--surface-2); color: var(--text); outline: none; }
+button.theme {
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px;
+  padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer;
+}
+h1, h2, h3 { font-family: "Source Serif 4", Georgia, serif; font-weight: 600; line-height: 1.2; }
+h1 { font-size: clamp(28px, 5vw, 40px); margin: 40px 0 8px; }
+h2 { font-size: 26px; margin: 56px 0 16px; padding-top: 8px; }
+h3 { font-size: 18px; margin: 28px 0 10px; }
+p.meta { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .88em; }
+code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+.lead { padding: 20px 22px; font-size: 16px; }
+.lead strong { font-weight: 600; }
+.lead p { margin: 0 0 10px; } .lead p:last-child { margin: 0; }
+.grid { display: grid; gap: 12px; }
+.kpis { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin-top: 16px; }
+.kpi { padding: 14px 16px; }
+.kpi .v { font-size: 26px; font-weight: 600; font-family: "Source Serif 4", serif; }
+.kpi .l { color: var(--muted); font-size: 13px; }
+.kpi.good .v { color: var(--green); } .kpi.bad .v { color: var(--red); } .kpi.warn .v { color: var(--orange); }
+.verdict { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.verdict .card { padding: 14px 16px; border-left: 4px solid var(--border); }
+.verdict .ok { border-left-color: var(--green); } .verdict .mid { border-left-color: var(--orange); } .verdict .no { border-left-color: var(--red); }
+.verdict h3 { margin: 0 0 6px; font-family: "IBM Plex Sans"; font-size: 15px; }
+.verdict p { margin: 0; color: var(--muted); font-size: 14px; }
+.score { display: grid; grid-template-columns: minmax(150px, 1.1fr) 120px 2fr; gap: 6px 16px; padding: 8px 18px; align-items: center; }
+.score > div { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.score > div:nth-last-child(-n+3) { border-bottom: 0; }
+.bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.bar.lo i { background: var(--red); } .bar.md i { background: var(--orange); }
+.score .c { color: var(--muted); font-size: 14px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+td.id { font-family: "IBM Plex Mono", monospace; font-weight: 500; white-space: nowrap; }
+.chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.chip.high { color: var(--red); background: var(--red-soft); }
+.chip.med { color: var(--orange); background: var(--orange-soft); }
+.chip.low { color: var(--yellow); background: var(--yellow-soft); }
+.chip.ok { color: var(--green); background: var(--green-soft); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.filters button {
+  font: inherit; font-size: 13px; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  padding: 5px 12px; border-radius: 999px; cursor: pointer;
+}
+.filters button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.findings { display: grid; gap: 10px; }
+.finding { padding: 14px 16px; }
+.finding header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+.finding .fid { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+.finding .area { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-left: auto; }
+.finding h4 { margin: 0; font-size: 15px; font-weight: 600; flex-basis: 100%; }
+.finding p { margin: 4px 0 0; font-size: 14px; }
+.finding p.reco { color: var(--muted); }
+.finding p.reco b { color: var(--text); font-weight: 600; }
+.strengths { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.strengths .card { padding: 14px 16px; }
+.strengths h4 { margin: 0 0 4px; font-size: 15px; }
+.strengths p { margin: 0; color: var(--muted); font-size: 14px; }
+.plan ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+.plan li { counter-increment: s; display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); align-items: start; }
+.plan li:last-child { border-bottom: 0; }
+.plan li::before { content: counter(s); font-family: "IBM Plex Mono"; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 8px; text-align: center; padding: 2px 0; }
+.plan .eff { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.plan .ref { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--muted); }
+.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+footer { margin-top: 56px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 16px; }
+@media (max-width: 640px) {
+  .score { grid-template-columns: 1fr 90px; }
+  .score .c { grid-column: 1 / -1; padding-top: 0 !important; }
+  .score > div:nth-child(3n+1), .score > div:nth-child(3n+2) { border-bottom: 0; }
+  .plan li { grid-template-columns: 30px 1fr; }
+  .plan .eff { grid-column: 2; }
+  nav.toc { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Erable <span>· audit</span></div>
+    <nav class="toc" aria-label="Sections">
+      <a href="#synthese">Synthèse</a><a href="#chiffres">Chiffres</a><a href="#ci">CI</a><a href="#forces">Points forts</a>
+      <a href="#constats">Constats</a><a href="#plan">Plan d'action</a>
+    </nav>
+    <button class="theme" type="button" id="theme" aria-label="Changer de thème">Thème</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Qualité, fiabilité et préparation au déploiement</h1>
+  <p class="meta">17 octobre 2026 · <span class="mono">main @ 68dd869</span> (tag <span class="mono">0.1.0</span>) · code, tests, CI, sécurité, exploitation, UX</p>
+
+  <section id="synthese">
+    <div class="card lead">
+      <p><strong>La conception est d'un niveau rare pour un projet de cet âge ; ce qui manque, c'est la preuve qu'elle tient en dehors du poste de développement.</strong></p>
+      <p>La stratégie de test est exemplaire et, en local, tout est vert : 747 tests Core, 259 Storage, 363 Server, 757 Vitest, couverture de Core à 93,6 %. Mais <strong>aucune exécution de la CI GitHub n'a encore été verte</strong> : 7 e2e échouent de façon reproductible, la fumée desktop échoue sous Linux et Windows, le workflow nightly est un YAML invalide. Mutation testing, restauration de sauvegarde, release et signature n'ont jamais été exécutés.</p>
+    </div>
+
+    <h3>Verdict par usage</h3>
+    <div class="grid verdict">
+      <div class="card ok"><h3>Démo, usage personnel local</h3><p>Prêt.</p></div>
+      <div class="card mid"><h3>Serveur interne, équipe de confiance</h3><p>Presque : corriger B1 à B4, puis une semaine de CI verte, nightly compris.</p></div>
+      <div class="card no"><h3>Desktop pour utilisateurs externes</h3><p>Pas encore : release exécutée de bout en bout, signature, fumée verte sur les 3 OS.</p></div>
+      <div class="card no"><h3>Serveur exposé sur Internet</h3><p>Pas encore : en plus, en-têtes de sécurité, anti-verrouillage, restauration testée.</p></div>
+    </div>
+
+    <h3>Tableau de bord</h3>
+    <div class="card score" role="table" aria-label="Notes par dimension">
+      <div role="cell"><b>Architecture et conception</b></div><div role="cell"><div class="bar" aria-label="5 sur 5"><i style="width:100%"></i></div></div><div class="c" role="cell">Core pur, ID unique, références par ID, décisions tracées.</div>
+      <div role="cell"><b>Stratégie de test</b></div><div role="cell"><div class="bar" aria-label="5 sur 5"><i style="width:100%"></i></div></div><div class="c" role="cell">Propriétés, spec partagée C#↔TS, matrice d'autorisation, crash, fuzz, mutation.</div>
+      <div role="cell"><b>Tests exécutés</b></div><div role="cell"><div class="bar" aria-label="4 sur 5"><i style="width:80%"></i></div></div><div class="c" role="cell">≈ 2 100 tests verts en local, 131 e2e ; couverture mesurée seulement sur Core.</div>
+      <div role="cell"><b>Intégration continue</b></div><div role="cell"><div class="bar lo" aria-label="2 sur 5"><i style="width:40%"></i></div></div><div class="c" role="cell">Très bien conçue mais jamais verte ; nightly cassé ; mutation jamais lancée.</div>
+      <div role="cell"><b>Sécurité</b></div><div role="cell"><div class="bar" aria-label="4 sur 5"><i style="width:80%"></i></div></div><div class="c" role="cell">Desktop, sessions, pièces jointes, XSS très soignés ; manquent CSP et anti-verrouillage.</div>
+      <div role="cell"><b>Fiabilité des données</b></div><div role="cell"><div class="bar" aria-label="4 sur 5"><i style="width:80%"></i></div></div><div class="c" role="cell">WAL + FULL, crash tests, doctor, migrations v1→v4 ; restauration jamais jouée.</div>
+      <div role="cell"><b>Exploitation et distribution</b></div><div role="cell"><div class="bar lo" aria-label="2 sur 5"><i style="width:40%"></i></div></div><div class="c" role="cell">Docker + Trivy OK ; release, mise à jour et signature jamais exécutées.</div>
+      <div role="cell"><b>UX et cohérence</b></div><div role="cell"><div class="bar" aria-label="4 sur 5"><i style="width:80%"></i></div></div><div class="c" role="cell">Fidèle au mockup, clavier et i18n ; vocabulaire de validation et éléments « bientôt ».</div>
+    </div>
+  </section>
+
+  <section id="chiffres">
+    <h2>Chiffres clés</h2>
+    <div class="grid kpis">
+      <div class="card kpi good"><div class="v">117/117</div><div class="l">scénarios E2E tracés à un test</div></div>
+      <div class="card kpi good"><div class="v">93,6 %</div><div class="l">lignes couvertes dans Core (branches 89,5 %)</div></div>
+      <div class="card kpi good"><div class="v">1 369</div><div class="l">tests .NET verts (Core, Storage, Server)</div></div>
+      <div class="card kpi warn"><div class="v">757/758</div><div class="l">tests Vitest (1 test chronométré instable)</div></div>
+      <div class="card kpi warn"><div class="v">447 Ko</div><div class="l">bundle initial gzip, budget 500 Ko (89 %)</div></div>
+      <div class="card kpi bad"><div class="v">0</div><div class="l">exécution de CI entièrement verte</div></div>
+      <div class="card kpi bad"><div class="v">0 / 58</div><div class="l">tâches passées à « done » (54 en review)</div></div>
+      <div class="card kpi"><div class="v">0</div><div class="l">avertissement de build, ESLint, tsc</div></div>
+    </div>
+
+    <h3>Taille du code</h3>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Projet</th><th>Production</th><th>Tests</th></tr></thead>
+        <tbody>
+          <tr><td>Erable.Core</td><td>4 769 l.</td><td>3 223 l. · 747 tests · couverture 93,6 %</td></tr>
+          <tr><td>Erable.Storage</td><td>5 318 l.</td><td>3 500 l. · 261 tests · couverture non mesurée</td></tr>
+          <tr><td>Erable.Server</td><td>7 216 l.</td><td>6 951 l. · 364 tests · couverture non mesurée</td></tr>
+          <tr><td>Erable.Desktop</td><td>612 l.</td><td>self-test + pilotage CDP</td></tr>
+          <tr><td>SPA (TypeScript)</td><td>≈ 23 300 l.</td><td>49 fichiers Vitest (≈ 6 200 l.) · 27 specs Playwright · 131 e2e</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="ci">
+    <h2>État de la CI GitHub</h2>
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Job</th><th>État</th><th>Cause</th></tr></thead>
+        <tbody>
+          <tr><td>Workflow lint</td><td><span class="chip high">échec</span></td><td><code>nightly.yml</code> l. 152 : <code>name: Smoke (Windows: …)</code>, deux-points non quotés → YAML invalide</td></tr>
+          <tr><td>Nightly</td><td><span class="chip high">jamais exécuté</span></td><td>Même cause : « workflow file issue » à chaque push</td></tr>
+          <tr><td>E2E Chromium + WebKit</td><td><span class="chip high">7 / 150 en échec</span></td><td>Identiques sur deux exécutions : palette d'insertion modifiée (ID abrégé absent, <code>nested-interactive</code>), délais WebKit sur la recherche rapide et l'ouverture d'un dossier</td></tr>
+          <tr><td>Desktop linux-x64</td><td><span class="chip high">plantage</span></td><td><code>libPhotinoX.Native.so</code> exige <code>libnotify.so.4</code>, non installé</td></tr>
+          <tr><td>Desktop win-x64</td><td><span class="chip high">8 échecs</span></td><td><code>connectOverCDP: ECONNREFUSED 127.0.0.1:9600</code> (port de débogage WebView2)</td></tr>
+          <tr><td>Desktop macOS arm64 / x64</td><td><span class="chip ok">vert</span></td><td>osx-x64 publié mais sans fumée</td></tr>
+          <tr><td>Tests unitaires Linux / macOS (Release)</td><td><span class="chip ok">vert</span></td><td>La veille, Vitest échouait sur macOS (<code>PropertyView.test.tsx</code>), corrigé depuis</td></tr>
+          <tr><td>Docker : build, Trivy, fumée, absence de <code>/_test</code></td><td><span class="chip ok">vert</span></td><td>—</td></tr>
+          <tr><td>Durée du pipeline PR</td><td><span class="chip med">14–15 min</span></td><td>Objectif §T-13 : moins de 12 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Le dépôt est sur GitHub depuis le 17/10 : ces échecs sont ceux des toutes premières exécutions. Ils montrent que les tests attrapent de vraies régressions, mais aussi qu'ils n'étaient pas relancés avant chaque commit.</p>
+  </section>
+
+  <section id="forces">
+    <h2>Points forts</h2>
+    <div class="grid strengths">
+      <div class="card"><h4>Des documents qui servent</h4><p>Règles <code>Fnn.Rn</code>, scénarios <code>E2E-nn-nn</code>, risques classés par gravité, décisions <code>Q</code>/<code>P</code> tranchées explicitement, traçabilité vérifiée automatiquement.</p></div>
+      <div class="card"><h4>Domaine isolé et prouvé</h4><p>Core sans IO, <code>TimeProvider</code>, propriétés CsCheck / fast-check sur l'ID, le parseur, l'héritage, l'arbre et la fusion (« aucun caractère perdu sans conflit »).</p></div>
+      <div class="card"><h4>Une spec, deux implémentations</h4><p>Les fixtures JSON pilotent xUnit et Vitest : une divergence de parseur devient visible au lieu de casser des liens.</p></div>
+      <div class="card"><h4>Pas de mock de ce qu'on possède</h4><p>Vrai SQLite, vrai serveur, vrai navigateur ; <code>erable doctor</code> vérifie la base laissée par les tests.</p></div>
+      <div class="card"><h4>Le fuzzing a déjà payé</h4><p>Dépassement de pile capable d'arrêter le serveur et temps quadratiques trouvés, corrigés par des limites partagées C#/TS.</p></div>
+      <div class="card"><h4>Données protégées</h4><p>WAL + <code>synchronous = FULL</code>, blobs écrits par <code>rename</code> atomique, crash tests sur le vrai processus, migrations testées v1→v4.</p></div>
+      <div class="card"><h4>Sécurité traitée comme une fonctionnalité</h4><p>Matrice d'autorisation sur tous les endpoints, jetons hachés, pièces jointes en <code>sandbox</code>, Markdown sans <code>innerHTML</code>.</p></div>
+      <div class="card"><h4>Chaîne d'approvisionnement</h4><p>Actions épinglées par SHA, Renovate, versions centralisées, Trivy, pnpm épinglé.</p></div>
+      <div class="card"><h4>Notes de tâches honnêtes</h4><p>Chaque tâche dit ce qui n'a pas été vérifié : c'est ce qui rend cet audit précis.</p></div>
+    </div>
+  </section>
+
+  <section id="constats">
+    <h2>Constats et recommandations</h2>
+    <div class="filters" role="group" aria-label="Filtrer les constats">
+      <button type="button" data-f="all" aria-pressed="true">Tous</button>
+      <button type="button" data-f="high" aria-pressed="false">Haute</button>
+      <button type="button" data-f="med" aria-pressed="false">Moyenne</button>
+      <button type="button" data-f="low" aria-pressed="false">Basse / UX</button>
+      <button type="button" data-a="Tests" aria-pressed="false">Tests</button>
+      <button type="button" data-a="Sécurité" aria-pressed="false">Sécurité</button>
+      <button type="button" data-a="Données" aria-pressed="false">Données</button>
+      <button type="button" data-a="UX" aria-pressed="false">UX</button>
+      <button type="button" data-a="Processus" aria-pressed="false">Processus</button>
+    </div>
+    <div class="findings" id="findings"></div>
+  </section>
+
+  <section id="plan" class="plan">
+    <h2>Plan d'action</h2>
+    <div class="grid two">
+      <div>
+        <h3>Bloquants avant toute mise entre les mains d'utilisateurs</h3>
+        <div class="card"><ol>
+          <li><div>Corriger <code>nightly.yml</code> et les remarques actionlint <div class="ref">B1 · T2</div></div><span class="eff">10 min</span></li>
+          <li><div>Corriger la palette et les délais WebKit, obtenir une CI PR verte <div class="ref">B2 · T1 · U6</div></div><span class="eff">½–1 j</span></li>
+          <li><div>Fumée desktop : <code>libnotify4</code> (Linux), port CDP (Windows) <div class="ref">B3 · R3</div></div><span class="eff">½ j</span></li>
+          <li><div>Protéger <code>main</code>, retirer le tag <code>0.1.0</code> <div class="ref">B4 · R5</div></div><span class="eff">15 min</span></li>
+          <li><div>Release de test complète : installeurs, fumée, mise à jour N → N+1 <div class="ref">B5 · T6</div></div><span class="eff">1 j</span></li>
+          <li><div>Jouer la restauration Litestream de bout en bout <div class="ref">B6 · R1</div></div><span class="eff">½ j</span></li>
+        </ol></div>
+      </div>
+      <div>
+        <h3>Avant une exposition sur Internet</h3>
+        <div class="card"><ol>
+          <li><div>CSP, <code>frame-ancestors</code>, <code>Referrer-Policy</code>, HSTS <div class="ref">S1</div></div><span class="eff">½ j</span></li>
+          <li><div>Verrouillage par (login, adresse) et délai progressif <div class="ref">S2</div></div><span class="eff">½ j</span></li>
+          <li><div>Changement de mot de passe en libre-service <div class="ref">S4</div></div><span class="eff">½ j</span></li>
+          <li><div>Premier passage Stryker, puis seuil 70 % <div class="ref">T5</div></div><span class="eff">½ j +</span></li>
+        </ol></div>
+        <h3>Ensuite</h3>
+        <p>T3 (test chronométré), T4 (couverture publiée), U1 à U5, R3/R4, S3, S7, mise à jour de l'index des tâches.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Méthode : lecture de <code>docs/</code> et <code>tasks/</code>, revue ciblée du code, exécution locale des suites (.NET, Vitest, lint, typecheck, build), couverture de <code>Erable.Core</code>, analyse des exécutions GitHub Actions, parcours manuel en mode serveur sur « Chroniques d'Aube ». Les e2e n'ont pas été relancés en local. Version Markdown : <code>reports/audit-qualite-2026-10-17.md</code>.
+  </footer>
+</main>
+
+<script>
+const F = [
+  ["T1","high","Tests","7 e2e @pr échouent de façon déterministe","La palette d'insertion n'affiche plus l'ID abrégé attendu par E2E-05-03 et ses options contiennent des boutons (axe : nested-interactive). Sous WebKit, délais dépassés sur la recherche rapide et l'ouverture d'un dossier. Régression réelle, pas une instabilité.","Boutons hors du role=option ; relancer les e2e avant chaque commit d'interface."],
+  ["T2","high","Tests","Les filets nightly n'ont jamais tourné","YAML invalide : ni Firefox, ni visuel, ni benchmarks, ni issue automatique. Les e2e multi-utilisateur et concurrence (F14), les plus critiques, ne sont pas @pr et n'ont jamais été exécutés en CI.","Quoter la ligne 152 ; passer un scénario multi-utilisateur et un de concurrence en @pr."],
+  ["R1","high","Données","Restauration Litestream jamais exécutée","deploy/litestream/test-restore.sh n'a jamais tourné. Une sauvegarde jamais restaurée n'est pas une sauvegarde.","Jouer le script, puis l'ajouter au nightly ou à la release."],
+  ["T3","med","Tests","Assertion chronométrée dans un test unitaire","palette.test.ts exige < 50 ms sur 10 000 éléments : 81 ms sous charge, vert en isolé. C'est le test instable que §T-1.6 proscrit.","Déplacer la mesure dans les tests @perf."],
+  ["T4","med","Tests","Couverture ni publiée ni bloquante","§T-12 prévoit un rapport à chaque PR et un seuil sur Core. Seul Core.Tests a l'extension ; Storage, Server et le front ne sont pas mesurés.","Extension sur les trois projets, @vitest/coverage-v8, seuil 90 % sur Core."],
+  ["T5","med","Tests","Mutation testing jamais exécuté","Code et tests écrits par le même agent : le risque est que les tests confirment l'intention de l'implémenteur plutôt que la spécification. La mutation est le meilleur contre-pouvoir.","Lancer weekly-quality.yml maintenant, publier les scores, puis break: 70."],
+  ["S1","med","Sécurité","Aucun en-tête de sécurité sur la SPA","Ni CSP, ni frame-ancestors / X-Frame-Options, ni Referrer-Policy ; le Caddyfile n'en ajoute pas. Clickjacking possible en mode serveur, aucune défense en profondeur contre une XSS future.","CSP default-src 'self' ; frame-ancestors 'none' ; Referrer-Policy: no-referrer ; HSTS côté Caddy."],
+  ["S2","med","Sécurité","Verrouillage ciblé d'un compte","5 échecs sur un login le bloquent 15 min quel que soit le mot de passe : n'importe qui peut empêcher l'administrateur de se connecter indéfiniment.","Blocage dur par (login, adresse), simple délai progressif par login ; journaliser."],
+  ["R2","med","Données","Pièces jointes répliquées toutes les 5 min","Après restauration, des pages peuvent référencer des blobs absents. doctor le détecte mais la procédure ne le dit pas.","Documenter ce cas et la sortie attendue de doctor."],
+  ["R3","med","Données","Dépendance Linux non déclarée","PhotinoX exige libnotify4 ; sans elle l'app plante au démarrage (vu en CI). Les utilisateurs Linux seront touchés.","Ajouter le paquet à la CI, au paquet Linux et au guide."],
+  ["P1","med","Processus","Aucune tâche « done »","54 tâches en review : tout attend une relecture humaine, difficile à ce volume (≈ 40 000 lignes de production en 5 jours). Le commit b2568c7 a changé l'interface sans relancer les e2e.","main protégée (PR verte obligatoire), hook de pré-push, relecture par jalon."],
+  ["S3","low","Sécurité","Images externes autorisées","Un éditeur peut insérer un pixel de suivi révélant l'IP et l'heure de lecture de chaque lecteur.","Bloquer par défaut (img-src 'self') avec réglage par projet, ou proxifier."],
+  ["S4","low","Sécurité","Pas de changement de mot de passe en libre-service","Seul un administrateur peut le faire ; pas de réinitialisation, pas de MFA ni d'OIDC.","« Changer mon mot de passe » dans les préférences."],
+  ["S5","low","Sécurité","Ré-hachage = déconnexion générale","Le ré-hachage à la connexion passe par SetPassword, qui supprime toutes les sessions de l'utilisateur.","Stocker le nouveau hachage sans révoquer dans ce cas."],
+  ["S6","low","Sécurité","Mise à jour automatique sans signature","La confiance repose sur le compte GitHub ; SmartScreen et Gatekeeper avertiront.","Signer avant toute distribution publique ; 2FA matériel sur GitHub."],
+  ["S7","low","Sécurité","Pas de SECURITY.md","Aucune voie de signalement de vulnérabilité.","Politique de divulgation minimale."],
+  ["T6","low","Tests","Release jamais jouée","Fumée osx-x64 absente, .pkg jamais installé, mise à jour N → N+1 jamais vérifiée.","Release de test (v0.1.1-rc.1) selon docs/release.md."],
+  ["T7","low","Tests","Position R10 fausse avec tabulation","Connu (Markdig), exclu du fuzzer en attendant.","Ajouter le cas aux fixtures comme « attendu en échec »."],
+  ["R4","low","Données","Sauvegarde desktop par copie manuelle","« Copier le dossier quand l'app est fermée » : copier pendant l'exécution (WAL) donne une copie incohérente.","Commande « Exporter une sauvegarde » via l'API de sauvegarde SQLite."],
+  ["R5","low","Processus","Tag 0.1.0 hors convention","Ne déclenche pas la release (v*) et posé avant une CI verte.","Taguer v0.1.0 seulement après une CI verte."],
+  ["P2","low","Processus","Index des tâches en retard","M5-01 « todo » dans tasks/README.md mais « review » dans son fichier ; colonne de M4-09 incohérente.","Mettre l'index à jour, idéalement généré."],
+  ["U1","low","UX","Vocabulaire de validation incohérent","« 1 erreur de validation », « hors règles », champ rouge — alors que la validation avertit sans bloquer (invariant 6).","Un seul terme : « avertissement », couleur d'avertissement."],
+  ["U2","low","UX","Éléments « bientôt » visibles","« Modèles de projet — bientôt » sur l'accueil donne une impression d'inachevé.","Masquer jusqu'à ce que la fonctionnalité existe."],
+  ["U3","low","UX","Sous-titre de l'accueil hors contexte","« Ouvrez un wiki local ou connectez-vous à un serveur » dans le navigateur en mode serveur, où c'est impossible.","Texte selon le mode."],
+  ["U4","low","UX","Dates relatives ambiguës","« il y a 7 m. » : minutes ou mois ?","Mots complets, date exacte en info-bulle."],
+  ["U5","low","UX","En-tête d'édition à largeur moyenne","À ≈ 800 px, « Enregistrer » passe sous le titre ; l'éditeur devient une colonne étroite.","Replier le panneau latéral sous un seuil."],
+  ["U6","low","UX","Palette d'insertion moins accessible","Les boutons « lien / intégrer » dans chaque option gênent les lecteurs d'écran ; Entrée / Maj+Entrée suffisaient.","Une cible par option, raccourcis en pied de palette."],
+  ["U7","low","UX","« Chargement… » en texte brut","2 à 3 s à la première ouverture (build Debug, à froid).","Mesurer en Release ; sinon squelette de mise en page."],
+  ["U8","low","UX","Auteur affiché par son identifiant","« camille » quand le compte n'existe pas sur ce serveur.","Distinguer : « camille (compte inconnu) »."],
+  ["U9","low","UX","Guide court, langues mélangées","Guide de 57 lignes ; README en anglais, docs en français.","Choisir la langue du public ; enrichir (mode serveur, sauvegarde)."],
+  ["U10","low","UX","Onglets « éléments ouverts »","Proposition en attente depuis M1-09 ; probablement la fonctionnalité « façon IDE » la plus attendue.","À trancher."]
+];
+const label = { high: "Haute", med: "Moyenne", low: "Basse" };
+const host = document.getElementById("findings");
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+host.innerHTML = F.map(([id, sev, area, title, body, reco]) =>
+  `<article class="card finding" data-sev="${sev}" data-area="${area}">
+    <header><span class="fid">${id}</span><span class="chip ${sev}">${label[sev]}</span><span class="area">${area}</span><h4>${esc(title)}</h4></header>
+    <p>${esc(body)}</p><p class="reco"><b>Recommandation :</b> ${esc(reco)}</p></article>`).join("");
+const buttons = document.querySelectorAll(".filters button");
+buttons.forEach((b) => b.addEventListener("click", () => {
+  buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  host.querySelectorAll(".finding").forEach((el) => {
+    const show = b.dataset.f === "all" || (b.dataset.f ? el.dataset.sev === b.dataset.f : el.dataset.area === b.dataset.a);
+    el.hidden = !show;
+  });
+}));
+const root = document.documentElement;
+try { const t = localStorage.getItem("erable-audit-theme"); if (t) root.dataset.theme = t; } catch {}
+document.getElementById("theme").addEventListener("click", () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("erable-audit-theme", root.dataset.theme); } catch {}
+});
+</script>
+</body>
+</html>
