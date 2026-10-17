@@ -4,7 +4,7 @@ import { HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 import { http, server } from "../../test/msw";
 import { renderWithProviders } from "../../test/render";
-import { accessOf } from "../project/access";
+import { accessOf, loadingAccess } from "../project/access";
 import { AuthGate } from "./AuthGate";
 
 function mockServer(signedIn: { current: boolean }) {
@@ -122,11 +122,35 @@ describe("AuthGate (M4-01)", () => {
 
 describe("project access", () => {
   it("lets a reader read only", () => {
-    expect(accessOf("reader")).toEqual({ role: "reader", canEdit: false, isAdmin: false });
+    expect(accessOf("reader")).toEqual({
+      role: "reader",
+      canEdit: false,
+      isAdmin: false,
+      roleKnown: true,
+    });
   });
 
   it("lets an editor edit, and only an administrator manage the members", () => {
-    expect(accessOf("editor")).toEqual({ role: "editor", canEdit: true, isAdmin: false });
-    expect(accessOf("admin")).toEqual({ role: "admin", canEdit: true, isAdmin: true });
+    expect(accessOf("editor")).toEqual({
+      role: "editor",
+      canEdit: true,
+      isAdmin: false,
+      roleKnown: true,
+    });
+    expect(accessOf("admin")).toEqual({
+      role: "admin",
+      canEdit: true,
+      isAdmin: true,
+      roleKnown: true,
+    });
+  });
+
+  it("lets the user read while the role is loading", () => {
+    expect(loadingAccess).toEqual({
+      role: "reader",
+      canEdit: false,
+      isAdmin: false,
+      roleKnown: false,
+    });
   });
 });

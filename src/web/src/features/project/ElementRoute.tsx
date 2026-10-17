@@ -14,7 +14,7 @@ import { useCountView } from "../recent/useCountView";
 import { CategoryView } from "../category/CategoryView";
 import { LinkTypeView } from "../links/LinkTypeView";
 import { PropertyView } from "../properties/PropertyView";
-import { useCanEdit } from "./access";
+import { useProjectAccess } from "./access";
 
 /** `/p/:projectId/e/:elementId`: the kind of the element chooses the view (docs/architecture.md §3.1, F03.R3). */
 export function ElementRoute() {
@@ -22,7 +22,7 @@ export function ElementRoute() {
   const { projectId, elementId } = useParams({ from: "/p/$projectId/e/$elementId" });
   const { edit: editRequested } = useSearch({ from: "/p/$projectId/e/$elementId" });
   // A reader following an edit link reads instead (F14.R1).
-  const canEdit = useCanEdit();
+  const { canEdit, roleKnown } = useProjectAccess();
   const edit = editRequested === true && canEdit;
   const enabled = projectId !== null && elementId !== null;
   const element = useQuery({
@@ -60,7 +60,10 @@ export function ElementRoute() {
     return <NotFoundScreen />;
   }
   if (element.isError) throw element.error;
-  if (element.isPending) return <p aria-busy="true">{t("common.loading")}</p>;
+  // The views below read `edit` once, when they mount: an edit link waits for the role rather than settling in reading.
+  if (element.isPending || (editRequested === true && !roleKnown)) {
+    return <p aria-busy="true">{t("common.loading")}</p>;
+  }
   if (element.data.deleted) return <NotFoundScreen />;
 
   switch (element.data.kind) {

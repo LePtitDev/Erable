@@ -24,7 +24,7 @@ import { ApiError } from "../../shared/api/client";
 import { apiInfoQuery } from "../../shared/api/queries";
 import { useProjectServer } from "../../shared/api/servers";
 import { AccessDeniedScreen, NotFoundScreen } from "./ErrorScreens";
-import { accessOf, ProjectAccessContext, useCanEdit } from "./access";
+import { accessOf, loadingAccess, ProjectAccessContext, useCanEdit } from "./access";
 import { useConnectionStore } from "../../shared/realtime/connectionStore";
 import { usePresenceStore } from "../../shared/realtime/presenceStore";
 import { useProjectEvents } from "./useProjectEvents";
@@ -53,9 +53,10 @@ export function ProjectShell() {
       project.error.status === 404;
     return denied ? <AccessDeniedScreen /> : <NotFoundScreen project />;
   }
-  // Until the role is known the user reads: the edit buttons never flash up for a reader.
   return (
-    <ProjectAccessContext value={accessOf(project.data?.myRole ?? "reader")}>
+    <ProjectAccessContext
+      value={project.data === undefined ? loadingAccess : accessOf(project.data.myRole)}
+    >
       <ShellFrame projectId={projectId} projectName={project.data?.name ?? t("common.loading")} />
     </ProjectAccessContext>
   );

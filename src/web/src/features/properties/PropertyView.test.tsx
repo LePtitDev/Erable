@@ -1,7 +1,9 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { delay } from "msw";
 import { describe, expect, it } from "vitest";
 import { chroniquesNodes, ids, mockProject } from "../../test/projectMocks";
+import { http, server } from "../../test/msw";
 import { renderApp } from "../../test/render";
 import {
   definitions,
@@ -189,5 +191,30 @@ describe("PropertyView", () => {
       options: [{ key: "marchande", label: "Marchande" }],
       replacements: { garde: "marchande" },
     });
+  });
+  it("opens in edit mode even when the role of the user arrives after the property", async () => {
+    const { nodes: all } = mockProject({ nodes: nodes() });
+    mockStructure();
+    mockProperty(niveauView(all));
+    // The project (hence the role) answers last: the view must not settle in reading mode meanwhile.
+    server.use(
+      http.get("/api/v1/projects/{projectId}", async ({ response }) => {
+        await delay(300);
+        return response(200).json({
+          id: ids.project,
+          name: "Chroniques d'Aube",
+          folder: "/w/chroniques",
+          contentLanguage: "fr",
+          formatVersion: 1,
+          createdAt: "2026-03-10T09:00:00.000Z",
+          myRole: "admin",
+        });
+      }),
+    );
+    await renderApp(`/p/${ids.project}/e/${structureIds.niveau}?edit=true`);
+
+    expect(
+      await screen.findByRole("radiogroup", { name: "Type de valeur" }, { timeout: 3000 }),
+    ).toBeInTheDocument();
   });
 });

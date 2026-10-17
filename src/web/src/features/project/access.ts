@@ -10,11 +10,16 @@ export interface ProjectAccess {
   readonly canEdit: boolean;
   /** Administrator: the members of the project. */
   readonly isAdmin: boolean;
+  /** False while the project (hence the role) is loading: the user reads meanwhile. */
+  readonly roleKnown: boolean;
 }
 
 export function accessOf(role: ProjectRole): ProjectAccess {
-  return { role, canEdit: role !== "reader", isAdmin: role === "admin" };
+  return { role, canEdit: role !== "reader", isAdmin: role === "admin", roleKnown: true };
 }
+
+/** Until the role is known the user reads: the edit buttons never flash up for a reader. */
+export const loadingAccess: ProjectAccess = { ...accessOf("reader"), roleKnown: false };
 
 /**
  * Provided by the project shell. Outside it (a component rendered alone) the user is an administrator, which is
