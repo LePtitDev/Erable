@@ -7,9 +7,8 @@ import {
   type Transaction,
   type TransactionSpec,
 } from "@codemirror/state";
-import { EditorView, keymap } from "@codemirror/view";
+import { EditorView, keymap, type KeyBinding } from "@codemirror/view";
 import type { ElementId } from "../../shared/ids/elementId";
-import { platformKey, shortcuts } from "../../shared/keyboard/shortcuts";
 
 /**
  * The insert palette inside the editor (F05.R3, docs/architecture.md §6.2). Opened by typing `[[` or `![[` — the text
@@ -126,7 +125,7 @@ export interface PaletteKeys {
   tab: (delta: number) => void;
 }
 
-/** State field, keys (above the editor's own) and the opening shortcut (configurable in M5-01). */
+/** State field and keys, above the editor's own; the opening shortcut is `openPaletteBinding`. */
 export function insertPalette(keys: PaletteKeys): Extension {
   const whenOpen = (run: (view: EditorView) => void) => (view: EditorView) => {
     if (!view.state.field(paletteField).open) return false;
@@ -172,18 +171,22 @@ export function insertPalette(keys: PaletteKeys): Extension {
             view.dispatch({ effects: closePalette.of(null) });
           }),
         },
-        {
-          key: platformKey(shortcuts.openPalette),
-          preventDefault: true,
-          run: (view) => {
-            const head = view.state.selection.main.head;
-            view.dispatch({
-              effects: openPalette.of({ trigger: "shortcut", from: head, embed: false }),
-            });
-            return true;
-          },
-        },
       ]),
     ),
   ];
+}
+
+/** The binding that opens the palette (the combination is the user's, F15.R4); nothing is inserted. */
+export function openPaletteBinding(key: string): KeyBinding {
+  return {
+    key,
+    preventDefault: true,
+    run: (view) => {
+      const head = view.state.selection.main.head;
+      view.dispatch({
+        effects: openPalette.of({ trigger: "shortcut", from: head, embed: false }),
+      });
+      return true;
+    },
+  };
 }

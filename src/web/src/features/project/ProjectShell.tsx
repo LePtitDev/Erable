@@ -12,6 +12,8 @@ import { useWindowStore } from "../../shared/native/native";
 import { useSetTheme } from "../../shared/theme/useSetTheme";
 import { useSystemDark } from "../../shared/theme/useSystemDark";
 import { Logo } from "../../shared/ui/Logo";
+import { useFormatCombo } from "../../shared/keyboard/useFormatCombo";
+import { useShortcut, useShortcuts } from "../../shared/keyboard/useShortcuts";
 import { QuickSearch } from "../search/QuickSearch";
 import { PreferencesDialog } from "../home/PreferencesDialog";
 import { Explorer } from "../explorer/Explorer";
@@ -73,25 +75,10 @@ function ShellFrame({
   const [preferences, setPreferences] = useState(false);
   const [quickSearch, setQuickSearch] = useState(false);
 
-  // Ctrl+K (⌘K) opens the quick search from anywhere, the editor included (F10.R1).
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (
-        event.key.toLowerCase() === "k" &&
-        (event.ctrlKey || event.metaKey) &&
-        !event.altKey &&
-        !event.shiftKey
-      ) {
-        event.preventDefault();
-        event.stopPropagation();
-        setQuickSearch(true);
-      }
-    };
-    window.addEventListener("keydown", onKey, true);
-    return () => {
-      window.removeEventListener("keydown", onKey, true);
-    };
-  }, []);
+  // Ctrl+K (⌘K) by default opens the quick search from anywhere, the editor included (F10.R1, F15.R4).
+  useShortcut("quickSearch", () => {
+    setQuickSearch(true);
+  });
 
   // Document and window title (DesktopWindow): the project while it is shown.
   const setWindowProject = useWindowStore((s) => s.setProjectName);
@@ -177,6 +164,8 @@ function TopBar({
   const setPreference = useSetTheme();
   const systemDark = useSystemDark();
   const dark = preference === "dark" || (preference === "system" && systemDark);
+  const quickSearchKey = useShortcuts().quickSearch;
+  const formatCombo = useFormatCombo();
 
   return (
     <header className={styles["topBar"]}>
@@ -221,7 +210,9 @@ function TopBar({
       <button type="button" className={styles["search"]} onClick={onSearch}>
         <Search aria-hidden size={16} />
         <span className={styles["searchText"]}>{t("shell.search")}</span>
-        <kbd className={styles["kbd"]}>{t("shell.searchShortcut")}</kbd>
+        {quickSearchKey !== "" && (
+          <kbd className={styles["kbd"]}>{formatCombo(quickSearchKey)}</kbd>
+        )}
       </button>
       <div className={styles["right"]}>
         <PresenceAvatars />

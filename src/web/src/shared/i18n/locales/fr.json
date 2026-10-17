@@ -260,22 +260,17 @@
   "help": {
     "title": "Aide et raccourcis",
     "keys": {
-      "openFolder": "Ctrl+O",
-      "save": "Ctrl+S",
       "rename": "F2",
       "palette": "[[",
-      "paletteShortcut": "Ctrl+Espace",
       "close": "Échap",
       "delete": "Suppr"
     },
     "shortcuts": {
-      "openFolder": "Ouvrir un dossier de projet",
-      "save": "Enregistrer la page",
       "rename": "Renommer l’élément sélectionné dans l’arbre",
       "palette": "Insérer une référence (palette d’insertion)",
-      "paletteShortcut": "Ouvrir la palette d’insertion",
       "close": "Fermer une fenêtre ou la palette"
-    }
+    },
+    "customize": "Les raccourcis marqués d’un astérisque se modifient dans les préférences."
   },
   "notFound": {
     "title": "Élément introuvable",
@@ -301,7 +296,6 @@
     "back": "Page précédente",
     "forward": "Page suivante",
     "search": "Rechercher pages, catégories, propriétés…",
-    "searchShortcut": "Ctrl K",
     "languageNamed": "Langue : {{language}}",
     "toggleTheme": "Basculer le thème clair / sombre",
     "showSidePanel": "Afficher le panneau latéral",
@@ -585,7 +579,6 @@
     "content": "Contenu Markdown",
     "placeholder": "Écrivez ici… Tapez [[ pour insérer une référence.",
     "save": "Enregistrer",
-    "saveShortcut": "Ctrl S",
     "toolbar": "Mise en forme",
     "heading": "Titre",
     "bold": "Gras",
@@ -1019,6 +1012,30 @@
       "name": "Nom affiché",
       "passwordHint": "Au moins 8 caractères. Communiquez-le à la personne : elle pourra le changer.",
       "submit": "Créer et ajouter"
+    }
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "hint": "Cliquez sur une combinaison, puis appuyez sur la nouvelle. Échap annule.",
+    "capturing": "Appuyez sur la combinaison…",
+    "none": "Aucun",
+    "change": "Modifier le raccourci : {{action}}",
+    "reset": "Rétablir le raccourci par défaut : {{action}}",
+    "resetAll": "Tout rétablir",
+    "replace": "Remplacer",
+    "conflict": "Déjà utilisé par : {{action}} ({{combo}}).",
+    "actions": {
+      "openPalette": "Ouvrir la palette d’insertion",
+      "quickSearch": "Recherche",
+      "save": "Enregistrer la page",
+      "openFolder": "Ouvrir un dossier de projet"
+    },
+    "keyNames": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "shift": "Maj",
+      "meta": "Méta",
+      "space": "Espace"
     }
   }
 }

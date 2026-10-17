@@ -1,9 +1,16 @@
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
-import { Compartment, EditorState, type Extension, type TransactionSpec } from "@codemirror/state";
+import {
+  Compartment,
+  EditorState,
+  Prec,
+  type Extension,
+  type TransactionSpec,
+} from "@codemirror/state";
 import {
   EditorView,
   highlightActiveLine,
   highlightActiveLineGutter,
+  type KeyBinding,
   keymap,
   lineNumbers,
   placeholder,
@@ -29,6 +36,10 @@ interface MarkdownEditorProps {
   readonly onChange: (doc: string) => void;
   readonly onCursor: (line: number, column: number) => void;
   readonly onSave: () => void;
+  /** Combination of « Enregistrer » in CodeMirror notation (the user's, F15.R4); empty for none. */
+  readonly saveKey: string;
+  /** Other bindings configurable by the user (opening the insert palette). */
+  readonly bindings?: readonly KeyBinding[];
   /** Every update of the editor (the insert palette follows the cursor and the typed query). */
   readonly onUpdate?: (view: EditorView) => void;
   /** Extensions added by other features (insert palette, attachments). */
@@ -45,7 +56,26 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
     const view = useRef<EditorView | null>(null);
     const callbacks = useRef(props);
     const extra = useRef(new Compartment());
+    const bindingsSlot = useRef(new Compartment());
     callbacks.current = props;
+
+    /** Save, then the bindings of other features; an empty combination means no shortcut. */
+    function bindingsOf(current: MarkdownEditorProps): Extension {
+      const save: KeyBinding[] =
+        current.saveKey === ""
+          ? []
+          : [
+              {
+                key: current.saveKey,
+                preventDefault: true,
+                run: () => {
+                  callbacks.current.onSave();
+                  return true;
+                },
+              },
+            ];
+      return Prec.highest(keymap.of([...save, ...(current.bindings ?? [])]));
+    }
 
     useImperativeHandle(ref, () => ({
       get view() {
@@ -83,19 +113,9 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
               "aria-multiline": "true",
               tabindex: "0",
             }),
-            keymap.of([
-              {
-                key: "Mod-s",
-                preventDefault: true,
-                run: () => {
-                  callbacks.current.onSave();
-                  return true;
-                },
-              },
-              ...defaultKeymap,
-              ...historyKeymap,
-              indentWithTab,
-            ]),
+            // The user's own combinations (save, open the palette), reconfigured when they change them (F15.R4).
+            bindingsSlot.current.of(bindingsOf(callbacks.current)),
+            keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
             EditorView.updateListener.of((update) => {
               callbacks.current.onUpdate?.(update.view);
               if (update.docChanged) callbacks.current.onChange(update.state.doc.toString());
@@ -127,6 +147,10 @@ export const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorPro
     useEffect(() => {
       view.current?.dispatch({ effects: extra.current.reconfigure(props.extensions ?? []) });
     }, [props.extensions]);
+
+    useEffect(() => {
+      view.current?.dispatch({ effects: bindingsSlot.current.reconfigure(bindingsOf(props)) });
+    }, [props.saveKey, props.bindings]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return <div ref={host} style={{ height: "100%" }} />;
   },

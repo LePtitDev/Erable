@@ -260,22 +260,17 @@
   "help": {
     "title": "Ayuda y atajos",
     "keys": {
-      "openFolder": "Ctrl+O",
-      "save": "Ctrl+S",
       "rename": "F2",
       "palette": "[[",
-      "paletteShortcut": "Ctrl+Espacio",
       "close": "Esc",
       "delete": "Supr"
     },
     "shortcuts": {
-      "openFolder": "Abrir la carpeta de un proyecto",
-      "save": "Guardar la página",
       "rename": "Renombrar el elemento seleccionado en el árbol",
       "palette": "Insertar una referencia (paleta de inserción)",
-      "paletteShortcut": "Abrir la paleta de inserción",
       "close": "Cerrar un diálogo o la paleta"
-    }
+    },
+    "customize": "Los atajos marcados con asterisco se pueden cambiar en las preferencias."
   },
   "notFound": {
     "title": "Elemento no encontrado",
@@ -301,7 +296,6 @@
     "back": "Página anterior",
     "forward": "Página siguiente",
     "search": "Buscar páginas, categorías, propiedades…",
-    "searchShortcut": "Ctrl K",
     "languageNamed": "Idioma: {{language}}",
     "toggleTheme": "Cambiar entre tema claro y oscuro",
     "showSidePanel": "Mostrar el panel lateral",
@@ -585,7 +579,6 @@
     "content": "Contenido Markdown",
     "placeholder": "Escriba aquí… Teclee [[ para insertar una referencia.",
     "save": "Guardar",
-    "saveShortcut": "Ctrl S",
     "toolbar": "Formato",
     "heading": "Título",
     "bold": "Negrita",
@@ -1019,6 +1012,30 @@
       "name": "Nombre visible",
       "passwordHint": "Al menos 8 caracteres. Entréguela a la persona: podrá cambiarla.",
       "submit": "Crear y añadir"
+    }
+  },
+  "shortcuts": {
+    "title": "Atajos de teclado",
+    "hint": "Haga clic en una combinación y pulse la nueva. Esc cancela.",
+    "capturing": "Pulse la combinación…",
+    "none": "Ninguno",
+    "change": "Cambiar el atajo: {{action}}",
+    "reset": "Restaurar el atajo predeterminado: {{action}}",
+    "resetAll": "Restaurar todo",
+    "replace": "Reemplazar",
+    "conflict": "Ya utilizado por: {{action}} ({{combo}}).",
+    "actions": {
+      "openPalette": "Abrir la paleta de inserción",
+      "quickSearch": "Búsqueda",
+      "save": "Guardar la página",
+      "openFolder": "Abrir una carpeta de proyecto"
+    },
+    "keyNames": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "shift": "Mayús",
+      "meta": "Meta",
+      "space": "Espacio"
     }
   }
 }

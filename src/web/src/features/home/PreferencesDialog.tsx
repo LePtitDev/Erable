@@ -3,9 +3,10 @@ import { LanguageSwitcher } from "../../shared/i18n/LanguageSwitcher";
 import { ThemeSwitcher } from "../../shared/theme/ThemeSwitcher";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
+import { ShortcutsSettings } from "./ShortcutsSettings";
 import field from "../../shared/ui/Field.module.css";
 
-/** Preferences reachable from the home screen and from a project (F15). Shortcuts join with M5-01. */
+/** Preferences reachable from the home screen and from a project (F15). */
 export function PreferencesDialog({
   open,
   onOpenChange,
@@ -33,6 +34,7 @@ export function PreferencesDialog({
       <div className={field["form"]}>
         <LanguageSwitcher />
         <ThemeSwitcher />
+        <ShortcutsSettings />
       </div>
     </Dialog>
   );

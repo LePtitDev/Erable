@@ -260,22 +260,17 @@
   "help": {
     "title": "Help and shortcuts",
     "keys": {
-      "openFolder": "Ctrl+O",
-      "save": "Ctrl+S",
       "rename": "F2",
       "palette": "[[",
-      "paletteShortcut": "Ctrl+Space",
       "close": "Esc",
       "delete": "Del"
     },
     "shortcuts": {
-      "openFolder": "Open a project folder",
-      "save": "Save the page",
       "rename": "Rename the element selected in the tree",
       "palette": "Insert a reference (insert palette)",
-      "paletteShortcut": "Open the insert palette",
       "close": "Close a dialog or the palette"
-    }
+    },
+    "customize": "Shortcuts marked with an asterisk can be changed in the preferences."
   },
   "notFound": {
     "title": "Element not found",
@@ -301,7 +296,6 @@
     "back": "Previous page",
     "forward": "Next page",
     "search": "Search pages, categories, properties…",
-    "searchShortcut": "Ctrl K",
     "languageNamed": "Language: {{language}}",
     "toggleTheme": "Toggle light / dark theme",
     "showSidePanel": "Show the side panel",
@@ -576,7 +570,6 @@
     "content": "Markdown content",
     "placeholder": "Write here… Type [[ to insert a reference.",
     "save": "Save",
-    "saveShortcut": "Ctrl S",
     "toolbar": "Formatting",
     "heading": "Heading",
     "bold": "Bold",
@@ -993,6 +986,30 @@
       "name": "Display name",
       "passwordHint": "At least 8 characters. Give it to the person: they can change it.",
       "submit": "Create and add"
+    }
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "hint": "Click a combination, then press the new one. Esc cancels.",
+    "capturing": "Press the combination…",
+    "none": "None",
+    "change": "Change the shortcut: {{action}}",
+    "reset": "Restore the default shortcut: {{action}}",
+    "resetAll": "Restore all",
+    "replace": "Replace",
+    "conflict": "Already used by: {{action}} ({{combo}}).",
+    "actions": {
+      "openPalette": "Open the insert palette",
+      "quickSearch": "Search",
+      "save": "Save the page",
+      "openFolder": "Open a project folder"
+    },
+    "keyNames": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "shift": "Shift",
+      "meta": "Meta",
+      "space": "Space"
     }
   }
 }

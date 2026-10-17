@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test";
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
 import { EditorPage, InsertPalette } from "../pages/EditorPage";
+import { PreferencesDialog } from "../pages/PreferencesDialog";
 import { PageViewPage } from "../pages/PageViewPage";
 import { t } from "../support/i18n";
 
@@ -92,5 +93,30 @@ test.describe("F05 · Insert palette", () => {
     await editor.save();
     await expect(page).not.toHaveURL(/edit=true/);
     expect(await markdownOf(page, reference.id, chroniques.colGeleLieu)).toMatch(/\n\n\[\[$/);
+  });
+  test("E2E-05-07 · Configurable shortcut @nightly", async ({ page, reference }) => {
+    const preferences = new PreferencesDialog(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await preferences.openFromProject();
+    await preferences.assignShortcut("openPalette", "Control+Shift+L");
+    await expect(preferences.shortcut("openPalette")).toContainText("Ctrl+Maj+L");
+    await page.keyboard.press("Escape");
+
+    try {
+      const editor = new EditorPage(page);
+      await editor.open();
+      await editor.content.click();
+      await page.keyboard.press("Control+Shift+L");
+
+      await expect(new InsertPalette(page).dialog).toBeVisible();
+    } finally {
+      await page.keyboard.press("Escape");
+      await page.request.put("/api/v1/me/preferences", {
+        data: {
+          ...(await (await page.request.get("/api/v1/me/preferences")).json()),
+          shortcuts: {},
+        },
+      });
+    }
   });
 });

@@ -21,6 +21,19 @@ export class PreferencesDialog {
     await this.page.getByRole("button", { name: t("shell.languageNamed", { language }) }).click();
   }
 
+  /** The button that shows (and changes) the combination of an action of the table of shortcuts. */
+  shortcut(action: string): Locator {
+    return this.dialog.getByRole("button", {
+      name: t("shortcuts.change", { action: t(`shortcuts.actions.${action}`) }),
+    });
+  }
+
+  /** Assigns a combination to an action: click, then press it. */
+  async assignShortcut(action: string, combination: string) {
+    await this.shortcut(action).click();
+    await this.page.keyboard.press(combination);
+  }
+
   theme(name: "light" | "dark" | "system"): Locator {
     return this.dialog.getByRole("radio", { name: t(`preferences.theme.${name}`) });
   }

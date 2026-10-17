@@ -260,22 +260,17 @@
   "help": {
     "title": "Hilfe und Tastenkürzel",
     "keys": {
-      "openFolder": "Strg+O",
-      "save": "Strg+S",
       "rename": "F2",
       "palette": "[[",
-      "paletteShortcut": "Strg+Leertaste",
       "close": "Esc",
       "delete": "Entf"
     },
     "shortcuts": {
-      "openFolder": "Einen Projektordner öffnen",
-      "save": "Die Seite speichern",
       "rename": "Das im Baum ausgewählte Element umbenennen",
       "palette": "Eine Referenz einfügen (Einfügepalette)",
-      "paletteShortcut": "Die Einfügepalette öffnen",
       "close": "Einen Dialog oder die Palette schließen"
-    }
+    },
+    "customize": "Mit Sternchen markierte Kürzel lassen sich in den Einstellungen ändern."
   },
   "notFound": {
     "title": "Element nicht gefunden",
@@ -301,7 +296,6 @@
     "back": "Vorherige Seite",
     "forward": "Nächste Seite",
     "search": "Seiten, Kategorien, Eigenschaften suchen…",
-    "searchShortcut": "Strg K",
     "languageNamed": "Sprache: {{language}}",
     "toggleTheme": "Helles / dunkles Design umschalten",
     "showSidePanel": "Seitenleiste anzeigen",
@@ -576,7 +570,6 @@
     "content": "Markdown-Inhalt",
     "placeholder": "Hier schreiben… [[ tippen, um eine Referenz einzufügen.",
     "save": "Speichern",
-    "saveShortcut": "Strg S",
     "toolbar": "Formatierung",
     "heading": "Überschrift",
     "bold": "Fett",
@@ -993,6 +986,30 @@
       "name": "Anzeigename",
       "passwordHint": "Mindestens 8 Zeichen. Geben Sie es der Person weiter: Sie kann es ändern.",
       "submit": "Erstellen und hinzufügen"
+    }
+  },
+  "shortcuts": {
+    "title": "Tastenkürzel",
+    "hint": "Klicken Sie auf eine Kombination und drücken Sie dann die neue. Esc bricht ab.",
+    "capturing": "Kombination drücken…",
+    "none": "Keine",
+    "change": "Tastenkürzel ändern: {{action}}",
+    "reset": "Standardkürzel wiederherstellen: {{action}}",
+    "resetAll": "Alle zurücksetzen",
+    "replace": "Ersetzen",
+    "conflict": "Bereits verwendet von: {{action}} ({{combo}}).",
+    "actions": {
+      "openPalette": "Einfügepalette öffnen",
+      "quickSearch": "Suche",
+      "save": "Seite speichern",
+      "openFolder": "Projektordner öffnen"
+    },
+    "keyNames": {
+      "ctrl": "Strg",
+      "alt": "Alt",
+      "shift": "Umschalt",
+      "meta": "Meta",
+      "space": "Leertaste"
     }
   }
 }

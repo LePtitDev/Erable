@@ -36,6 +36,9 @@ import type { PillTarget } from "../editor/pills";
 import { usePageDraft } from "../editor/usePageDraft";
 import { PalettePopup } from "../palette/PalettePopup";
 import { useInsertPalette } from "../palette/useInsertPalette";
+import { openPaletteBinding } from "../palette/palette";
+import { ariaKeyShortcuts, useFormatCombo } from "../../shared/keyboard/useFormatCombo";
+import { useShortcuts } from "../../shared/keyboard/useShortcuts";
 import { approveClose, useWindowStore } from "../../shared/native/native";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
 import { useShellStore } from "../project/shellStore";
@@ -80,8 +83,6 @@ export function PageEditor({ projectId, element, focusTitle }: PageEditorProps) 
   );
 }
 
-/** Accessible shortcut of « Enregistrer » (key names of the ARIA specification, not displayed). */
-const saveKeys = "Control+S";
 const idPattern = /\[\[([0-9A-Fa-f]{16})/g;
 
 function EditorScreen({
@@ -104,6 +105,12 @@ function EditorScreen({
   const navigate = useNavigate();
   const editor = useRef<MarkdownEditorHandle>(null);
   const palette = useInsertPalette(projectId, editor);
+  const keys = useShortcuts();
+  const formatCombo = useFormatCombo();
+  const bindings = useMemo(
+    () => (keys.openPalette === "" ? [] : [openPaletteBinding(keys.openPalette)]),
+    [keys.openPalette],
+  );
   const uploads = useEditorUploads(projectId, element.id);
   const extensions = useMemo(
     () => [palette.extension, uploads.extension],
@@ -435,10 +442,10 @@ function EditorScreen({
             variant="primary"
             onClick={() => void saveAndClose()}
             disabled={saving || uploads.pending > 0}
-            aria-keyshortcuts={saveKeys}
+            aria-keyshortcuts={ariaKeyShortcuts(keys.save)}
           >
             {t("editor.save")}
-            <kbd className={styles["kbd"]}>{t("editor.saveShortcut")}</kbd>
+            {keys.save !== "" && <kbd className={styles["kbd"]}>{formatCombo(keys.save)}</kbd>}
           </Button>
         </div>
       </header>
@@ -563,7 +570,9 @@ function EditorScreen({
           </label>
           <span className={styles["hint"]}>
             {t("editor.insertHint")}{" "}
-            <kbd className={styles["kbd"]}>{t("help.keys.paletteShortcut")}</kbd>
+            {keys.openPalette !== "" && (
+              <kbd className={styles["kbd"]}>{formatCombo(keys.openPalette)}</kbd>
+            )}
           </span>
         </span>
       </div>
@@ -582,6 +591,8 @@ function EditorScreen({
               setCursor({ line, column });
             }}
             onSave={() => void saveAndClose()}
+            saveKey={keys.save}
+            bindings={bindings}
             onUpdate={palette.onUpdate}
             extensions={extensions}
           />

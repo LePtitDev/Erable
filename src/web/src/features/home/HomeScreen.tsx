@@ -17,6 +17,7 @@ import type { ElementId } from "../../shared/ids/elementId";
 import { LanguageSwitcher } from "../../shared/i18n/LanguageSwitcher";
 import { ThemeSwitcher } from "../../shared/theme/ThemeSwitcher";
 import { Logo } from "../../shared/ui/Logo";
+import { useShortcut } from "../../shared/keyboard/useShortcuts";
 import { HelpDialog } from "./HelpDialog";
 import styles from "./HomeScreen.module.css";
 import { NewProjectDialog } from "./NewProjectDialog";
@@ -58,23 +59,9 @@ export function HomeScreen() {
     setDialog("open");
   }, [dropped]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        !event.shiftKey &&
-        !event.altKey &&
-        event.key.toLowerCase() === "o"
-      ) {
-        event.preventDefault();
-        setDialog("open");
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, []);
+  useShortcut("openFolder", () => {
+    setDialog("open");
+  });
 
   const opened = (project: ProjectSummary, elementId?: ElementId | null) => {
     setDialog(null);
