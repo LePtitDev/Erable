@@ -113,7 +113,7 @@ test.describe("F05 · Insert palette", () => {
       await page.keyboard.press("Escape");
       await page.request.put("/api/v1/me/preferences", {
         data: {
-          ...(await (await page.request.get("/api/v1/me/preferences")).json()),
+          ...((await (await page.request.get("/api/v1/me/preferences")).json()) as object),
           shortcuts: {},
         },
       });

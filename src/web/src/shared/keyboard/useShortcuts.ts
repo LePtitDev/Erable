@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { preferencesQuery } from "../api/preferences";
+import { isRecordingShortcut } from "./capture";
 import {
   matchesEvent,
   resolveShortcuts,
@@ -22,11 +23,14 @@ export function useShortcuts(): ResolvedShortcuts {
 export function useShortcut(action: ShortcutAction, handler: () => void, enabled = true) {
   const combo = useShortcuts()[action];
   const latest = useRef(handler);
-  latest.current = handler;
+  // Written after each render, read only when a key is pressed.
+  useLayoutEffect(() => {
+    latest.current = handler;
+  });
   useEffect(() => {
     if (!enabled || combo === "") return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (!matchesEvent(event, combo)) return;
+      if (isRecordingShortcut() || !matchesEvent(event, combo)) return;
       event.preventDefault();
       event.stopPropagation();
       latest.current();

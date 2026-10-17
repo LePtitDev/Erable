@@ -1,5 +1,5 @@
 import { RotateCcw } from "lucide-react";
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useSavePreferences } from "../../shared/api/preferences";
 import {
@@ -11,6 +11,7 @@ import {
   type ResolvedShortcuts,
   type ShortcutAction,
 } from "../../shared/keyboard/shortcuts";
+import { setRecordingShortcut } from "../../shared/keyboard/capture";
 import { useFormatCombo } from "../../shared/keyboard/useFormatCombo";
 import { useShortcuts } from "../../shared/keyboard/useShortcuts";
 import { Button } from "../../shared/ui/Button";
@@ -42,6 +43,13 @@ export function ShortcutsSettings() {
   const format = useFormatCombo();
   const [capturing, setCapturing] = useState<ShortcutAction | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
+
+  useEffect(() => {
+    setRecordingShortcut(capturing !== null);
+    return () => {
+      setRecordingShortcut(false);
+    };
+  }, [capturing]);
 
   const store = (next: ResolvedShortcuts) => {
     void save({ shortcuts: overridesOf(next) }).catch((error: unknown) => {
@@ -97,7 +105,13 @@ export function ShortcutsSettings() {
                   setPending(null);
                   setCapturing(action);
                 }}
-                onKeyDown={capturing === action ? (event) => onKeyDown(action, event) : undefined}
+                onKeyDown={
+                  capturing === action
+                    ? (event) => {
+                        onKeyDown(action, event);
+                      }
+                    : undefined
+                }
                 onBlur={() => {
                   setCapturing((current) => (current === action ? null : current));
                 }}

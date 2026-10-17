@@ -81,21 +81,22 @@ const pathological = [
   "[[",
   "![[",
   "[",
-  "]",
   "`",
   "*",
   "_",
-  "> ",
   "- ",
   "<",
   "[[3F2A9C14E07B5D21|",
-  "[a](",
   "\\",
   "~",
   "|",
   "# ",
-  "1. ",
 ];
+
+// Found by this fuzzing (M5-04), in remark/micromark itself (the parser without the Erable extension does the same):
+// quadratic time on these, and a stack overflow (RangeError) on deeply nested quotes and lists. Recorded in
+// tasks/M5-04. `it.fails` turns red when one is fixed or bounded (page size limit): then move it to the list above.
+const knownSuperLinear = ["]", "> ", "1. ", "[a]("];
 
 const seconds = Number(import.meta.env["VITE_ERABLE_FUZZ_SECONDS"] ?? "1");
 const budgetMs = (Number.isFinite(seconds) && seconds > 0 ? seconds : 1) * 1000;
@@ -156,10 +157,10 @@ describe("markdown fuzzing", () => {
     },
   );
 
-  it("takes time linear in the size on pathological repetitions", { timeout: 120_000 }, () => {
+  const assertLinear = (tokens: readonly string[]) => {
     const small = 5_000;
     const large = 8 * small;
-    for (const token of pathological) {
+    for (const token of tokens) {
       elapsed(token.repeat(500));
       const fast = best(token.repeat(small));
       const slow = best(token.repeat(large));
@@ -170,5 +171,21 @@ describe("markdown fuzzing", () => {
         `${JSON.stringify(token)} × ${String(large)}: ${slow.toFixed(0)} ms vs ${fast.toFixed(0)} ms`,
       ).toBeLessThan(allowed);
     }
+  };
+
+  it("takes time linear in the size on pathological repetitions", { timeout: 120_000 }, () => {
+    assertLinear(pathological);
+  });
+
+  it.fails(
+    "KNOWN: takes time linear on nested quotes, lists and unclosed links",
+    { timeout: 300_000 },
+    () => {
+      assertLinear(knownSuperLinear);
+    },
+  );
+
+  it.fails("KNOWN: does not overflow the stack on deeply nested quotes", () => {
+    analyzeMarkdown("> ".repeat(20_000));
   });
 });

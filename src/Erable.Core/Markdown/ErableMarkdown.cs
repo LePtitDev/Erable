@@ -29,7 +29,19 @@ public static partial class ErableMarkdown
     public static MarkdownAnalysis Analyze(string markdown)
     {
         ArgumentNullException.ThrowIfNull(markdown);
-        var document = Markdig.Markdown.Parse(markdown, Pipeline);
+        Markdig.Syntax.MarkdownDocument document;
+        try
+        {
+            document = Markdig.Markdown.Parse(markdown, Pipeline);
+        }
+        catch (ArgumentException)
+        {
+            // Markdig refuses input nested deeper than its limit (« [ » or « > » repeated thousands of times). The page is
+            // not sensible Markdown but it is the user's text: it is kept and indexed as plain text, with no reference and no
+            // heading, instead of failing the save (found by the fuzzing of M5-04).
+            return new MarkdownAnalysis([], [], NormalizeWhitespace(markdown));
+        }
+
         var references = new List<MarkdownReference>();
         var headings = new List<MarkdownHeading>();
         var anchors = new Slugs.UniqueAnchors();
@@ -111,11 +123,32 @@ public static partial class ErableMarkdown
         return text.ToString();
     }
 
+    /// <summary>
+    /// The text of the inlines in document order. Iterative on purpose: a hostile page can nest thousands of inlines
+    /// (« [[ » repeated 5 000 times), which a recursive walk turns into a stack overflow that no handler can catch and
+    /// that takes the whole server down (found by the fuzzing of M5-04).
+    /// </summary>
     private static void AppendInlines(StringBuilder text, ContainerInline? container)
     {
-        for (var inline = container?.FirstChild; inline is not null; inline = inline.NextSibling)
+        // The next sibling to visit in each container that is still open.
+        var resume = new Stack<Inline?>();
+        var inline = container?.FirstChild;
+        while (true)
         {
-            switch (inline)
+            if (inline is null)
+            {
+                if (resume.Count == 0)
+                {
+                    return;
+                }
+
+                inline = resume.Pop();
+                continue;
+            }
+
+            var current = inline;
+            inline = current.NextSibling;
+            switch (current)
             {
                 case ReferenceInline reference:
                     text.Append(reference.Reference.Label);
@@ -138,7 +171,8 @@ public static partial class ErableMarkdown
                 case TaskList:
                     break;
                 case ContainerInline child:
-                    AppendInlines(text, child);
+                    resume.Push(inline);
+                    inline = child.FirstChild;
                     break;
                 default:
                     break;

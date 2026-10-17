@@ -76,7 +76,7 @@ test.describe("F15 · Preferences", () => {
 
     const alert = preferences.dialog.getByRole("alert");
     await expect(alert).toContainText(
-      `${t("shortcuts.conflict", { action: t("shortcuts.actions.quickSearch"), combo: "Ctrl+K" })}`,
+      t("shortcuts.conflict", { action: t("shortcuts.actions.quickSearch"), combo: "Ctrl+K" }),
     );
     await expect(alert).toContainText("Recherche");
     // Replacing gives the combination to the palette; the search loses it.
