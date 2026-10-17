@@ -69,7 +69,7 @@ La ligne de commande l'emporte sur l'environnement, qui l'emporte sur les valeur
 ### Sauvegarde
 
 Arrêtez le conteneur (ou faites une copie cohérente du volume) puis copiez `/data` : c'est tout. Chaque projet est un dossier autonome (`projects/<identifiant>/` avec `erable.db`, `blobs/`) : `erable doctor <dossier>` en vérifie l'intégrité, volume monté ailleurs et conteneur arrêté.
-La sauvegarde continue (Litestream vers un stockage S3) est décrite avec la finition (M5-05).
+Pour une sauvegarde **continue** (quelques secondes de retard au plus), voir [§6](#6-sauvegarde-continue-avec-litestream).
 
 ### Mise à jour
 
@@ -112,3 +112,59 @@ Les WebSocket (SignalR : événements et présence) traversent `reverse_proxy` s
 | Impossible de se connecter derrière un proxy, ou « Trop de tentatives » pour tout le monde | `ERABLE_TRUST_PROXY` manquant : toutes les requêtes semblent venir de l'adresse du proxy. |
 | Le cookie n'est pas enregistré en HTTPS | `ERABLE_PUBLIC_URL` en `http://`, ou proxy qui ne transmet pas `X-Forwarded-Proto`. |
 | Les pièces jointes sont refusées (413) | `ERABLE_MAX_ATTACHMENT_MB` (taille d'un fichier) ou `ERABLE_PROJECT_QUOTA_MB` (place du projet). |
+
+---
+
+## 6. Sauvegarde continue avec Litestream
+
+Une copie du volume `/data` est la sauvegarde la plus simple (§2), mais elle exige d'arrêter le serveur et ne protège que jusqu'à la dernière copie. **Litestream** réplique en continu les bases SQLite vers un stockage S3-compatible (AWS S3, Scaleway, Backblaze B2, MinIO…) : la perte maximale est de quelques secondes d'écriture, pour quelques centimes par mois.
+
+### Ce qui est sauvegardé, et comment
+
+| Quoi | Où | Comment |
+|---|---|---|
+| Comptes et droits | `server.db` | Litestream |
+| Contenu de chaque projet | `projects/<id>/erable.db` | Litestream (les nouveaux projets sont détectés seuls) |
+| Manifeste du projet | `projects/<id>/erable.json` | copie périodique (service `files-backup`, rclone) |
+| Pièces jointes | `projects/<id>/blobs/` | copie périodique : les fichiers sont nommés par leur SHA-256, donc jamais modifiés ; la copie n'efface rien dans le bucket |
+
+Litestream ne sait répliquer que SQLite : sans le service `files-backup`, une restauration retrouverait les pages mais pas leurs pièces jointes ni le manifeste.
+
+### Mise en place
+
+1. Créez un **bucket** dédié et une clé d'accès limitée à ce bucket (lecture, écriture, liste).
+2. Dans `deploy/.env`, renseignez les variables `LITESTREAM_*` (voir `deploy/.env.example`).
+3. Démarrez avec le fichier supplémentaire :
+
+```bash
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml -f deploy/docker-compose.litestream.yml up -d
+```
+
+Litestream partage le volume `erable-data` avec le serveur (les bases sont en mode WAL, ce que Litestream exige) et ne demande rien de plus au serveur. `docker compose logs litestream` doit montrer une réplication par base. Les versions des images (`litestream/litestream`, `rclone/rclone`) sont figées dans le fichier : mettez-les à jour volontairement.
+
+### Restauration
+
+Le serveur doit être **arrêté** et le volume vide (ou débarrassé des bases abîmées).
+
+```bash
+docker compose -f deploy/docker-compose.yml down
+docker volume rm <projet>_erable-data && docker volume create <projet>_erable-data
+export LITESTREAM_BUCKET=… LITESTREAM_ENDPOINT=… LITESTREAM_ACCESS_KEY_ID=… LITESTREAM_SECRET_ACCESS_KEY=…
+deploy/litestream/restore.sh <projet>_erable-data <identifiant-projet-1> <identifiant-projet-2>
+```
+
+Les identifiants de projets sont les dossiers sous `projects/` du bucket (console S3 ou `rclone lsd`). Le script restaure `server.db`, chaque `erable.db`, puis copie manifestes et pièces jointes, et rend les fichiers à l'utilisateur de l'image (UID 1654). Redémarrez ensuite le serveur et vérifiez chaque projet :
+
+```bash
+docker compose -f deploy/docker-compose.yml run --rm --no-deps --entrypoint dotnet erable erable.dll doctor /data/projects/<identifiant>
+```
+
+### Tester la chaîne complète
+
+`deploy/litestream/test-restore.sh` joue le scénario de bout en bout avec un MinIO local : création d'un projet et d'une page, réplication, destruction du volume, restauration, `erable doctor`, puis lecture de la page. À lancer une fois après tout changement du fichier Litestream ou des versions d'images. **Il n'a pas encore été exécuté** : voir `tasks/M5-05-i18n-backup-docs.md`.
+
+### Limites
+
+- Litestream protège contre la perte du disque ou du serveur, pas contre une erreur humaine : une page supprimée par erreur se restaure par la corbeille et l'historique (F12, F13), pas par la sauvegarde.
+- Le retard de réplication des pièces jointes est celui de `FILES_BACKUP_INTERVAL_SECONDS` (5 minutes par défaut).
+- Une restauration remet le serveur dans l'état de la dernière réplication : les écritures plus récentes sont perdues.

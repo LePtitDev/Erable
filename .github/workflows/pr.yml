@@ -73,7 +73,7 @@ jobs:
           pnpm -C src/web build
           pnpm -C src/web bundle-size
       - name: E2E traceability (all M0 scenarios must have a test)
-        run: pnpm -C src/web e2e:trace --enforce M0
+        run: pnpm -C src/web e2e:trace --enforce M5
 
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

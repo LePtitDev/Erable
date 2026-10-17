@@ -1,0 +1,49 @@
+# Adds continuous backup to the SQLite databases (docs/deployment.md §6).
+#   docker compose --env-file deploy/.env -f deploy/docker-compose.yml -f deploy/docker-compose.litestream.yml up -d
+# Needs LITESTREAM_* in deploy/.env (see deploy/.env.example). Litestream shares the data volume with the server.
+services:
+  litestream:
+    image: litestream/litestream:0.3.13
+    restart: unless-stopped
+    command: ["replicate", "-config", "/etc/litestream.yml"]
+    depends_on:
+      erable:
+        condition: service_healthy
+    environment:
+      LITESTREAM_BUCKET: ${LITESTREAM_BUCKET:?set the bucket in deploy/.env}
+      LITESTREAM_ENDPOINT: ${LITESTREAM_ENDPOINT:?set the S3 endpoint in deploy/.env}
+      LITESTREAM_REGION: ${LITESTREAM_REGION:-us-east-1}
+      LITESTREAM_ACCESS_KEY_ID: ${LITESTREAM_ACCESS_KEY_ID:?set the access key in deploy/.env}
+      LITESTREAM_SECRET_ACCESS_KEY: ${LITESTREAM_SECRET_ACCESS_KEY:?set the secret key in deploy/.env}
+      LITESTREAM_FORCE_PATH_STYLE: ${LITESTREAM_FORCE_PATH_STYLE:-false}
+    volumes:
+      - erable-data:/data
+      - ./litestream/litestream.yml:/etc/litestream.yml:ro
+
+  # What Litestream cannot replicate: the manifest of each project (erable.json) and the attachments (blobs/, named by
+  # their SHA-256, so never modified: copying is enough). Nothing is ever deleted from the bucket.
+  files-backup:
+    image: rclone/rclone:1.68.2
+    restart: unless-stopped
+    depends_on:
+      erable:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        while true; do
+        rclone copy /data/projects "backup:$${LITESTREAM_BUCKET}/files"
+        --include "*/erable.json" --include "*/blobs/**" --create-empty-src-dirs=false;
+        sleep "$${FILES_BACKUP_INTERVAL_SECONDS:-300}"; done
+    environment:
+      LITESTREAM_BUCKET: ${LITESTREAM_BUCKET}
+      FILES_BACKUP_INTERVAL_SECONDS: ${FILES_BACKUP_INTERVAL_SECONDS:-300}
+      RCLONE_CONFIG_BACKUP_TYPE: s3
+      RCLONE_CONFIG_BACKUP_PROVIDER: Other
+      RCLONE_CONFIG_BACKUP_ENDPOINT: ${LITESTREAM_ENDPOINT}
+      RCLONE_CONFIG_BACKUP_REGION: ${LITESTREAM_REGION:-us-east-1}
+      RCLONE_CONFIG_BACKUP_ACCESS_KEY_ID: ${LITESTREAM_ACCESS_KEY_ID}
+      RCLONE_CONFIG_BACKUP_SECRET_ACCESS_KEY: ${LITESTREAM_SECRET_ACCESS_KEY}
+      RCLONE_CONFIG_BACKUP_FORCE_PATH_STYLE: ${LITESTREAM_FORCE_PATH_STYLE:-false}
+    volumes:
+      - erable-data:/data:ro

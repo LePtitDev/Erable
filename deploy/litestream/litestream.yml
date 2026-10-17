@@ -1,0 +1,29 @@
+# Continuous replication of the SQLite databases of an Erable server (docs/deployment.md §6, M5-05).
+# The databases are in WAL mode, which Litestream needs. The attachments (blobs/) are NOT SQLite: see the guide.
+# Environment variables are expanded by Litestream.
+dbs:
+  # Accounts and rights.
+  - path: /data/server.db
+    replica:
+      type: s3
+      bucket: ${LITESTREAM_BUCKET}
+      path: server.db
+      endpoint: ${LITESTREAM_ENDPOINT}
+      region: ${LITESTREAM_REGION}
+      access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+      secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+      force-path-style: ${LITESTREAM_FORCE_PATH_STYLE}
+  # One database per project, found as projects are created.
+  - dir: /data/projects
+    pattern: "erable.db"
+    recursive: true
+    watch: true
+    replica:
+      type: s3
+      bucket: ${LITESTREAM_BUCKET}
+      path: projects
+      endpoint: ${LITESTREAM_ENDPOINT}
+      region: ${LITESTREAM_REGION}
+      access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+      secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+      force-path-style: ${LITESTREAM_FORCE_PATH_STYLE}

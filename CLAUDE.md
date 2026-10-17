@@ -13,7 +13,10 @@ Ce fichier s'adresse aux agents IA qui implémentent le projet. Il est **priorit
 | `docs/architecture.md` | Stack, modèle de données, stockage, API, sécurité, jalons | §A-x |
 | `docs/features.md` | Fonctionnalités `Fnn`, règles `Fnn.Rn`, scénarios `E2E-nn-nn` (= critères d'acceptation) | Fnn / E2E-nn-nn |
 | `docs/testing.md` | Stratégie de test, outillage, définition de « terminé » | §T-x |
-| `docs/deployment.md` | Installer un serveur : `erable serve`, Docker, Compose + Caddy, variables `ERABLE_*` | — |
+| `docs/deployment.md` | Installer un serveur : `erable serve`, Docker, Compose + Caddy, variables `ERABLE_*`, sauvegarde continue Litestream | — |
+| `docs/release.md` | Publier une version : tag `v*`, installeurs Velopack, mise à jour, signature | — |
+| `docs/user-guide.md` | Guide de l'utilisateur : démarrage, `[[ID]]`, raccourcis, dossiers et sous-pages | — |
+| `docs/i18n-review.md` | Traductions : vérifications automatiques et liste à relire | — |
 | `mockups/Erable — Wiki local.html` | Référence visuelle des 6 écrans | Mockup |
 | `tasks/` | Plan d'implémentation, une tâche par fichier | `M<j>-<nn>` |
 
