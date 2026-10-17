@@ -1,0 +1,4 @@
+{
+  "$comment": "Tests en quarantaine (docs/testing.md §1, §13) : corrigés ou supprimés sous 24 h. Un test `@quarantine` sans entrée ici, ou une entrée sans test, échoue `pnpm quarantine:check`.",
+  "entries": []
+}

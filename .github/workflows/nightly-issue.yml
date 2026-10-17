@@ -1,0 +1,35 @@
+# Opens (or completes) an issue when a nightly or weekly workflow fails (M5-04, docs/testing.md §13).
+# Runs from the default branch with the permissions it declares; it reads nothing from the failed run but its metadata.
+name: Nightly failure issue
+
+on:
+  workflow_run:
+    workflows: ["Nightly", "Nightly robustness", "Weekly quality"]
+    types: [completed]
+
+permissions:
+  issues: write
+
+jobs:
+  report:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.event == 'schedule' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Open an issue, or add a comment to the one already open
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          COMMIT: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          title="Failure of the scheduled workflow: $WORKFLOW"
+          body="The run failed on commit \`${COMMIT:0:8}\`: $RUN_URL"
+          existing=$(gh issue list --state open --label ci-failure --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh label create ci-failure --color B60205 --description "A scheduled workflow failed" 2>/dev/null || true
+            gh issue create --title "$title" --label ci-failure --body "$body"
+          fi

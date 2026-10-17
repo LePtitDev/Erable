@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "timezone": "Europe/Paris",
+  "schedule": ["before 6am on monday"],
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 3,
+  "rangeStrategy": "pin",
+  "minimumReleaseAge": "3 days",
+  "packageRules": [
+    {
+      "description": "One weekly pull request per ecosystem: the whole PR pipeline runs once, not once per package.",
+      "matchManagers": ["nuget", "dotnet-sdk"],
+      "groupName": "NuGet and .NET dependencies"
+    },
+    {
+      "matchManagers": ["npm"],
+      "groupName": "npm dependencies (web)"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Docker base images and the Playwright image of the visual tests, together with the Playwright package.",
+      "matchManagers": ["dockerfile", "docker-compose"],
+      "groupName": "Docker images"
+    },
+    {
+      "description": "The Playwright image of the visual tests must stay on the version of the Playwright package (screenshots).",
+      "matchFileNames": ["src/web/e2e/visual/Dockerfile"],
+      "groupName": "Playwright (package and visual image)"
+    },
+    {
+      "matchPackageNames": ["@playwright/test"],
+      "groupName": "Playwright (package and visual image)"
+    },
+    {
+      "description": "Dotnet tools (vpk, Stryker) belong to the NuGet group but Velopack must stay aligned with vpk.",
+      "matchPackageNames": ["Velopack", "vpk"],
+      "groupName": "Velopack"
+    },
+    {
+      "description": "A major version is never merged without a look: its own pull request.",
+      "matchUpdateTypes": ["major"],
+      "groupName": null
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  }
+}

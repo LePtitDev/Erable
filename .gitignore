@@ -37,3 +37,5 @@ BenchmarkDotNet.Artifacts/
 
 # Local deployment settings (deploy/.env.example is the template).
 deploy/.env
+src/web/reports/
+src/web/node_modules/.stryker-tmp/

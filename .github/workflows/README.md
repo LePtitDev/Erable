@@ -4,6 +4,10 @@
 |---|---|---|
 | `pr.yml` | chaque push, chaque pull request, manuel (`workflow_dispatch`) | voir ci-dessous |
 | `release.yml` | tag `v*`, manuel | installeurs Velopack x4, fumee sur l installe, migration des projets `legacy/`, image Docker + scan, publication (docs/release.md) |
+| `nightly.yml` | chaque nuit, manuel | e2e complet 3 navigateurs + a11y, visuel (conteneur fixe), budgets et benchmarks, fumée desktop 3 OS ; quarantaine |
+| `nightly-robustness.yml` | chaque nuit | crash tests (100 arrêts) et charge NBomber |
+| `weekly-quality.yml` | dimanche | Stryker.NET, StrykerJS, fuzzing C# et TS (10 min chacun) |
+| `nightly-issue.yml` | échec d'un workflow planifié | ouvre (ou complète) une issue `ci-failure` |
 
 `pr.yml` (cible < 12 min, docs/testing.md §13), quatre jobs en parallèle :
 

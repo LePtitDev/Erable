@@ -1,0 +1,126 @@
+# Weekly quality of the tests themselves (M5-04, docs/testing.md §12): mutation testing (Stryker.NET on Erable.Core,
+# StrykerJS on the TypeScript twins of the shared specification) and ten minutes of Markdown fuzzing per language.
+# Objective: mutation score >= 70 %. The scores are in each job summary. A failure opens an issue (nightly-issue.yml).
+# Third-party actions are pinned by commit SHA (tag in comment); Renovate bumps them.
+name: Weekly quality
+
+on:
+  schedule:
+    - cron: "11 3 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-quality
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  NODE_VERSION: "22"
+
+jobs:
+  mutation-core:
+    name: Stryker.NET (Erable.Core)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - run: dotnet tool restore
+      - name: Mutate Erable.Core
+        working-directory: tests/Erable.Core.Tests
+        run: dotnet dotnet-stryker --config-file stryker-config.json
+      - name: Score in the summary
+        if: always()
+        run: node build/mutation-summary.mjs artifacts/mutation/core >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-core
+          path: artifacts/mutation/core/
+          if-no-files-found: ignore
+
+  mutation-web:
+    name: StrykerJS (ids, Markdown, rules)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: src/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: src/web/pnpm-lock.yaml
+      - run: pnpm -C src/web install --frozen-lockfile
+      - name: Mutate the TypeScript twins
+        run: pnpm -C src/web mutation
+      - name: Score in the summary
+        if: always()
+        run: node build/mutation-summary.mjs src/web/reports/mutation >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mutation-web
+          path: src/web/reports/mutation/
+          if-no-files-found: ignore
+
+  fuzz-csharp:
+    name: Fuzzing of the C# Markdown analysis (10 min)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ERABLE_FUZZ_SECONDS: "600"
+      ERABLE_FUZZ_OUTPUT: ${{ github.workspace }}/artifacts/fuzz
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - name: Fuzz with a new seed
+        run: ERABLE_FUZZ_SEED=$RANDOM dotnet test --project tests/Erable.Core.Tests -c Release -- --filter-class "*MarkdownFuzzTests"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: fuzz-cases-csharp
+          path: artifacts/fuzz/
+          if-no-files-found: ignore
+
+  fuzz-typescript:
+    name: Fuzzing of the TypeScript Markdown analysis (10 min)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_ERABLE_FUZZ_SECONDS: "600"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: src/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: src/web/pnpm-lock.yaml
+      - run: pnpm -C src/web install --frozen-lockfile
+      - name: Fuzz with a new seed
+        run: VITE_ERABLE_FUZZ_SEED=$RANDOM pnpm -C src/web exec vitest run src/shared/markdown/markdown.fuzz.test.ts

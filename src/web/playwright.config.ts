@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env["ERABLE_E2E_PORT"] ?? 5181);
 const ci = process.env["CI"] !== undefined;
+// Reserved to the nightly pipeline (docs/testing.md §13): Firefox, and the quarantined tests (run apart, never blocking).
+const nightly = process.env["ERABLE_E2E_NIGHTLY"] === "1";
 
 /**
  * End-to-end tests against the real backend in test mode (docs/testing.md §9).
@@ -30,8 +32,26 @@ export default defineConfig({
   // Timing measurements (@perf) are meaningless under a full parallel run: they run alone, `pnpm e2e:perf`.
   projects: [
     // Screenshots are compared in a fixed container only (`pnpm e2e:visual`): their own project, left out of the others.
-    { name: "chromium", use: { ...devices["Desktop Chrome"] }, grepInvert: /@perf|@visual/ },
-    { name: "webkit", use: { ...devices["Desktop Safari"] }, grepInvert: /@perf|@visual/ },
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+      grepInvert: /@perf|@visual|@quarantine/,
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+      grepInvert: /@perf|@visual|@quarantine/,
+    },
+    ...(nightly
+      ? [
+          {
+            name: "firefox",
+            use: { ...devices["Desktop Firefox"] },
+            grepInvert: /@perf|@visual|@quarantine/,
+          },
+          { name: "quarantine", use: { ...devices["Desktop Chrome"] }, grep: /@quarantine/ },
+        ]
+      : []),
     { name: "perf", use: { ...devices["Desktop Chrome"] }, grep: /@perf/ },
     {
       name: "visual",

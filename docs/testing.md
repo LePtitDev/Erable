@@ -244,6 +244,8 @@ Mesurés sur le projet généré **10 000 pages / 300 catégories / 50 000 réf�
 - **Couverture** : rapportée à chaque PR, mais seuil bloquant **uniquement sur Core**. Ailleurs, elle sert à repérer les trous, pas d'objectif chiffré : un objectif global pousse à écrire des tests inutiles.
 - **Fuzzing** du parseur Markdown (C# et TS) avec entrées aléatoires et corpus de cas réels pendant 10 minutes chaque semaine : aucun crash, aucune boucle infinie, temps linéaire en la taille de l'entrée.
 
+**Mise en œuvre (M5-04)** : `.github/workflows/weekly-quality.yml` (dimanche) lance Stryker.NET (`tests/Erable.Core.Tests/stryker-config.json`) sur `Erable.Core`, StrykerJS (`src/web/stryker.config.json`, `pnpm mutation`) sur les identifiants, le Markdown et les règles, puis dix minutes de fuzzing C# (`MarkdownFuzzTests`, `ERABLE_FUZZ_SECONDS`) et TS (`markdown.fuzz.test.ts`, `VITE_ERABLE_FUZZ_SECONDS`) avec une graine neuve. Une version courte (1 s, graine fixe) fait partie de la suite normale. Les scores et les survivants sont dans le résumé de chaque job (`build/mutation-summary.mjs`) ; les entrées en échec sont écrites dans `artifacts/fuzz/` au format de `spec/fixtures/markdown/edge-cases.json` pour y être ajoutées une fois la sortie attendue décidée.
+
 ---
 
 ## 13. Intégration continue
@@ -258,7 +260,8 @@ GitHub Actions, trois pipelines :
 
 - `main` est protégée : merge uniquement si le pipeline PR est vert et qu'une revue a été faite.
 - Les dépendances sont mises à jour par **Renovate**, regroupées chaque semaine, et passent par le même pipeline.
-- Un échec nightly ouvre automatiquement une issue.
+- Un échec nightly ouvre automatiquement une issue. (`nightly-issue.yml`, étiquette `ci-failure` ; commentaire sur l'issue déjà ouverte plutôt qu'un doublon).
+- **Quarantaine** : un test instable reçoit le tag `@quarantine` dans son titre et une entrée dans `spec/quarantine.json` ; il sort des pipelines bloquants (projet Playwright `quarantine`, nightly seulement, non bloquant). `pnpm quarantine:check` (nightly) échoue si une entrée a plus de 24 h ou si le registre et les tags divergent : corrigé ou supprimé, jamais « à relancer ».
 
 ---
 

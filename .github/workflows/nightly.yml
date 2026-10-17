@@ -1,0 +1,177 @@
+# Nightly pipeline (M5-04, docs/testing.md §13): everything the PR pipeline leaves out. Target < 45 min: the jobs run in
+# parallel. Crash tests and load are in nightly-robustness.yml. A failure opens an issue (nightly-issue.yml).
+# Third-party actions are pinned by commit SHA (tag in comment); Renovate bumps them.
+name: Nightly
+
+on:
+  schedule:
+    - cron: "37 1 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  NODE_VERSION: "22"
+
+jobs:
+  e2e:
+    name: E2E, all scenarios (Chromium, WebKit, Firefox) and accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ERABLE_E2E_NIGHTLY: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: src/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: src/web/pnpm-lock.yaml
+      - run: pnpm -C src/web install --frozen-lockfile
+      - name: Quarantine registry (nothing older than 24 h)
+        run: pnpm -C src/web quarantine:check
+      - name: Playwright browsers
+        run: pnpm -C src/web exec playwright install --with-deps chromium webkit firefox
+      - run: dotnet build src/Erable.Server
+      - name: E2E (every scenario, three browsers)
+        run: pnpm -C src/web e2e:nightly
+      - name: Quarantined tests (reported, never blocking)
+        continue-on-error: true
+        run: pnpm -C src/web e2e:quarantine
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            src/web/playwright-report/
+            src/web/test-results/
+          retention-days: 14
+
+  visual:
+    name: Visual regressions (fixed container)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # Same image and same command as on a workstation: docs/testing.md §9.3, src/web/e2e/screenshots/README.md.
+      - name: Compare the screenshots
+        run: node src/web/scripts/visual-docker.mjs
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: visual-diffs
+          path: src/web/test-results/
+          retention-days: 14
+
+  performance:
+    name: Benchmarks and budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - name: Server budgets (p95)
+        run: dotnet run -c Release --project tests/Erable.Benchmarks -- budgets --light --json artifacts/perf/budgets.json
+      - name: BenchmarkDotNet against the baseline (> +15 % fails)
+        run: dotnet run -c Release --project tests/Erable.Benchmarks -- bench
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: perf-report
+          path: artifacts/perf/
+          if-no-files-found: ignore
+
+  desktop:
+    name: Desktop smoke (${{ matrix.rid }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, rid: win-x64 }
+          - { os: ubuntu-latest, rid: linux-x64 }
+          - { os: macos-latest, rid: osx-arm64 }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: src/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: src/web/pnpm-lock.yaml
+      - run: pnpm -C src/web install --frozen-lockfile
+      - name: Publish
+        run: node build/publish-desktop.mjs ${{ matrix.rid }}
+      - name: Linux runtime dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Smoke (Windows: WebView2 over CDP, then self-test)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          pnpm -C src/web e2e:desktop
+          $p = Start-Process artifacts/desktop/win-x64/Erable/Erable.Desktop.exe -ArgumentList '--self-test','--self-test-report','self-test.json' -PassThru -Wait
+          Get-Content self-test.json
+          if ($p.ExitCode -ne 0) { exit 1 }
+      - name: Smoke (self-test)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          app=artifacts/desktop/${{ matrix.rid }}/Erable/Erable.Desktop
+          if [ "$RUNNER_OS" = "Linux" ]; then run="xvfb-run -a"; else run=""; fi
+          status=0
+          $run "$app" --self-test --self-test-report self-test.json || status=$?
+          cat self-test.json || true
+          exit $status
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: desktop-smoke-${{ matrix.rid }}
+          path: |
+            self-test.json
+            src/web/playwright-report-desktop/
+          if-no-files-found: ignore
