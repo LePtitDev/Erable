@@ -16,6 +16,12 @@
     "retry": "Reintentar"
   },
   "preferences": {
+    "displayName": {
+      "label": "Nombre visible",
+      "hint": "Se muestra en la pantalla de inicio y como autor de sus cambios.",
+      "save": "Guardar",
+      "saved": "Nombre guardado."
+    },
     "language": "Idioma de la interfaz",
     "theme": {
       "label": "Tema",

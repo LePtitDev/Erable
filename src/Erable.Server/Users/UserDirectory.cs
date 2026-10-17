@@ -1,23 +1,28 @@
 using System.Text.Json;
 using Erable.Core.Projects;
 using Erable.Server.Hosting;
+using Erable.Server.Projects;
 
 namespace Erable.Server.Users;
 
 /// <summary>
 /// Display names of the authors recorded in projects (<c>createdBy</c>, <c>updatedBy</c>): the accounts of the server (M4-01), else
-/// the local user; test mode also knows the users of <c>spec/projects/users.json</c>, the authors
-/// of the reference project. An unknown author is shown by its identifier.
+/// the local user, under the name chosen in the preferences or, by default, the OS account name; test mode also knows
+/// the users of <c>spec/projects/users.json</c>, the authors of the reference project. An unknown author is shown by its identifier.
 /// </summary>
 public sealed class UserDirectory
 {
     private readonly Dictionary<string, string> _names = new(StringComparer.Ordinal);
     private readonly Accounts.AccountService _accounts;
+    private readonly UserProfiles _profiles;
+    private readonly IHttpContextAccessor _http;
 
-    public UserDirectory(ErableHostOptions options, Accounts.AccountService accounts)
+    public UserDirectory(ErableHostOptions options, Accounts.AccountService accounts, UserProfiles profiles, IHttpContextAccessor http)
     {
         ArgumentNullException.ThrowIfNull(options);
         _accounts = accounts;
+        _profiles = profiles;
+        _http = http;
         _names[KnownUsers.Local] = LocalName();
         if (ErableHost.TestEndpointsCompiled && options.TestMode && options.FixturesDirectory is { } fixtures)
         {
@@ -32,6 +37,11 @@ public sealed class UserDirectory
     public string NameOf(string userId)
     {
         ArgumentNullException.ThrowIfNull(userId);
+        if (userId == KnownUsers.Local && _profiles.For(_http.HttpContext).GetDisplayName() is { } chosen)
+        {
+            return chosen;
+        }
+
         return _accounts.DisplayNameOf(userId) ?? (_names.TryGetValue(userId, out var name) ? name : userId);
     }
 

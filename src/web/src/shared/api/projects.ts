@@ -14,6 +14,23 @@ export const meQuery = queryOptions({
   staleTime: Infinity,
 });
 
+/**
+ * Changes the name the user is shown under (greeting, authors, presence). Everything else cached may show it as an
+ * author, so it is refetched too.
+ */
+export function useRenameMe() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => unwrap(api.PUT("/api/v1/me/name", { body: { name } })),
+    onSuccess: (me) => {
+      client.setQueryData(queryKeys.me, me);
+      return client.invalidateQueries({
+        predicate: (query) => query.queryHash !== JSON.stringify(queryKeys.me),
+      });
+    },
+  });
+}
+
 export const projectListQuery = queryOptions({
   queryKey: queryKeys.projectList,
   queryFn: ({ signal }) => unwrap(api.GET("/api/v1/projects", { signal })),

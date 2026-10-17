@@ -2375,6 +2375,36 @@
         }
       }
     },
+    "/api/v1/me/name": {
+      "put": {
+        "tags": [
+          "Me"
+        ],
+        "operationId": "RenameMe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameMeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me/recent-projects": {
       "get": {
         "tags": [
@@ -4748,6 +4778,17 @@
             "$ref": "#/components/schemas/ProjectRole"
           },
           "serverId": {
+            "type": "string"
+          }
+        }
+      },
+      "RenameMeRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
             "type": "string"
           }
         }

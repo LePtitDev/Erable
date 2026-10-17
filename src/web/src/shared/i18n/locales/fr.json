@@ -16,6 +16,12 @@
     "retry": "Réessayer"
   },
   "preferences": {
+    "displayName": {
+      "label": "Nom affiché",
+      "hint": "Utilisé sur l’accueil et comme auteur de vos modifications.",
+      "save": "Enregistrer",
+      "saved": "Nom enregistré."
+    },
     "language": "Langue de l'interface",
     "theme": {
       "label": "Thème",

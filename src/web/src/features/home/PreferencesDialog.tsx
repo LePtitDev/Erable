@@ -3,6 +3,7 @@ import { LanguageSwitcher } from "../../shared/i18n/LanguageSwitcher";
 import { ThemeSwitcher } from "../../shared/theme/ThemeSwitcher";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
+import { DisplayNameSettings } from "./DisplayNameSettings";
 import { ShortcutsSettings } from "./ShortcutsSettings";
 import field from "../../shared/ui/Field.module.css";
 
@@ -32,6 +33,7 @@ export function PreferencesDialog({
       }
     >
       <div className={field["form"]}>
+        <DisplayNameSettings />
         <LanguageSwitcher />
         <ThemeSwitcher />
         <ShortcutsSettings />

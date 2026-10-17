@@ -16,6 +16,12 @@
     "retry": "Retry"
   },
   "preferences": {
+    "displayName": {
+      "label": "Display name",
+      "hint": "Shown on the home screen and as the author of your changes.",
+      "save": "Save",
+      "saved": "Name saved."
+    },
     "language": "Interface language",
     "theme": {
       "label": "Theme",

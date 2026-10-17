@@ -16,6 +16,12 @@
     "retry": "Erneut versuchen"
   },
   "preferences": {
+    "displayName": {
+      "label": "Anzeigename",
+      "hint": "Wird auf der Startseite und als Autor Ihrer Änderungen angezeigt.",
+      "save": "Speichern",
+      "saved": "Name gespeichert."
+    },
     "language": "Sprache der Oberfläche",
     "theme": {
       "label": "Design",

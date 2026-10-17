@@ -293,4 +293,95 @@ describe("HomeScreen", () => {
     await user.click(within(confirm).getByRole("button", { name: "Annuler" }));
     expect(created).toBe(false);
   });
+  describe("display name", () => {
+    function mockRename() {
+      const sent: unknown[] = [];
+      server.use(
+        http.get("/api/v1/me/preferences", ({ response }) =>
+          response(200).json({ language: "fr", theme: "system", shortcuts: {} }),
+        ),
+        http.put("/api/v1/me/name", async ({ request, response }) => {
+          const body = await request.json();
+          sent.push(body);
+          if (body.name.trim() === "") {
+            return response.untyped(
+              HttpResponse.json(
+                { status: 422, code: "account.name.invalid" },
+                { status: 422, headers: { "Content-Type": "application/problem+json" } },
+              ),
+            );
+          }
+          return response(200).json({
+            id: "local",
+            name: body.name.trim(),
+            defaultProjectsFolder: "C:\\Users\\arthur\\Documents\\Erable",
+            isServerAdmin: true,
+          });
+        }),
+      );
+      return sent;
+    }
+
+    async function openPreferences(user: ReturnType<typeof userEvent.setup>) {
+      await screen.findByRole("heading", { level: 1, name: "Bonjour, Arthur" });
+      await user.click(screen.getByRole("button", { name: "Préférences" }));
+      return screen.findByRole("dialog", { name: "Préférences" });
+    }
+
+    it("renames the user from the preferences and greets them with the new name", async () => {
+      mockHome();
+      const sent = mockRename();
+      const user = userEvent.setup();
+      await renderApp("/");
+      const dialog = await openPreferences(user);
+
+      const input = within(dialog).getByLabelText("Nom affiché");
+      await waitFor(() => {
+        expect(input).toHaveValue("Arthur");
+      });
+      await user.clear(input);
+      await user.type(input, "Camille{Enter}");
+
+      expect(await within(dialog).findByRole("status")).toHaveTextContent("Nom enregistré.");
+      expect(sent).toEqual([{ name: "Camille" }]);
+      await user.click(within(dialog).getByRole("button", { name: "Fermer" }));
+      expect(
+        await screen.findByRole("heading", { level: 1, name: "Bonjour, Camille" }),
+      ).toBeInTheDocument();
+    });
+
+    it("cannot save an unchanged name", async () => {
+      mockHome();
+      mockRename();
+      const user = userEvent.setup();
+      await renderApp("/");
+      const dialog = await openPreferences(user);
+
+      await waitFor(() => {
+        expect(within(dialog).getByLabelText("Nom affiché")).toHaveValue("Arthur");
+      });
+
+      expect(within(dialog).getByRole("button", { name: "Enregistrer" })).toBeDisabled();
+    });
+
+    it("shows why a name is refused", async () => {
+      mockHome();
+      mockRename();
+      const user = userEvent.setup();
+      await renderApp("/");
+      const dialog = await openPreferences(user);
+
+      const input = within(dialog).getByLabelText("Nom affiché");
+      await waitFor(() => {
+        expect(input).toHaveValue("Arthur");
+      });
+      await user.clear(input);
+      await user.type(input, "   ");
+      await user.click(within(dialog).getByRole("button", { name: "Enregistrer" }));
+
+      expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+        "Le nom affiché doit comporter 1 à 80 caractères.",
+      );
+    });
+  });
 });

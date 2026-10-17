@@ -93,6 +93,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M5-03](M5-03-release-pipeline.md) | Velopack, signature, pipeline release | M0-11 | todo |
 | [M5-04](M5-04-quality-nightly.md) | Nightly, mutation testing, fuzzing | M3-06 | todo |
 | [M5-05](M5-05-i18n-backup-docs.md) | i18n complète et documentation d'exploitation | toutes | todo |
+| [M5-06](M5-06-display-name.md) | Nom affiché modifiable dans les préférences | M1-08, M4-01 | review |
 
 ## Chemin critique
 

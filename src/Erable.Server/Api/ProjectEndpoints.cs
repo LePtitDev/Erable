@@ -55,6 +55,7 @@ public static class ProjectEndpoints
 
         var me = api.MapGroup("/me").WithTags("Me").RequireSignIn();
         me.MapGet("/", GetMe).WithName("GetMe");
+        me.MapPut("/name", RenameMe).WithName("RenameMe");
         me.MapGet("/recent-projects", ListRecent).WithName("ListRecentProjects");
         me.MapDelete("/recent-projects/{projectId}", RemoveRecent).WithName("RemoveRecentProject");
         me.MapPut("/recent-projects/{projectId}/last-element", RecordLastElement).WithName("RecordLastElement");
@@ -419,6 +420,37 @@ public static class ProjectEndpoints
             ? Path.Combine(options.DataDirectory ?? Path.GetTempPath(), "e2e", slot, "projects")
             : DefaultProjectsFolder(options);
         return TypedResults.Ok(new CurrentUserInfo(id, users.NameOf(id), folder, http.User.IsServerAdmin()));
+    }
+
+    /// <summary>
+    /// Changes the name the user is shown under, everywhere: on a server the display name of their account (seen by the
+    /// other members too), on the desktop a name kept in the application profile in place of the OS account name.
+    /// </summary>
+    private static Results<Ok<CurrentUserInfo>, ProblemHttpResult> RenameMe(
+        RenameMeRequest request, AccountService accounts, UserProfile profile, UserDirectory users, ErableHostOptions options,
+        UserProfiles profiles, HttpContext http)
+    {
+        var name = AccountRules.NormalizeDisplayName(request.Name);
+        if (!name.IsSuccess)
+        {
+            return Problems.From(name.Error);
+        }
+
+        var id = CurrentUser.Id(http);
+        if (accounts.Enabled)
+        {
+            var updated = accounts.UpdateAccount(id, name.Value, disabled: null, isServerAdmin: null, password: null);
+            if (!updated.IsSuccess)
+            {
+                return Problems.From(updated.Error);
+            }
+        }
+        else
+        {
+            profile.SaveDisplayName(name.Value);
+        }
+
+        return GetMe(users, options, profiles, http);
     }
 
     /// <summary>Desktop: <c>Documents/Erable</c>; server: <c>&lt;data&gt;/projects</c> (docs/architecture.md §7.1).</summary>

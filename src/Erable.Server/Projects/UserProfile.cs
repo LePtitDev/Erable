@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Erable.Core;
+using Erable.Core.Accounts;
 using Erable.Storage;
 
 namespace Erable.Server.Projects;
@@ -17,8 +18,12 @@ public sealed class UserProfile
 
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { WriteIndented = true, NewLine = "\n" };
 
+    private const string IdentityFile = "identity.json";
+
     private readonly Lock _gate = new();
     private readonly string _directory;
+    private string? _displayName;
+    private bool _identityLoaded;
 
     public UserProfile(string directory)
     {
@@ -100,6 +105,37 @@ public sealed class UserProfile
         }
     }
 
+    /// <summary>
+    /// Display name chosen by the local user (desktop), or null to keep the OS account name. Kept in memory once read:
+    /// it is looked up for every author shown (history, presence).
+    /// </summary>
+    public string? GetDisplayName()
+    {
+        lock (_gate)
+        {
+            if (!_identityLoaded)
+            {
+                _displayName = AccountRules.NormalizeDisplayName(Read<IdentityDocument>(IdentityFile)?.Name) is { IsSuccess: true } name
+                    ? name.Value
+                    : null;
+                _identityLoaded = true;
+            }
+
+            return _displayName;
+        }
+    }
+
+    /// <summary>Saves the display name of the local user; it must already be normalized (<see cref="AccountRules.NormalizeDisplayName"/>).</summary>
+    public void SaveDisplayName(string name)
+    {
+        lock (_gate)
+        {
+            Write(IdentityFile, new IdentityDocument(name));
+            _displayName = name;
+            _identityLoaded = true;
+        }
+    }
+
     /// <summary>Reads a profile document; null when absent or unreadable (a damaged profile must not block the app).</summary>
     public T? Read<T>(string name)
         where T : class
@@ -127,6 +163,8 @@ public sealed class UserProfile
 
     /// <summary>Deletes a profile document; nothing happens when it does not exist.</summary>
     public void Delete(string name) => File.Delete(Path.Combine(_directory, name));
+
+    private sealed record IdentityDocument(string? Name);
 
     private static bool SameFolder(string a, string b) =>
         string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar),
