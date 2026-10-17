@@ -1,0 +1,207 @@
+# Release pipeline (M5-03, docs/testing.md §13, docs/release.md): a tag `v*` builds the desktop installers on the three
+# systems, smoke-tests the installed application, migrates every frozen legacy project, builds and scans the server image,
+# then publishes. The release stays a draft until everything is green.
+# Third-party actions are pinned by commit SHA (tag in comment); Renovate bumps them.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build without publishing (x.y.z); the packages are only kept as workflow artifacts"
+        required: true
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  NODE_VERSION: "22"
+  # A tag push publishes; a manual run only builds.
+  PUBLISH: ${{ github.event_name == 'push' }}
+  VERSION: ${{ github.event_name == 'push' && github.ref_name || format('v{0}', inputs.version) }}
+
+jobs:
+  legacy:
+    name: Migrate every legacy project
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      # spec/projects/legacy/vN: each published format version is opened, migrated and checked (docs/testing.md §6).
+      - name: Open and migrate each frozen project
+        run: dotnet test --project tests/Erable.Storage.Tests -c Release -- --filter-class "*LegacyProjectTests" --filter-class "*ProjectMigrationTests"
+      - name: Migration through the API
+        run: dotnet test --project tests/Erable.Server.Tests -c Release -- --filter-class "*ProjectMigrationApiTests"
+
+  notes:
+    name: Release notes and draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Notes from the commits since the previous tag
+        run: node build/release-notes.mjs "$VERSION" > release-notes.md
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-notes
+          path: release-notes.md
+      - name: Draft release
+        if: env.PUBLISH == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$VERSION" --draft --title "Erable ${VERSION#v}" --notes-file release-notes.md
+
+  package:
+    name: Installer (${{ matrix.rid }})
+    needs: [notes, legacy]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: windows-latest, rid: win-x64 }
+          - { os: ubuntu-latest, rid: linux-x64 }
+          - { os: macos-latest, rid: osx-arm64 }
+          - { os: macos-latest, rid: osx-x64 }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    # Signing is optional: without these secrets the packages are unsigned (docs/release.md lists what to provide).
+    env:
+      ERABLE_SIGN_AZURE_METADATA: ${{ secrets.ERABLE_SIGN_AZURE_METADATA }}
+      ERABLE_SIGN_APPLE_APP_IDENTITY: ${{ secrets.ERABLE_SIGN_APPLE_APP_IDENTITY }}
+      ERABLE_SIGN_APPLE_INSTALL_IDENTITY: ${{ secrets.ERABLE_SIGN_APPLE_INSTALL_IDENTITY }}
+      ERABLE_NOTARY_PROFILE: ${{ secrets.ERABLE_NOTARY_PROFILE }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-${{ runner.os }}-
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: src/web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: src/web/pnpm-lock.yaml
+      - run: pnpm -C src/web install --frozen-lockfile
+
+      - name: Package (Velopack)
+        shell: bash
+        run: node build/pack-desktop.mjs ${{ matrix.rid }} --version "${VERSION#v}"
+
+      - name: Linux runtime dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good libfuse2t64
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      # Smoke on the INSTALLERS, not on the build tree (docs/testing.md §10).
+      - name: Smoke test of the installed application (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem artifacts/release/win-x64 -Filter '*Setup.exe' | Select-Object -First 1
+          Start-Process $setup.FullName -ArgumentList '--silent' -Wait
+          $app = Join-Path $env:LOCALAPPDATA 'Erable/current/Erable.Desktop.exe'
+          if (-not (Test-Path $app)) { Write-Error "Not installed: $app"; exit 1 }
+          $p = Start-Process $app -ArgumentList '--self-test','--self-test-report','self-test.json' -PassThru -Wait
+          Get-Content self-test.json
+          if ($p.ExitCode -ne 0) { exit 1 }
+      - name: Smoke test of the AppImage (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          image=$(ls artifacts/release/linux-x64/*.AppImage | head -n 1)
+          chmod +x "$image"
+          status=0
+          xvfb-run -a "$image" --appimage-extract-and-run --self-test --self-test-report self-test.json || status=$?
+          cat self-test.json || true
+          exit $status
+      - name: Smoke test of the application bundle (macOS arm64)
+        if: runner.os == 'macOS' && matrix.rid == 'osx-arm64'
+        run: |
+          # The portable archive holds the same application bundle as the .pkg installer.
+          mkdir portable && unzip -q artifacts/release/osx-arm64/*Portable.zip -d portable
+          app=$(find portable -name Erable.Desktop -type f -perm +111 | head -n 1)
+          status=0
+          "$app" --self-test --self-test-report self-test.json || status=$?
+          cat self-test.json || true
+          exit $status
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-${{ matrix.rid }}
+          path: artifacts/release/${{ matrix.rid }}/
+          retention-days: 30
+      - name: Attach to the draft release
+        if: env.PUBLISH == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$VERSION" artifacts/release/${{ matrix.rid }}/* --clobber
+
+  image:
+    name: Server image (build, scan, push)
+    needs: [notes, legacy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build
+        run: docker build --tag erable:release .
+      - name: Scan for known vulnerabilities (fixed HIGH and CRITICAL fail the release)
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: erable:release
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
+      - name: Push to the GitHub registry
+        if: env.PUBLISH == 'true'
+        run: |
+          repository="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/erable"
+          echo "${{ github.token }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+          for tag in "${VERSION#v}" latest; do
+            docker tag erable:release "$repository:$tag"
+            docker push "$repository:$tag"
+          done
+
+  publish:
+    name: Publish
+    needs: [package, image]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release edit "$VERSION" --draft=false

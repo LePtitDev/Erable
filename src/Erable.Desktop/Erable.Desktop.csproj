@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="PhotinoX" />
+    <PackageReference Include="Velopack" />
   </ItemGroup>
 
   <PropertyGroup>

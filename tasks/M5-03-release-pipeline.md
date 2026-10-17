@@ -1,6 +1,6 @@
 # M5-03 — Velopack, signature, pipeline release
 
-- **Statut** : todo
+- **Statut** : in-progress
 - **Jalon** : M5
 - **Dépend de** : M0-11
 - **Références** : §A-10 (Packaging), §A-11.4 (coûts), §T-10, §T-13 (Release), P-06
@@ -23,7 +23,13 @@ Une version 1.0 installable et qui se met à jour seule sur les trois OS.
 
 ## Notes d'implémentation
 
-_À remplir par l'agent : décisions, écarts, dettes, commandes de vérification, message de commit proposé._
+- **Velopack 1.2.161** (`Directory.Packages.props`) dans `Erable.Desktop` ; `vpk` 1.2.161 en outil local (`.config/dotnet-tools.json`, `dotnet tool restore`). `VelopackApp.Build().Run()` est la première instruction de `Main`.
+- **Mise à jour** (`AppUpdater`) : au démarrage, hors tests et `--self-test`, uniquement si l'application est installée ; téléchargement en arrière-plan, installation à la fermeture suivante (`WaitExitThenApplyUpdates`), jamais en session. Désactivable par `ERABLE_DISABLE_UPDATES=1` ou `desktop.json` (`checkForUpdates: false`) dans le profil. `ERABLE_UPDATE_SOURCE` (dossier ou URL) remplace GitHub pour vérifier N → N+1 sans publier.
+- **Scripts** : `build/pack-desktop.mjs <rid> --version x.y.z` (publish + `vpk pack`, signature pilotée par variables d'environnement) ; `build/release-notes.mjs <tag>` (notes depuis les Conventional Commits).
+- **Workflow `release.yml`** : `legacy` → `notes` → `package` ×4 (installeur, fumée sur l'installé) + `image` (scan Trivy, push GHCR) → `publish` (brouillon → publié). Aucune action tierce nouvelle (pas de SHA inventé) : `gh` et `docker` en ligne de commande.
+- **Signature** : rien acheté ni créé. `docs/release.md` liste ce que l'utilisateur doit fournir (Azure Trusted Signing, Apple Developer, secrets). Le câblage de l'authentification Azure et de l'import du trousseau Apple n'est pas écrit (comptes inexistants).
+- **Non vérifié** : seul le build de `Erable.Desktop` a été exécuté ; ni `vpk pack`, ni le workflow, ni la mise à jour N → N+1 n'ont tourné. Les critères « release de test sur 3 OS » et « mise à jour N → N+1 » restent donc ouverts : ils demandent un tag créé par l'utilisateur et la procédure de `docs/release.md`. Fumée macOS sur l'installé : bundle de l'archive portable (le `.pkg` s'installe avec `sudo`, non testé) ; osx-x64 sans fumée.
+- Message de commit : `feat(desktop): add Velopack packaging, auto-update and release pipeline (M5-03)`
 
 ## Propositions
 

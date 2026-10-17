@@ -1,5 +1,5 @@
 // Publishes the self-contained desktop application for one runtime and archives it (decision P-06: plain
-// archives in M0, Velopack installer in M5-03).
+// archives in M0, Velopack installer: build/pack-desktop.mjs, M5-03).
 // Usage: node build/publish-desktop.mjs <rid> [--skip-web]
 //   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64
 // Output: artifacts/desktop/<rid>/Erable/ and artifacts/desktop/Erable-<rid>.(zip|tar.gz)

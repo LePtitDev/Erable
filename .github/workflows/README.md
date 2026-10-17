@@ -3,6 +3,7 @@
 | Workflow | Déclencheur | Contenu |
 |---|---|---|
 | `pr.yml` | chaque push, chaque pull request, manuel (`workflow_dispatch`) | voir ci-dessous |
+| `release.yml` | tag `v*`, manuel | installeurs Velopack x4, fumee sur l installe, migration des projets `legacy/`, image Docker + scan, publication (docs/release.md) |
 
 `pr.yml` (cible < 12 min, docs/testing.md §13), quatre jobs en parallèle :
 

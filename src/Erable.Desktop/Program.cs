@@ -3,6 +3,7 @@ using Erable.Server.Api;
 using Erable.Server.Hosting;
 using Erable.Server.Native;
 using Microsoft.Extensions.DependencyInjection;
+using Velopack;
 
 namespace Erable.Desktop;
 
@@ -14,6 +15,9 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        // First thing, before anything else: Velopack handles its install, update and uninstall hooks here and exits.
+        VelopackApp.Build().Run();
+
         var selfTest = args.Contains(SelfTest.Flag);
         var reportIndex = Array.IndexOf(args, SelfTest.ReportFlag);
         var reportPath = reportIndex >= 0 && reportIndex + 1 < args.Length ? args[reportIndex + 1] : null;
@@ -58,6 +62,12 @@ internal static class Program
         {
             app.StartAsync().GetAwaiter().GetResult();
             var baseAddress = ErableHost.GetListeningUri(app);
+
+            // Tests and the smoke journey must not depend on the network or change the installed version.
+            if (!selfTest && !testMode)
+            {
+                _ = Task.Run(() => AppUpdater.CheckAsync(profile));
+            }
 
             // The token travels in the fragment: never sent to the server, so never in a request log.
             var fragment = "#session=" + token;
