@@ -44,8 +44,25 @@ export async function changeLanguage(language: string, instance: I18n = i18next)
   await instance.changeLanguage(language);
 }
 
+/**
+ * The pseudo-locale exists in development and in the build the end-to-end tests use (`VITE_PSEUDO_LOCALE=1`, set by
+ * e2e/support/start-backend.mjs); never in a release build.
+ */
+const pseudoEnabled = import.meta.env.DEV || import.meta.env["VITE_PSEUDO_LOCALE"] === "1";
+
+/** Where the visual tests ask for the pseudo-locale without saving it as a preference (the backend refuses it). */
+const forcedLocaleKey = "erable:locale";
+
+function forcedLocale(): string | null {
+  try {
+    return window.sessionStorage.getItem(forcedLocaleKey);
+  } catch {
+    return null;
+  }
+}
+
 export function availableLanguages(): string[] {
-  return import.meta.env.DEV ? [...interfaceLanguages, pseudoLanguage] : [...interfaceLanguages];
+  return pseudoEnabled ? [...interfaceLanguages, pseudoLanguage] : [...interfaceLanguages];
 }
 
 /**
@@ -54,7 +71,7 @@ export function availableLanguages(): string[] {
  */
 export function initialLanguage(): string {
   const fromDocument = document.documentElement.lang;
-  if (fromDocument === pseudoLanguage && import.meta.env.DEV) {
+  if (pseudoEnabled && (fromDocument === pseudoLanguage || forcedLocale() === pseudoLanguage)) {
     return pseudoLanguage;
   }
   return isInterfaceLanguage(fromDocument)

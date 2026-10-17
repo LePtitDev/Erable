@@ -190,6 +190,7 @@ Règles d'écriture :
 
 - Captures de chaque écran du mockup en **clair/sombre × fr/en × xx**, comparées à des références. Le rendu est stabilisé (polices embarquées, animations coupées, horloge figée) et exécuté dans un conteneur Docker fixe pour éviter les différences d'un poste à l'autre.
 - **axe-core** sur chaque écran : zéro violation « serious » ou « critical ». Contraste vérifié dans les deux thèmes.
+- **Procédure** : les captures sont des tests Playwright du projet `visual` (`@visual`), exclus des autres projets. Elles se comparent et se mettent à jour dans le conteneur fixe `src/web/e2e/visual/Dockerfile` : `pnpm -C src/web e2e:visual:docker` (ajouter `-- --update` pour réécrire les références, puis relire chaque image modifiée avant de commiter). Les références sont versionnées dans `src/web/e2e/screenshots/`. La pseudo-locale `xx` n'existe que dans le build de test (`VITE_PSEUDO_LOCALE=1`).
 - Un parcours **100 % clavier** (arbre, édition, palette, recherche), puisque l'outil vise une ergonomie de type IDE.
 
 ---

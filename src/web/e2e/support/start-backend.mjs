@@ -19,6 +19,8 @@ if (!process.argv.includes("--skip-build")) {
     {
       cwd: webDir,
       stdio: "inherit",
+      // The pseudo-locale (xx) is part of the test build only: the visual tests render it (docs/testing.md §9.3).
+      env: { ...process.env, VITE_PSEUDO_LOCALE: "1" },
     },
   );
 }

@@ -22,6 +22,8 @@
     "api:check": "node scripts/api-generate.mjs --check",
     "e2e": "playwright test",
     "e2e:pr": "playwright test --grep @pr",
+    "e2e:visual": "playwright test --project visual",
+    "e2e:visual:docker": "node scripts/visual-docker.mjs",
     "e2e:perf": "playwright test --project perf --workers 1",
     "e2e:trace": "node scripts/trace-e2e.mjs",
     "e2e:desktop": "playwright test --config playwright.desktop.config.ts"

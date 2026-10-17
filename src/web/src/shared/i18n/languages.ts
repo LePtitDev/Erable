@@ -5,7 +5,7 @@
 export const interfaceLanguages = ["fr", "en", "de", "es"] as const;
 export type InterfaceLanguage = (typeof interfaceLanguages)[number];
 
-/** Pseudo-locale for layout and missing-translation checks (docs/testing.md §8.2), development only. */
+/** Pseudo-locale for layout and missing-translation checks (docs/testing.md §8.2), development and end-to-end builds only. */
 export const pseudoLanguage = "xx";
 
 export const referenceLanguage: InterfaceLanguage = "fr";
