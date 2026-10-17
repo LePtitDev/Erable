@@ -12,6 +12,7 @@ interface FixtureFile {
   readonly cases: readonly ({ readonly name: string } & Record<string, unknown>)[];
 }
 
+// Every folder of spec/fixtures is picked up (limits, markdown, rules, ids…); a new folder shows after Vite re-reads this file.
 const files = import.meta.glob<FixtureFile>("../../../../spec/fixtures/**/*.json", {
   eager: true,
   import: "default",

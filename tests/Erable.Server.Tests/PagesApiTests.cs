@@ -31,6 +31,25 @@ public sealed class PagesApiTests
         return await backend.Client.SendAsync(request, TestContext.Current.CancellationToken);
     }
 
+    [Theory]
+    [InlineData("]", 40_000, "page.content.lineTooLong")]
+    [InlineData("> ", 33, "page.content.tooNested")]
+    [InlineData("[", 300, "page.content.repeatedCharacter")]
+    public async Task SavePageContent_BeyondTheSafetyLimits_Answers422AndKeepsThePage(string unit, int count, string code)
+    {
+        await using var backend = await TestBackend.StartAsync();
+        var project = await backend.CreateProjectAsync();
+        var page = await backend.CreatePageAsync(project.Id, Roots.Pages.Id, "Ilsa", "Avant.");
+
+        using var response = await SaveAsync(backend, project.Id, page.Id, string.Concat(Enumerable.Repeat(unit, count)), $"\"{page.Revision}\"");
+
+        response.StatusCode.ShouldBe(System.Net.HttpStatusCode.UnprocessableEntity);
+        (await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken)).ShouldContain(code);
+        var view = await (await backend.Client.GetAsync(Url($"/api/v1/projects/{project.Id}/pages/{page.Id}"), TestContext.Current.CancellationToken))
+            .ReadAsync<PageView>();
+        view.Markdown.ShouldBe("Avant.");
+    }
+
     [Fact]
     public async Task GetPage_CreatedWithMarkdown_ReturnsViewWithSubPages()
     {

@@ -96,6 +96,11 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
             return Task.FromResult(Result.Failure<Element>(new DomainError(ErrorCodes.KindNotCreatable, $"{kind} cannot be created yet.")));
         }
 
+        if (markdown is not null && RefuseContent(markdown) is { } tooComplex)
+        {
+            return Task.FromResult(Result.Failure<Element>(tooComplex));
+        }
+
         return Project.Database.WriteAsync((connection, transaction) =>
         {
             var tree = Repository.LoadTree(connection);
@@ -184,6 +189,11 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(markdown);
+        if (RefuseContent(markdown) is { } tooComplex)
+        {
+            return Task.FromResult(Result.Failure<PageSaved>(tooComplex));
+        }
+
         return Project.Database.WriteAsync((connection, transaction) =>
         {
             var element = Repository.GetElement(pageId, connection);
@@ -202,6 +212,11 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
                 }
 
                 markdown = attempt.Value.Markdown;
+                if (RefuseContent(markdown) is { } mergedTooComplex)
+                {
+                    return Result.Failure<PageSaved>(mergedTooComplex);
+                }
+
                 structure = attempt.Value.Structure;
                 merge = attempt.Value.Info;
             }
@@ -308,6 +323,15 @@ public sealed partial class ProjectService(OpenedProject project, TimeProvider c
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────────
+
+    /// <summary>The error of a page that breaks a safety limit (<see cref="MarkdownLimits"/>), null when it is within them.</summary>
+    private static DomainError? RefuseContent(string markdown) =>
+        MarkdownLimits.Check(markdown) is { } violation
+            ? new DomainError(
+                violation.Code,
+                $"The page breaks the limit '{violation.Rule}' (line {violation.Line}).",
+                new Dictionary<string, object?>(StringComparer.Ordinal) { ["rule"] = violation.Rule.ToString(), ["line"] = violation.Line })
+            : null;
 
     /// <summary>Content, plain text and reference index of a page, from one analysis of its Markdown.</summary>
     private static void WriteContent(SqliteConnection connection, SqliteTransaction transaction, ElementId pageId, string markdown)

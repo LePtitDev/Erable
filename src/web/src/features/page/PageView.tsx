@@ -10,6 +10,7 @@ import { useUiState } from "../../shared/api/uiState";
 import { referenceLanguage } from "../../shared/i18n/languages";
 import type { ElementId } from "../../shared/ids/elementId";
 import { analyzeMarkdown } from "../../shared/markdown/analyze";
+import { checkMarkdownLimits } from "../../shared/markdown/limits";
 import { Button } from "../../shared/ui/Button";
 import { KindBadge } from "../../shared/ui/KindBadge";
 import { useTreeMutations } from "../explorer/useTreeMutations";
@@ -154,7 +155,34 @@ export function PageView({
   );
 }
 
-function PageBody({
+/**
+ * The page, or its text as it is when it breaks the safety limits (a page saved before they existed, an import): the
+ * parsers are never run on it, so that one degenerate page cannot freeze or break the screen (docs/markdown-syntax.md §6).
+ */
+function PageBody(props: {
+  readonly projectId: ElementId;
+  readonly data: PageData;
+  readonly contentLanguage: string;
+}) {
+  const { t } = useTranslation();
+  const violation = useMemo(() => checkMarkdownLimits(props.data.markdown), [props.data.markdown]);
+  if (violation === null) return <RichPageBody {...props} />;
+  return (
+    <>
+      <p role="note">{t("page.tooComplex")}</p>
+      <pre className={contentStyles["content"]} lang={props.contentLanguage}>
+        {props.data.markdown}
+      </pre>
+      <SubPages
+        projectId={props.projectId}
+        pageId={props.data.element.id}
+        subPages={props.data.subPages}
+      />
+    </>
+  );
+}
+
+function RichPageBody({
   projectId,
   data,
   contentLanguage,

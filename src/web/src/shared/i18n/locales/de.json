@@ -72,6 +72,13 @@
       "revisionConflict": "Die Seite wurde inzwischen geändert. Laden Sie sie vor dem Speichern neu.",
       "category": {
         "invalid": "Eine Kategorie der Seite existiert nicht mehr."
+      },
+      "content": {
+        "tooLarge": "Die Seite ist größer als 1 MB. Teilen Sie sie in mehrere Seiten auf.",
+        "lineTooLong": "Eine Zeile ist länger als 10.000 Zeichen. Fügen Sie Zeilenumbrüche ein.",
+        "repeatedCharacter": "Dasselbe Zeichen ([, ], (, ) oder >) wiederholt sich mehr als 256-mal hintereinander.",
+        "tooNested": "Zitate oder Listen sind mehr als 32 Ebenen tief verschachtelt, oder die Einrückung beträgt mehr als 256 Leerzeichen.",
+        "paragraphTooLong": "Mehr als 2.000 Zeilen folgen ohne Leerzeile aufeinander. Teilen Sie den Text in Absätze."
       }
     },
     "attachment": {
@@ -537,7 +544,8 @@
       "categories": "Kategorien",
       "files": "Dateien",
       "links": "Verknüpfungen"
-    }
+    },
+    "tooComplex": "Diese Seite überschreitet die Anzeigegrenzen (Text zu lang oder zu stark verschachtelt): Sie wird unverändert und ohne Formatierung angezeigt."
   },
   "reference": {
     "broken": {

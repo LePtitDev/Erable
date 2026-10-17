@@ -1,0 +1,189 @@
+{
+  "description": "Safety limits of docs/markdown-syntax.md §6: md + unit repeated count times; rule is the first limit broken (null: within the limits) and line its 1-based line (0: the whole page).",
+  "cases": [
+    {
+      "name": "ordinary page",
+      "md": "# Titre\n\nUn paragraphe avec [[3F2A9C14E07B5D21]] et du texte - suite.\n\n- item\n- item\n\n> citation\n",
+      "unit": "",
+      "count": 0,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "line of 10000 characters",
+      "md": "",
+      "unit": "a",
+      "count": 10000,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "line of 10001 characters",
+      "md": "",
+      "unit": "a",
+      "count": 10001,
+      "rule": "lineLength",
+      "line": 1
+    },
+    {
+      "name": "256 closing brackets in a row",
+      "md": "",
+      "unit": "]",
+      "count": 256,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "257 closing brackets in a row",
+      "md": "",
+      "unit": "]",
+      "count": 257,
+      "rule": "repeatedCharacter",
+      "line": 1
+    },
+    {
+      "name": "257 opening brackets after text",
+      "md": "texte\n",
+      "unit": "[",
+      "count": 257,
+      "rule": "repeatedCharacter",
+      "line": 2
+    },
+    {
+      "name": "257 parentheses",
+      "md": "",
+      "unit": "(",
+      "count": 257,
+      "rule": "repeatedCharacter",
+      "line": 1
+    },
+    {
+      "name": "unclosed links, 8000 characters",
+      "md": "",
+      "unit": "[a](",
+      "count": 2000,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "unclosed links, 64 KB",
+      "md": "",
+      "unit": "[a](",
+      "count": 16000,
+      "rule": "lineLength",
+      "line": 1
+    },
+    {
+      "name": "40 KB of closing brackets",
+      "md": "",
+      "unit": "]",
+      "count": 40000,
+      "rule": "lineLength",
+      "line": 1
+    },
+    {
+      "name": "32 nested quotes",
+      "md": "",
+      "unit": "> ",
+      "count": 32,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "33 nested quotes",
+      "md": "",
+      "unit": "> ",
+      "count": 33,
+      "rule": "nesting",
+      "line": 1
+    },
+    {
+      "name": "33 nested ordered lists",
+      "md": "",
+      "unit": "1. ",
+      "count": 33,
+      "rule": "nesting",
+      "line": 1
+    },
+    {
+      "name": "33 nested bullets",
+      "md": "text\n",
+      "unit": "- ",
+      "count": 33,
+      "rule": "nesting",
+      "line": 2
+    },
+    {
+      "name": "mixed markers",
+      "md": "",
+      "unit": "> - 1. ",
+      "count": 11,
+      "rule": "nesting",
+      "line": 1
+    },
+    {
+      "name": "indentation of 256",
+      "md": "                                                                                                                                                                                                                                                                ",
+      "unit": "x",
+      "count": 1,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "2000 lines without blank line",
+      "md": "",
+      "unit": "a\n",
+      "count": 2000,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "2001 lines without blank line",
+      "md": "",
+      "unit": "a\n",
+      "count": 2001,
+      "rule": "paragraphLines",
+      "line": 2001
+    },
+    {
+      "name": "2001 lines with CRLF",
+      "md": "",
+      "unit": "a\r\n",
+      "count": 2001,
+      "rule": "paragraphLines",
+      "line": 2001
+    },
+    {
+      "name": "page of 1048576 characters",
+      "md": "",
+      "unit": "\n",
+      "count": 1048576,
+      "rule": null,
+      "line": 0
+    },
+    {
+      "name": "page of 1048577 characters",
+      "md": "",
+      "unit": "\n",
+      "count": 1048577,
+      "rule": "size",
+      "line": 0
+    },
+    {
+      "name": "indentation of 257",
+      "md": "                                                                                                                                                                                                                                                                 ",
+      "unit": "x",
+      "count": 1,
+      "rule": "nesting",
+      "line": 1
+    },
+    {
+      "name": "two paragraphs of 1500 lines",
+      "md": "a\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\na\n\n",
+      "unit": "a\n",
+      "count": 1500,
+      "rule": null,
+      "line": 0
+    }
+  ]
+}

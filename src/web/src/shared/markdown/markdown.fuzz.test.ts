@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { analyzeMarkdown } from "./analyze";
+import { checkMarkdownLimits } from "./limits";
 
 // Fuzzing of the Markdown analysis (docs/testing.md §12, M5-04), twin of MarkdownFuzzTests.cs: random inputs made of the
 // tokens that matter to the grammar never throw and cost time linear in their size. A short run belongs to the regular
@@ -96,7 +97,7 @@ const pathological = [
 // Found by this fuzzing (M5-04), in remark/micromark itself (the parser without the Erable extension does the same):
 // quadratic time on these, and a stack overflow (RangeError) on deeply nested quotes and lists. Recorded in
 // tasks/M5-04. `it.fails` turns red when one is fixed or bounded (page size limit): then move it to the list above.
-const knownSuperLinear = ["]", "> ", "1. ", "[a]("];
+const guarded = ["]", "> ", "1. ", "[a]("];
 
 const seconds = Number(import.meta.env["VITE_ERABLE_FUZZ_SECONDS"] ?? "1");
 const budgetMs = (Number.isFinite(seconds) && seconds > 0 ? seconds : 1) * 1000;
@@ -177,15 +178,10 @@ describe("markdown fuzzing", () => {
     assertLinear(pathological);
   });
 
-  it.fails(
-    "KNOWN: takes time linear on nested quotes, lists and unclosed links",
-    { timeout: 300_000 },
-    () => {
-      assertLinear(knownSuperLinear);
-    },
-  );
-
-  it.fails("KNOWN: does not overflow the stack on deeply nested quotes", () => {
-    analyzeMarkdown("> ".repeat(20_000));
+  it("refuses at the limits what is quadratic or overflows the stack", () => {
+    for (const token of guarded) {
+      expect(checkMarkdownLimits(token.repeat(40_000)), JSON.stringify(token)).not.toBeNull();
+      expect(checkMarkdownLimits(token.repeat(8_000)), JSON.stringify(token)).not.toBeNull();
+    }
   });
 });

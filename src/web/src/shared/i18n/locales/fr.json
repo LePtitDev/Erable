@@ -72,6 +72,13 @@
       "revisionConflict": "La page a été modifiée entre-temps. Rechargez-la avant d’enregistrer.",
       "category": {
         "invalid": "Une catégorie de la page n’existe plus."
+      },
+      "content": {
+        "tooLarge": "La page dépasse 1 Mo. Scindez-la en plusieurs pages.",
+        "lineTooLong": "Une ligne dépasse 10 000 caractères. Ajoutez des retours à la ligne.",
+        "repeatedCharacter": "Un même caractère ([, ], (, ) ou >) est répété plus de 256 fois de suite.",
+        "tooNested": "Citations ou listes imbriquées sur plus de 32 niveaux, ou indentation de plus de 256 espaces.",
+        "paragraphTooLong": "Plus de 2 000 lignes se suivent sans ligne vide. Séparez le texte en paragraphes."
       }
     },
     "attachment": {
@@ -546,7 +553,8 @@
       "categories": "Catégories",
       "files": "Fichiers",
       "links": "Liens"
-    }
+    },
+    "tooComplex": "Cette page dépasse les limites d’affichage (texte trop long ou trop imbriqué) : elle est montrée telle quelle, sans mise en forme."
   },
   "reference": {
     "broken": {

@@ -72,6 +72,13 @@
       "revisionConflict": "The page changed in the meantime. Reload it before saving.",
       "category": {
         "invalid": "A category of the page no longer exists."
+      },
+      "content": {
+        "tooLarge": "The page is larger than 1 MB. Split it into several pages.",
+        "lineTooLong": "A line is longer than 10,000 characters. Add line breaks.",
+        "repeatedCharacter": "The same character ([, ], (, ) or >) is repeated more than 256 times in a row.",
+        "tooNested": "Quotes or lists nested more than 32 levels deep, or an indentation of more than 256 spaces.",
+        "paragraphTooLong": "More than 2,000 lines follow each other without a blank line. Split the text into paragraphs."
       }
     },
     "attachment": {
@@ -537,7 +544,8 @@
       "categories": "Categories",
       "files": "Files",
       "links": "Links"
-    }
+    },
+    "tooComplex": "This page exceeds the display limits (text too long or too deeply nested): it is shown as it is, without formatting."
   },
   "reference": {
     "broken": {

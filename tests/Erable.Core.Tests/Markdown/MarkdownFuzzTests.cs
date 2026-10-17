@@ -38,10 +38,10 @@ public sealed class MarkdownFuzzTests
 
     /// <summary>
     /// Found by this fuzzing (M5-04): Markdig takes quadratic time on these before it gives up on the nesting depth
-    /// (« [a]( » × 16 000 = 64 KB takes about a second, × 4 for each doubling). Upstream behaviour, recorded in
-    /// tasks/M5-04; the explicit test below becomes a regular one when it is fixed or bounded (page size limit).
+    /// (« [a]( » × 16 000 = 64 KB takes about a second, × 4 for each doubling). Not fixed upstream: the limits of
+    /// <see cref="MarkdownLimits"/> refuse them before the parser runs (docs/markdown-syntax.md §6).
     /// </summary>
-    private static readonly string[] KnownSuperLinear = ["[a](", "> ", "[", "1. "];
+    private static readonly string[] Guarded = ["[a](", "> ", "[", "1. ", "]"];
 
     [Fact]
     public void Analyze_RandomInputs_NeverThrowsAndStaysCoherent()
@@ -84,8 +84,15 @@ public sealed class MarkdownFuzzTests
     [Fact]
     public void Analyze_PathologicalRepetitions_TakeTimeLinearInTheSize() => AssertLinear(Pathological);
 
-    [Fact(Explicit = true)]
-    public void Analyze_KnownSuperLinearRepetitions_TakeTimeLinearInTheSize() => AssertLinear(KnownSuperLinear);
+    [Fact]
+    public void Check_RepetitionsThatAreQuadraticInTheParser_AreRefused()
+    {
+        foreach (var token in Guarded)
+        {
+            MarkdownLimits.Check(string.Concat(Enumerable.Repeat(token, 40_000))).ShouldNotBeNull(token);
+            MarkdownLimits.Check(string.Concat(Enumerable.Repeat(token, 8_000))).ShouldNotBeNull(token);
+        }
+    }
 
     private static void AssertLinear(string[] tokens)
     {

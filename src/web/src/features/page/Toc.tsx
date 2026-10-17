@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { analyzeMarkdown } from "../../shared/markdown/analyze";
+import { checkMarkdownLimits } from "../../shared/markdown/limits";
 import styles from "./PageView.module.css";
 import { subPagesAnchor } from "./anchors";
 
@@ -17,8 +18,9 @@ export function Toc({
 }) {
   const { t } = useTranslation();
   const entries = useMemo(() => {
-    const found = analyzeMarkdown(markdown)
-      .headings.filter((h) => h.level === 2 || h.level === 3)
+    // A page over the safety limits is shown as plain text: no heading to list.
+    const found = (checkMarkdownLimits(markdown) !== null ? [] : analyzeMarkdown(markdown).headings)
+      .filter((h) => h.level === 2 || h.level === 3)
       .map((h) => ({ anchor: h.anchor, text: h.text, level: h.level }));
     return hasSubPages
       ? [...found, { anchor: subPagesAnchor, text: t("page.subPages"), level: 2 }]

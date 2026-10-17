@@ -81,3 +81,20 @@ Utilisé pour l'index plein texte (M3) et comparé entre les deux implémentatio
 - Pas de référence dans les attributs, les destinations de lien ni les définitions de référence (`[x]: url`).
 - Pas d'intégration de section (`![[ID#ancre]]`).
 - Pas d'autre attribut que `width` et `align` ; tout ajout passe par ce document, puis par les fixtures.
+
+## 6. Limites de sécurité
+
+Les analyseurs (Markdig côté serveur, remark/micromark côté navigateur) ont un temps **quadratique**, voire un dépassement de pile, sur quelques dizaines de Ko d'entrée dégénérée : `]` répété 40 000 fois fige le navigateur près de 40 s, `> ` répété 8 000 fois lève une `RangeError`. Un même éditeur pourrait ainsi figer ses collègues ou saturer le serveur. Un pré-balayage **linéaire** refuse ces formes avant tout analyseur, au serveur (`MarkdownLimits`, erreur 422, rien n'est écrit) et dans le client (message avant l'envoi). Une page réelle n'approche aucune de ces valeurs.
+
+| Règle | Limite | Code d'erreur |
+|---|---|---|
+| Taille de la page | 1 048 576 unités UTF-16 (≈ 1 Mo) | `page.content.tooLarge` |
+| Longueur d'une ligne | 10 000 caractères | `page.content.lineTooLong` |
+| Répétition de `[` `]` `(` `)` `>` | 256 d'affilée | `page.content.repeatedCharacter` |
+| Marqueurs de citation et de liste en début de ligne (`> > 1. - `) | 32 ; indentation : 256 espaces ou tabulations | `page.content.tooNested` |
+| Lignes consécutives sans ligne vide | 2 000 | `page.content.paragraphTooLong` |
+
+- La première règle enfreinte, dans l'ordre du document, est signalée avec sa ligne (1 ; 0 pour la taille). `\r\n` et `\n` sont équivalents.
+- Ces limites **bloquent** l'enregistrement, contrairement aux règles de propriétés qui avertissent (§A-5.4) : ce sont des garde-fous, pas des règles métier.
+- Une page déjà enregistrée qui les dépasse (importée, ou écrite avant leur existence) reste lisible : elle est affichée en **texte brut**, sans mise en forme ni sommaire, et le serveur l'indexe comme texte.
+- Cas partagés : `spec/fixtures/limits/limits.json` (`md` + `unit` répété `count` fois), exécutés par xUnit et Vitest.

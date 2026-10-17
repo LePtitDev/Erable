@@ -68,6 +68,17 @@ public static class ErrorCodes
     /// <summary>An enum option still used by values was removed without a replacement (F08.R5); pages in <c>pages</c>.</summary>
     public const string PropertyOptionInUse = "property.option.inUse";
 
+    /// <summary>The Markdown of a page breaks a safety limit (docs/markdown-syntax.md §6, <c>MarkdownLimits</c>): the save is refused.</summary>
+    public const string PageContentTooLarge = "page.content.tooLarge";
+
+    public const string PageContentLineTooLong = "page.content.lineTooLong";
+
+    public const string PageContentRepeatedCharacter = "page.content.repeatedCharacter";
+
+    public const string PageContentTooNested = "page.content.tooNested";
+
+    public const string PageContentParagraphTooLong = "page.content.paragraphTooLong";
+
     /// <summary>A category given to a page does not exist (or is in the trash).</summary>
     public const string PageCategoryInvalid = "page.category.invalid";
 

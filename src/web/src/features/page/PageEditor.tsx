@@ -35,6 +35,7 @@ import { MarkdownEditor, type MarkdownEditorHandle } from "../editor/MarkdownEdi
 import type { PillTarget } from "../editor/pills";
 import { usePageDraft } from "../editor/usePageDraft";
 import { PalettePopup } from "../palette/PalettePopup";
+import { checkMarkdownLimits, limitErrorKey } from "../../shared/markdown/limits";
 import { useInsertPalette } from "../palette/useInsertPalette";
 import { openPaletteBinding } from "../palette/palette";
 import { ariaKeyShortcuts, useFormatCombo } from "../../shared/keyboard/useFormatCombo";
@@ -252,6 +253,12 @@ function EditorScreen({
     }): Promise<boolean> => {
       // Placeholders of running uploads are not text: saving now would lose their `![[ID]]`.
       if (saving || uploads.pending > 0) return false;
+      // The server refuses the same shapes (docs/markdown-syntax.md §6): say so before sending anything.
+      const violation = checkMarkdownLimits(plan.markdown);
+      if (violation !== null) {
+        setError(t(limitErrorKey(violation.rule)));
+        return false;
+      }
       setSaving(true);
       setError(null);
       try {
