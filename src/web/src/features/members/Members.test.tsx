@@ -33,7 +33,7 @@ function mockMembers(initial: Member[], isServerAdmin = false) {
     http.put(
       "/api/v1/projects/{projectId}/members/{userId}",
       async ({ params, request, response }) => {
-        const body = (await request.json());
+        const body = await request.json();
         puts.push({ userId: params["userId"], role: body.role });
         const found = members.find((m) => m.userId === params["userId"]) ?? admin;
         found.role = body.role;
