@@ -97,12 +97,11 @@
   font-size: var(--text-xs);
 }
 
-.settings {
+.footer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-0-5);
   margin-top: auto;
-  padding: 0 var(--space-2);
 }
 
 .main {

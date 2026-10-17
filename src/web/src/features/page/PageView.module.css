@@ -1,6 +1,7 @@
 .page {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-12);
   padding: var(--space-10) clamp(20px, 4vw, 56px) 64px;
 }

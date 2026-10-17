@@ -103,6 +103,12 @@ describe("palette state (F05.R3)", () => {
     expect(apply(open, insertReference(open, orsen, true)).doc.toString()).toBe(`![[${orsen}]]`);
   });
 
+  it("keeps the embed when ![[ was typed and the choice is validated with Enter", () => {
+    const open = type(create(), "![[carte");
+
+    expect(apply(open, insertReference(open, orsen, false)).doc.toString()).toBe(`![[${orsen}]]`);
+  });
+
   it("opened by the shortcut, inserts at the cursor without removing any text", () => {
     const start = create("Avant après", 6);
     const open = apply(start, {

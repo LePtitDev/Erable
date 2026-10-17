@@ -14,8 +14,6 @@ import { useTranslation } from "react-i18next";
 import { apiInfoQuery } from "../../shared/api/queries";
 import { meQuery, type ProjectSummary } from "../../shared/api/projects";
 import type { ElementId } from "../../shared/ids/elementId";
-import { LanguageSwitcher } from "../../shared/i18n/LanguageSwitcher";
-import { ThemeSwitcher } from "../../shared/theme/ThemeSwitcher";
 import { Logo } from "../../shared/ui/Logo";
 import { useShortcut } from "../../shared/keyboard/useShortcuts";
 import { HelpDialog } from "./HelpDialog";
@@ -117,6 +115,9 @@ export function HomeScreen() {
               {t("common.soon")}
             </span>
           </button>
+        </nav>
+        <div className={styles["footer"]}>
+          {server && <UserMenu />}
           <button
             type="button"
             className={styles["navItem"]}
@@ -137,11 +138,6 @@ export function HomeScreen() {
             <CircleQuestionMark aria-hidden size={18} />
             {t("home.nav.help")}
           </button>
-        </nav>
-        <div className={styles["settings"]}>
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-          {server && <UserMenu />}
         </div>
       </aside>
 

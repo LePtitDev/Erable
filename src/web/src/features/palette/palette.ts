@@ -108,7 +108,9 @@ export function insertReference(
   const p = state.field(paletteField);
   const from = p.open ? p.from : state.selection.main.from;
   const to = p.open && p.trigger === "typed" ? state.selection.main.head : state.selection.main.to;
-  const text = `${embed ? "!" : ""}[[${id}]]`;
+  // `![[` typed by the user already chose an embed: Enter must not silently turn it into a link.
+  const asEmbed = embed || (p.open && p.trigger === "typed" && p.embed);
+  const text = `${asEmbed ? "!" : ""}[[${id}]]`;
   return {
     changes: { from, to, insert: text },
     selection: { anchor: from + text.length },
