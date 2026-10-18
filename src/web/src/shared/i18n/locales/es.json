@@ -22,6 +22,16 @@
       "save": "Guardar",
       "saved": "Nombre guardado."
     },
+    "password": {
+      "title": "Contraseña",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirmar la nueva contraseña",
+      "hint": "Al menos {{min}} caracteres. Se cerrará la sesión en sus otros dispositivos.",
+      "mismatch": "Las dos contraseñas no coinciden.",
+      "save": "Cambiar la contraseña",
+      "saved": "Contraseña cambiada."
+    },
     "language": "Idioma de la interfaz",
     "theme": {
       "label": "Tema",
@@ -155,6 +165,7 @@
     "auth": {
       "invalidCredentials": "Usuario o contraseña incorrectos",
       "tooManyAttempts": "Demasiados intentos fallidos. Inténtelo de nuevo en unos minutos.",
+      "wrongCurrentPassword": "La contraseña actual es incorrecta.",
       "required": "Debe iniciar sesión.",
       "unavailable": "Este servidor no tiene cuentas."
     },

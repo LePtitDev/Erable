@@ -98,6 +98,7 @@ Les WebSocket (SignalR : événements et présence) traversent `reverse_proxy` s
 ## 4. Ce que le serveur protège, et ce qu'il ne protège pas
 
 - **Mots de passe** : hachés (PBKDF2, sel par mot de passe), jamais journalisés ni renvoyés. **Essais de connexion limités** : 5 échecs pour un identifiant depuis une même adresse, ou 40 échecs depuis une adresse, en 15 minutes, puis `429` (le blocage est journalisé). Un identifiant visé depuis de nombreuses adresses n'est jamais bloqué, pour qu'un tiers ne puisse pas empêcher son titulaire de se connecter : au-delà de 5 échecs, chaque essai attend seulement un délai croissant (1 s, doublé à chaque échec, au plus 10 s).
+- **Changement de mot de passe** en libre-service (*Préférences*), avec le mot de passe actuel : les autres appareils sont déconnectés, celui qui fait le changement reste connecté.
 - **Sessions** : cookie `HttpOnly`, `SameSite=Strict`, révocables (déconnexion, changement de mot de passe, compte désactivé) ; jeton `Bearer` pour l'application de bureau connectée. Aucune session n'est lisible par un script de la page.
 - **Droits** par projet : lecteur, éditeur, administrateur. Un non-membre ne voit ni le nom ni l'existence d'un projet.
 - **Pièces jointes** : taille maximale, quota par projet, jamais interprétées par le navigateur (`Content-Disposition`, `nosniff`, SVG et HTML en téléchargement).
@@ -112,6 +113,7 @@ Les WebSocket (SignalR : événements et présence) traversent `reverse_proxy` s
 | `project.locked` / projet non ouvert | Le dossier est déjà ouvert par l'application de bureau ou par un autre serveur. |
 | Impossible de se connecter derrière un proxy, ou « Trop de tentatives » pour tout le monde | `ERABLE_TRUST_PROXY` manquant : toutes les requêtes semblent venir de l'adresse du proxy. |
 | Le cookie n'est pas enregistré en HTTPS | `ERABLE_PUBLIC_URL` en `http://`, ou proxy qui ne transmet pas `X-Forwarded-Proto`. |
+| Un utilisateur a oublié son mot de passe | Un administrateur du serveur lui en donne un nouveau (`PATCH /api/v1/accounts/{login}`) ; l'utilisateur le remplace ensuite lui-même dans *Préférences › Mot de passe*. Si le **seul** administrateur a perdu le sien, il n'existe pas encore de procédure : les variables `ERABLE_ADMIN_*` ne servent que sur un serveur sans compte. |
 | Les pièces jointes sont refusées (413) | `ERABLE_MAX_ATTACHMENT_MB` (taille d'un fichier) ou `ERABLE_PROJECT_QUOTA_MB` (place du projet). |
 
 ---

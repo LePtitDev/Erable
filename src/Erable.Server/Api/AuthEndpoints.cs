@@ -12,6 +12,9 @@ public sealed record LoginRequest(string Login, string Password, bool IssueToken
 /// <summary>The session just opened. <c>Token</c> is set only for a bearer token; a cookie is never readable by scripts.</summary>
 public sealed record SessionResult(string Id, string Name, bool IsServerAdmin, DateTimeOffset ExpiresAt, string? Token);
 
+/// <summary>A user changing their own password: the current one proves that the session is still theirs.</summary>
+public sealed record ChangeMyPasswordRequest(string CurrentPassword, string NewPassword);
+
 /// <summary>Login and logout of the server (M4-01). Not available in desktop mode, where there are no accounts.</summary>
 public static class AuthEndpoints
 {
@@ -20,6 +23,7 @@ public static class AuthEndpoints
         var auth = api.MapGroup("/auth").WithTags("Auth");
         auth.MapPost("/login", Login).WithName("Login").PublicAccess();
         auth.MapPost("/logout", Logout).WithName("Logout").RequireSignIn();
+        auth.MapPut("/password", ChangeMyPassword).WithName("ChangeMyPassword").RequireSignIn();
         return api;
     }
 
@@ -71,6 +75,51 @@ public static class AuthEndpoints
 
         return TypedResults.Ok(new SessionResult(
             account.Id, account.DisplayName, account.IsServerAdmin, issued.ExpiresAt, request.IssueToken ? issued.Token : null));
+    }
+
+    /// <summary>
+    /// Changes the password of the signed-in user (audit S4). Every session of the account ends, as when an administrator
+    /// changes it; the device making the request gets a new session of the same kind, so it stays signed in.
+    /// Failed checks of the current password count against the brute-force limits of the login.
+    /// </summary>
+    private static Results<Ok<SessionResult>, ProblemHttpResult> ChangeMyPassword(
+        ChangeMyPasswordRequest request, HttpContext http, ErableHostOptions options, AccountService accounts, LoginThrottle throttle)
+    {
+        if (!accounts.Enabled)
+        {
+            return Problems.Problem(StatusCodes.Status404NotFound, "auth.unavailable", "This backend has no accounts.");
+        }
+
+        var id = CurrentUser.Id(http);
+        var address = http.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        if (throttle.RetryAfterSeconds(id, address) is { } wait)
+        {
+            http.Response.Headers.RetryAfter = wait.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return Problems.Problem(StatusCodes.Status429TooManyRequests, "auth.tooManyAttempts", "Too many failed attempts; try again later.");
+        }
+
+        if (accounts.Verify(id, request.CurrentPassword) is not { } account)
+        {
+            throttle.RecordFailure(id, address);
+            return Problems.Problem(StatusCodes.Status403Forbidden, "auth.wrongCurrentPassword", "The current password is wrong.");
+        }
+
+        var changed = accounts.ChangePassword(id, request.NewPassword);
+        if (!changed.IsSuccess)
+        {
+            return Problems.From(changed.Error);
+        }
+
+        throttle.Reset(id, address);
+        var bearer = http.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase);
+        var issued = accounts.StartSession(id, bearer ? ServerStore.SessionKindBearer : ServerStore.SessionKindCookie);
+        if (!bearer)
+        {
+            SessionCookies.Append(http, options, issued.Token, issued.ExpiresAt);
+        }
+
+        return TypedResults.Ok(new SessionResult(
+            account.Id, account.DisplayName, account.IsServerAdmin, issued.ExpiresAt, bearer ? issued.Token : null));
     }
 
     private static NoContent Logout(HttpContext http, ErableHostOptions options, AccountService accounts)

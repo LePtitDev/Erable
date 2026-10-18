@@ -22,6 +22,16 @@
       "save": "Save",
       "saved": "Name saved."
     },
+    "password": {
+      "title": "Password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm the new password",
+      "hint": "At least {{min}} characters. Your other devices will be signed out.",
+      "mismatch": "The two passwords do not match.",
+      "save": "Change password",
+      "saved": "Password changed."
+    },
     "language": "Interface language",
     "theme": {
       "label": "Theme",
@@ -155,6 +165,7 @@
     "auth": {
       "invalidCredentials": "Incorrect login or password",
       "tooManyAttempts": "Too many failed attempts. Try again in a few minutes.",
+      "wrongCurrentPassword": "The current password is wrong.",
       "required": "You need to sign in.",
       "unavailable": "This server has no accounts."
     },

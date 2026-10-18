@@ -118,6 +118,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/password": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["ChangeMyPassword"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me": {
     parameters: {
       query?: never;
@@ -1143,6 +1159,10 @@ export interface components {
       properties: components["schemas"]["CategoryPropertyItem"][];
       subCategories: components["schemas"]["CategorySummary"][];
     };
+    ChangeMyPasswordRequest: {
+      currentPassword: string;
+      newPassword: string;
+    };
     ChildPage: {
       id: components["schemas"]["ElementId"];
       name: string;
@@ -1959,6 +1979,30 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  ChangeMyPassword: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChangeMyPasswordRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResult"];
+        };
       };
     };
   };

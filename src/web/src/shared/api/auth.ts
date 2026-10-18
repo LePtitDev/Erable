@@ -10,6 +10,17 @@ export function login(loginName: string, password: string): Promise<SessionResul
   );
 }
 
+/**
+ * Changes the password of the signed-in user (audit S4). The server ends every other session and sends this browser a
+ * new cookie, so the user stays signed in here.
+ */
+export function changeMyPassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<SessionResult> {
+  return unwrap(api.PUT("/api/v1/auth/password", { body: { currentPassword, newPassword } }));
+}
+
 /** Ends the session on the server: the cookie is dead even if someone kept a copy (E2E-14-01). */
 export async function logout(): Promise<void> {
   await unwrap(api.POST("/api/v1/auth/logout"));

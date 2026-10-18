@@ -114,6 +114,36 @@
         }
       }
     },
+    "/api/v1/auth/password": {
+      "put": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "ChangeMyPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeMyPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/projects": {
       "get": {
         "tags": [
@@ -3222,6 +3252,21 @@
           "pageCountWithSubCategories": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "ChangeMyPasswordRequest": {
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
           }
         }
       },

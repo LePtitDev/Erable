@@ -4,6 +4,7 @@ import { ThemeSwitcher } from "../../shared/theme/ThemeSwitcher";
 import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
 import { DisplayNameSettings } from "./DisplayNameSettings";
+import { PasswordSettings } from "./PasswordSettings";
 import { ShortcutsSettings } from "./ShortcutsSettings";
 import field from "../../shared/ui/Field.module.css";
 
@@ -37,6 +38,7 @@ export function PreferencesDialog({
         <LanguageSwitcher />
         <ThemeSwitcher />
         <ShortcutsSettings />
+        <PasswordSettings />
       </div>
     </Dialog>
   );

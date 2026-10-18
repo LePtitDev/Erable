@@ -22,6 +22,16 @@
       "save": "Speichern",
       "saved": "Name gespeichert."
     },
+    "password": {
+      "title": "Passwort",
+      "current": "Aktuelles Passwort",
+      "new": "Neues Passwort",
+      "confirm": "Neues Passwort bestätigen",
+      "hint": "Mindestens {{min}} Zeichen. Ihre anderen Geräte werden abgemeldet.",
+      "mismatch": "Die beiden Passwörter stimmen nicht überein.",
+      "save": "Passwort ändern",
+      "saved": "Passwort geändert."
+    },
     "language": "Sprache der Oberfläche",
     "theme": {
       "label": "Design",
@@ -155,6 +165,7 @@
     "auth": {
       "invalidCredentials": "Benutzername oder Passwort falsch",
       "tooManyAttempts": "Zu viele fehlgeschlagene Versuche. Versuchen Sie es in einigen Minuten erneut.",
+      "wrongCurrentPassword": "Das aktuelle Passwort ist falsch.",
       "required": "Sie müssen sich anmelden.",
       "unavailable": "Dieser Server hat keine Konten."
     },

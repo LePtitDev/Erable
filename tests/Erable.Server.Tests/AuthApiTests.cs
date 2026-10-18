@@ -134,6 +134,58 @@ public sealed class AuthApiTests
         me.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
+    private static HttpRequestMessage ChangePassword(string cookie, string current, string next)
+    {
+        var request = WithCookie(HttpMethod.Put, "/api/v1/auth/password", cookie);
+        request.Content = JsonContent.Create(new ChangeMyPasswordRequest(current, next), options: ApiJson.Options);
+        return request;
+    }
+
+    [Fact]
+    public async Task ChangeMyPassword_WithTheCurrentPassword_KeepsThisDeviceSignedInAndEndsTheOthers()
+    {
+        await using var backend = await StartAsync();
+        using var anonymous = backend.NewAnonymousClient();
+        var (_, here) = await LoginAsync(anonymous, "camille", "camille-pass-1");
+        var (_, elsewhere) = await LoginAsync(anonymous, "camille", "camille-pass-1");
+
+        using var change = await anonymous.SendAsync(ChangePassword(here!, "camille-pass-1", "camille-pass-2"), Ct);
+
+        change.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var renewed = change.Headers.GetValues("Set-Cookie").Single(v => v.StartsWith(SessionCookies.CookieName + "=", StringComparison.Ordinal)).Split(';')[0];
+        (await anonymous.SendAsync(WithCookie(HttpMethod.Get, "/api/v1/me", renewed), Ct)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await anonymous.SendAsync(WithCookie(HttpMethod.Get, "/api/v1/me", elsewhere!), Ct)).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await LoginAsync(anonymous, "camille", "camille-pass-1")).Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await LoginAsync(anonymous, "camille", "camille-pass-2")).Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task ChangeMyPassword_WrongCurrentPassword_Returns403AndKeepsThePassword()
+    {
+        await using var backend = await StartAsync();
+        using var anonymous = backend.NewAnonymousClient();
+        var (_, cookie) = await LoginAsync(anonymous, "camille", "camille-pass-1");
+
+        using var change = await anonymous.SendAsync(ChangePassword(cookie!, "not-my-password", "camille-pass-2"), Ct);
+
+        change.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        (await change.ProblemCodeAsync()).ShouldBe("auth.wrongCurrentPassword");
+        (await LoginAsync(anonymous, "camille", "camille-pass-1")).Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task ChangeMyPassword_TooShortNewPassword_Returns422()
+    {
+        await using var backend = await StartAsync();
+        using var anonymous = backend.NewAnonymousClient();
+        var (_, cookie) = await LoginAsync(anonymous, "camille", "camille-pass-1");
+
+        using var change = await anonymous.SendAsync(ChangePassword(cookie!, "camille-pass-1", "short"), Ct);
+
+        change.StatusCode.ShouldBe(HttpStatusCode.UnprocessableEntity);
+        (await change.ProblemCodeAsync()).ShouldBe("account.password.invalid");
+    }
+
     [Fact]
     public async Task Logout_InvalidatesTheOldCookie()
     {

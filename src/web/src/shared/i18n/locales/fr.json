@@ -22,6 +22,16 @@
       "save": "Enregistrer",
       "saved": "Nom enregistré."
     },
+    "password": {
+      "title": "Mot de passe",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe",
+      "hint": "Au moins {{min}} caractères. Vos autres appareils seront déconnectés.",
+      "mismatch": "Les deux mots de passe ne correspondent pas.",
+      "save": "Changer le mot de passe",
+      "saved": "Mot de passe changé."
+    },
     "language": "Langue de l'interface",
     "theme": {
       "label": "Thème",
@@ -155,6 +165,7 @@
     "auth": {
       "invalidCredentials": "Identifiant ou mot de passe incorrect",
       "tooManyAttempts": "Trop de tentatives échouées. Réessayez dans quelques minutes.",
+      "wrongCurrentPassword": "Le mot de passe actuel est incorrect.",
       "required": "Vous devez vous connecter.",
       "unavailable": "Ce serveur n’a pas de comptes."
     },
