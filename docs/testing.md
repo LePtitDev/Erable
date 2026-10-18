@@ -203,6 +203,8 @@ Playwright ne pilote pas tous les WebViews natifs ; on combine donc deux approch
 - **macOS et Linux** : mode **`--self-test`**. L'app démarre sur un projet temporaire, la SPA exécute un scénario scripté (créer une page, insérer une référence, joindre une image, rechercher, enregistrer), envoie le résultat au backend, et le processus sort avec un code 0 ou 1. Sous Linux, ça tourne sous `xvfb`.
 - Ce test de fumée s'exécute sur **l'artefact packagé** (sortie Velopack), pas sur le build de dev : c'est l'installeur qu'on livre qui doit fonctionner.
 - Vérifié aussi : port aléatoire réellement sur loopback, second lancement avec le même projet (verrou ou réutilisation de l'instance), fermeture propre (WAL fusionné, aucun processus résiduel).
+- **Langue** : le lanceur des e2e Windows force `--lang=fr-FR` dans le WebView2 (la locale de référence, comme `locale: "fr-FR"` des e2e web), quelle que soit la langue de la machine ; `ERABLE_E2E_WEBVIEW_LANG` la change, par exemple pour reproduire un poste en anglais.
+- **Budget de démarrage** (E2E-16-01) : 3 s. Les runners partagés de la CI (rendu logiciel, Xvfb, disques froids) mesurent 3,3 à 3,6 s : les jobs desktop de `pr.yml`, `nightly.yml` et `release.yml` fixent `ERABLE_STARTUP_BUDGET_MS=5000`, lu par `--self-test` comme par l'e2e Windows. La mesure figure toujours dans le rapport (`startup-budget`), pour suivre l'écart au budget de 3 s.
 
 ---
 

@@ -69,6 +69,9 @@ test.afterEach(async () => {
 });
 
 // M1 version of the scenario: start, then a project, a page, a reference and an image (the search joins in M3).
+/** E2E-16-01: 3 s; the CI runners raise it with ERABLE_STARTUP_BUDGET_MS (docs/testing.md §10), like the self-test. */
+const startupBudgetMs = Number(process.env["ERABLE_STARTUP_BUDGET_MS"] ?? "") || 3_000;
+
 test("E2E-16-01 · Start and smoke journey @desktop", async () => {
   app = await launchDesktop();
   const { page } = app;
@@ -76,7 +79,7 @@ test("E2E-16-01 · Start and smoke journey @desktop", async () => {
   await expect(page.getByText(t("app.mode.desktop"))).toBeVisible();
   const startupMs = Date.now() - app.launchedAt;
   test.info().annotations.push({ type: "startup", description: `${String(startupMs)} ms` });
-  expect(startupMs).toBeLessThan(3_000);
+  expect(startupMs).toBeLessThan(startupBudgetMs);
   expect(page.url()).not.toContain("session=");
 
   // A project.

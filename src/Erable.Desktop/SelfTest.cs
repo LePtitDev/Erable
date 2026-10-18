@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -17,8 +18,17 @@ internal static class SelfTest
     public const string ReportFlag = "--self-test-report";
     public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
 
-    /// <summary>E2E-16-01 (M0): the home screen is displayed less than 3 s after launch.</summary>
-    public static readonly TimeSpan StartupBudget = TimeSpan.FromSeconds(3);
+    /// <summary>Overrides <see cref="StartupBudget"/>, in milliseconds: the CI runners set 5000 (docs/testing.md §10).</summary>
+    public const string StartupBudgetVariable = "ERABLE_STARTUP_BUDGET_MS";
+
+    /// <summary>
+    /// E2E-16-01 (M0): the home screen is displayed less than 3 s after launch. Shared CI runners (software rendering,
+    /// cold disks, Xvfb) may raise it through <see cref="StartupBudgetVariable"/>; the measure is reported either way.
+    /// </summary>
+    public static readonly TimeSpan StartupBudget =
+        int.TryParse(Environment.GetEnvironmentVariable(StartupBudgetVariable), NumberStyles.None, CultureInfo.InvariantCulture, out var ms) && ms > 0
+            ? TimeSpan.FromMilliseconds(ms)
+            : TimeSpan.FromSeconds(3);
 
     private static readonly TimeSpan ConnectTimeout = TimeSpan.FromMilliseconds(500);
 

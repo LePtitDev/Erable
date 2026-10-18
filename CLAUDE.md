@@ -216,6 +216,7 @@ dotnet run -c Release --project tests/Erable.Benchmarks -- load [--users 50] [--
 node build/publish-desktop.mjs win-x64     # ou linux-x64, osx-arm64, osx-x64 → artifacts/desktop/
 pnpm -C src/web e2e:desktop                # Windows : E2E-16-01/02 sur le binaire publié (CDP)
 artifacts/desktop/<rid>/Erable/Erable.Desktop [dossier] --self-test [--self-test-report rapport.json]   # code de sortie 0/1
+# Desktop : ERABLE_STARTUP_BUDGET_MS=<ms> remplace le budget de démarrage de 3 s (5000 en CI) ; ERABLE_E2E_WEBVIEW_LANG change la langue forcée des e2e (fr-FR)
 # Desktop : ERABLE_PROFILE_DIR=<dossier> remplace le profil applicatif (tests) ; avec ERABLE_TEST_MODE=1,
 # ERABLE_TEST_PICK_FOLDER=<dossier> remplace le sélecteur de dossier natif (E2E-16-03)
 ```
