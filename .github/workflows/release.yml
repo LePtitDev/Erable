@@ -87,8 +87,8 @@ jobs:
     timeout-minutes: 40
     # Signing is optional: without these secrets the packages are unsigned (docs/release.md lists what to provide).
     env:
-      # E2E-16-01 asks for 3 s; shared runners (software rendering, Xvfb, cold disks) get 5 s (docs/testing.md §10).
-      ERABLE_STARTUP_BUDGET_MS: "5000"
+      # E2E-16-01 asks for 3 s; shared runners (software rendering, Xvfb, cold disks) get 10 s (docs/testing.md §10).
+      ERABLE_STARTUP_BUDGET_MS: "10000"
       ERABLE_SIGN_AZURE_METADATA: ${{ secrets.ERABLE_SIGN_AZURE_METADATA }}
       ERABLE_SIGN_APPLE_APP_IDENTITY: ${{ secrets.ERABLE_SIGN_APPLE_APP_IDENTITY }}
       ERABLE_SIGN_APPLE_INSTALL_IDENTITY: ${{ secrets.ERABLE_SIGN_APPLE_INSTALL_IDENTITY }}

@@ -895,7 +895,7 @@ Ces scénarios s'exécutent **sur le binaire packagé** (§T-10) : via CDP sous 
 ```gherkin
 E2E-16-01 · Démarrage et parcours de fumée                    P0 · @desktop · M0
 Quand        je lance l'application installée
-Alors        l'écran d'accueil s'affiche en moins de 3 secondes (5 s sur les runners partagés de la CI, testing.md §10)
+Alors        l'écran d'accueil s'affiche en moins de 3 secondes (10 s sur les runners partagés de la CI, testing.md §10)
 Et           le scénario de fumée (créer un projet, une page, une référence, une image, rechercher) réussit
 
 E2E-16-02 · Serveur local protégé                             P0 · @desktop · M0

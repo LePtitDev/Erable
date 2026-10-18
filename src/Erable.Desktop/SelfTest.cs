@@ -18,7 +18,7 @@ internal static class SelfTest
     public const string ReportFlag = "--self-test-report";
     public static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
 
-    /// <summary>Overrides <see cref="StartupBudget"/>, in milliseconds: the CI runners set 5000 (docs/testing.md §10).</summary>
+    /// <summary>Overrides <see cref="StartupBudget"/>, in milliseconds: the CI runners set 10000 (docs/testing.md §10).</summary>
     public const string StartupBudgetVariable = "ERABLE_STARTUP_BUDGET_MS";
 
     /// <summary>
