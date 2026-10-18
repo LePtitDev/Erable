@@ -23,8 +23,13 @@ public static class AuthEndpoints
         return api;
     }
 
-    private static Results<Ok<SessionResult>, ProblemHttpResult> Login(
-        LoginRequest request, HttpContext http, ErableHostOptions options, AccountService accounts, LoginThrottle throttle)
+    private static async Task<Results<Ok<SessionResult>, ProblemHttpResult>> Login(
+        LoginRequest request,
+        HttpContext http,
+        ErableHostOptions options,
+        AccountService accounts,
+        LoginThrottle throttle,
+        ILoggerFactory loggers)
     {
         if (!accounts.Enabled)
         {
@@ -39,14 +44,25 @@ public static class AuthEndpoints
             return Problems.Problem(StatusCodes.Status429TooManyRequests, "auth.tooManyAttempts", "Too many failed attempts; try again later.");
         }
 
+        // A login tried too often from everywhere is slowed down, never blocked (its owner must still get in).
+        if (throttle.DelayFor(login) is { } delay && delay > TimeSpan.Zero)
+        {
+            await Task.Delay(delay, options.TimeProvider, http.RequestAborted).ConfigureAwait(false);
+        }
+
         // Same answer for an unknown login, a wrong password and a disabled account: nothing to enumerate.
         if (accounts.Verify(request.Login, request.Password) is not { } account)
         {
             throttle.RecordFailure(login, address);
+            if (throttle.RetryAfterSeconds(login, address) is { } blockedFor)
+            {
+                ServerLog.LoginBlocked(loggers.CreateLogger(typeof(AuthEndpoints)), login, address, blockedFor);
+            }
+
             return Problems.Problem(StatusCodes.Status401Unauthorized, "auth.invalidCredentials", "Invalid login or password.");
         }
 
-        throttle.Reset(login);
+        throttle.Reset(login, address);
         var issued = accounts.StartSession(account.Id, request.IssueToken ? ServerStore.SessionKindBearer : ServerStore.SessionKindCookie);
         if (!request.IssueToken)
         {

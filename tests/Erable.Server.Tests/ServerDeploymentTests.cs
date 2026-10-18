@@ -154,6 +154,37 @@ public sealed class ServerDeploymentTests
     // ─── Reverse proxy ──────────────────────────────────────────────────────
 
     [Fact]
+    public async Task Login_TargetedFromManyAddresses_IsSlowedDownButTheOwnerStillGetsIn()
+    {
+        await using var backend = await TestBackend.StartAsync(o => o with
+        {
+            TrustProxy = true,
+            LoginMaxFailures = 2,
+            LoginDelayStep = TimeSpan.FromMilliseconds(1),
+            LoginMaxDelay = TimeSpan.FromMilliseconds(5),
+        });
+        backend.Accounts.CreateAccount("camille", "Camille", "password-camille").IsSuccess.ShouldBeTrue();
+        using var anonymous = backend.NewAnonymousClient();
+
+        async Task<HttpResponseMessage> LoginAsync(string password, string client)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, Url("/api/v1/auth/login"))
+            {
+                Content = JsonContent.Create(new LoginRequest("camille", password), options: ApiJson.Options),
+            };
+            request.Headers.Add("X-Forwarded-For", client);
+            return await anonymous.SendAsync(request, Ct);
+        }
+
+        for (var i = 0; i < 10; i++)
+        {
+            (await LoginAsync("wrong", $"203.0.113.{i}")).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        }
+
+        (await LoginAsync("password-camille", "198.51.100.9")).StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
     public async Task Login_BehindATrustedProxy_SecuresTheCookieAndCountsFailuresPerClientAddress()
     {
         await using var backend = await TestBackend.StartAsync(o => o with { TrustProxy = true, LoginMaxFailuresPerAddress = 3, LoginMaxFailures = 100 });

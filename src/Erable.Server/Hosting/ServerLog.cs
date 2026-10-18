@@ -19,6 +19,9 @@ internal static partial class ServerLog
     [LoggerMessage(Level = LogLevel.Error, Message = "The shared project in {Folder} was not opened: {Code} {Detail}")]
     public static partial void SharedProjectNotOpened(ILogger logger, string folder, string code, string detail);
 
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Login attempts on '{Login}' from {Address} are blocked for {Seconds} s after repeated failures.")]
+    public static partial void LoginBlocked(ILogger logger, string login, string address, int seconds);
+
     [LoggerMessage(Level = LogLevel.Error, Message = "Endpoint {Endpoint} declares no access rule.")]
     public static partial void UndeclaredAccess(ILogger logger, string? endpoint);
 

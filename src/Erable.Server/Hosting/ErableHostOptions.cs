@@ -57,8 +57,17 @@ public sealed record ErableHostOptions
 
     public static readonly TimeSpan DefaultSessionLifetime = TimeSpan.FromHours(12);
 
-    /// <summary>Failed logins tolerated for one login name within <see cref="LoginWindow"/> before it is locked out.</summary>
+    /// <summary>
+    /// Failed logins tolerated for one login name from one address within <see cref="LoginWindow"/> before that pair is
+    /// blocked; from all addresses together, the number after which attempts on the login are slowed down.
+    /// </summary>
     public int LoginMaxFailures { get; init; } = 5;
+
+    /// <summary>First delay applied to a login that failed too often from all addresses; doubled at each failure.</summary>
+    public TimeSpan LoginDelayStep { get; init; } = TimeSpan.FromSeconds(1);
+
+    /// <summary>Cap of the delay: the owner of a targeted login always gets in, at most this much later.</summary>
+    public TimeSpan LoginMaxDelay { get; init; } = TimeSpan.FromSeconds(10);
 
     /// <summary>Failed logins tolerated from one address within <see cref="LoginWindow"/>.</summary>
     public int LoginMaxFailuresPerAddress { get; init; } = 40;

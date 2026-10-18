@@ -97,7 +97,7 @@ Les WebSocket (SignalR : événements et présence) traversent `reverse_proxy` s
 
 ## 4. Ce que le serveur protège, et ce qu'il ne protège pas
 
-- **Mots de passe** : hachés (PBKDF2, sel par mot de passe), jamais journalisés ni renvoyés. **Essais de connexion limités** : 5 échecs par identifiant et 40 par adresse en 15 minutes, puis `429`.
+- **Mots de passe** : hachés (PBKDF2, sel par mot de passe), jamais journalisés ni renvoyés. **Essais de connexion limités** : 5 échecs pour un identifiant depuis une même adresse, ou 40 échecs depuis une adresse, en 15 minutes, puis `429` (le blocage est journalisé). Un identifiant visé depuis de nombreuses adresses n'est jamais bloqué, pour qu'un tiers ne puisse pas empêcher son titulaire de se connecter : au-delà de 5 échecs, chaque essai attend seulement un délai croissant (1 s, doublé à chaque échec, au plus 10 s).
 - **Sessions** : cookie `HttpOnly`, `SameSite=Strict`, révocables (déconnexion, changement de mot de passe, compte désactivé) ; jeton `Bearer` pour l'application de bureau connectée. Aucune session n'est lisible par un script de la page.
 - **Droits** par projet : lecteur, éditeur, administrateur. Un non-membre ne voit ni le nom ni l'existence d'un projet.
 - **Pièces jointes** : taille maximale, quota par projet, jamais interprétées par le navigateur (`Content-Disposition`, `nosniff`, SVG et HTML en téléchargement).
