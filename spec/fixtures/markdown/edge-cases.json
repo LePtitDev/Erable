@@ -351,6 +351,23 @@
       "name": "bare bar in a table row splits the cell",
       "md": "| a | b |\n|---|---|\n| [[3F2A9C14E07B5D21|c]] | d |",
       "refs": []
+    },
+    {
+      "name": "tab in a list item heading (R10 positions)",
+      "md": "* ##\t#    [[3F2A9C14E07B5D21]]",
+      "refs": [
+        {
+          "id": "3F2A9C14E07B5D21",
+          "anchor": null,
+          "label": null,
+          "embed": false,
+          "attrs": null,
+          "start": 10,
+          "end": 30
+        }
+      ],
+      "knownFailure": "csharp",
+      "note": "Markdig (UsePreciseSourceLocation) reports 8..28 instead of 10..30: known gap, tasks/M5-04 point 3. Remove knownFailure once fixed."
     }
   ]
 }

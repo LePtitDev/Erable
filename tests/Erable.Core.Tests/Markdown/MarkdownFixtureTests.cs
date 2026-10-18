@@ -24,6 +24,13 @@ public sealed class MarkdownFixtureTests
             r.Id.ToString(), r.Anchor, r.Label, r.IsEmbed,
             r.Attributes is null ? null : new ExpectedAttrs(r.Attributes.Width, r.Attributes.Align), r.Start, r.End));
 
+        if (c.KnownFailure == "csharp")
+        {
+            // A known gap kept visible (audit T7): this turns red once fixed, so that the marker gets removed.
+            actual.ShouldNotBe(c.Refs, $"'{c.Name}' now passes: remove its knownFailure marker.");
+            return;
+        }
+
         actual.ShouldBe(c.Refs);
     }
 
@@ -73,7 +80,8 @@ public sealed class MarkdownFixtureTests
 
     public sealed record ExpectedRef(string Id, string? Anchor, string? Label, bool Embed, ExpectedAttrs? Attrs, int Start, int End);
 
-    public sealed record RefCase(string Name, string Md, IReadOnlyList<ExpectedRef> Refs);
+    /// <param name="KnownFailure">« csharp »: a documented gap of the C# side, which must still fail.</param>
+    public sealed record RefCase(string Name, string Md, IReadOnlyList<ExpectedRef> Refs, string? KnownFailure = null);
 
     public sealed record PlainCase(string Name, string Md, string Plain);
 
