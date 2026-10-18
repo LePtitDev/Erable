@@ -73,17 +73,15 @@ function ServerRow({
   });
 
   return (
-    <li className={styles["item"]} style={{ flexDirection: "column", alignItems: "stretch" }}>
-      <div
-        style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}
-      >
+    <li className={`${styles["item"] ?? ""} ${styles["server"] ?? ""}`}>
+      <div className={styles["serverRow"]}>
         <span className={styles["initials"]} aria-hidden>
           {initialsOf(server.name)}
         </span>
         <span className={styles["text"]}>
           <button
             type="button"
-            className={styles["name"]}
+            className={`${styles["name"] ?? ""} ${styles["toggle"] ?? ""}`}
             aria-expanded={open}
             onClick={() => {
               setToggled(!open);
@@ -92,7 +90,7 @@ function ServerRow({
             {open ? <ChevronDown aria-hidden size={16} /> : <ChevronRight aria-hidden size={16} />}
             {server.name}
           </button>
-          <span className={styles["path"]}>
+          <span className={`${styles["path"] ?? ""} ${styles["togglePath"] ?? ""}`}>
             {server.url}
             {server.userName !== null && ` · ${server.userName}`}
           </span>

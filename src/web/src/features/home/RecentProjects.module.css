@@ -78,6 +78,37 @@
   background: var(--color-hover);
 }
 
+/* A server: its row, then its projects below. No wrap: a wrapping column measures the nested list at its narrowest
+   width, where each project row breaks in two, and leaves that height empty. */
+.server {
+  flex-flow: column nowrap;
+  align-items: stretch;
+}
+
+/* The click target of the server name covers this row only, not the projects below. */
+.serverRow {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.toggle > svg {
+  flex: none;
+}
+
+/* Under the name, not under the chevron (16 px and the gap). */
+.togglePath {
+  padding-left: calc(16px + var(--space-1));
+}
+
 .unavailable {
   color: var(--color-text-faint);
 }
