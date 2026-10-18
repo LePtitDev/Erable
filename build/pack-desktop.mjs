@@ -1,6 +1,8 @@
 // Packs the published desktop application with Velopack: installer, update packages and release manifest (M5-03).
 // Usage: node build/pack-desktop.mjs <rid> --version <x.y.z> [--skip-publish] [--channel <name>]
 //   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64   (run on the matching OS: vpk packs a macOS app on macOS only)
+//   --channel: Velopack channel; default win, linux, osx-arm64 or osx-x64. The two macOS architectures need their own
+//              channel: they share one release, and the default « osx » would give their files the same names.
 // Output: artifacts/release/<rid>/ (Setup / AppImage / pkg, *.nupkg, releases.<channel>.json, RELEASES-*).
 //
 // Signing is optional and driven by environment variables (docs/release.md); without them the packages are unsigned.
@@ -29,7 +31,7 @@ const publishDir = join(root, "artifacts", "desktop", rid, "Erable");
 const outputDir = join(root, "artifacts", "release", rid);
 
 if (!process.argv.includes("--skip-publish")) {
-  run(process.execPath, [join(root, "build", "publish-desktop.mjs"), rid]);
+  run(process.execPath, [join(root, "build", "publish-desktop.mjs"), rid, "--version", version]);
 }
 if (!existsSync(publishDir)) throw new Error(`${publishDir} is missing: publish first.`);
 
@@ -59,7 +61,7 @@ const args = [
   "--outputDir",
   outputDir,
 ];
-const channel = argument("--channel");
+const channel = argument("--channel") ?? (os === "osx" ? rid : undefined);
 if (channel) args.push("--channel", channel);
 
 const env = process.env;

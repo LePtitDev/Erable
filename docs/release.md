@@ -1,23 +1,28 @@
 # Publier une version
 
-Une version est un **tag Git `vX.Y.Z`** poussé par l'utilisateur. Le workflow `.github/workflows/release.yml` fait le reste ; la release reste un **brouillon** tant que tout n'est pas vert, puis elle est publiée automatiquement.
+Une version est un **tag Git `vX.Y.Z` ou `X.Y.Z`**. Deux façons de la créer, au choix ; le workflow `.github/workflows/release.yml` fait le reste :
+
+- **pousser le tag** (`git tag v1.2.0 && git push origin v1.2.0`) : le workflow crée une release **brouillon**, y joint les installeurs, puis la publie quand tout est vert ;
+- **créer la release sur GitHub** (*Releases → Draft a new release*, nouveau tag, *Publish release*) : GitHub pousse le tag, le workflow garde la release telle quelle (titre, notes, publiée) et y **joint les installeurs** une fois construits. Si la release n'a pas de notes, il y met celles générées. Tant que le workflow tourne (≈ 30 min), la release publiée n'a pas encore ses fichiers ; si un job échoue, elle reste sans eux (relancer le workflow, ou le rattrapage ci-dessous).
+
+**Rattrapage** d'une release existante sans installeurs (tag créé avant ce workflow, échec) : *Actions → Release → Run workflow*, `version` = le tag exact (ex. `1.0.0`), cocher **attach**. Le workflow construit le code **du tag** et joint les fichiers à sa release, sans changer son état (brouillon ou publiée).
 
 | Étape | Ce qui est vérifié ou produit |
 |---|---|
 | `legacy` | chaque projet figé de `spec/projects/legacy/vN` s'ouvre, migre vers le format courant et reste intact |
 | `notes` | notes de version générées depuis les Conventional Commits depuis le tag précédent (`build/release-notes.mjs`) |
-| `package` (×4) | `win-x64`, `linux-x64`, `osx-arm64`, `osx-x64` : publication autonome puis **Velopack** (`build/pack-desktop.mjs`) ; fumée `--self-test` sur l'application **installée** (installeur Windows, AppImage, bundle macOS) ; fichiers joints à la release |
+| `package` (×4) | `win-x64`, `linux-x64`, `osx-arm64`, `osx-x64` : publication autonome (binaires estampillés de la version du tag) puis **Velopack** (`build/pack-desktop.mjs`) ; fumée `--self-test` sur l'application **installée** (installeur Windows, AppImage, bundle macOS) ; fichiers joints à la release |
 | `image` | image Docker du serveur, scan Trivy (HIGH/CRITICAL corrigeables = échec), publication sur `ghcr.io/<propriétaire>/erable:<version>` et `latest` |
-| `publish` | passage du brouillon en release publiée |
+| `publish` | passage du brouillon en release publiée (sans effet si elle l'est déjà) |
 
-Un lancement manuel (*Actions → Release → Run workflow*, avec une version) construit tout **sans rien publier** : les paquets restent en artefacts du workflow.
+Un lancement manuel (*Actions → Release → Run workflow*, avec une version, sans **attach**) construit tout **sans rien publier** : les paquets restent en artefacts du workflow.
 
 ## Livrables par système
 
 | Système | Fichiers (dans `artifacts/release/<rid>/`) |
 |---|---|
 | Windows | `Erable-win-Setup.exe` (installeur par utilisateur, sans droits administrateur), paquets `.nupkg`, `Erable-win-Portable.zip` |
-| macOS | `Erable-osx-<arch>-Setup.pkg`, `Erable-osx-<arch>-Portable.zip`, paquets de mise à jour |
+| macOS | `Erable-osx-<arch>-Setup.pkg`, `Erable-osx-<arch>-Portable.zip`, paquets de mise à jour ; chaque architecture a son **canal** Velopack (`osx-arm64`, `osx-x64`) pour que leurs fichiers ne s'écrasent pas dans la release |
 | Linux | `Erable-linux-x86_64.AppImage`, `Erable-linux-Portable.zip`, paquets de mise à jour |
 | Tous | `releases.<canal>.json` et `RELEASES-*` : le manifeste que l'application interroge |
 

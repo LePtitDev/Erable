@@ -7,18 +7,29 @@ if (!tag) {
   console.error("Usage: node build/release-notes.mjs <tag> [--previous <tag>]");
   process.exit(2);
 }
-const git = (...args) => execFileSync("git", args, { encoding: "utf8" }).trim();
+const git = (...args) => execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+const exists = (ref) => {
+  try {
+    git("rev-parse", "--verify", "--quiet", `${ref}^{commit}`);
+    return true;
+  } catch {
+    return false;
+  }
+};
+// A build-only run names a version that has no tag yet: the notes go up to the current commit.
+const head = exists(tag) ? tag : "HEAD";
 const previousIndex = process.argv.indexOf("--previous");
 let previous = previousIndex > 0 ? process.argv[previousIndex + 1] : undefined;
 if (!previous) {
   try {
-    previous = git("describe", "--tags", "--abbrev=0", "--match", "v*", `${tag}^`);
+    // Version tags, with or without the « v » (a release created on GitHub may have either).
+    previous = git("describe", "--tags", "--abbrev=0", "--match", "v[0-9]*", "--match", "[0-9]*", `${head}^`);
   } catch {
     previous = undefined; // first release: the whole history
   }
 }
 
-const range = previous ? `${previous}..${tag}` : tag;
+const range = previous ? `${previous}..${head}` : head;
 const subjects = git("log", "--no-merges", "--format=%s", range).split("\n").filter(Boolean);
 
 const sections = [

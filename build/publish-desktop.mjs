@@ -1,7 +1,8 @@
 // Publishes the self-contained desktop application for one runtime and archives it (decision P-06: plain
 // archives in M0, Velopack installer: build/pack-desktop.mjs, M5-03).
-// Usage: node build/publish-desktop.mjs <rid> [--skip-web]
+// Usage: node build/publish-desktop.mjs <rid> [--skip-web] [--version <x.y.z>]
 //   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64
+//   --version: version stamped in the binaries (shown by the application); default: Directory.Build.props
 // Output: artifacts/desktop/<rid>/Erable/ and artifacts/desktop/Erable-<rid>.(zip|tar.gz)
 import { execFileSync } from "node:child_process";
 import { existsSync, rmSync } from "node:fs";
@@ -9,8 +10,10 @@ import { join, resolve } from "node:path";
 
 const rids = ["win-x64", "linux-x64", "osx-arm64", "osx-x64"];
 const rid = process.argv[2];
-if (!rids.includes(rid)) {
-  console.error(`Usage: node build/publish-desktop.mjs <${rids.join("|")}> [--skip-web]`);
+const versionIndex = process.argv.indexOf("--version");
+const version = versionIndex > 0 ? process.argv[versionIndex + 1] : undefined;
+if (!rids.includes(rid) || (versionIndex > 0 && !/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version ?? ""))) {
+  console.error(`Usage: node build/publish-desktop.mjs <${rids.join("|")}> [--skip-web] [--version <x.y.z>]`);
   process.exit(2);
 }
 
@@ -40,6 +43,7 @@ run("dotnet", [
   "true",
   // Precompiled code: noticeably faster start (E2E-16-01 budget: 3 s).
   "-p:PublishReadyToRun=true",
+  ...(version ? [`-p:Version=${version}`] : []),
   "--output",
   appDir,
 ]);
