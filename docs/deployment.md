@@ -162,6 +162,8 @@ Les identifiants de projets sont les dossiers sous `projects/` du bucket (consol
 docker compose -f deploy/docker-compose.yml run --rm --no-deps --entrypoint dotnet erable erable.dll doctor /data/projects/<identifiant>
 ```
 
+**Pièces jointes plus récentes que leur copie.** Les bases sont répliquées en continu, les pièces jointes toutes les `FILES_BACKUP_INTERVAL_SECONDS` (5 minutes par défaut) : une pièce jointe ajoutée juste avant la panne peut donc manquer après la restauration, alors que la base la cite. `doctor` la signale par une erreur `blob.missing` (« The file of the attachment is missing », avec l'ID de la pièce jointe et le début de son SHA-256) et sort avec le code `1` ; `--fix` ne la répare pas. Le reste du projet est intact : récupérez le fichier auprès de la personne qui l'a ajouté, puis ajoutez-le de nouveau à la page.
+
 ### Tester la chaîne complète
 
 `deploy/litestream/test-restore.sh` joue le scénario de bout en bout avec un MinIO local : création d'un projet et d'une page, réplication, destruction du volume, restauration, `erable doctor`, puis lecture de la page. À lancer une fois après tout changement du fichier Litestream ou des versions d'images. **Il n'a pas encore été exécuté** : voir `tasks/M5-05-i18n-backup-docs.md`.
