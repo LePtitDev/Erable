@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- erable-cli: read-only extraction of a project for other tools (docs/cli.md). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>erable-cli</AssemblyName>
+    <RootNamespace>Erable.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Erable.Core\Erable.Core.csproj" />
+    <ProjectReference Include="..\Erable.Storage\Erable.Storage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Erable.Cli.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -27,6 +27,7 @@ Pour produire un installeur sur sa machine, sans CI : `scripts/publish.sh` (ou `
 | macOS | `Erable-osx-<arch>-Setup.pkg`, `Erable-osx-<arch>-Portable.zip`, paquets de mise à jour ; chaque architecture a son **canal** Velopack (`osx-arm64`, `osx-x64`) pour que leurs fichiers ne s'écrasent pas dans la release |
 | Linux | `Erable-linux-x86_64.AppImage`, `Erable-linux-Portable.zip`, paquets de mise à jour |
 | Tous | `releases.<canal>.json` et `RELEASES-*` : le manifeste que l'application interroge |
+| Tous | `erable-cli-<rid>.zip` (Windows) ou `.tar.gz` : l'outil `erable-cli` en un exécutable autonome (`docs/cli.md`), dans `artifacts/cli/` ; vérifié sur le projet de référence (sauf `osx-x64`) |
 
 Les noms exacts sont ceux de `vpk` (Velopack).
 

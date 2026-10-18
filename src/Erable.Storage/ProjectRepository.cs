@@ -190,6 +190,19 @@ public sealed class ProjectRepository(ProjectDatabase database)
             new { Id = sourceId.ToInt64() }).Select(r => r.ToReference())];
     }
 
+    /// <summary>Every reference whose source is live, by source then position (exports, <c>erable-cli</c>).</summary>
+    public IReadOnlyList<StoredReference> GetAllReferences(SqliteConnection? connection = null)
+    {
+        using var owned = connection is null ? Database.OpenConnection() : null;
+        return [.. (connection ?? owned!).Query<RefRow>(
+            """
+            SELECT r.source_id AS SourceId, r.target_id AS TargetId, r.anchor AS Anchor, r.is_embed AS IsEmbed, r.position AS Position
+            FROM refs r JOIN elements e ON e.id = r.source_id
+            WHERE e.deleted_at IS NULL
+            ORDER BY r.source_id, r.position
+            """).Select(r => r.ToReference())];
+    }
+
     /// <summary>References pointing to <paramref name="targetId"/> from live elements.</summary>
     public IReadOnlyList<StoredReference> GetIncomingReferences(ElementId targetId, SqliteConnection? connection = null)
     {

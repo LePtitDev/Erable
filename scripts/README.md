@@ -7,7 +7,7 @@ Shortcuts for building, running, testing and hosting Erable from a clone of the 
 | [`build`](#build) | Builds the web client and the .NET solution |
 | [`run`](#run) | Runs the desktop application, a development server or the Vite dev server |
 | [`test`](#test) | Runs the checks of the PR pipeline locally |
-| [`publish`](#publish) | Builds the desktop installer of this machine's system |
+| [`publish`](#publish) | Builds the desktop installer of this machine's system, and `erable-cli` |
 | [`serve`](#serve) | Hosts a server on this machine, without Docker |
 | [`compose`](#compose) | Hosts a server with Docker Compose behind Caddy (HTTPS) |
 
@@ -62,7 +62,7 @@ Runs the checks of the PR pipeline (`docs/testing.md` §13): .NET format check, 
 scripts/publish.sh [--version x.y.z] [--rid win-x64|linux-x64|osx-arm64|osx-x64]
 ```
 
-Builds the desktop installer locally, as the release workflow does (`docs/release.md`): installs the web dependencies, publishes the self-contained application (SPA included) with the version stamped in the binaries, then packs it with Velopack (`build/pack-desktop.mjs`, the `vpk` tool of `.config/dotnet-tools.json`). The files land in `artifacts/release/<rid>/`: `Erable-win-Setup.exe`, `Erable-linux-x86_64.AppImage` or `Erable-osx-<arch>-Setup.pkg`, a portable archive and the update packages.
+Builds the desktop installer locally, as the release workflow does (`docs/release.md`): installs the web dependencies, publishes the self-contained application (SPA included) with the version stamped in the binaries, then packs it with Velopack (`build/pack-desktop.mjs`, the `vpk` tool of `.config/dotnet-tools.json`). The files land in `artifacts/release/<rid>/`: `Erable-win-Setup.exe`, `Erable-linux-x86_64.AppImage` or `Erable-osx-<arch>-Setup.pkg`, a portable archive and the update packages. It also publishes `erable-cli` (`docs/cli.md`) as one self-contained executable in `artifacts/cli/<rid>/`, archived as `artifacts/cli/erable-cli-<rid>.zip` (or `.tar.gz`).
 
 | Option | Default | Meaning |
 |---|---|---|

@@ -14,7 +14,8 @@ Ce fichier s'adresse aux agents IA qui implémentent le projet. Il est **priorit
 | `docs/features.md` | Fonctionnalités `Fnn`, règles `Fnn.Rn`, scénarios `E2E-nn-nn` (= critères d'acceptation) | Fnn / E2E-nn-nn |
 | `docs/testing.md` | Stratégie de test, outillage, définition de « terminé » | §T-x |
 | `docs/deployment.md` | Installer un serveur : `erable serve`, Docker, Compose + Caddy, variables `ERABLE_*`, sauvegarde continue Litestream | — |
-| `docs/release.md` | Publier une version : tag `v*`, installeurs Velopack, mise à jour, signature | — |
+| `docs/release.md` | Publier une version : tag `vX.Y.Z` ou `X.Y.Z`, installeurs Velopack, mise à jour, signature | — |
+| `docs/cli.md` | `erable-cli` : extraction en lecture seule d'un projet, **contrat** de commandes et de JSON (`erable-cli/1`) à ne pas casser | — |
 | `docs/user-guide.md` | Guide de l'utilisateur : démarrage, `[[ID]]`, raccourcis, dossiers et sous-pages | — |
 | `docs/i18n-review.md` | Traductions : vérifications automatiques et liste à relire | — |
 | `mockups/Erable — Wiki local.html` | Référence visuelle des 6 écrans | Mockup |
@@ -123,6 +124,7 @@ Erable/
 │  ├─ Erable.Storage/     SQLite + Dapper, migrations, FTS5, BlobStore
 │  ├─ Erable.Server/      ASP.NET Core Minimal API, SignalR, auth, OpenAPI, CLI (serve, doctor)
 │  ├─ Erable.Desktop/     shell Photino
+│  ├─ Erable.Cli/         erable-cli : extraction en lecture seule (JSON, Markdown), contrat docs/cli.md
 │  └─ web/                SPA React/TS (pnpm + Vite) ; e2e Playwright dans web/e2e/
 ├─ tests/                 Erable.Core.Tests, Erable.Storage.Tests, Erable.Server.Tests, …
 ├─ spec/
@@ -166,7 +168,7 @@ Raccourcis (`.bat` sous Windows, `.sh` ailleurs) dans `scripts/` :
 scripts/build.sh [Debug|Release]            # dépendances web, SPA, solution .NET
 scripts/run.sh [desktop|server [dossier] [port]|dev]
 scripts/test.sh [--e2e] [--desktop]         # contrôles du pipeline PR ; --desktop : publication + fumée
-scripts/publish.sh [--version x.y.z] [--rid <rid>]  # installeur desktop de cette machine (Velopack) dans artifacts/release/<rid>/ ; version par défaut : dernier tag Git
+scripts/publish.sh [--version x.y.z] [--rid <rid>]  # installeur desktop de cette machine (Velopack) dans artifacts/release/<rid>/ et erable-cli dans artifacts/cli/ ; version par défaut : dernier tag Git
 scripts/serve.sh [dossier] [--port 5080] [--lan] [--rebuild] [-- options]   # héberger sans Docker : publie en Release (artifacts/server, refait si le commit change) puis erable serve ; dossier par défaut data/
 scripts/compose.sh [--litestream] setup|up|update|down|status|logs|backup|restore|doctor   # héberger avec Docker Compose + Caddy (deploy/.env)
 ```
@@ -185,6 +187,8 @@ dotnet run --project src/Erable.Server -- healthcheck [--port 8080]       # code
 docker build -t erable .                                                  # image du serveur (docs/deployment.md)
 dotnet run --project src/Erable.Server -- doctor <projet> [--json] [--fix]   # intégrité d'un projet fermé (0 sain, 1 anomalies, 2 illisible)
 dotnet run --project src/Erable.Desktop                 # app desktop (après pnpm -C src/web build)
+dotnet run --project src/Erable.Cli -- <info|tree|page|pages|schema|links|attachments|attachment|export> <projet> [--pretty]   # erable-cli, docs/cli.md (codes 0 ok, 1 usage, 2 projet illisible, 3 élément introuvable, 4 sortie)
+node build/publish-cli.mjs win-x64 [--version x.y.z]  # erable-cli autonome (un fichier) → artifacts/cli/
 
 # SPA (pnpm épinglé par `packageManager` : utiliser Corepack, `corepack pnpm …` si les shims ne sont pas activés)
 pnpm -C src/web install

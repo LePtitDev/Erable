@@ -2,15 +2,21 @@ using Erable.Core;
 using Erable.Core.Elements;
 using Erable.Core.Projects;
 using Erable.Core.Tree;
+using Microsoft.Data.Sqlite;
 
 namespace Erable.Storage;
 
-/// <summary>An open project: holds the single-instance lock until disposed.</summary>
+/// <summary>
+/// An open project: holds the single-instance lock until disposed. A snapshot (<see cref="ProjectStore.OpenSnapshot"/>)
+/// holds no lock: its database is a private copy, deleted on dispose.
+/// </summary>
 public sealed class OpenedProject : IDisposable
 {
-    private readonly ProjectLock _lock;
+    private readonly ProjectLock? _lock;
+    private readonly Action? _onDispose;
 
-    internal OpenedProject(string folder, ProjectManifest manifest, ProjectDatabase database, ProjectLock projectLock, string? backupPath)
+    internal OpenedProject(
+        string folder, ProjectManifest manifest, ProjectDatabase database, ProjectLock? projectLock, string? backupPath, Action? onDispose = null)
     {
         Folder = folder;
         Manifest = manifest;
@@ -19,6 +25,7 @@ public sealed class OpenedProject : IDisposable
         BlobsDirectory = Path.Combine(folder, ProjectFiles.Blobs);
         Blobs = new DiskBlobStore(BlobsDirectory);
         _lock = projectLock;
+        _onDispose = onDispose;
         BackupPath = backupPath;
     }
 
@@ -41,7 +48,8 @@ public sealed class OpenedProject : IDisposable
     public void Dispose()
     {
         Database.Dispose();
-        _lock.Dispose();
+        _lock?.Dispose();
+        _onDispose?.Invoke();
     }
 }
 
@@ -242,6 +250,117 @@ public static class ProjectStore
             acquired.Value.Dispose();
             throw;
         }
+    }
+
+    /// <summary>
+    /// A read-only view of a project, for tools (<c>erable-cli</c>): a consistent copy of its database, taken through
+    /// the SQLite backup API into a temporary folder, deleted when the result is disposed. Nothing of the project is
+    /// written and its lock is not taken, so it works while an application has the project open; an older format is
+    /// migrated in the copy only. Attachments are read from the project's <c>blobs/</c>, and must not be written through
+    /// the result: only reads are meant.
+    /// </summary>
+    public static Result<OpenedProject> OpenSnapshot(string folder)
+    {
+        ArgumentNullException.ThrowIfNull(folder);
+        folder = Path.GetFullPath(folder);
+        if (!Directory.Exists(folder))
+        {
+            return new DomainError(StorageErrors.Inaccessible, $"'{folder}' does not exist.");
+        }
+
+        var read = ManifestFile.Read(folder);
+        if (!read.IsSuccess)
+        {
+            return read.Error;
+        }
+
+        var manifest = read.Value;
+        if (manifest.FormatVersion > ProjectFormat.CurrentVersion)
+        {
+            return TooNew(manifest.FormatVersion);
+        }
+
+        var databasePath = Path.Combine(folder, ProjectFiles.Database);
+        if (!File.Exists(databasePath))
+        {
+            return new DomainError(StorageErrors.InvalidManifest, $"{ProjectFiles.Database} is missing.");
+        }
+
+        var copyDirectory = Directory.CreateTempSubdirectory("erable-snapshot-").FullName;
+        void DeleteCopy()
+        {
+            try
+            {
+                Directory.Delete(copyDirectory, recursive: true);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Best effort: a leftover in the temporary folder harms nothing.
+            }
+        }
+
+        ProjectDatabase? database = null;
+        try
+        {
+            var copyPath = Path.Combine(copyDirectory, ProjectFiles.Database);
+            CopyDatabase(databasePath, copyPath);
+            database = ProjectDatabase.Open(copyPath);
+            var schemaVersion = database.ReadSchemaVersion();
+            if (schemaVersion > ProjectFormat.CurrentVersion)
+            {
+                database.Dispose();
+                DeleteCopy();
+                return TooNew(schemaVersion);
+            }
+
+            if (schemaVersion < ProjectFormat.CurrentVersion)
+            {
+                using var connection = database.OpenConnection();
+                Migrations.Apply(connection, schemaVersion);
+            }
+
+            return new OpenedProject(
+                folder, manifest with { FormatVersion = ProjectFormat.CurrentVersion }, database, projectLock: null, backupPath: null, DeleteCopy);
+        }
+        catch (Exception ex) when (ex is SqliteException or IOException or UnauthorizedAccessException)
+        {
+            database?.Dispose();
+            DeleteCopy();
+            return new DomainError(StorageErrors.Inaccessible, $"The project database cannot be read: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Copy of the database. Without a write-ahead log, no connection is open (the last one to close deletes it): the
+    /// file alone is the database, copied as it is, since even a read-only SQLite connection would create
+    /// <c>-wal</c> and <c>-shm</c> files in the project. With one, another process may be writing: the online backup
+    /// of a read-only connection gives a consistent copy, and its files are already there.
+    /// </summary>
+    private static void CopyDatabase(string source, string destination)
+    {
+        if (!File.Exists(source + "-wal"))
+        {
+            using var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var copy = new FileStream(destination, FileMode.CreateNew, FileAccess.Write);
+            input.CopyTo(copy);
+            return;
+        }
+
+        using var from = new SqliteConnection(new SqliteConnectionStringBuilder
+        {
+            DataSource = source,
+            Mode = SqliteOpenMode.ReadOnly,
+            Pooling = false,
+        }.ToString());
+        using var to = new SqliteConnection(new SqliteConnectionStringBuilder
+        {
+            DataSource = destination,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Pooling = false,
+        }.ToString());
+        from.Open();
+        to.Open();
+        from.BackupDatabase(to);
     }
 
     /// <summary>

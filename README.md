@@ -49,6 +49,7 @@ src/Erable.Core       pure domain (no IO dependency)
 src/Erable.Storage    SQLite, migrations, FTS5, attachment storage
 src/Erable.Server     API, SignalR, authentication, CLI (serve, doctor)
 src/Erable.Desktop    Photino shell
+src/Erable.Cli        erable-cli: read-only extraction of a project as JSON / Markdown
 src/web               React/TypeScript SPA
 tests/ · spec/        tests and shared C# ↔ TypeScript cases
 docs/ · tasks/        documentation and implementation plan
@@ -67,6 +68,7 @@ The documentation is written in French.
 | [docs/testing.md](docs/testing.md) | Testing strategy |
 | [docs/deployment.md](docs/deployment.md) | Installing a server: Docker, Compose, Litestream |
 | [docs/release.md](docs/release.md) | Publishing a release |
+| [docs/cli.md](docs/cli.md) | `erable-cli`: extracting a project for other tools (commands, JSON contract) |
 
 Contributions (human or AI-assisted) follow the rules in [CLAUDE.md](CLAUDE.md).
 

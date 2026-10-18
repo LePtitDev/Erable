@@ -1,6 +1,7 @@
 @echo off
 rem Builds the Windows installer, as the release workflow does (docs\release.md): self-contained publication, then
-rem Velopack. The files land in artifacts\release\win-x64\ (Erable-win-Setup.exe, portable archive, packages).
+rem Velopack. The files land in artifacts\release\win-x64\ (Erable-win-Setup.exe, portable archive, packages);
+rem erable-cli (docs\cli.md) in artifacts\cli\.
 rem Usage: scripts\publish.bat [--version x.y.z]
 rem   --version  default from Git: the tag of HEAD, or x.y.(z+1)-dev.N after the last tag
 rem Unsigned unless ERABLE_SIGN_AZURE_METADATA is set (docs\release.md).
@@ -27,8 +28,12 @@ call :pnpm install --frozen-lockfile || goto :error
 echo ==^> Desktop installer (win-x64)
 node build/pack-desktop.mjs win-x64 %VERSION_ARGS% || goto :error
 
+echo ==^> Command-line tool (win-x64)
+node build/publish-cli.mjs win-x64 %VERSION_ARGS% || goto :error
+
 echo Installer and packages in artifacts\release\win-x64\:
 dir /b artifacts\release\win-x64
+echo Command-line tool: artifacts\cli\erable-cli-win-x64.zip
 exit /b 0
 
 :error
