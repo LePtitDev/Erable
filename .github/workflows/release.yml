@@ -137,7 +137,7 @@ jobs:
       - name: Smoke test of the AppImage (Linux)
         if: runner.os == 'Linux'
         run: |
-          image=$(ls artifacts/release/linux-x64/*.AppImage | head -n 1)
+          image=$(find artifacts/release/linux-x64 -maxdepth 1 -name '*.AppImage' | head -n 1)
           chmod +x "$image"
           status=0
           xvfb-run -a "$image" --appimage-extract-and-run --self-test --self-test-report self-test.json || status=$?

@@ -63,7 +63,7 @@ jobs:
             --env ERABLE_ADMIN_LOGIN=admin \
             --env ERABLE_ADMIN_PASSWORD=ci-password-2026 \
             erable:ci
-          for attempt in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             status=$(docker inspect --format '{{.State.Health.Status}}' erable)
             echo "health: $status"
             [ "$status" = healthy ] && exit 0
