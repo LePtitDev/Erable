@@ -1,6 +1,8 @@
 // Packs the published desktop application with Velopack: installer, update packages and release manifest (M5-03).
-// Usage: node build/pack-desktop.mjs <rid> --version <x.y.z> [--skip-publish] [--channel <name>]
+// Usage: node build/pack-desktop.mjs <rid> [--version <x.y.z>] [--skip-publish] [--channel <name>]
 //   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64   (run on the matching OS: vpk packs a macOS app on macOS only)
+//   --version: default from Git: the version tag of HEAD, or after the last one x.y.(z+1)-dev.<commits since>, which
+//              sorts between that release and the next (an installed local build is not « updated » to an older one).
 //   --channel: Velopack channel; default win, linux, osx-arm64 or osx-x64. The two macOS architectures need their own
 //              channel: they share one release, and the default « osx » would give their files the same names.
 // Output: artifacts/release/<rid>/ (Setup / AppImage / pkg, *.nupkg, releases.<channel>.json, RELEASES-*).
@@ -17,14 +19,14 @@ const argument = (name) => {
   const index = process.argv.indexOf(name);
   return index > 0 ? process.argv[index + 1] : undefined;
 };
+const root = resolve(import.meta.dirname, "..");
 const rid = process.argv[2];
-const version = argument("--version");
+const version = argument("--version") ?? versionFromGit();
 if (!rids.includes(rid) || !/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version ?? "")) {
-  console.error(`Usage: node build/pack-desktop.mjs <${rids.join("|")}> --version <x.y.z> [--skip-publish] [--channel <name>]`);
+  console.error(`Usage: node build/pack-desktop.mjs <${rids.join("|")}> [--version <x.y.z>] [--skip-publish] [--channel <name>]`);
   process.exit(2);
 }
 
-const root = resolve(import.meta.dirname, "..");
 const run = (file, args) => execFileSync(file, args, { cwd: root, stdio: "inherit" });
 const os = rid.startsWith("win") ? "win" : rid.startsWith("osx") ? "osx" : "linux";
 const publishDir = join(root, "artifacts", "desktop", rid, "Erable");
@@ -79,3 +81,24 @@ if (os === "win" && env["ERABLE_SIGN_AZURE_METADATA"]) {
 run("dotnet", ["tool", "restore"]);
 run("dotnet", args);
 console.log(`Packaged ${rid} ${version} in ${outputDir}`);
+
+/** x.y.z for a commit tagged vx.y.z (or x.y.z); x.y.(z+1)-dev.N N commits after it; 0.0.1-dev.N without any tag. */
+function versionFromGit() {
+  let described;
+  try {
+    described = execFileSync("git", ["describe", "--tags", "--long", "--match", "v[0-9]*", "--match", "[0-9]*"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    const count = execFileSync("git", ["rev-list", "--count", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+    return `0.0.1-dev.${count}`;
+  }
+  // v1.2.3-4-gabcdef0 (--long: the count is always there, 0 on the tag itself)
+  const match = /^v?(\d+)\.(\d+)\.(\d+)(-[0-9A-Za-z.-]+?)?-(\d+)-g[0-9a-f]+$/.exec(described);
+  if (!match) return undefined;
+  const [, major, minor, patch, prerelease, distance] = match;
+  if (distance === "0") return `${major}.${minor}.${patch}${prerelease ?? ""}`;
+  return `${major}.${minor}.${Number(patch) + 1}-dev.${distance}`;
+}

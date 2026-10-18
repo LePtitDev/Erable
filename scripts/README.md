@@ -7,6 +7,7 @@ Shortcuts for building, running, testing and hosting Erable from a clone of the 
 | [`build`](#build) | Builds the web client and the .NET solution |
 | [`run`](#run) | Runs the desktop application, a development server or the Vite dev server |
 | [`test`](#test) | Runs the checks of the PR pipeline locally |
+| [`publish`](#publish) | Builds the desktop installer of this machine's system |
 | [`serve`](#serve) | Hosts a server on this machine, without Docker |
 | [`compose`](#compose) | Hosts a server with Docker Compose behind Caddy (HTTPS) |
 
@@ -54,6 +55,21 @@ Runs the checks of the PR pipeline (`docs/testing.md` §13): .NET format check, 
 |---|---|
 | `--e2e` | Also runs Playwright (Chromium and WebKit) against the real backend, installing the browsers if needed |
 | `--desktop` | Also publishes the desktop application for this machine and runs its `--self-test`. On Windows, also runs the desktop e2e tests over CDP (`pnpm e2e:desktop`) |
+
+## publish
+
+```bash
+scripts/publish.sh [--version x.y.z] [--rid win-x64|linux-x64|osx-arm64|osx-x64]
+```
+
+Builds the desktop installer locally, as the release workflow does (`docs/release.md`): installs the web dependencies, publishes the self-contained application (SPA included) with the version stamped in the binaries, then packs it with Velopack (`build/pack-desktop.mjs`, the `vpk` tool of `.config/dotnet-tools.json`). The files land in `artifacts/release/<rid>/`: `Erable-win-Setup.exe`, `Erable-linux-x86_64.AppImage` or `Erable-osx-<arch>-Setup.pkg`, a portable archive and the update packages.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--version x.y.z` | from Git | The tag of `HEAD` (`v1.2.0` or `1.2.0` gives `1.2.0`); after the last tag, `x.y.(z+1)-dev.N` with N commits since it, which sorts after that release and before the next one |
+| `--rid <rid>` (`.sh` only) | this machine | Target system. Velopack packs for the system it runs on; macOS can pack both architectures. `.bat` always builds `win-x64` |
+
+The packages are unsigned unless the `ERABLE_SIGN_*` variables of `docs/release.md` are set: Windows SmartScreen and macOS Gatekeeper then warn on first launch. An installed application checks GitHub for updates; set `ERABLE_DISABLE_UPDATES=1` to keep a local build as it is.
 
 ## serve
 

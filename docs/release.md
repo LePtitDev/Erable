@@ -17,6 +17,8 @@ Une version est un **tag Git `vX.Y.Z` ou `X.Y.Z`**. Deux façons de la créer, a
 
 Un lancement manuel (*Actions → Release → Run workflow*, avec une version, sans **attach**) construit tout **sans rien publier** : les paquets restent en artefacts du workflow.
 
+Pour produire un installeur sur sa machine, sans CI : `scripts/publish.sh` (ou `scripts\publish.bat`), voir `scripts/README.md` ; la version vient du dernier tag Git si elle n'est pas donnée.
+
 ## Livrables par système
 
 | Système | Fichiers (dans `artifacts/release/<rid>/`) |
