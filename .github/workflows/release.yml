@@ -198,7 +198,7 @@ jobs:
             artifacts/release/${{ matrix.rid }}/
             artifacts/cli/erable-cli-${{ matrix.rid }}.*
           retention-days: 30
-      - name: Attach to the draft release
+      - name: Attach to the release (draft, or the one created on GitHub)
         if: env.PUBLISH == 'true'
         shell: bash
         env:
