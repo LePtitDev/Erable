@@ -3,11 +3,10 @@
   "stryker-config": {
     "project": "Erable.Core.csproj",
     "solution": "../../Erable.sln",
-    "test-projects": ["tests/Erable.Core.Tests/Erable.Core.Tests.csproj"],
+    "test-projects": ["Erable.Core.Tests.csproj"],
     "reporters": ["progress", "html", "json"],
     "mutation-level": "Standard",
     "thresholds": { "high": 85, "low": 70, "break": 0 },
-    "concurrency": 2,
-    "output": "../../artifacts/mutation/core"
+    "concurrency": 2
   }
 }

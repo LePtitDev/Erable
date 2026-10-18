@@ -41,7 +41,8 @@ jobs:
       - run: dotnet tool restore
       - name: Mutate Erable.Core
         working-directory: tests/Erable.Core.Tests
-        run: dotnet dotnet-stryker --config-file stryker-config.json
+        # The output folder is a command-line option only: Stryker.NET refuses it in the configuration file.
+        run: dotnet dotnet-stryker --config-file stryker-config.json --output ../../artifacts/mutation/core
       - name: Score in the summary
         if: always()
         run: node build/mutation-summary.mjs artifacts/mutation/core >> "$GITHUB_STEP_SUMMARY"
