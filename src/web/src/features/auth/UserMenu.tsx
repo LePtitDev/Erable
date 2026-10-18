@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
 import { useTranslation } from "react-i18next";
-import { logout } from "../../shared/api/auth";
+import { signOutAndReload } from "../../shared/api/auth";
 import { initialsOf, meQuery } from "../../shared/api/projects";
 import { apiInfoQuery } from "../../shared/api/queries";
 import styles from "./UserMenu.module.css";
@@ -26,16 +26,6 @@ export function UserMenu() {
     );
   }
 
-  const signOut = () => {
-    // The session ends on the server, then the page is loaded afresh: no cached data of this user survives in the
-    // browser, and the gate shows the login screen.
-    logout()
-      .catch(() => undefined)
-      .finally(() => {
-        globalThis.location.assign("/");
-      });
-  };
-
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -53,7 +43,7 @@ export function UserMenu() {
           <DropdownMenu.Label className={styles["who"]}>
             {t("auth.signedInAs", { name: me.data.name })}
           </DropdownMenu.Label>
-          <DropdownMenu.Item className={styles["item"]} onSelect={signOut}>
+          <DropdownMenu.Item className={styles["item"]} onSelect={signOutAndReload}>
             <LogOut aria-hidden size={16} />
             {t("auth.logout")}
           </DropdownMenu.Item>

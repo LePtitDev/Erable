@@ -53,6 +53,36 @@ describe("HomeScreen", () => {
     ).toBeInTheDocument();
   });
 
+  it("offers to sign out under the help, without an avatar, on a server", async () => {
+    mockHome();
+    server.use(
+      http.get("/api/info", ({ response }) =>
+        response(200).json({
+          appVersion: "0.1.0",
+          apiVersion: "v1",
+          formatVersion: 1,
+          mode: "server",
+          folderProjects: false,
+        }),
+      ),
+      http.get("/api/v1/projects", ({ response }) => response(200).json([])),
+    );
+    await renderApp("/");
+
+    const signOut = await screen.findByRole("button", { name: "Se déconnecter" });
+    const help = screen.getByRole("button", { name: "Aide et raccourcis" });
+    expect(help.compareDocumentPosition(signOut) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Compte de Arthur" })).not.toBeInTheDocument();
+  });
+
+  it("has nobody to sign out on the desktop", async () => {
+    mockHome();
+    await renderApp("/");
+
+    await screen.findByRole("heading", { level: 1, name: "Bonjour, Arthur" });
+    expect(screen.queryByRole("button", { name: "Se déconnecter" })).not.toBeInTheDocument();
+  });
+
   it("lists recent projects with their relative date", async () => {
     mockHome([{ name: "Chroniques d'Aube", status: "project" }]);
     await renderApp("/");

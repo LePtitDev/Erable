@@ -4,6 +4,7 @@ import {
   FolderOpen,
   FolderPlus,
   CircleQuestionMark,
+  LogOut,
   Server,
   Settings,
   SquareLibrary,
@@ -25,7 +26,7 @@ import { RecentProjects } from "./RecentProjects";
 import { ConnectServerDialog } from "./ConnectServerDialog";
 import { ServersSection } from "./ServersSection";
 import { ServerProjects } from "./ServerProjects";
-import { UserMenu } from "../auth/UserMenu";
+import { signOutAndReload } from "../../shared/api/auth";
 
 type OpenDialog = "new" | "open" | "connect" | "preferences" | "help" | null;
 
@@ -104,7 +105,6 @@ export function HomeScreen() {
           </a>
         </nav>
         <div className={styles["footer"]}>
-          {server && <UserMenu />}
           <button
             type="button"
             className={styles["navItem"]}
@@ -125,6 +125,12 @@ export function HomeScreen() {
             <CircleQuestionMark aria-hidden size={18} />
             {t("home.nav.help")}
           </button>
+          {server && (
+            <button type="button" className={styles["navItem"]} onClick={signOutAndReload}>
+              <LogOut aria-hidden size={18} />
+              {t("auth.logout")}
+            </button>
+          )}
         </div>
       </aside>
 

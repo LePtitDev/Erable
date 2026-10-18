@@ -23,7 +23,7 @@ export class LoginPage {
     await this.submit.click();
   }
 
-  /** The avatar of the signed-in user (top bar, home screen). */
+  /** The avatar of the signed-in user (top bar of a project). */
   avatar(name: string): Locator {
     return this.page.getByRole("button", { name: t("auth.userMenu", { name }) });
   }

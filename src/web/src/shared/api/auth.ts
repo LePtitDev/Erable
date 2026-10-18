@@ -26,6 +26,18 @@ export async function logout(): Promise<void> {
   await unwrap(api.POST("/api/v1/auth/logout"));
 }
 
+/**
+ * Signs out, then loads the page afresh: no cached data of this user survives in the browser, and the gate shows the
+ * login screen.
+ */
+export function signOutAndReload(): void {
+  logout()
+    .catch(() => undefined)
+    .finally(() => {
+      globalThis.location.assign("/");
+    });
+}
+
 interface AuthState {
   /** The session expired while the user was working: the sign-in dialog is shown over the screen. */
   readonly reloginOpen: boolean;
