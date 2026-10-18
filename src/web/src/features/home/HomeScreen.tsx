@@ -4,7 +4,6 @@ import {
   FolderOpen,
   FolderPlus,
   CircleQuestionMark,
-  LayoutTemplate,
   Server,
   Settings,
   SquareLibrary,
@@ -103,18 +102,6 @@ export function HomeScreen() {
             <SquareLibrary aria-hidden size={18} />
             {t("home.nav.projects")}
           </a>
-          <button
-            type="button"
-            className={styles["navItem"]}
-            disabled
-            aria-describedby="templates-soon"
-          >
-            <LayoutTemplate aria-hidden size={18} />
-            {t("home.nav.templates")}
-            <span id="templates-soon" className={styles["soon"]}>
-              {t("common.soon")}
-            </span>
-          </button>
         </nav>
         <div className={styles["footer"]}>
           {server && <UserMenu />}
@@ -146,7 +133,9 @@ export function HomeScreen() {
           <h1 className={styles["greeting"]}>
             {me.isSuccess ? t("home.greeting", { name: me.data.name }) : t("app.name")}
           </h1>
-          <p className={styles["subtitle"]}>{t("home.subtitle")}</p>
+          <p className={styles["subtitle"]}>
+            {t(server ? "home.subtitleServer" : "home.subtitle")}
+          </p>
         </header>
 
         <div className={styles["actions"]}>

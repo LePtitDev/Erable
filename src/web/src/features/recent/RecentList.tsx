@@ -50,7 +50,11 @@ export function RecentList({
               <span className={styles["name"]}>{entry.name}</span>
               {entry.who !== undefined && <span className={styles["who"]}>{entry.who}</span>}
             </span>
-            <time className={styles["when"]} dateTime={entry.at}>
+            <time
+              className={styles["when"]}
+              dateTime={entry.at}
+              title={format.dateTime(new Date(entry.at))}
+            >
               {format.relative(new Date(entry.at))}
             </time>
           </Link>

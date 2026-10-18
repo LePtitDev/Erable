@@ -12,7 +12,6 @@
     "error": "Ein Fehler ist aufgetreten: {{message}}",
     "cancel": "Abbrechen",
     "close": "Schließen",
-    "soon": "bald",
     "retry": "Erneut versuchen"
   },
   "preferences": {
@@ -213,10 +212,10 @@
     "version": "Version {{version}}",
     "greeting": "Hallo, {{name}}",
     "subtitle": "Öffnen Sie ein lokales Wiki oder verbinden Sie sich mit einem gemeinsamen Server.",
+    "subtitleServer": "Hier finden Sie die Projekte, die auf diesem Server mit Ihnen geteilt werden.",
     "nav": {
       "label": "Hauptnavigation",
       "projects": "Projekte",
-      "templates": "Projektvorlagen",
       "preferences": "Einstellungen",
       "help": "Hilfe und Tastenkürzel"
     },
@@ -335,8 +334,8 @@
       "links_one": "{{count}} Verknüpfungstyp",
       "links_other": "{{count}} Verknüpfungstypen",
       "cursor": "Z {{line}}, Sp {{column}}",
-      "errors_one": "{{count}} Validierungsfehler",
-      "errors_other": "{{count}} Validierungsfehler",
+      "warnings_one": "{{count}} Validierungswarnung",
+      "warnings_other": "{{count}} Validierungswarnungen",
       "readOnly": "Schreibgeschützt",
       "connection": {
         "connecting": "Verbindung wird hergestellt…",

@@ -25,7 +25,9 @@ export function createFormatters(language: string, clock: Clock, justNow?: strin
   const locale = language === pseudoLanguage ? referenceLanguage : language;
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
   const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
-  const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style: "short" });
+  // Short for hours and less (« il y a 2 h »), in words from a day on: « il y a 7 m. » could be minutes or months.
+  const relativeShort = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style: "short" });
+  const relativeLong = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style: "long" });
   const number = new Intl.NumberFormat(locale);
 
   return {
@@ -33,12 +35,13 @@ export function createFormatters(language: string, clock: Clock, justNow?: strin
     date: (value: Date) => date.format(value),
     /** « 12 mars 2026 à 10:00 » */
     dateTime: (value: Date) => dateTime.format(value),
-    /** « il y a 2 h », « hier », « dans 3 j » */
+    /** « il y a 2 h », « hier », « il y a 7 mois », « dans 3 jours » */
     relative: (value: Date) => {
       const seconds = Math.round((value.getTime() - clock().getTime()) / 1000);
       if (justNow !== undefined && Math.abs(seconds) < justNowSeconds) return justNow;
       const [unit, size] = units.find(([, s]) => Math.abs(seconds) >= s) ?? ["second", 1];
-      return relative.format(Math.round(seconds / size), unit);
+      const style = size >= 24 * 3600 ? relativeLong : relativeShort;
+      return style.format(Math.round(seconds / size), unit);
     },
     /** « 2,6 Ko », « 71,6 Ko », « 1,2 Mo » (binary multiples, the units people see in their file manager). */
     size: (bytes: number) => {

@@ -12,7 +12,6 @@
     "error": "Something went wrong: {{message}}",
     "cancel": "Cancel",
     "close": "Close",
-    "soon": "soon",
     "retry": "Retry"
   },
   "preferences": {
@@ -213,10 +212,10 @@
     "version": "Version {{version}}",
     "greeting": "Hello, {{name}}",
     "subtitle": "Open a local wiki or connect to a shared server.",
+    "subtitleServer": "Find the projects shared with you on this server.",
     "nav": {
       "label": "Main navigation",
       "projects": "Projects",
-      "templates": "Project templates",
       "preferences": "Preferences",
       "help": "Help and shortcuts"
     },
@@ -335,8 +334,8 @@
       "links_one": "{{count}} link type",
       "links_other": "{{count}} link types",
       "cursor": "Ln {{line}}, Col {{column}}",
-      "errors_one": "{{count}} validation error",
-      "errors_other": "{{count}} validation errors",
+      "warnings_one": "{{count}} validation warning",
+      "warnings_other": "{{count}} validation warnings",
       "readOnly": "Read-only",
       "connection": {
         "connecting": "Connecting…",

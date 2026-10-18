@@ -118,7 +118,7 @@
 }
 
 .badValue {
-  color: var(--color-danger);
+  color: var(--color-warning);
   font-family: var(--font-mono);
 }
 

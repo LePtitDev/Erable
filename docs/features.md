@@ -406,7 +406,7 @@ Alors        la page revient à son contenu enregistré et le brouillon est supp
 
 E2E-05-12 · Validation en direct non bloquante                P0 · @pr · M2
 Étant donné  « Ilsa Varenne » en édition, panneau Propriétés ouvert
-Alors        « Niveau » affiche « Doit être inférieur ou égal à 60 » et la barre d'état « 1 erreur de validation »
+Alors        « Niveau » affiche « Doit être inférieur ou égal à 60 » et la barre d'état « 1 avertissement de validation »
 Quand        j'enregistre
 Alors        l'enregistrement réussit et la page porte un badge « hors règles »
 Quand        je remplace 72 par 55

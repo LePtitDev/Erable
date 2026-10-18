@@ -14,6 +14,14 @@ describe("createFormatters", () => {
     expect(createFormatters("en", clock).relative(twoHoursAgo)).toBe("2 hr. ago");
   });
 
+  it("spells out days, months and years, whose short forms are ambiguous", () => {
+    const sevenMonthsAgo = new Date(now.getTime() - 7 * 30 * 24 * 3600 * 1000);
+    const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 3600 * 1000);
+    expect(createFormatters("fr", clock).relative(sevenMonthsAgo)).toBe("il y a 7 mois");
+    expect(createFormatters("fr", clock).relative(threeDaysAgo)).toBe("il y a 3 jours");
+    expect(createFormatters("en", clock).relative(sevenMonthsAgo)).toBe("7 months ago");
+  });
+
   it("uses words for yesterday", () => {
     const yesterday = new Date(now.getTime() - 24 * 3600 * 1000);
     expect(createFormatters("fr", clock).relative(yesterday)).toBe("hier");

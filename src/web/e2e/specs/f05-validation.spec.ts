@@ -11,7 +11,7 @@ test.describe("F05 · Live validation", () => {
 
     const niveau = panel.field("Niveau");
     await expect(niveau).toContainText(t("property.violation.less_or_equal", { value: 60 }));
-    await expect(page.getByText(t("shell.status.errors_one", { count: 1 }))).toBeVisible();
+    await expect(page.getByText(t("shell.status.warnings_one", { count: 1 }))).toBeVisible();
 
     await expectNoSeriousViolations(page);
     await panel.save();
@@ -21,6 +21,6 @@ test.describe("F05 · Live validation", () => {
     await page.getByRole("button", { name: t("page.edit") }).click();
     await niveau.getByRole("textbox", { name: "Niveau" }).fill("55");
     await expect(niveau).not.toContainText(t("property.violation.less_or_equal", { value: 60 }));
-    await expect(page.getByText(t("shell.status.errors_one", { count: 1 }))).toHaveCount(0);
+    await expect(page.getByText(t("shell.status.warnings_one", { count: 1 }))).toHaveCount(0);
   });
 });

@@ -299,7 +299,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
       )}
       {mode === "edit" && validationErrors > 0 && (
         <span className={styles["errors"]} role="status">
-          {t("shell.status.errors", { count: validationErrors })}
+          {t("shell.status.warnings", { count: validationErrors })}
         </span>
       )}
       {!canEdit && <span role="status">{t("shell.status.readOnly")}</span>}

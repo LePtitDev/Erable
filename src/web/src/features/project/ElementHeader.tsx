@@ -56,7 +56,7 @@ export function ElementHeader({
         <div className={styles["meta"]}>
           <IdChip id={element.id} />
           {chips}
-          <span className={styles["stamp"]}>
+          <span className={styles["stamp"]} title={format.dateTime(new Date(element.updatedAt))}>
             {t("element.modified", {
               when: format.relative(new Date(element.updatedAt)),
               who: author(element.updatedBy, element.updatedByName),

@@ -31,6 +31,10 @@
   --color-on-accent: #fff;
   --color-danger: #b42318;
   --color-danger-soft: #fcedeb;
+
+  /* Rule violations: they warn, they never block (invariant 6) */
+  --color-warning: #8a4a00;
+  --color-warning-soft: #fdf0dc;
   --color-highlight: #fbe7b5;
 
   /* Element kinds (badges P / C / Pr / L / attachments) */
@@ -127,6 +131,8 @@
   --color-on-accent: #0e1a15;
   --color-danger: #f28b82;
   --color-danger-soft: #2e1a19;
+  --color-warning: #f0b45a;
+  --color-warning-soft: #2e2414;
   --color-highlight: #4a3d16;
   --color-kind-page: #8db7ea;
   --color-kind-page-soft: #1c2838;
@@ -163,6 +169,8 @@
     --color-on-accent: #0e1a15;
     --color-danger: #f28b82;
     --color-danger-soft: #2e1a19;
+    --color-warning: #f0b45a;
+    --color-warning-soft: #2e2414;
     --color-highlight: #4a3d16;
     --color-kind-page: #8db7ea;
     --color-kind-page-soft: #1c2838;

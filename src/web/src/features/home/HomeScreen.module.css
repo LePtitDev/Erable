@@ -89,14 +89,6 @@
   font-weight: var(--weight-medium);
 }
 
-.soon {
-  margin-left: auto;
-  padding: 0 var(--space-1-5);
-  border-radius: var(--radius-pill);
-  background: var(--color-sunken);
-  font-size: var(--text-xs);
-}
-
 .footer {
   display: flex;
   flex-direction: column;

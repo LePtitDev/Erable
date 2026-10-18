@@ -12,7 +12,6 @@
     "error": "Une erreur est survenue : {{message}}",
     "cancel": "Annuler",
     "close": "Fermer",
-    "soon": "bientôt",
     "retry": "Réessayer"
   },
   "preferences": {
@@ -213,10 +212,10 @@
     "version": "Version {{version}}",
     "greeting": "Bonjour, {{name}}",
     "subtitle": "Ouvrez un wiki local ou connectez-vous à un serveur partagé.",
+    "subtitleServer": "Retrouvez les projets partagés avec vous sur ce serveur.",
     "nav": {
       "label": "Navigation principale",
       "projects": "Projets",
-      "templates": "Modèles de projet",
       "preferences": "Préférences",
       "help": "Aide et raccourcis"
     },
@@ -339,9 +338,9 @@
       "categories_many": "{{count}} catégories",
       "properties_many": "{{count}} propriétés",
       "links_many": "{{count}} types de liens",
-      "errors_one": "{{count}} erreur de validation",
-      "errors_other": "{{count}} erreurs de validation",
-      "errors_many": "{{count}} erreurs de validation",
+      "warnings_one": "{{count}} avertissement de validation",
+      "warnings_other": "{{count}} avertissements de validation",
+      "warnings_many": "{{count}} avertissements de validation",
       "readOnly": "Lecture seule",
       "connection": {
         "connecting": "Connexion…",

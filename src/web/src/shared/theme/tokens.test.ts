@@ -32,6 +32,8 @@ const pairs: [string, string][] = [
   ["--color-on-accent", "--color-accent"],
   ["--color-danger", "--color-surface"],
   ["--color-danger", "--color-danger-soft"],
+  ["--color-warning", "--color-surface"],
+  ["--color-warning", "--color-warning-soft"],
   ["--color-text", "--color-highlight"],
   ...["page", "category", "property", "link", "attachment"].map((kind): [string, string] => [
     `--color-kind-${kind}`,

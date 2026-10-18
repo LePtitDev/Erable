@@ -124,9 +124,13 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
                     </Button>
                   </>
                 )}
-                <span className={styles["when"]}>
+                <time
+                  className={styles["when"]}
+                  dateTime={project.lastOpenedAt}
+                  title={format.dateTime(new Date(project.lastOpenedAt))}
+                >
                   {format.relative(new Date(project.lastOpenedAt))}
-                </span>
+                </time>
               </li>
             );
           })}
