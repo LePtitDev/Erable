@@ -36,9 +36,11 @@ scripts/build.sh              # web dependencies, SPA, .NET solution
 scripts/run.sh desktop        # desktop application
 scripts/run.sh server ./MyWiki 5080   # server on a project folder
 scripts/test.sh               # PR pipeline checks (--e2e for Playwright)
+scripts/serve.sh ./MyWiki --lan              # host a server without Docker (Release build)
+scripts/compose.sh setup wiki.example.org    # host with Docker Compose + Caddy (HTTPS), then: scripts/compose.sh up
 ```
 
-On Windows, use the `.bat` equivalents. The full list of commands (tests, e2e, performance, publishing) is in [CLAUDE.md](CLAUDE.md#9-commandes).
+On Windows, use the `.bat` equivalents. Every script and its arguments: [scripts/README.md](scripts/README.md). The full list of commands (tests, e2e, performance, publishing) is in [CLAUDE.md](CLAUDE.md#9-commandes).
 
 ## Repository layout
 
