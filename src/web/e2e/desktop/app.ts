@@ -42,6 +42,7 @@ export interface LaunchOptions {
 }
 
 let nextCdpPort = 9600;
+const webViewLanguage = process.env["ERABLE_E2E_WEBVIEW_LANG"] ?? "fr-FR";
 
 /** A fresh, empty folder for a test (application profile, projects). */
 export function tempFolder(prefix: string): string {
@@ -75,7 +76,9 @@ export function spawnDesktop(options: LaunchOptions & { cdpPort?: number }): {
       ...(options.cdpPort === undefined
         ? {}
         : {
-            WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${String(options.cdpPort)}`,
+            // French, the reference locale the tests read, whatever the language of the machine (the CI runners
+            // are in English): like `locale: "fr-FR"` in playwright.config.ts.
+            WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${String(options.cdpPort)} --lang=${webViewLanguage}`,
           }),
       ...options.env,
     },
