@@ -11,6 +11,8 @@ Erable est un wiki structuré, « façon IDE » : des pages en Markdown, rangée
 5. Rien n'est perdu par erreur : les éléments supprimés vont dans la **corbeille** et chaque enregistrement crée une **révision** que l'on peut comparer et restaurer (*Historique*).
 6. **Sauvegarder** un projet local, c'est copier son dossier quand l'application est fermée. Pour travailler à plusieurs, un administrateur installe un serveur (`docs/deployment.md`).
 
+Sous Linux, l'application a besoin de WebKitGTK 4.1 et de libnotify (Debian / Ubuntu : `sudo apt install libwebkit2gtk-4.1-0 libnotify4`).
+
 Les préférences (langue de l'interface, thème clair ou sombre, raccourcis) se règlent depuis l'accueil (*Préférences*) comme depuis la barre du haut d'un projet.
 
 ## 2. Relier les pages : la syntaxe `[[ID]]`

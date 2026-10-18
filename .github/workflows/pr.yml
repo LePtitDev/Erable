@@ -216,7 +216,7 @@ jobs:
         name: Linux runtime dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 libnotify4 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - if: matrix.smoke == 'self-test'
         name: Self-test (E2E-16-01, E2E-16-02)

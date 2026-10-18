@@ -23,6 +23,8 @@ Un lancement manuel (*Actions → Release → Run workflow*, avec une version) c
 
 Les noms exacts sont ceux de `vpk` (Velopack).
 
+**Dépendances Linux.** L'AppImage n'embarque pas le moteur web ni les bibliothèques du bureau : la machine doit fournir WebKitGTK 4.1 et libnotify (PhotinoX s'arrête au démarrage sans `libnotify.so.4`). Sous Debian / Ubuntu : `sudo apt install libwebkit2gtk-4.1-0 libnotify4` ; sous Fedora : `sudo dnf install webkit2gtk4.1 libnotify`.
+
 ## Mise à jour automatique
 
 Au démarrage, l'application installée interroge les releases GitHub. Si une version plus récente existe, elle est téléchargée en arrière-plan et **installée à la prochaine fermeture** : jamais en pleine session. Un build de développement (non installé) ne vérifie rien.

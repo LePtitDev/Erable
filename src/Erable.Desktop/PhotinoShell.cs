@@ -54,7 +54,11 @@ internal sealed partial class PhotinoShell : INativeBridge
         {
             // The window only ever talks to the in-process backend on 127.0.0.1. Without this, WebView2 resolves the
             // system proxy (WPAD auto-detection) before the first request, which can stall the empty window for ~20 s.
-            _window.SetBrowserControlInitParameters("--no-proxy-server");
+            // Arguments set by the application replace WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS instead of adding to it, so
+            // the variable is carried over by hand (the desktop e2e tests open the CDP port through it).
+            var extra = Environment.GetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS");
+            _window.SetBrowserControlInitParameters(
+                string.IsNullOrWhiteSpace(extra) ? "--no-proxy-server" : $"--no-proxy-server {extra}");
         }
 
         _window.Load(url);

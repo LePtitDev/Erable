@@ -147,7 +147,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 libnotify4 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: "Smoke (Windows: WebView2 over CDP, then self-test)"
         if: runner.os == 'Windows'
