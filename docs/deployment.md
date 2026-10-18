@@ -101,6 +101,7 @@ Les WebSocket (SignalR : événements et présence) traversent `reverse_proxy` s
 - **Sessions** : cookie `HttpOnly`, `SameSite=Strict`, révocables (déconnexion, changement de mot de passe, compte désactivé) ; jeton `Bearer` pour l'application de bureau connectée. Aucune session n'est lisible par un script de la page.
 - **Droits** par projet : lecteur, éditeur, administrateur. Un non-membre ne voit ni le nom ni l'existence d'un projet.
 - **Pièces jointes** : taille maximale, quota par projet, jamais interprétées par le navigateur (`Content-Disposition`, `nosniff`, SVG et HTML en téléchargement).
+- **Navigateur** : politique de sécurité du contenu (CSP) sur l'application, pas d'intégration dans le cadre d'un autre site (*clickjacking*), aucun `Referer` envoyé aux sites liés. Le `Caddyfile` fourni ajoute HSTS ; derrière un autre reverse proxy, ajoutez `Strict-Transport-Security: max-age=31536000`.
 - **Hors du périmètre** : la protection du réseau (pare-feu), les sauvegardes, la mise à jour du système et de l'image de base (le CI analyse l'image à chaque changement et chaque semaine : `.github/workflows/docker.yml`).
 
 ## 5. Dépannage

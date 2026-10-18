@@ -284,6 +284,9 @@ public static class ErableHost
 
     private static void ConfigurePipeline(WebApplication app, ErableHostOptions options)
     {
+        // First: the headers also go out on the responses that the guards below refuse.
+        app.UseMiddleware<SecurityHeadersMiddleware>();
+
         if (options.Mode == HostMode.Desktop)
         {
             app.UseMiddleware<DesktopSecurityMiddleware>();

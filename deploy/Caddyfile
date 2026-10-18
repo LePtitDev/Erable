@@ -2,5 +2,7 @@
 # ports 80 and 443 open). WebSockets (SignalR) pass through reverse_proxy without any setting.
 {$ERABLE_DOMAIN} {
 	encode zstd gzip
+	# HTTPS only for a year (the other security headers come from Erable itself).
+	header Strict-Transport-Security "max-age=31536000"
 	reverse_proxy erable:8080
 }

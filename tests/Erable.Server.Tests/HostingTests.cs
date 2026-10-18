@@ -60,6 +60,38 @@ public sealed class HostingTests
     [InlineData("/")]
     [InlineData("/index.html")]
     [InlineData("/some/client/route")]
+    public async Task Get_SpaShell_SendsContentSecurityPolicy(string path)
+    {
+        await using var backend = await TestBackend.StartAsync();
+
+        using var response = await backend.Client.GetAsync(new Uri(path, UriKind.Relative), Ct);
+
+        var policy = string.Join(';', response.Headers.GetValues("Content-Security-Policy"));
+        policy.ShouldContain("default-src 'self'");
+        policy.ShouldContain("script-src 'self'");
+        policy.ShouldContain("frame-ancestors 'self'");
+        policy.ShouldContain("base-uri 'none'");
+    }
+
+    [Theory]
+    [InlineData("/")]
+    [InlineData("/api/info")]
+    [InlineData("/api/does-not-exist")]
+    public async Task Get_AnyResponse_SendsSecurityHeaders(string path)
+    {
+        await using var backend = await TestBackend.StartAsync();
+
+        using var response = await backend.Client.GetAsync(new Uri(path, UriKind.Relative), Ct);
+
+        response.Headers.GetValues("X-Content-Type-Options").ShouldBe(["nosniff"]);
+        response.Headers.GetValues("X-Frame-Options").ShouldBe(["SAMEORIGIN"]);
+        response.Headers.GetValues("Referrer-Policy").ShouldBe(["no-referrer"]);
+    }
+
+    [Theory]
+    [InlineData("/")]
+    [InlineData("/index.html")]
+    [InlineData("/some/client/route")]
     public async Task Get_SpaShell_CarriesThemeBeforeFirstPaint(string path)
     {
         await using var backend = await TestBackend.StartAsync();

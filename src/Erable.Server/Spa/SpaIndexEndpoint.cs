@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Erable.Server.Projects;
+using Erable.Server.Security;
 using Microsoft.Net.Http.Headers;
 
 namespace Erable.Server.Spa;
@@ -38,6 +39,7 @@ internal static partial class SpaIndexEndpoint
         html = HtmlTag().Replace(html, $"<html{lang} data-theme=\"{theme}\"", 1);
 
         context.Response.Headers[HeaderNames.CacheControl] = "no-cache";
+        context.Response.Headers[HeaderNames.ContentSecurityPolicy] = SecurityHeadersMiddleware.SpaContentSecurityPolicy;
         return TypedResults.Content(html, "text/html; charset=utf-8");
     }
 
