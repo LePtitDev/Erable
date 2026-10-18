@@ -194,7 +194,8 @@ public sealed class AccountService
 
         if (result == PasswordVerificationResult.SuccessRehashNeeded)
         {
-            Store.SetPassword(account.Id, _hasher.HashPassword(account.Id, password!));
+            // Not SetPassword: the password is the same, so the other devices of the user stay signed in.
+            Store.UpgradePasswordHash(account.Id, account.PasswordHash, _hasher.HashPassword(account.Id, password!));
         }
 
         return account;

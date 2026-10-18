@@ -89,6 +89,31 @@ public sealed class ServerStoreTests : IDisposable
     }
 
     [Fact]
+    public void UpgradePasswordHash_KeepsTheSessions()
+    {
+        _store.CreateAccount(Account("malo"));
+        _store.AddSession(new SessionRecord("s", "malo", ServerStore.SessionKindBearer, Now, Now.AddHours(1)));
+        var current = _store.GetAccount("malo")!.PasswordHash;
+
+        _store.UpgradePasswordHash("malo", current, "stronger-hash").ShouldBeTrue();
+
+        _store.FindSession("s").ShouldNotBeNull();
+        _store.GetAccount("malo")!.PasswordHash.ShouldBe("stronger-hash");
+    }
+
+    [Fact]
+    public void UpgradePasswordHash_AfterAConcurrentChange_KeepsTheNewPassword()
+    {
+        _store.CreateAccount(Account("malo"));
+        var current = _store.GetAccount("malo")!.PasswordHash;
+        _store.SetPassword("malo", "changed-meanwhile");
+
+        _store.UpgradePasswordHash("malo", current, "stronger-hash").ShouldBeFalse();
+
+        _store.GetAccount("malo")!.PasswordHash.ShouldBe("changed-meanwhile");
+    }
+
+    [Fact]
     public void UpdateAccount_Disabling_EndsSessions()
     {
         _store.CreateAccount(Account("malo"));

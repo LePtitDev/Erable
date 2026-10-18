@@ -8,6 +8,8 @@ using Erable.Core.Elements;
 using Erable.Server.Api;
 using Erable.Server.Security;
 using Erable.Server.Tests.Infrastructure;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Server.Tests;
@@ -111,6 +113,25 @@ public sealed class AuthApiTests
         blocked.Headers.RetryAfter.ShouldNotBeNull();
         clock.Advance(TimeSpan.FromMinutes(16));
         (await LoginAsync(anonymous, "camille", "camille-pass-1")).Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task Login_WithAHashToUpgrade_UpgradesItAndKeepsTheOtherSessions()
+    {
+        await using var backend = await StartAsync();
+        // A hash of an older strength (fewer iterations): verified as SuccessRehashNeeded.
+        var weak = new PasswordHasher<string>(Options.Create(new PasswordHasherOptions { IterationCount = 1_000 }));
+        var weakHash = weak.HashPassword("camille", "camille-pass-1");
+        backend.Accounts.Store.SetPassword("camille", weakHash);
+        // A session opened on another device before the upgrade.
+        var other = backend.Accounts.StartSession("camille", Erable.Storage.ServerStore.SessionKindCookie);
+        using var anonymous = backend.NewAnonymousClient();
+
+        (await LoginAsync(anonymous, "camille", "camille-pass-1")).Response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        backend.Accounts.Store.GetAccount("camille")!.PasswordHash.ShouldNotBe(weakHash);
+        using var me = await anonymous.SendAsync(WithCookie(HttpMethod.Get, "/api/v1/me", $"{SessionCookies.CookieName}={other.Token}"), Ct);
+        me.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]

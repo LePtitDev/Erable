@@ -211,6 +211,21 @@ public sealed class ServerStore : IDisposable
         }
     }
 
+    /// <summary>
+    /// Replaces the hash of the same password by a stronger one (algorithm upgrade at sign-in): the sessions stay, since
+    /// the password did not change. Only if the hash is still <paramref name="currentHash"/> (no concurrent change).
+    /// </summary>
+    public bool UpgradePasswordHash(string id, string currentHash, string upgradedHash)
+    {
+        lock (_writeGate)
+        {
+            using var connection = Open();
+            return connection.Execute(
+                "UPDATE accounts SET password_hash = @Upgraded WHERE id = @Id AND password_hash = @Current",
+                new { Id = id, Current = currentHash, Upgraded = upgradedHash }) > 0;
+        }
+    }
+
     public bool UpdateAccount(string id, string displayName, bool isServerAdmin, bool disabled)
     {
         lock (_writeGate)
