@@ -96,7 +96,8 @@ jobs:
     name: Installer (${{ matrix.rid }})
     needs: [notes, legacy]
     strategy:
-      fail-fast: true
+      # Every system reports its own failure: one broken installer must not hide the state of the others.
+      fail-fast: false
       matrix:
         include:
           - { os: windows-latest, rid: win-x64 }

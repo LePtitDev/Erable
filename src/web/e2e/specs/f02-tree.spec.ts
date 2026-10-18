@@ -65,7 +65,9 @@ test.describe("F02 · Explorer", () => {
   test("E2E-02-04 · Move to another root is refused @pr", async ({ page, reference }) => {
     const tree = new TreePanel(page);
     await page.goto(reference.url(pagesRoot));
+    await expect(tree.item("PNJ", "last")).toBeVisible();
     const before = await tree.childrenOf("Catégories");
+    expect(before).toContain("Personnage");
 
     await tree.item("PNJ", "last").dragTo(tree.root("Pages"));
 

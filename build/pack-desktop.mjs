@@ -11,7 +11,7 @@
 //   Windows (Azure Trusted Signing)  ERABLE_SIGN_AZURE_METADATA = path of the metadata JSON (endpoint, account, profile)
 //   macOS                            ERABLE_SIGN_APPLE_APP_IDENTITY, ERABLE_SIGN_APPLE_INSTALL_IDENTITY, ERABLE_NOTARY_PROFILE
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { versionFromGit } from "./version.mjs";
 
@@ -41,6 +41,25 @@ if (!existsSync(publishDir)) throw new Error(`${publishDir} is missing: publish 
 rmSync(outputDir, { recursive: true, force: true });
 mkdirSync(outputDir, { recursive: true });
 
+// vpk wants an .ico on Windows, a .png on Linux and an .icns on macOS. The .icns is built from the 256 px PNG: an icns
+// file is a header followed by typed chunks, and the « ic08 » chunk (256×256) holds a PNG as it is.
+const icon = (() => {
+  const assets = join(root, "src", "Erable.Desktop", "Assets");
+  if (os === "win") return join(assets, "erable.ico");
+  if (os === "linux") return join(assets, "erable.png");
+  const png = readFileSync(join(assets, "erable.png"));
+  if (png.readUInt32BE(16) !== 256 || png.readUInt32BE(20) !== 256) throw new Error("erable.png must be 256×256 for ic08.");
+  const chunk = Buffer.alloc(8);
+  chunk.write("ic08", 0, "ascii");
+  chunk.writeUInt32BE(8 + png.length, 4);
+  const header = Buffer.alloc(8);
+  header.write("icns", 0, "ascii");
+  header.writeUInt32BE(16 + png.length, 4);
+  const path = join(root, "artifacts", "desktop", rid, "erable.icns");
+  writeFileSync(path, Buffer.concat([header, chunk, png]));
+  return path;
+})();
+
 const args = [
   "vpk",
   `[${os}]`,
@@ -60,7 +79,7 @@ const args = [
   "--runtime",
   rid,
   "--icon",
-  join(root, "src", "Erable.Desktop", "Assets", os === "win" ? "erable.ico" : "erable.png"),
+  icon,
   "--outputDir",
   outputDir,
 ];
