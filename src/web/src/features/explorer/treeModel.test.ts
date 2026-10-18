@@ -182,7 +182,7 @@ describe("tree invariants under random valid moves (docs/testing.md §4.1)", () 
 });
 
 describe("performance (indicative, formal budget in M3-06)", () => {
-  it("indexes 10 000 elements and computes the visible lines in well under 50 ms", () => {
+  it("indexes 10 000 elements and computes the visible lines", () => {
     const nodes: TreeNodeItem[] = [node(roots.pages, "root", null, "Pages")];
     const folders: ElementId[] = [];
     for (let f = 0; f < 100; f++) {
@@ -194,12 +194,10 @@ describe("performance (indicative, formal budget in M3-06)", () => {
     }
     const expanded = new Set<ElementId>([roots.pages, ...folders.slice(0, 50)]);
 
-    const start = performance.now();
+    // The time budget is measured in a real browser by the @perf tests (docs/testing.md §11.1), never here (§T-1.6).
     const index = indexTree(nodes);
     const rows = visibleRows(index, expanded);
-    const elapsed = performance.now() - start;
 
     expect(rows).toHaveLength(1 + 100 + 50 * 100);
-    expect(elapsed).toBeLessThan(50);
   });
 });

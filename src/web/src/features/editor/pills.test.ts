@@ -109,7 +109,7 @@ describe("pillDecorations (F05.R1, F05.R2)", () => {
     expect(raw.doc.toString()).toBe(s.doc.toString());
   });
 
-  it("stays fast on a page of 5 000 lines: one screen of decorations in well under 50 ms", () => {
+  it("decorates only the visible screen of a page of 5 000 lines", () => {
     const doc = Array.from(
       { length: 5000 },
       (_, i) => `Ligne ${String(i)} avec [[${orsen}]] et du texte.`,
@@ -117,11 +117,9 @@ describe("pillDecorations (F05.R1, F05.R2)", () => {
     const s = state(doc);
     const screen = { from: s.doc.line(2500).from, to: s.doc.line(2560).to };
 
-    const start = performance.now();
+    // The time budget is measured in a real browser by the @perf tests (docs/testing.md §11.1), never here (§T-1.6).
     const set = pillDecorations(s, [screen]);
-    const elapsed = performance.now() - start;
 
     expect(ranges(set)).toHaveLength(61);
-    expect(elapsed).toBeLessThan(50);
   });
 });

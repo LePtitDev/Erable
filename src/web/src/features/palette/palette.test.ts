@@ -188,7 +188,7 @@ describe("palette search and ranking", () => {
     expect(searchPalette(index, "pers", "all")).toEqual([]);
   });
 
-  it("answers in well under 50 ms on 10 000 elements (indicative)", () => {
+  it("finds the best match among 10 000 elements", () => {
     const big: TreeNodeItem[] = [n(roots.pages, "root", null, "Pages")];
     for (let i = 0; i < 10_000; i++) {
       big.push(
@@ -202,11 +202,9 @@ describe("palette search and ranking", () => {
     }
     const bigIndex = buildPaletteIndex(big, []);
 
-    const start = performance.now();
+    // The 50 ms budget is measured in a real browser by the @perf tests (perf-large.spec.ts), never here (§T-1.6).
     const found = searchPalette(bigIndex, "page 99", "all");
-    const elapsed = performance.now() - start;
 
     expect(found[0]?.name).toBe("Page 99 du monde");
-    expect(elapsed).toBeLessThan(50);
   });
 });
