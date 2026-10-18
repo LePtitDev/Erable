@@ -25,6 +25,8 @@ src/web/blob-report/
 *.db-shm
 *.db-wal
 !spec/**/*.db
+# Default data folder of scripts/serve.sh
+/data/
 
 # IDE / OS
 .idea/

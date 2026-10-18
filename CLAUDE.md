@@ -166,6 +166,8 @@ Raccourcis (`.bat` sous Windows, `.sh` ailleurs) dans `scripts/` :
 scripts/build.sh [Debug|Release]            # dépendances web, SPA, solution .NET
 scripts/run.sh [desktop|server [dossier] [port]|dev]
 scripts/test.sh [--e2e] [--desktop]         # contrôles du pipeline PR ; --desktop : publication + fumée
+scripts/serve.sh [dossier] [--port 5080] [--lan] [--rebuild] [-- options]   # héberger sans Docker : publie en Release (artifacts/server, refait si le commit change) puis erable serve ; dossier par défaut data/
+scripts/compose.sh [--litestream] setup|up|update|down|status|logs|backup|restore|doctor   # héberger avec Docker Compose + Caddy (deploy/.env)
 ```
 
 Détail des commandes :

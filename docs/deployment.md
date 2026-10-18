@@ -11,6 +11,19 @@ Erable existe sous trois formes d'hébergement. C'est **le même exécutable** (
 | Héberger plusieurs projets pour une ou plusieurs équipes | Image Docker | [§2](#2-image-docker) |
 | Idem, accessible depuis Internet, avec HTTPS automatique | Docker Compose + Caddy | [§3](#3-docker-compose-et-https-caddy) |
 
+Depuis un clone du dépôt, deux raccourcis enchaînent ces étapes (`.bat` sous Windows, `.sh` ailleurs) :
+
+| Script | Rôle |
+|---|---|
+| `scripts/serve.sh [dossier] [--port 5080] [--lan] [--rebuild] [-- options]` | §1 sans Docker : publie le serveur en Release (SPA comprise) dans `artifacts/server` — de nouveau seulement si le commit a changé, ou avec `--rebuild` — puis lance `erable serve`. Dossier par défaut : `data/`. Les options après `--` vont à `erable serve` (`--max-attachment-mb`, `--project-quota-mb`…). |
+| `scripts/compose.sh setup [domaine]` | §3 : crée `deploy/.env` (lisible par vous seul) avec un mot de passe aléatoire pour le premier administrateur, affiché une fois. |
+| `scripts/compose.sh up` / `update` | Construit l'image et démarre ou met à jour la pile, puis attend l'état `healthy`. `update` récupère aussi les images de base récentes : à lancer après `git pull`. |
+| `scripts/compose.sh down` / `status` / `logs [service]` | Arrêt (le volume est conservé), état, journaux. |
+| `scripts/compose.sh backup [dossier]` | Arrête Erable, archive le volume `/data` dans `artifacts/backups/erable-data-<date>.tar.gz` (ou `dossier`), redémarre. |
+| `scripts/compose.sh restore <archive>` | Après confirmation, remplace tout le volume par l'archive (comptes et projets), puis redémarre. |
+| `scripts/compose.sh doctor [identifiant]` | Arrête Erable, passe `erable doctor` sur chaque projet (ou un seul), redémarre ; code de sortie de `doctor`. |
+| `scripts/compose.sh --litestream <commande>` | Même chose avec la sauvegarde continue (§6). |
+
 ---
 
 ## 1. Partager un projet local : `erable serve`
