@@ -147,12 +147,12 @@
   cursor: pointer;
 }
 
-.footerAction:hover:not(:disabled) {
-  color: var(--color-accent-text);
-}
-
 .footerAction:disabled {
   cursor: default;
+}
+
+.footerAction:hover:not(:disabled) {
+  color: var(--color-accent-text);
 }
 
 .footer kbd {
