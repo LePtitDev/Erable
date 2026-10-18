@@ -26,8 +26,12 @@ export function isShortcutAction(value: string): value is ShortcutAction {
   return Object.hasOwn(shortcuts, value);
 }
 
+/**
+ * The platform as CodeMirror sees it (`navigator.platform`), so that `Mod` is the same key in the editor and in the
+ * window. Not the user agent: WebKit announces « Mac OS X » on every system (Playwright's WebKit on Linux among them).
+ */
 export function isMac(): boolean {
-  return /Mac|iPhone|iPad/.test(navigator.platform) || navigator.userAgent.includes("Mac OS X");
+  return /Mac|iPhone|iPad/.test(navigator.platform);
 }
 
 export function platformKey(shortcut: Shortcut, mac: boolean = isMac()): string {

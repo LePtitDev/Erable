@@ -121,27 +121,6 @@
   font-size: var(--text-xs);
 }
 
-.optionActions {
-  display: flex;
-  gap: var(--space-1);
-}
-
-.optionAction {
-  padding: var(--space-0-5) var(--space-2);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
-}
-
-.optionAction:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent-text);
-}
-
 .empty {
   margin: 0;
   padding: var(--space-3);
@@ -157,6 +136,23 @@
   background: var(--color-bg);
   color: var(--color-text-muted);
   font-size: var(--text-sm);
+}
+
+.footerAction {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.footerAction:hover:not(:disabled) {
+  color: var(--color-accent-text);
+}
+
+.footerAction:disabled {
+  cursor: default;
 }
 
 .footer kbd {

@@ -147,27 +147,7 @@ export function PalettePopup({
                   <span className={styles["optionName"]}>{entry.label}</span>
                   <span className={styles["optionPath"]}>{entry.path}</span>
                 </span>
-                {entry === active ? (
-                  // Mouse access to « link » (Enter) and « embed » (Shift+Enter); the keyboard has the keys above.
-                  <span className={styles["optionActions"]} aria-hidden="true">
-                    {insertModes.map((mode) => (
-                      <button
-                        key={mode}
-                        type="button"
-                        tabIndex={-1}
-                        className={styles["optionAction"]}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPick(mode === "embed", entry);
-                        }}
-                      >
-                        {t(`palette.keys.${mode}`)}
-                      </button>
-                    ))}
-                  </span>
-                ) : (
-                  <span className={styles["optionId"]}>{shortId(entry.id)}</span>
-                )}
+                <span className={styles["optionId"]}>{shortId(entry.id)}</span>
               </div>
             ))}
           </div>
@@ -177,12 +157,23 @@ export function PalettePopup({
         <span>
           <kbd>↑↓</kbd> {t("palette.keys.navigate")}
         </span>
-        <span>
-          <kbd>{t("palette.keys.enter")}</kbd> {t("palette.keys.link")}
-        </span>
-        <span>
-          <kbd>{t("palette.keys.shiftEnter")}</kbd> {t("palette.keys.embed")}
-        </span>
+        {insertModes.map((mode) => (
+          // Mouse access to « link » and « embed » for the highlighted option, outside the listbox: an option holds a
+          // single target (axe-core nested-interactive); the keyboard has Enter and Shift+Enter.
+          <button
+            key={mode}
+            type="button"
+            tabIndex={-1}
+            className={styles["footerAction"]}
+            disabled={active === null}
+            onClick={() => {
+              onPick(mode === "embed");
+            }}
+          >
+            <kbd>{t(mode === "embed" ? "palette.keys.shiftEnter" : "palette.keys.enter")}</kbd>{" "}
+            {t(`palette.keys.${mode}`)}
+          </button>
+        ))}
         <span>
           <kbd>{t("palette.keys.tab")}</kbd> {t("palette.keys.nextTab")}
         </span>

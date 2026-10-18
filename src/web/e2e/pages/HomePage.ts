@@ -37,7 +37,7 @@ export class HomePage {
   async openFolder(folder: string) {
     // The shortcut is listened to once the screen is rendered.
     await this.page.getByRole("button", { name: t("home.open.title") }).waitFor();
-    await this.page.keyboard.press("Control+o");
+    await this.page.keyboard.press("ControlOrMeta+o");
     await this.openDialog.getByLabel(t("home.open.folder")).fill(folder);
     await this.openDialog.getByRole("button", { name: t("home.open.submit") }).click();
   }

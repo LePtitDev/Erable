@@ -42,7 +42,7 @@ export class EditorPage {
   }
 
   async save() {
-    await this.page.keyboard.press("Control+s");
+    await this.page.keyboard.press("ControlOrMeta+s");
   }
 
   pill(text: string): Locator {

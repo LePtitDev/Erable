@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   canonicalCombo,
   comboFromEvent,
   findConflict,
   formatCombo,
+  isMac,
   matchesEvent,
   resolveShortcuts,
   type KeyNames,
@@ -105,5 +106,26 @@ describe("formatCombo", () => {
 
   it("uses the symbols of macOS", () => {
     expect(formatCombo("Mod-Shift-k", names, true)).toBe("⇧⌘K");
+  });
+});
+
+describe("isMac", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("follows the platform, like CodeMirror, and not a user agent that claims macOS", () => {
+    vi.spyOn(navigator, "platform", "get").mockReturnValue("Linux x86_64");
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15",
+    );
+
+    expect(isMac()).toBe(false);
+  });
+
+  it("recognises macOS from its platform", () => {
+    vi.spyOn(navigator, "platform", "get").mockReturnValue("MacIntel");
+
+    expect(isMac()).toBe(true);
   });
 });
