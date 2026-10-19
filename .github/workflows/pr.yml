@@ -1,9 +1,12 @@
-# PR pipeline (docs/testing.md §13): every push and pull request, target < 12 min.
+# PR pipeline (docs/testing.md §13): every branch push and pull request, target < 12 min.
+# Tag pushes (releases) are left to release.yml: the tagged commit has already been through this pipeline.
 # Third-party actions are pinned by commit SHA (tag in comment); Renovate will bump them (§13).
 name: PR
 
 on:
   push:
+    # A branch filter alone excludes tags.
+    branches: ["**"]
   pull_request:
   workflow_dispatch:
 

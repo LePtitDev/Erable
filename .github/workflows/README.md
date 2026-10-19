@@ -2,8 +2,8 @@
 
 | Workflow | Déclencheur | Contenu |
 |---|---|---|
-| `pr.yml` | chaque push, chaque pull request, manuel (`workflow_dispatch`) | voir ci-dessous |
-| `release.yml` | tag `vX.Y.Z` ou `X.Y.Z` (poussé, ou créé par une release GitHub), manuel (construction seule, ou rattrapage d'une release avec *attach*) | installeurs Velopack x4, fumee sur l installe, migration des projets `legacy/`, image Docker + scan, publication (docs/release.md) |
+| `pr.yml` | chaque push de branche (pas les tags), chaque pull request, manuel (`workflow_dispatch`) | voir ci-dessous |
+| `release.yml` | tag `vX.Y.Z` ou `X.Y.Z` (poussé, ou créé par une release GitHub), manuel (construction seule, ou rattrapage d'une release avec *attach*) | installeurs Velopack x4 et erable-cli, image Docker + scan, publication (docs/release.md) ; aucun test : le commit tagué est déjà passé par `pr.yml` |
 | `nightly.yml` | chaque nuit, manuel | e2e complet 3 navigateurs + a11y, visuel (conteneur fixe), budgets et benchmarks, fumée desktop 3 OS ; quarantaine |
 | `nightly-robustness.yml` | chaque nuit | crash tests (100 arrêts) et charge NBomber |
 | `weekly-quality.yml` | dimanche | Stryker.NET, StrykerJS, fuzzing C# et TS (10 min chacun) |

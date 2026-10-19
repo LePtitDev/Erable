@@ -201,10 +201,10 @@ Playwright ne pilote pas tous les WebViews natifs ; on combine donc deux approch
 
 - **Windows** : WebView2 expose le protocole DevTools. En lançant l'app avec `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=…`, Playwright s'y connecte (`connectOverCDP`) et rejoue un sous-ensemble des parcours e2e **dans le vrai binaire**.
 - **macOS et Linux** : mode **`--self-test`**. L'app démarre sur un projet temporaire, la SPA exécute un scénario scripté (créer une page, insérer une référence, joindre une image, rechercher, enregistrer), envoie le résultat au backend, et le processus sort avec un code 0 ou 1. Sous Linux, ça tourne sous `xvfb`.
-- Ce test de fumée s'exécute sur **l'artefact packagé** (sortie Velopack), pas sur le build de dev : c'est l'installeur qu'on livre qui doit fonctionner.
+- Ce test de fumée s'exécute sur **l'artefact publié** (publication autonome, `pr.yml` et `nightly.yml`), pas sur le build de dev. Le workflow de release ne relance pas de test : l'installeur Velopack n'est pas lui-même vérifié en CI.
 - Vérifié aussi : port aléatoire réellement sur loopback, second lancement avec le même projet (verrou ou réutilisation de l'instance), fermeture propre (WAL fusionné, aucun processus résiduel).
 - **Langue** : le lanceur des e2e Windows force `--lang=fr-FR` dans le WebView2 (la locale de référence, comme `locale: "fr-FR"` des e2e web), quelle que soit la langue de la machine ; `ERABLE_E2E_WEBVIEW_LANG` la change, par exemple pour reproduire un poste en anglais.
-- **Budget de démarrage** (E2E-16-01) : 3 s. Les runners partagés de la CI (rendu logiciel, Xvfb, disques froids) mesurent 3,3 à 3,6 s : les jobs desktop de `pr.yml`, `nightly.yml` et `release.yml` fixent `ERABLE_STARTUP_BUDGET_MS=10000`, lu par `--self-test` comme par l'e2e Windows. La mesure figure toujours dans le rapport (`startup-budget`), pour suivre l'écart au budget de 3 s.
+- **Budget de démarrage** (E2E-16-01) : 3 s. Les runners partagés de la CI (rendu logiciel, Xvfb, disques froids) mesurent 3,3 à 3,6 s : les jobs desktop de `pr.yml` et `nightly.yml` fixent `ERABLE_STARTUP_BUDGET_MS=10000`, lu par `--self-test` comme par l'e2e Windows. La mesure figure toujours dans le rapport (`startup-budget`), pour suivre l'écart au budget de 3 s.
 
 ---
 
@@ -256,9 +256,9 @@ GitHub Actions, trois pipelines :
 
 | Pipeline | Déclencheur | Contenu | Durée cible |
 |---|---|---|---|
-| **PR** | chaque push | lint + typage, unitaires C# et TS, spec partagée, stockage, API, e2e Chromium + WebKit (parcours critiques), client OpenAPI à jour, taille du bundle. Build + tests unitaires sur **Windows, Linux et macOS** | < 12 min |
+| **PR** | chaque push de branche (pas les tags), chaque pull request | lint + typage, unitaires C# et TS, spec partagée, stockage, API, e2e Chromium + WebKit (parcours critiques), client OpenAPI à jour, taille du bundle. Build + tests unitaires sur **Windows, Linux et macOS** | < 12 min |
 | **Nightly** | chaque nuit sur `main` | e2e complet (3 navigateurs), visuel, accessibilité, benchmarks, charge NBomber, desktop fumée sur 3 OS | < 45 min |
-| **Release** | tag `v*` | build packagé, signature, fumée desktop sur les installeurs, migration de tous les projets `legacy/`, image Docker + scan de vulnérabilités | — |
+| **Release** | tag `v*` | build packagé, signature, image Docker + scan de vulnérabilités ; aucun test (le commit tagué est déjà passé par le pipeline PR) | — |
 
 - `main` est protégée : merge uniquement si le pipeline PR est vert et qu'une revue a été faite.
 - Les dépendances sont mises à jour par **Renovate**, regroupées chaque semaine, et passent par le même pipeline.

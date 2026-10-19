@@ -9,11 +9,12 @@ Une version est un **tag Git `vX.Y.Z` ou `X.Y.Z`**. Deux façons de la créer, a
 
 | Étape | Ce qui est vérifié ou produit |
 |---|---|
-| `legacy` | chaque projet figé de `spec/projects/legacy/vN` s'ouvre, migre vers le format courant et reste intact |
 | `notes` | notes de version générées depuis les Conventional Commits depuis le tag précédent (`build/release-notes.mjs`) |
-| `package` (×4) | `win-x64`, `linux-x64`, `osx-arm64`, `osx-x64` : publication autonome (binaires estampillés de la version du tag) puis **Velopack** (`build/pack-desktop.mjs`) ; fumée `--self-test` sur l'application **installée** (installeur Windows, AppImage, bundle macOS) ; fichiers joints à la release |
+| `package` (×4) | `win-x64`, `linux-x64`, `osx-arm64`, `osx-x64` : publication autonome (binaires estampillés de la version du tag) puis **Velopack** (`build/pack-desktop.mjs`) et `erable-cli` ; fichiers joints à la release |
 | `image` | image Docker du serveur, scan Trivy (HIGH/CRITICAL corrigeables = échec), publication sur `ghcr.io/<propriétaire>/erable:<version>` et `latest` |
 | `publish` | passage du brouillon en release publiée (sans effet si elle l'est déjà) |
+
+Le workflow ne lance **aucun test** : le commit tagué est déjà passé par le pipeline PR (tests, migration des projets `legacy/`, fumée desktop sur les 3 OS), et un push de tag ne relance pas ce pipeline.
 
 Un lancement manuel (*Actions → Release → Run workflow*, avec une version, sans **attach**) construit tout **sans rien publier** : les paquets restent en artefacts du workflow.
 
@@ -27,7 +28,7 @@ Pour produire un installeur sur sa machine, sans CI : `scripts/publish.sh` (ou `
 | macOS | `Erable-osx-<arch>-Setup.pkg`, `Erable-osx-<arch>-Portable.zip`, paquets de mise à jour ; chaque architecture a son **canal** Velopack (`osx-arm64`, `osx-x64`) pour que leurs fichiers ne s'écrasent pas dans la release |
 | Linux | `Erable-linux-x86_64.AppImage`, `Erable-linux-Portable.zip`, paquets de mise à jour |
 | Tous | `releases.<canal>.json` et `RELEASES-*` : le manifeste que l'application interroge |
-| Tous | `erable-cli-<rid>.zip` (Windows) ou `.tar.gz` : l'outil `erable-cli` en un exécutable autonome (`docs/cli.md`), dans `artifacts/cli/` ; vérifié sur le projet de référence (sauf `osx-x64`) |
+| Tous | `erable-cli-<rid>.zip` (Windows) ou `.tar.gz` : l'outil `erable-cli` en un exécutable autonome (`docs/cli.md`), dans `artifacts/cli/` |
 
 Les noms exacts sont ceux de `vpk` (Velopack).
 

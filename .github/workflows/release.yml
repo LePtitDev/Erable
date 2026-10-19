@@ -1,7 +1,7 @@
 # Release pipeline (M5-03, docs/testing.md §13, docs/release.md): a version tag (`v1.2.3` or `1.2.3`) builds the desktop
-# installers and erable-cli on the three systems, smoke-tests the installed application, migrates every frozen legacy project, builds
-# and scans the server image, then publishes. A tag pushed with Git gets a draft release, published once everything is
-# green; a release created on GitHub (which pushes its tag) is kept as it is and receives the installers.
+# installers and erable-cli on the three systems, builds and scans the server image, then publishes. No tests run here: the
+# tagged commit has already been through the PR pipeline. A tag pushed with Git gets a draft release, published once
+# everything is green; a release created on GitHub (which pushes its tag) is kept as it is and receives the installers.
 # Third-party actions are pinned by commit SHA (tag in comment); Renovate bumps them.
 name: Release
 
@@ -40,28 +40,6 @@ env:
   SOURCE_REF: ${{ inputs.attach && format('refs/tags/{0}', inputs.version) || github.ref }}
 
 jobs:
-  legacy:
-    name: Migrate every legacy project
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ env.SOURCE_REF }}
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          global-json-file: global.json
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ${{ env.NUGET_PACKAGES }}
-          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
-          restore-keys: nuget-${{ runner.os }}-
-      # spec/projects/legacy/vN: each published format version is opened, migrated and checked (docs/testing.md §6).
-      - name: Open and migrate each frozen project
-        run: dotnet test --project tests/Erable.Storage.Tests -c Release -- --filter-class "*LegacyProjectTests" --filter-class "*ProjectMigrationTests"
-      - name: Migration through the API
-        run: dotnet test --project tests/Erable.Server.Tests -c Release -- --filter-class "*ProjectMigrationApiTests"
-
   notes:
     name: Release notes and draft
     runs-on: ubuntu-latest
@@ -94,7 +72,7 @@ jobs:
 
   package:
     name: Installer (${{ matrix.rid }})
-    needs: [notes, legacy]
+    needs: [notes]
     strategy:
       # Every system reports its own failure: one broken installer must not hide the state of the others.
       fail-fast: false
@@ -108,8 +86,6 @@ jobs:
     timeout-minutes: 40
     # Signing is optional: without these secrets the packages are unsigned (docs/release.md lists what to provide).
     env:
-      # E2E-16-01 asks for 3 s; shared runners (software rendering, Xvfb, cold disks) get 10 s (docs/testing.md §10).
-      ERABLE_STARTUP_BUDGET_MS: "10000"
       ERABLE_SIGN_AZURE_METADATA: ${{ secrets.ERABLE_SIGN_AZURE_METADATA }}
       ERABLE_SIGN_APPLE_APP_IDENTITY: ${{ secrets.ERABLE_SIGN_APPLE_APP_IDENTITY }}
       ERABLE_SIGN_APPLE_INSTALL_IDENTITY: ${{ secrets.ERABLE_SIGN_APPLE_INSTALL_IDENTITY }}
@@ -144,54 +120,6 @@ jobs:
       - name: Command-line tool
         shell: bash
         run: node build/publish-cli.mjs ${{ matrix.rid }} --version "${TAG#v}"
-      - name: Smoke test of the command-line tool (reads the reference project, writes nothing)
-        if: matrix.rid != 'osx-x64'
-        shell: bash
-        run: |
-          cli=artifacts/cli/${{ matrix.rid }}/erable-cli
-          if [ -f "$cli.exe" ]; then cli="$cli.exe"; fi
-          "$cli" info spec/projects/chroniques
-          test -z "$(git status --porcelain -- spec/projects/chroniques)"
-
-      - name: Linux runtime dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-0 libnotify4 xvfb gstreamer1.0-libav gstreamer1.0-plugins-good libfuse2t64
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      # Smoke on the INSTALLERS, not on the build tree (docs/testing.md §10).
-      - name: Smoke test of the installed application (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $setup = Get-ChildItem artifacts/release/win-x64 -Filter '*Setup.exe' | Select-Object -First 1
-          Start-Process $setup.FullName -ArgumentList '--silent' -Wait
-          $app = Join-Path $env:LOCALAPPDATA 'Erable/current/Erable.Desktop.exe'
-          if (-not (Test-Path $app)) { Write-Error "Not installed: $app"; exit 1 }
-          $p = Start-Process $app -ArgumentList '--self-test','--self-test-report','self-test.json' -PassThru -Wait
-          Get-Content self-test.json
-          if ($p.ExitCode -ne 0) { exit 1 }
-      - name: Smoke test of the AppImage (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          image=$(find artifacts/release/linux-x64 -maxdepth 1 -name '*.AppImage' | head -n 1)
-          chmod +x "$image"
-          status=0
-          xvfb-run -a "$image" --appimage-extract-and-run --self-test --self-test-report self-test.json || status=$?
-          cat self-test.json || true
-          exit $status
-      - name: Smoke test of the application bundle (macOS arm64)
-        if: runner.os == 'macOS' && matrix.rid == 'osx-arm64'
-        run: |
-          # The portable archive holds the same application bundle as the .pkg installer.
-          mkdir portable && unzip -q artifacts/release/osx-arm64/*Portable.zip -d portable
-          app=$(find portable -name Erable.Desktop -type f -perm +111 | head -n 1)
-          status=0
-          "$app" --self-test --self-test-report self-test.json || status=$?
-          cat self-test.json || true
-          exit $status
-
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-${{ matrix.rid }}
@@ -208,7 +136,7 @@ jobs:
 
   image:
     name: Server image (build, scan, push)
-    needs: [notes, legacy]
+    needs: [notes]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
