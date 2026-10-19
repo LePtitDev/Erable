@@ -10,51 +10,72 @@ namespace Erable.Mobile;
 
 /// <summary>
 /// The first screen (F19.R1, R3, R6): the servers added on this phone. A tap opens one, a long press forgets it, the
-/// button adds one after checking it. Built in code: a list and a button do not need a layout file.
+/// button adds one after checking it. Drawn as the home screen of the SPA on a phone (Resources/layout/servers.xml).
 /// </summary>
 [Activity(Label = "@string/app_name", MainLauncher = true, Exported = true, Theme = "@style/ErableTheme.Web",
     LaunchMode = Android.Content.PM.LaunchMode.SingleTop)]
 public sealed class ServersActivity : Activity
 {
     private ServerStore _store = null!;
-    private ServerAdapter _adapter = null!;
+    private LinearLayout _list = null!;
+    private View _empty = null!;
+    private View _hint = null!;
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
         _store = new ServerStore(this);
-        _adapter = new ServerAdapter(this);
 
-        var padding = Dp(16);
-        var root = new LinearLayout(this) { Orientation = Orientation.Vertical };
-        root.SetPadding(padding, padding, padding, padding);
+        SetContentView(Resource.Layout.servers);
+        _list = FindViewById<LinearLayout>(Resource.Id.list)!;
+        _empty = FindViewById(Resource.Id.empty)!;
+        _hint = FindViewById(Resource.Id.hint)!;
+        FindViewById<TextView>(Resource.Id.version)!.Text = GetString(Resource.String.app_version, new Java.Lang.String(AppVersion()));
+        FindViewById(Resource.Id.add)!.Click += (_, _) => AskForAddress();
 
-        var title = new TextView(this) { Text = GetString(Resource.String.servers_title) };
-        title.SetTextSize(ComplexUnitType.Sp, 26);
-        title.SetPadding(0, Dp(8), 0, Dp(16));
-        root.AddView(title);
-
-        var empty = new TextView(this) { Text = GetString(Resource.String.servers_empty) };
-        empty.SetTextSize(ComplexUnitType.Sp, 16);
-        var list = new ListView(this) { Adapter = _adapter, EmptyView = empty };
-        list.ItemClick += (_, e) => Open(_adapter[e.Position]);
-        list.ItemLongClick += (_, e) => ConfirmForget(_adapter[e.Position]);
-        root.AddView(empty, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-        root.AddView(list, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, 0, 1));
-
-        var add = new Button(this) { Text = GetString(Resource.String.servers_add) };
-        add.SetMinimumHeight(Dp(48));
-        add.Click += (_, _) => AskForAddress();
-        root.AddView(add, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.WrapContent));
-
-        SetContentView(root);
-        SystemBars.Pad(Window!, root);
+        SystemBars.Pad(Window!, FindViewById(Resource.Id.root)!, FindViewById(Resource.Id.header));
     }
 
     protected override void OnResume()
     {
         base.OnResume();
-        _adapter.Show(_store.Load().Servers);
+        Show(_store.Load().Servers);
+    }
+
+    /// <summary>One row per server: its host, then its version (and « Non chiffré » for plain HTTP, F19.R3).</summary>
+    private void Show(IReadOnlyList<SavedServer> servers)
+    {
+        _list.RemoveAllViews();
+        foreach (var server in servers)
+        {
+            var row = LayoutInflater.Inflate(Resource.Layout.server_row, _list, false)!;
+            var details = GetString(Resource.String.server_version, new Java.Lang.String(server.AppVersion));
+            if (server.IsCleartext)
+            {
+                details += " · " + GetString(Resource.String.cleartext);
+            }
+
+            row.FindViewById<TextView>(Resource.Id.host)!.Text = server.Host;
+            row.FindViewById<TextView>(Resource.Id.details)!.Text = details;
+            row.Click += (_, _) => Open(server);
+            row.LongClick += (_, _) => ConfirmForget(server);
+            _list.AddView(row);
+        }
+
+        var none = servers.Count == 0;
+        _empty.Visibility = none ? ViewStates.Visible : ViewStates.Gone;
+        _list.Visibility = none ? ViewStates.Gone : ViewStates.Visible;
+        _hint.Visibility = none ? ViewStates.Gone : ViewStates.Visible;
+    }
+
+    private string AppVersion()
+    {
+        var info = OperatingSystem.IsAndroidVersionAtLeast(33)
+            ? PackageManager!.GetPackageInfo(PackageName!, Android.Content.PM.PackageManager.PackageInfoFlags.Of(0L))
+#pragma warning disable CA1422 // Before Android 13 only.
+            : PackageManager!.GetPackageInfo(PackageName!, 0);
+#pragma warning restore CA1422
+        return info?.VersionName ?? string.Empty;
     }
 
     private int Dp(int value) => (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, value, Resources!.DisplayMetrics);
@@ -76,7 +97,7 @@ public sealed class ServersActivity : Activity
         field.SetSingleLine(true);
         var help = new TextView(this) { Text = GetString(Resource.String.add_help) };
         var error = new TextView(this) { Visibility = ViewStates.Gone };
-        error.SetTextColor(Android.Graphics.Color.ParseColor("#b3261e"));
+        error.SetTextColor(new Android.Graphics.Color(GetColor(Resource.Color.danger)));
         var body = new LinearLayout(this) { Orientation = Orientation.Vertical };
         body.SetPadding(Dp(24), Dp(8), Dp(24), 0);
         body.AddView(field);
@@ -104,7 +125,7 @@ public sealed class ServersActivity : Activity
             if (added.IsSuccess)
             {
                 dialog.Dismiss();
-                _adapter.Show(_store.Load().Servers);
+                Show(_store.Load().Servers);
                 Open(added.Value);
             }
             else
@@ -123,7 +144,7 @@ public sealed class ServersActivity : Activity
             .SetPositiveButton(Resource.String.forget_action, (_, _) =>
             {
                 _store.Forget(server);
-                _adapter.Show(_store.Load().Servers);
+                Show(_store.Load().Servers);
             })!
             .SetNegativeButton(Resource.String.cancel, (IDialogInterfaceOnClickListener?)null)!
             .Show();
@@ -136,39 +157,4 @@ public sealed class ServersActivity : Activity
         ServerErrors.NotServerMode => Resource.String.error_not_server,
         _ => Resource.String.error_unreachable,
     });
-
-    /// <summary>Two lines per server: its host, then its version (and « Non chiffré » for plain HTTP, F19.R3).</summary>
-    private sealed class ServerAdapter(Activity activity) : BaseAdapter<SavedServer>
-    {
-        private IReadOnlyList<SavedServer> _servers = [];
-
-        public void Show(IReadOnlyList<SavedServer> servers)
-        {
-            _servers = servers;
-            NotifyDataSetChanged();
-        }
-
-        public override SavedServer this[int position] => _servers[position];
-
-        public override int Count => _servers.Count;
-
-        public override long GetItemId(int position) => position;
-
-        public override View GetView(int position, View? convertView, ViewGroup? parent)
-        {
-            var view = convertView
-                ?? activity.LayoutInflater.Inflate(global::Android.Resource.Layout.SimpleListItem2, parent, false)!;
-            var server = _servers[position];
-            var details = activity.GetString(Resource.String.server_version, new Java.Lang.String(server.AppVersion));
-            if (server.IsCleartext)
-            {
-                details += " · " + activity.GetString(Resource.String.cleartext);
-            }
-
-            view.FindViewById<TextView>(global::Android.Resource.Id.Text1)!.Text = server.Host;
-            view.FindViewById<TextView>(global::Android.Resource.Id.Text2)!.Text = details;
-            view.SetMinimumHeight((int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 56, activity.Resources!.DisplayMetrics));
-            return view;
-        }
-    }
 }

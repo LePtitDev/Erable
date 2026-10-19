@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The dark tokens of the SPA (src/web/src/shared/theme/tokens.css). -->
+<resources>
+  <color name="accent">#6cc3a0</color>
+  <color name="accent_soft">#1c3229</color>
+  <color name="accent_text">#93d8bb</color>
+  <color name="on_accent">#0e1a15</color>
+  <color name="web_background">#121513</color>
+  <color name="surface">#191d1b</color>
+  <color name="hover">#232825</color>
+  <color name="border">#2a302c</color>
+  <color name="border_strong">#3a423d</color>
+  <color name="text">#e6e9e5</color>
+  <color name="text_muted">#a5ada7</color>
+  <color name="danger">#f28b82</color>
+</resources>

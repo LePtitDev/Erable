@@ -6,13 +6,11 @@
     <item name="android:colorAccent">@color/accent</item>
   </style>
 
-  <!-- The system bars show the background of the SPA (color-bg in src/web/src/shared/theme/tokens.css), dark icons. -->
+  <!-- The system bars show the background of the SPA (color-bg), dark icons. -->
   <style name="ErableTheme.Web" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+    <item name="android:colorPrimary">@color/accent</item>
+    <item name="android:colorAccent">@color/accent</item>
     <item name="android:windowBackground">@color/web_background</item>
     <item name="android:windowLightStatusBar">true</item>
   </style>
-
-  <color name="accent">#2c6a55</color>
-  <color name="web_background">#f4f5f2</color>
-  <color name="launcher_background">#2c6a55</color>
 </resources>

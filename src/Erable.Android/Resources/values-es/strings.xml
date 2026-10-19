@@ -2,6 +2,10 @@
 <resources>
   <string name="servers_title">Servidores</string>
   <string name="servers_empty">Añada la dirección de un servidor Erable para leer y editar sus wikis.</string>
+  <string name="servers_subtitle">Abra un servidor Erable para leer y editar sus wikis.</string>
+  <string name="servers_section">Servidores guardados</string>
+  <string name="servers_forget_hint">Mantenga pulsado un servidor para olvidarlo.</string>
+  <string name="app_version">Versión %1$s</string>
   <string name="servers_add">Añadir un servidor</string>
   <string name="add_title">Añadir un servidor</string>
   <string name="add_hint">wiki.ejemplo.es</string>

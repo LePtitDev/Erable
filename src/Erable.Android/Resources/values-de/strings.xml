@@ -2,6 +2,10 @@
 <resources>
   <string name="servers_title">Server</string>
   <string name="servers_empty">Fügen Sie die Adresse eines Erable-Servers hinzu, um seine Wikis zu lesen und zu bearbeiten.</string>
+  <string name="servers_subtitle">Öffnen Sie einen Erable-Server, um seine Wikis zu lesen und zu bearbeiten.</string>
+  <string name="servers_section">Gespeicherte Server</string>
+  <string name="servers_forget_hint">Lange auf einen Server tippen, um ihn zu entfernen.</string>
+  <string name="app_version">Version %1$s</string>
   <string name="servers_add">Server hinzufügen</string>
   <string name="add_title">Server hinzufügen</string>
   <string name="add_hint">wiki.beispiel.de</string>
