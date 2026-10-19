@@ -314,3 +314,12 @@ a.name::after {
 .menuItem[data-disabled] {
   color: var(--color-text-faint);
 }
+
+/* Touch screens (F18.R4). */
+@media (pointer: coarse) {
+  .name {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-touch);
+  }
+}

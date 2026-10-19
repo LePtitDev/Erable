@@ -375,7 +375,7 @@
       "property": "Name der neuen Eigenschaft",
       "linkType": "Name des neuen Verknüpfungstyps"
     },
-    "cut": "Verschieben…",
+    "cut": "Ausschneiden",
     "cutShortcut": "Strg+X",
     "paste": "Hierher verschieben",
     "pasteShortcut": "Strg+V",
@@ -390,7 +390,15 @@
     },
     "newCategory": "Neue Kategorie",
     "newProperty": "Neue Eigenschaft",
-    "newLinkType": "Neuer Verknüpfungstyp"
+    "newLinkType": "Neuer Verknüpfungstyp",
+    "moveTo": "Verschieben nach…",
+    "rowActions": "Aktionen für „{{name}}“",
+    "moveDialog": {
+      "title": "„{{name}}“ verschieben nach…",
+      "filter": "Ziele filtern",
+      "destinations": "Mögliche Ziele",
+      "none": "Kein anderes mögliches Ziel."
+    }
   },
   "recent": {
     "viewed": "Angesehen",

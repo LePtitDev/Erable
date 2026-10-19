@@ -153,6 +153,29 @@ describe("Explorer", () => {
     });
   });
 
+  it("moves a page with « Déplacer vers… » from the « … » button of its line (F18.R4, F18.R5)", async () => {
+    const { writes } = mockProject({
+      uiState: { [`tree-${ids.project}`]: { expanded: [roots.pages, ids.lieux] } },
+    });
+    const user = userEvent.setup();
+    const { tree } = await openTree();
+
+    // The button does not add to the name of its line.
+    expect(within(tree).getByRole("treeitem", { name: "Hautbois" })).toBeInTheDocument();
+    await user.click(within(tree).getByRole("button", { name: "Actions de « Hautbois »" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Déplacer vers…" }));
+    const dialog = await screen.findByRole("dialog", { name: "Déplacer « Hautbois » vers…" });
+    const destinations = within(dialog).getByRole("list", { name: "Destinations possibles" });
+    // Its own folder is not offered: nothing would change.
+    expect(within(destinations).queryByRole("button", { name: /^Lieux/ })).not.toBeInTheDocument();
+    await user.click(within(destinations).getByRole("button", { name: /^Personnages/ }));
+
+    await waitFor(() => {
+      expect(writes.patches).toEqual([{ id: ids.hautbois, body: { parentId: ids.personnages } }]);
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("finds a line by typing its first letters", async () => {
     mockProject();
     const user = userEvent.setup();

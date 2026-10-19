@@ -257,9 +257,19 @@
   }
 }
 
-/* No physical keyboard to show shortcuts for. */
+/* Touch screens (F18.R4): finger-sized tools, and no physical keyboard to show shortcuts for. */
 @media (pointer: coarse) {
   .kbd {
     display: none;
+  }
+
+  .tool,
+  .textTool {
+    min-width: var(--size-touch);
+    height: var(--size-touch);
+  }
+
+  .rawIds {
+    min-height: var(--size-touch);
   }
 }

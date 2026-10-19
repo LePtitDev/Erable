@@ -375,7 +375,7 @@
       "property": "Name of the new property",
       "linkType": "Name of the new link type"
     },
-    "cut": "Move…",
+    "cut": "Cut",
     "cutShortcut": "Ctrl+X",
     "paste": "Move here",
     "pasteShortcut": "Ctrl+V",
@@ -390,7 +390,15 @@
     },
     "newCategory": "New category",
     "newProperty": "New property",
-    "newLinkType": "New link type"
+    "newLinkType": "New link type",
+    "moveTo": "Move to…",
+    "rowActions": "Actions for “{{name}}”",
+    "moveDialog": {
+      "title": "Move “{{name}}” to…",
+      "filter": "Filter the destinations",
+      "destinations": "Possible destinations",
+      "none": "No other possible destination."
+    }
   },
   "recent": {
     "viewed": "Viewed",

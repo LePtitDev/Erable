@@ -381,7 +381,7 @@
       "property": "Nom de la nouvelle propriété",
       "linkType": "Nom du nouveau type de lien"
     },
-    "cut": "Déplacer…",
+    "cut": "Couper",
     "cutShortcut": "Ctrl+X",
     "paste": "Déplacer ici",
     "pasteShortcut": "Ctrl+V",
@@ -396,7 +396,15 @@
     },
     "newCategory": "Nouvelle catégorie",
     "newProperty": "Nouvelle propriété",
-    "newLinkType": "Nouveau type de lien"
+    "newLinkType": "Nouveau type de lien",
+    "moveTo": "Déplacer vers…",
+    "rowActions": "Actions de « {{name}} »",
+    "moveDialog": {
+      "title": "Déplacer « {{name}} » vers…",
+      "filter": "Filtrer les destinations",
+      "destinations": "Destinations possibles",
+      "none": "Aucune autre destination possible."
+    }
   },
   "recent": {
     "viewed": "Consultées",

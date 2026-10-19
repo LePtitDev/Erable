@@ -8,6 +8,7 @@ import {
   checkMove,
   dropDestination,
   indexTree,
+  moveDestinations,
   rootOf,
   ancestorsOf,
   visibleRows,
@@ -199,5 +200,41 @@ describe("performance (indicative, formal budget in M3-06)", () => {
     const rows = visibleRows(index, expanded);
 
     expect(rows).toHaveLength(1 + 100 + 50 * 100);
+  });
+});
+
+describe("moveDestinations (F18.R5)", () => {
+  const names = (moving: ElementId) =>
+    moveDestinations(tree, moving).map((d) => [...d.path, d.node.name].join(" / "));
+
+  it("offers the containers of the same root, in tree order, without the current parent", () => {
+    expect(names(hautbois)).toEqual([
+      "Pages",
+      "Pages / Personnages",
+      "Pages / Personnages / PNJ",
+      "Pages / Personnages / PNJ / Ilsa Varenne",
+      "Pages / Personnages / PNJ / Ilsa Varenne / Dialogues",
+      "Pages / Lieux / Col gelé",
+    ]);
+  });
+
+  it("never offers the element itself, what is below it, nor a parent that refuses its kind", () => {
+    // A folder goes into a root or a folder, never under a page (F02.R2).
+    expect(names(personnages)).toEqual(["Pages / Lieux"]);
+  });
+
+  it("offers nothing for a root, and stays within the root of the element", () => {
+    expect(moveDestinations(tree, roots.pages)).toEqual([]);
+    expect(names(categoryPnj)).toEqual([]);
+  });
+
+  it("agrees with checkMove on every destination", () => {
+    fc.assert(
+      fc.property(fc.constantFrom(...chroniques.map((n) => n.id)), (moving) => {
+        for (const destination of moveDestinations(tree, moving)) {
+          expect(checkMove(tree, moving, destination.node.id)).toBeNull();
+        }
+      }),
+    );
   });
 });

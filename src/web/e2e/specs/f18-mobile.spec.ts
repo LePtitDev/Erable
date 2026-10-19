@@ -9,7 +9,7 @@ import { QuickSearchPage } from "../pages/QuickSearchPage";
 import { SearchPage } from "../pages/SearchPage";
 import { TreePanel } from "../pages/TreePanel";
 import { t } from "../support/i18n";
-import { expectNoHorizontalScroll } from "../support/mobile";
+import { expectNoHorizontalScroll, expectTouchTargets } from "../support/mobile";
 import { screens } from "../support/screens";
 
 interface Manifest {
@@ -236,6 +236,88 @@ test.describe("F18 · Mobile version", () => {
     await page.getByRole("menuitem", { name: "Sign out" }).tap();
     // Signed out, the screen follows the browser language again.
     await expect(new LoginPage(page).form).toBeVisible();
+  });
+
+  test("E2E-18-07 · Menu of an element without a right click @mobile", async ({
+    page,
+    reference,
+  }) => {
+    const tree = new TreePanel(page);
+    const view = new PageViewPage(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await page.getByRole("button", { name: t("shell.showExplorer") }).tap();
+    await tree.item("Lieux").tap();
+
+    await tree.tree
+      .getByRole("button", { name: t("explorer.rowActions", { name: "Hautbois" }) })
+      .tap();
+    await page.getByRole("menuitem", { name: t("explorer.rename") }).tap();
+    const name = tree.tree.getByRole("textbox", { name: t("explorer.renameLabel") });
+    await name.fill("Hautbois-sur-Givre");
+    await name.press("Enter");
+
+    await expect(tree.item("Hautbois-sur-Givre")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(view.link("Hautbois-sur-Givre")).toBeVisible();
+  });
+
+  test("E2E-18-08 · Move an element without dragging @mobile @pr", async ({ page, reference }) => {
+    const tree = new TreePanel(page);
+    const view = new PageViewPage(page);
+    const actions = (name: string) =>
+      // The first in tree order (« Personnages » is also a folder of Propriétés).
+      tree.tree.getByRole("button", { name: t("explorer.rowActions", { name }) }).first();
+    const moveDialog = (name: string) =>
+      page.getByRole("dialog", { name: t("explorer.moveDialog.title", { name }) });
+    const destinations = (dialog: ReturnType<typeof moveDialog>) =>
+      dialog.getByRole("list", { name: t("explorer.moveDialog.destinations") }).getByRole("button");
+    await page.goto(reference.url(chroniques.ilsa));
+    await page.getByRole("button", { name: t("shell.showExplorer") }).tap();
+
+    await actions("Capitaine Orsen").tap();
+    await page.getByRole("menuitem", { name: t("explorer.moveTo") }).tap();
+    const orsen = moveDialog("Capitaine Orsen");
+    await destinations(orsen)
+      .filter({ hasText: /^Lieux/ })
+      .tap();
+    await expect(orsen).toBeHidden();
+
+    // Filed under Lieux, and still referenced by Ilsa Varenne.
+    await tree.item("Capitaine Orsen").tap();
+    await expect(view.breadcrumb).toContainText("Lieux");
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(view.link("Capitaine Orsen")).toBeVisible();
+
+    // A folder is offered neither itself, nor what is below it, nor anything outside Pages.
+    await page.getByRole("button", { name: t("shell.showExplorer") }).tap();
+    await actions("Personnages").tap();
+    await page.getByRole("menuitem", { name: t("explorer.moveTo") }).tap();
+    const offered = await destinations(moveDialog("Personnages")).allInnerTexts();
+    // The name is the first line of each destination, its path the second.
+    const names = offered.map((text) => text.split(/\r?\n/)[0]?.trim());
+    expect(names).toContain("Lieux");
+    for (const refused of ["Personnages", "PNJ", "Catégories", "Pages"]) {
+      expect(names).not.toContain(refused);
+    }
+  });
+
+  test("E2E-18-10 · Touch targets @mobile", async ({ page, reference }) => {
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expectTouchTargets(page, "home");
+
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(new PageViewPage(page).title).toBeVisible();
+    await expectTouchTargets(page, "page");
+
+    await page.getByRole("button", { name: t("shell.showExplorer") }).tap();
+    await expect(new TreePanel(page).tree).toBeVisible();
+    await expectTouchTargets(page, "explorer");
+    await page.keyboard.press("Escape");
+
+    await page.goto(`${reference.url(chroniques.ilsa)}?edit=true`);
+    await expect(page.getByRole("textbox", { name: t("editor.content") })).toBeVisible();
+    await expectTouchTargets(page, "editor");
   });
 
   test("E2E-18-11 · Installable web application @mobile", async ({ page, freshProfile }) => {

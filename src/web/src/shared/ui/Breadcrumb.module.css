@@ -30,3 +30,23 @@
 .current {
   color: var(--color-text);
 }
+
+/* Touch screens (F18.R4): each step of the path is a finger-sized target. */
+@media (pointer: coarse) {
+  .list {
+    gap: 0;
+  }
+
+  .link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--size-touch);
+    min-height: var(--size-touch);
+    padding-inline: var(--space-1-5);
+  }
+
+  .current {
+    padding-left: var(--space-1-5);
+  }
+}

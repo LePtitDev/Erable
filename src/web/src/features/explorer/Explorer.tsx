@@ -6,6 +6,7 @@ import {
   ChevronRight,
   ChevronsDownUp,
   Copy,
+  Ellipsis,
   FilePlus,
   Folder,
   FolderPlus,
@@ -32,9 +33,10 @@ import { useUiState } from "../../shared/api/uiState";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
 import { roots } from "../../shared/ids/roots";
 import { KindBadge } from "../../shared/ui/KindBadge";
-import { useIsNarrowScreen } from "../../shared/ui/media";
+import { useIsCoarsePointer, useIsNarrowScreen } from "../../shared/ui/media";
 import { RecentViewedPanel } from "../recent/RecentViewedPanel";
 import { DeleteDialog } from "../trash/DeleteDialog";
+import { MoveDialog } from "./MoveDialog";
 import styles from "./Explorer.module.css";
 import {
   ancestorsOf,
@@ -56,6 +58,8 @@ import { useProjectServer } from "../../shared/api/servers";
 /** Above this many visible rows, only the rows on screen are rendered (budget: 10 000 elements, docs/testing.md §11). */
 const virtualizeFrom = 200;
 const rowHeight = 30;
+/** With a coarse pointer every line is a 44 px touch target (F18.R4); same value as `--size-touch`. */
+const touchRowHeight = 44;
 const dragType = "application/x-erable-element";
 const recentHeadingId = "recent-viewed";
 
@@ -87,6 +91,8 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const canEdit = useCanEdit();
   // In the drawer of a phone, opening a folder would close the drawer (F18.R1): a tap unfolds it instead.
   const narrow = useIsNarrowScreen();
+  const coarse = useIsCoarsePointer();
+  const lineHeight = coarse ? touchRowHeight : rowHeight;
   // Members exist where accounts do: on a server, or for a project hosted by a connected one.
   const hosted = useQuery(apiInfoQuery).data?.folderProjects === false;
   const remote = useProjectServer(projectId) !== undefined;
@@ -105,6 +111,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const [error, setError] = useState<string | null>(null);
   const [menu, setMenu] = useState<{ x: number; y: number; id: ElementId } | null>(null);
   const [deleting, setDeleting] = useState<ElementId | null>(null);
+  const [moving, setMoving] = useState<ElementId | null>(null);
   const trash = useQuery(trashQuery(projectId));
   const typeahead = useRef({ text: "", at: 0 });
   const treeRef = useRef<HTMLDivElement>(null);
@@ -158,7 +165,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => rowHeight,
+    estimateSize: () => lineHeight,
     overscan: 12,
     enabled: virtual,
   });
@@ -435,6 +442,15 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         aria-selected={node.id === currentId}
         {...(row.expandable ? { "aria-expanded": row.expanded } : {})}
         {...(node.duplicateName ? { "aria-describedby": duplicateHintId } : {})}
+        // Named by its label (and count) only: the « … » button inside must not add to the name.
+        {...(isEditing
+          ? {}
+          : {
+              "aria-labelledby":
+                isRoot && countOf(node.id) !== undefined
+                  ? `${rowDomId(node.id)}-label ${rowDomId(node.id)}-count`
+                  : `${rowDomId(node.id)}-label`,
+            })}
         className={classes}
         style={{
           paddingLeft: `calc(${String(row.level - 1)} * var(--space-4) + var(--space-1-5))`,
@@ -506,11 +522,33 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
             }}
           />
         ) : (
-          <span className={styles["label"]}>{node.name}</span>
+          <span id={`${rowDomId(node.id)}-label`} className={styles["label"]}>
+            {node.name}
+          </span>
         )}
         {node.duplicateName && <Copy aria-hidden size={12} className={styles["duplicate"]} />}
         {isRoot && countOf(node.id) !== undefined && (
-          <span className={styles["count"]}>{countOf(node.id)}</span>
+          <span id={`${rowDomId(node.id)}-count`} className={styles["count"]}>
+            {countOf(node.id)}
+          </span>
+        )}
+        {canEdit && !isEditing && (
+          // The context menu without a right click (F18.R4). Out of the tab order: the tree is one tab stop, the
+          // keyboard has F2, Delete, Ctrl+X and the context-menu key.
+          <button
+            type="button"
+            tabIndex={-1}
+            className={styles["rowMenu"]}
+            aria-label={t("explorer.rowActions", { name: node.name })}
+            onClick={(e) => {
+              e.stopPropagation();
+              const box = e.currentTarget.getBoundingClientRect();
+              setFocusedId(node.id);
+              setMenu({ x: box.left, y: box.bottom, id: node.id });
+            }}
+          >
+            <Ellipsis aria-hidden size={16} />
+          </button>
         )}
       </div>
     );
@@ -594,11 +632,10 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
           aria-activedescendant={focused === null ? undefined : rowDomId(focused)}
           className={styles["tree"]}
           onKeyDown={onKeyDown}
-          style={
-            items === null
-              ? undefined
-              : { height: virtualizer.getTotalSize(), position: "relative" }
-          }
+          style={{
+            ["--tree-row-height" as string]: `${String(lineHeight)}px`,
+            ...(items === null ? {} : { height: virtualizer.getTotalSize(), position: "relative" }),
+          }}
         >
           {items === null
             ? rows.map(renderRow)
@@ -641,6 +678,17 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
           {t("members.title")}
         </Link>
       )}
+      <MoveDialog
+        index={index}
+        id={moving}
+        onMove={(id, parentId) => {
+          move(id, parentId, null);
+        }}
+        onClose={() => {
+          setMoving(null);
+          treeRef.current?.focus();
+        }}
+      />
       <DeleteDialog
         projectId={projectId}
         id={deleting}
@@ -687,6 +735,11 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         onRename={(id) => {
           afterMenu.current = () => {
             setEditing({ mode: "rename", id });
+          };
+        }}
+        onMoveTo={(id) => {
+          afterMenu.current = () => {
+            setMoving(id);
           };
         }}
         onCut={setCut}
@@ -804,6 +857,7 @@ function ContextMenu({
   onRestoreFocus,
   onCreate,
   onRename,
+  onMoveTo,
   onCut,
   onPaste,
   onDelete,
@@ -815,6 +869,7 @@ function ContextMenu({
   readonly onRestoreFocus: () => void;
   readonly onCreate: (kind: CreatableKind, parentId: ElementId) => void;
   readonly onRename: (id: ElementId) => void;
+  readonly onMoveTo: (id: ElementId) => void;
   readonly onCut: (id: ElementId) => void;
   readonly onPaste: (id: ElementId) => void;
   readonly onDelete: (id: ElementId) => void;
@@ -906,6 +961,14 @@ function ContextMenu({
               >
                 {t("explorer.rename")}
                 <span className={styles["shortcut"]}>{t("help.keys.rename")}</span>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                className={styles["menuItem"]}
+                onSelect={() => {
+                  onMoveTo(node.id);
+                }}
+              >
+                {t("explorer.moveTo")}
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 className={styles["menuItem"]}

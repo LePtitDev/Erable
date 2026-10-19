@@ -1,0 +1,70 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  max-height: 50vh;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.destination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  width: 100%;
+  min-height: var(--size-control-lg);
+  padding: var(--space-1-5) var(--space-3);
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.destination:hover {
+  background: var(--color-hover);
+}
+
+li:last-child > .destination {
+  border-bottom: 0;
+}
+
+.folder {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-weight: var(--weight-medium);
+}
+
+.path {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.none {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+/* The whole screen is the dialog's: the list may use it. */
+@media (width <= 720px) {
+  .list {
+    max-height: none;
+  }
+}

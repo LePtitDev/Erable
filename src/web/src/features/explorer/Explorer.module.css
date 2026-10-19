@@ -110,8 +110,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  height: 30px;
-  padding-right: var(--space-2-5);
+  height: var(--tree-row-height, 30px);
+  padding-right: var(--space-1);
   border-radius: var(--radius-sm);
   color: var(--color-text);
   font-size: var(--text-lg);
@@ -206,6 +206,47 @@
   color: var(--color-text-faint);
 }
 
+.rowMenu {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rowMenu:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.focused .rowMenu {
+  opacity: 1;
+}
+
+.row:hover .rowMenu {
+  opacity: 1;
+}
+
+/* Touch screens: always there, and as wide as a finger (F18.R4). */
+@media (pointer: coarse) {
+  .rowMenu {
+    width: var(--size-touch);
+    opacity: 1;
+  }
+
+  .caret {
+    width: 24px;
+  }
+}
+
 .count {
   color: var(--color-text-faint);
   font-size: var(--text-sm);
@@ -289,4 +330,10 @@
   background: var(--color-sunken);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
+}
+
+@media (pointer: coarse) {
+  .filter {
+    height: var(--size-touch);
+  }
 }

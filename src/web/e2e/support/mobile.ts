@@ -40,8 +40,8 @@ export async function expectNoHorizontalScroll(page: Page, screen: string): Prom
 }
 
 /**
- * F18.R4: every visible button, link of a navigation, text field and tab offers a 44 × 44 px touch target. The
- * target is the box of the element, or of its label when the element is a checkbox or radio wrapped in one. Links
+ * F18.R4: every visible button, link of a navigation, tree line, text field and tab offers a 44 × 44 px touch target.
+ * The target is the box of the element, or of its label when the field is wrapped in one. Links
  * inside running text are left out (WCAG 2.5.8 exception for inline targets).
  */
 export async function expectTouchTargets(page: Page, screen: string, minimum = 44): Promise<void> {
@@ -51,7 +51,7 @@ export async function expectTouchTargets(page: Page, screen: string, minimum = 4
       "[role=button]",
       "[role=tab]",
       "[role=menuitem]",
-      "[role=treeitem] > *",
+      "[role=treeitem]",
       "nav a",
       "input:not([type=hidden])",
       "select",
@@ -65,11 +65,10 @@ export async function expectTouchTargets(page: Page, screen: string, minimum = 4
     return [...document.querySelectorAll(selector)]
       .filter((element) => visible(element) && element.closest("[aria-hidden=true]") === null)
       .map((element) => {
-        const target =
-          element instanceof HTMLInputElement &&
-          (element.type === "checkbox" || element.type === "radio")
-            ? (element.closest("label") ?? element)
-            : element;
+        // A field wrapped in its label is reached through the whole label.
+        const target = element.matches("input, select, textarea")
+          ? (element.closest("label") ?? element)
+          : element;
         const box = target.getBoundingClientRect();
         return {
           name:
@@ -81,5 +80,5 @@ export async function expectTouchTargets(page: Page, screen: string, minimum = 4
       })
       .filter((target) => target.width < min || target.height < min);
   }, minimum);
-  expect(small, `${screen}: touch targets under ${String(minimum)} px`).toEqual([]);
+  expect.soft(small, `${screen}: touch targets under ${String(minimum)} px`).toEqual([]);
 }

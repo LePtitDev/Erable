@@ -94,6 +94,35 @@ export function checkMove(
   return canContain(tree, newParentId, node.kind) ? null : "invalidParent";
 }
 
+/** A place where « Déplacer vers… » can put an element, with the names of its ancestors for the list. */
+export interface MoveDestination {
+  readonly node: TreeNodeItem;
+  /** From the root down to the parent of `node`. */
+  readonly path: readonly string[];
+}
+
+/**
+ * Every parent that `id` may move into (F18.R5), in tree order: the same checks as a drop (F02.R1–R3), its current
+ * parent left out since nothing would change.
+ */
+export function moveDestinations(tree: TreeIndex, id: ElementId): MoveDestination[] {
+  const node = tree.byId.get(id);
+  const root = rootOf(tree, id);
+  if (node === undefined || root === null) return [];
+  const result: MoveDestination[] = [];
+  const walk = (current: TreeNodeItem, path: readonly string[]) => {
+    // Nothing under the element itself can receive it: its subtree is skipped whole.
+    if (current.id === id) return;
+    if (current.id !== node.parentId && checkMove(tree, id, current.id) === null) {
+      result.push({ node: current, path });
+    }
+    for (const child of childrenOf(tree, current.id)) walk(child, [...path, current.name]);
+  };
+  const top = tree.byId.get(root);
+  if (top !== undefined) walk(top, []);
+  return result;
+}
+
 export type DropPosition = "before" | "inside" | "after";
 
 /** Where a drop on `targetId` puts the element: new parent and index among its future siblings (itself excluded). */
