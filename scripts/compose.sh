@@ -27,6 +27,13 @@ command="${1:-}"
 project="${COMPOSE_PROJECT_NAME:-deploy}"
 compose() { docker compose --env-file "$env_file" "${files[@]}" "$@"; }
 
+# The version the image shows (Dockerfile): from Git like the other builds (build/version.mjs), or the tag of HEAD on
+# a machine without Node; ERABLE_VERSION, from the environment or deploy/.env, wins.
+if [ -z "${ERABLE_VERSION:-}" ] && ! grep -qs '^ERABLE_VERSION=.' "$env_file"; then
+  ERABLE_VERSION="$(node build/version.mjs 2>/dev/null || git describe --tags --exact-match 2>/dev/null | sed 's/^v//' || true)"
+  export ERABLE_VERSION
+fi
+
 require_env() {
   if [ ! -f "$env_file" ]; then
     echo "No $env_file: run scripts/compose.sh setup <domain> first." >&2

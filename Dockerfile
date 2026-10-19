@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 # Erable server image (M4-06, docs/deployment.md). Build from the repository root:
 #   docker build -t erable .
+#   docker build -t erable --build-arg ERABLE_VERSION="$(node build/version.mjs)" .   (the version it shows)
 # Run:   docker run -p 8080:8080 -v erable-data:/data -e ERABLE_ADMIN_LOGIN=admin -e ERABLE_ADMIN_PASSWORD=... erable
 
 # ─── 1. The web client ───────────────────────────────────────────────────────
@@ -26,8 +27,12 @@ COPY src/Erable.Storage src/Erable.Storage
 COPY src/Erable.Server src/Erable.Server
 # The server project serves the client from wwwroot/ when src/web/dist exists.
 COPY --from=web /src/web/dist src/web/dist
+# The version shown by the server (/api/info, home screen): the context has no .git to read it from, so it is given
+# (release.yml, scripts/compose); 0.0.0-dev otherwise.
+ARG ERABLE_VERSION=""
 # Release: the /_test endpoints are not compiled in.
-RUN dotnet publish src/Erable.Server/Erable.Server.csproj -c Release -o /app --no-restore -p:UseAppHost=false
+RUN dotnet publish src/Erable.Server/Erable.Server.csproj -c Release -o /app --no-restore -p:UseAppHost=false \
+      "-p:Version=${ERABLE_VERSION:-0.0.0-dev}"
 # The data folder, writable by the unprivileged user of the final image (a chiseled image has no shell to do it).
 RUN mkdir /data && chown 1654:1654 /data
 

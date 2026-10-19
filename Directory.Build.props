@@ -11,7 +11,9 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <!-- Non-exhaustive switch expressions must not compile. -->
     <WarningsAsErrors>$(WarningsAsErrors);CS8509;CS8524</WarningsAsErrors>
-    <Version>0.1.0</Version>
+    <!-- Shown when nothing better is known: the executables take theirs from Git (Directory.Build.targets), releases from their tag. -->
+    <ErableDefaultVersion>0.0.0-dev</ErableDefaultVersion>
+    <Version>$(ErableDefaultVersion)</Version>
     <Company>Erable</Company>
     <Product>Erable</Product>
   </PropertyGroup>

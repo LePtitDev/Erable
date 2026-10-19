@@ -6,6 +6,9 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:
+        # Set by scripts/compose from Git; or by hand in deploy/.env. Empty: 0.0.0-dev.
+        ERABLE_VERSION: ${ERABLE_VERSION:-}
     restart: unless-stopped
     environment:
       # The first administrator, created when the data volume is empty; ignored afterwards.

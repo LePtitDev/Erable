@@ -2,6 +2,8 @@
 
   <!-- erable-cli: read-only extraction of a project for other tools (docs/cli.md). -->
   <PropertyGroup>
+    <!-- The version it shows comes from Git in a local build (Directory.Build.targets). -->
+    <ErableVersionFromGit>true</ErableVersionFromGit>
     <OutputType>Exe</OutputType>
     <AssemblyName>erable-cli</AssemblyName>
     <RootNamespace>Erable.Cli</RootNamespace>

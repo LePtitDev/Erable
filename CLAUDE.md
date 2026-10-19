@@ -185,7 +185,8 @@ dotnet test --solution Erable.sln -c Release           # vérifie aussi l'absenc
 dotnet test --project tests/Erable.Storage.Tests -- --filter-method "*GenerateChroniques" --explicit only   # régénère spec/projects/chroniques
 dotnet run --project src/Erable.Server -- serve <dossier> [--port 5080] [--lan]   # dossier de projet (partagé tel quel) ou de données ; ERABLE_ADMIN_LOGIN/ERABLE_ADMIN_PASSWORD pour le premier administrateur ; ERABLE_TEST_MODE=1 pour /_test ; réglages ERABLE_* : docs/deployment.md
 dotnet run --project src/Erable.Server -- healthcheck [--port 8080]       # code 0 si le serveur local répond (santé du conteneur)
-docker build -t erable .                                                  # image du serveur (docs/deployment.md)
+docker build -t erable --build-arg ERABLE_VERSION="$(node build/version.mjs)" .   # image du serveur (docs/deployment.md) ; sans l'argument, elle affiche 0.0.0-dev
+node build/version.mjs                     # version d'un build local d'après Git (tag de HEAD, sinon x.y.(z+1)-dev.N) ; reprise par les exécutables (Directory.Build.targets)
 dotnet run --project src/Erable.Server -- doctor <projet> [--json] [--fix]   # intégrité d'un projet fermé (0 sain, 1 anomalies, 2 illisible)
 dotnet run --project src/Erable.Desktop                 # app desktop (après pnpm -C src/web build)
 dotnet run --project src/Erable.Cli -- <info|tree|page|pages|schema|links|attachments|attachment|export> <projet> [--pretty]   # erable-cli, docs/cli.md (codes 0 ok, 1 usage, 2 projet illisible, 3 élément introuvable, 4 sortie)

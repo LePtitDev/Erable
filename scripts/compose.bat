@@ -27,6 +27,8 @@ rem Compose names the project after the folder of the first file (deploy) unless
 set "PROJECT=%COMPOSE_PROJECT_NAME%"
 if "%PROJECT%"=="" set "PROJECT=deploy"
 set "COMPOSE=docker compose --env-file %ENV_FILE% %FILES%"
+rem The version the image shows (Dockerfile), from Git like the other builds; ERABLE_VERSION, set beforehand, wins.
+if not defined ERABLE_VERSION for /f %%v in ('node build\version.mjs 2^>nul') do set "ERABLE_VERSION=%%v"
 
 if /i "%COMMAND%"=="setup" goto :setup
 if not exist "%ENV_FILE%" if not "%COMMAND%"=="" (

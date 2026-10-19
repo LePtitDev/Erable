@@ -1,0 +1,31 @@
+<Project>
+
+  <!--
+    The version a local build shows (the home screen, /api/info, erable-cli): from Git, with the rule of
+    build/version.mjs (the tag of HEAD, else x.y.(z+1)-dev.N after the last tag). Only for the projects that set
+    ErableVersionFromGit, and only while the version is still the default of Directory.Build.props: one given on the
+    command line (-p:Version=…, the release scripts) wins (a target could otherwise overwrite even a global property).
+    Without Node or Git (the Docker build stage, a source archive) the default stays.
+  -->
+  <Target Name="ErableVersionFromGit"
+          BeforeTargets="GetAssemblyVersion"
+          Condition="'$(ErableVersionFromGit)' == 'true' and '$(Version)' == '$(ErableDefaultVersion)' and '$(DesignTimeBuild)' != 'true'">
+    <Exec Command="node &quot;$(MSBuildThisFileDirectory)build/version.mjs&quot;"
+          ConsoleToMSBuild="true"
+          StandardOutputImportance="low"
+          StandardErrorImportance="low"
+          IgnoreExitCode="true"
+          IgnoreStandardErrorWarningFormat="true"
+          EchoOff="true"
+          ContinueOnError="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ErableGitVersion" />
+      <Output TaskParameter="ExitCode" PropertyName="_ErableGitVersionExit" />
+    </Exec>
+    <PropertyGroup Condition="'$(_ErableGitVersionExit)' == '0' and $([System.Text.RegularExpressions.Regex]::IsMatch('$(_ErableGitVersion)', '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$'))">
+      <Version>$(_ErableGitVersion)</Version>
+      <!-- Evaluated from the default Version before this target: follow the one that applies. -->
+      <InformationalVersion>$(Version)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
+
+</Project>

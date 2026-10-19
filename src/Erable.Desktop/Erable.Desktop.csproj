@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- The version it shows comes from Git in a local build (Directory.Build.targets). -->
+    <ErableVersionFromGit>true</ErableVersionFromGit>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Erable.Desktop</RootNamespace>
     <!-- LibraryImport (user32: bring the window to the front, F16.R2) generates its marshalling as unsafe code. -->

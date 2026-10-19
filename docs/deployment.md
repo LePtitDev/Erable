@@ -50,7 +50,7 @@ erable serve ./MonWiki --lan --port 5080
 ### Construire et lancer
 
 ```bash
-docker build -t erable .
+docker build -t erable --build-arg ERABLE_VERSION="$(node build/version.mjs)" .
 docker run -d --name erable -p 8080:8080 -v erable-data:/data \
   -e ERABLE_ADMIN_LOGIN=admin -e ERABLE_ADMIN_PASSWORD='un mot de passe solide' \
   erable
