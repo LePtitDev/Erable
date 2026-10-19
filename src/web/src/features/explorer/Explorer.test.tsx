@@ -99,6 +99,23 @@ describe("Explorer", () => {
     expect(await within(tree).findByRole("treeitem", { name: "Objets" })).toBeInTheDocument();
   });
 
+  it("focuses the name of an element created from the context menu", async () => {
+    mockProject();
+    const user = userEvent.setup();
+    const { tree } = await openTree();
+
+    await user.pointer({
+      keys: "[MouseRight]",
+      target: within(tree).getByRole("treeitem", { name: /Propriétés/ }),
+    });
+    await user.click(await screen.findByRole("menuitem", { name: "Nouvelle propriété" }));
+
+    const input = await within(tree).findByRole("textbox");
+    await waitFor(() => {
+      expect(input).toHaveFocus();
+    });
+  });
+
   it("refuses to move a category into Pages with the keyboard alternative (E2E-02-04)", async () => {
     const { writes, nodes } = mockProject({
       uiState: { [`tree-${ids.project}`]: { expanded: [roots.pages, roots.categories] } },

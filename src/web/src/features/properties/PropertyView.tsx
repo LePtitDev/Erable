@@ -23,6 +23,7 @@ import {
   type RuleViolation,
   type ValidationRule,
 } from "../../shared/properties/rules";
+import { keyFromName, uniqueKey } from "../../shared/properties/keys";
 import {
   formatPropertyType,
   scalarTypes,
@@ -44,7 +45,7 @@ import { draftOfRule, keepApplicable, ruleOf, type RuleDraft } from "./ruleDraft
 import { ValueEditor } from "./ValueEditor";
 import styles from "./PropertyView.module.css";
 
-/** An option of the form: `key` is undefined for an option added in this draft (the backend derives it). */
+/** An option of the form: `key` is undefined for an option added in this draft (derived from its label on save). */
 interface OptionDraft {
   readonly uid: number;
   readonly key: string | undefined;
@@ -81,11 +82,34 @@ function typeOfDraft(draft: Draft): PropertyType {
   return { scalar: draft.scalar, list: draft.list };
 }
 
-/** Options that already exist on the backend (the ones a value can refer to). */
+/**
+ * Key of an option within the draft. A new option gets a provisional one, never a valid key, so that the default
+ * value and the rules can already name it; it is replaced by the saved key in `savedKeys`.
+ */
+function draftKey(option: OptionDraft): string {
+  return option.key ?? `#${String(option.uid)}`;
+}
+
+/** The options of the draft, under their draft keys (the ones the default value and the rules refer to). */
 function knownOptions(draft: Draft): EnumOption[] {
-  return draft.options.flatMap((o) =>
-    o.key === undefined ? [] : [{ key: o.key, label: o.label }],
-  );
+  return draft.options.map((o) => ({ key: draftKey(o), label: o.label }));
+}
+
+/** Draft key → saved key: a new option gets a key derived from its label, as the backend does for a keyless one. */
+function savedKeys(options: readonly OptionDraft[]): ReadonlyMap<string, string> {
+  const taken = new Set(options.flatMap((o) => (o.key === undefined ? [] : [o.key])));
+  const keys = new Map<string, string>();
+  for (const option of options) {
+    const key = option.key ?? uniqueKey(keyFromName(option.label.trim()), taken);
+    taken.add(key);
+    keys.set(draftKey(option), key);
+  }
+  return keys;
+}
+
+function withSavedKeys(value: PropertyValue, keys: ReadonlyMap<string, string>): PropertyValue {
+  if (Array.isArray(value)) return (value as readonly string[]).map((k) => keys.get(k) ?? k);
+  return typeof value === "string" ? (keys.get(value) ?? value) : value;
 }
 
 /** The definition the draft describes, for the editors (default value, tester) and the preview of the rules. */
@@ -454,19 +478,27 @@ function PropertyEditing({
   };
 
   const body = (replacements?: Record<string, string>) => {
+    const enumKeys = draft.scalar === "enum" ? savedKeys(draft.options) : new Map<string, string>();
     const rules: ValidationRule[] = draft.rules.flatMap((r) => {
       const rule = ruleOf(r, type, options);
-      return rule === null ? [] : [rule];
+      if (rule === null) return [];
+      return [
+        rule.op === "in" ? { ...rule, value: rule.value.map((k) => enumKeys.get(k) ?? k) } : rule,
+      ];
     });
     return {
       key: draft.key.trim(),
       description: draft.description,
       type: formatPropertyType(type),
-      default: draft.defaultValue ?? null,
+      default:
+        draft.defaultValue === undefined ? null : withSavedKeys(draft.defaultValue, enumKeys),
       rules,
       options:
         draft.scalar === "enum"
-          ? draft.options.map((o) => ({ key: o.key ?? null, label: o.label.trim() }))
+          ? draft.options.map((o) => ({
+              key: enumKeys.get(draftKey(o)) ?? null,
+              label: o.label.trim(),
+            }))
           : [],
       ...(replacements === undefined ? {} : { replacements }),
     };
@@ -665,7 +697,7 @@ function OptionsEditor({
 }) {
   const { t } = useTranslation();
   const update = (options: readonly OptionDraft[]) => {
-    const keys = new Set(options.flatMap((o) => (o.key === undefined ? [] : [o.key])));
+    const keys = new Set(options.map(draftKey));
     onChange({
       ...draft,
       options,

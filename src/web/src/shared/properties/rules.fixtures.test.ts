@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadFixtures } from "../../test/fixtures";
 import { requireElementId, type ElementId } from "../ids/elementId";
 import { evaluateRules, parseRule, parseRules, type RuleContext } from "./rules";
+import { keyFromName, uniqueKey } from "./keys";
 import { parseSafeRegex, safeRegexTest } from "./safeRegex";
 import { parsePropertyType, parseValue, type EnumOption, type PropertyType } from "./types";
 
@@ -40,6 +41,12 @@ interface RegexCase {
   readonly valid: boolean;
   readonly javascript?: string;
   readonly matches?: readonly (readonly [string, boolean])[];
+}
+
+interface KeyCase {
+  readonly label: string;
+  readonly taken: readonly string[];
+  readonly key: string;
 }
 
 const rules = <T>(file: string) =>
@@ -104,6 +111,12 @@ describe("values (values.json)", () => {
     if (value.ok) {
       expect(value.value).toEqual(c.canonical);
     }
+  });
+});
+
+describe("keys (keys.json)", () => {
+  it.each(rules<KeyCase>("keys.json"))("$file › $name", (c) => {
+    expect(uniqueKey(keyFromName(c.label), c.taken)).toBe(c.key);
   });
 });
 

@@ -192,6 +192,31 @@ describe("PropertyView", () => {
       replacements: { garde: "marchande" },
     });
   });
+
+  it("offers a new option as default value and in the rules before it is saved", async () => {
+    const { user, writes, article } = await open("role", undefined, "?edit=true");
+
+    await user.click(within(article).getByRole("button", { name: "Ajouter une option" }));
+    await user.type(within(article).getByRole("textbox", { name: "Option 3" }), "Première lame");
+    await user.selectOptions(
+      within(article).getByRole("combobox", { name: "Valeur par défaut de la propriété" }),
+      "Première lame",
+    );
+    await user.click(within(article).getByRole("button", { name: "Enregistrer" }));
+
+    await waitFor(() => {
+      expect(writes.puts).toHaveLength(1);
+    });
+    expect(writes.puts[0]?.body).toMatchObject({
+      default: "premiere_lame",
+      options: [
+        { key: "marchande", label: "Marchande" },
+        { key: "garde", label: "Garde" },
+        { key: "premiere_lame", label: "Première lame" },
+      ],
+    });
+  });
+
   it("opens in edit mode even when the role of the user arrives after the property", async () => {
     const { nodes: all } = mockProject({ nodes: nodes() });
     mockStructure();

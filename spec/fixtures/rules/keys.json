@@ -1,0 +1,17 @@
+{
+  "description": "Key derived from a display name (property, enum option), made unique among the keys already taken. key = Unique(FromName(label), taken).",
+  "cases": [
+    { "name": "plain word", "label": "Niveau", "taken": [], "key": "niveau" },
+    { "name": "spaces", "label": "Points de vie", "taken": [], "key": "points_de_vie" },
+    { "name": "accents dropped", "label": "Âge", "taken": [], "key": "age" },
+    { "name": "punctuation collapsed and trimmed", "label": "  Rôle / fonction  ", "taken": [], "key": "role_fonction" },
+    { "name": "leading digit gets a prefix", "label": "12 travaux", "taken": [], "key": "p_12_travaux" },
+    { "name": "nothing usable", "label": "!!!", "taken": [], "key": "p_" },
+    { "name": "empty label", "label": "", "taken": [], "key": "p_" },
+    { "name": "uppercase", "label": "PNJ Hostile", "taken": [], "key": "pnj_hostile" },
+    { "name": "long label truncated", "label": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "taken": [], "key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    { "name": "free key kept", "label": "Âge", "taken": ["niveau"], "key": "age" },
+    { "name": "taken key gets a suffix", "label": "Niveau", "taken": ["niveau", "niveau_2"], "key": "niveau_3" },
+    { "name": "suffix of a full-length key truncates it", "label": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "taken": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"], "key": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_2" }
+  ]
+}

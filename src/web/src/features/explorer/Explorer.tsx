@@ -105,6 +105,8 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const trash = useQuery(trashQuery(projectId));
   const typeahead = useRef({ text: "", at: 0 });
   const treeRef = useRef<HTMLDivElement>(null);
+  /** Edit chosen in the context menu, started once the menu has given the focus back. */
+  const afterMenu = useRef<(() => void) | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const setExpanded = useCallback(
@@ -663,13 +665,24 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         cut={cut}
         onClose={() => {
           setMenu(null);
-          treeRef.current?.focus();
+        }}
+        onRestoreFocus={() => {
+          // The name field appears only now: while the menu is open, it traps the focus and
+          // would blur (and so commit) the field at once.
+          const edit = afterMenu.current;
+          afterMenu.current = null;
+          if (edit === null) treeRef.current?.focus();
+          else edit();
         }}
         onCreate={(kind, parentId) => {
-          startCreate(kind, parentId);
+          afterMenu.current = () => {
+            startCreate(kind, parentId);
+          };
         }}
         onRename={(id) => {
-          setEditing({ mode: "rename", id });
+          afterMenu.current = () => {
+            setEditing({ mode: "rename", id });
+          };
         }}
         onCut={setCut}
         onPaste={paste}
@@ -783,6 +796,7 @@ function ContextMenu({
   index,
   cut,
   onClose,
+  onRestoreFocus,
   onCreate,
   onRename,
   onCut,
@@ -793,6 +807,7 @@ function ContextMenu({
   readonly index: TreeIndex;
   readonly cut: ElementId | null;
   readonly onClose: () => void;
+  readonly onRestoreFocus: () => void;
   readonly onCreate: (kind: CreatableKind, parentId: ElementId) => void;
   readonly onRename: (id: ElementId) => void;
   readonly onCut: (id: ElementId) => void;
@@ -817,7 +832,15 @@ function ContextMenu({
         />
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className={styles["menu"]} align="start" sideOffset={2}>
+        <DropdownMenu.Content
+          className={styles["menu"]}
+          align="start"
+          sideOffset={2}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            onRestoreFocus();
+          }}
+        >
           {node !== undefined && canContain(index, node.id, "page") && (
             <DropdownMenu.Item
               className={styles["menuItem"]}

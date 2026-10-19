@@ -17,6 +17,8 @@ public sealed class RuleFixtureTests
 
     public static TheoryData<FixtureCase> RegexCases => Only("regex.json");
 
+    public static TheoryData<FixtureCase> KeyCases => Only("keys.json");
+
     [Theory]
     [MemberData(nameof(EvaluationCases))]
     public void Evaluate_SharedCases_ReportsExpectedViolations(FixtureCase fixture)
@@ -95,6 +97,19 @@ public sealed class RuleFixtureTests
                 regex.Value.IsMatch(match[0].GetString()!).ShouldBe(match[1].GetBoolean(), $"value {match[0].GetRawText()}");
             }
         }
+    }
+
+    [Theory]
+    [MemberData(nameof(KeyCases))]
+    public void KeyFromName_SharedCases_SameKeyAsTypeScript(FixtureCase fixture)
+    {
+        using var document = JsonDocument.Parse(fixture.Json);
+        var c = document.RootElement;
+        var taken = c.GetProperty("taken").EnumerateArray().Select(k => k.GetString()!);
+
+        var key = PropertyKey.Unique(PropertyKey.FromName(c.GetProperty("label").GetString()!), taken);
+
+        key.ShouldBe(c.GetProperty("key").GetString());
     }
 
     private static IReadOnlyList<EnumOption>? Options(JsonElement c) =>
