@@ -7,7 +7,8 @@ const nightly = process.env["ERABLE_E2E_NIGHTLY"] === "1";
 
 /**
  * End-to-end tests against the real backend in test mode (docs/testing.md §9).
- * Chromium and WebKit on every PR; Firefox is reserved for the nightly pipeline.
+ * Chromium and WebKit on every PR; Firefox is reserved for the nightly pipeline. The `@mobile` scenarios run on an
+ * emulated phone only (project `mobile`, F18).
  */
 export default defineConfig({
   testDir: "./e2e/specs",
@@ -35,23 +36,30 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      grepInvert: /@perf|@visual|@quarantine/,
+      grepInvert: /@perf|@visual|@quarantine|@mobile/,
     },
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
-      grepInvert: /@perf|@visual|@quarantine/,
+      grepInvert: /@perf|@visual|@quarantine|@mobile/,
     },
     ...(nightly
       ? [
           {
             name: "firefox",
             use: { ...devices["Desktop Firefox"] },
-            grepInvert: /@perf|@visual|@quarantine/,
+            grepInvert: /@perf|@visual|@quarantine|@mobile/,
           },
           { name: "quarantine", use: { ...devices["Desktop Chrome"] }, grep: /@quarantine/ },
         ]
       : []),
+    // A phone (F18): touch screen, coarse pointer, 412 px wide; Chromium is also the engine of the Android WebView.
+    {
+      name: "mobile",
+      use: { ...devices["Pixel 7"] },
+      grep: /@mobile/,
+      grepInvert: /@perf|@visual|@quarantine/,
+    },
     { name: "perf", use: { ...devices["Desktop Chrome"] }, grep: /@perf/ },
     {
       name: "visual",

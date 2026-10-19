@@ -96,9 +96,10 @@
 
   /* Sizes */
   --size-control-sm: 28px;
-  --size-control-md: 32px; /* minimum touch target (docs/architecture.md §3.1) */
+  --size-control-md: 32px; /* minimum target with a mouse (docs/architecture.md §3.1) */
   --size-control-lg: 36px;
   --size-bar: 40px;
+  --size-touch: 44px; /* minimum touch target (F18.R4) */
 
   /* Radii */
   --radius-xs: 4px;
@@ -185,5 +186,15 @@
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 50%);
     --shadow-pop: 0 18px 48px rgb(0 0 0 / 55%);
     --color-overlay: rgb(0 0 0 / 55%);
+  }
+}
+
+/* Touch screens (coarse pointer, F18.R4): every control offers at least a 44 px touch target, whatever the width. */
+@media (pointer: coarse) {
+  :root {
+    --size-control-sm: var(--size-touch);
+    --size-control-md: var(--size-touch);
+    --size-control-lg: var(--size-touch);
+    --size-bar: 48px;
   }
 }

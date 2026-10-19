@@ -21,6 +21,23 @@ export function applyTheme(
   root: HTMLElement = document.documentElement,
 ) {
   root.dataset["theme"] = preference;
+  syncThemeColor(preference, root.ownerDocument);
+}
+
+/**
+ * index.html declares one `theme-color` per system scheme (the mobile browser bar, F18); a forced theme turns on
+ * the matching one whatever the system says. The original media query is kept to come back to « system ».
+ */
+function syncThemeColor(preference: ThemePreference, doc: Document) {
+  for (const meta of doc.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+    const media = (meta.dataset["media"] ??= meta.media);
+    meta.media =
+      preference === "system"
+        ? media
+        : media.includes("dark") === (preference === "dark")
+          ? "all"
+          : "not all";
+  }
 }
 
 interface ThemeState {

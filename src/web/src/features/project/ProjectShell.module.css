@@ -1,7 +1,11 @@
 .shell {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  height: 100vh;
+  height: 100dvh;
+
+  /* Notches and gesture bars once the page covers the whole screen (viewport-fit=cover, F18). */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
   background: var(--color-bg);
 }
 

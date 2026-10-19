@@ -4,6 +4,7 @@ using System.Text.Json;
 using Erable.Core;
 using Erable.Server.Hosting;
 using Erable.Server.Tests.Infrastructure;
+using Erable.Testing;
 
 namespace Erable.Server.Tests;
 
@@ -86,6 +87,21 @@ public sealed class HostingTests
         response.Headers.GetValues("X-Content-Type-Options").ShouldBe(["nosniff"]);
         response.Headers.GetValues("X-Frame-Options").ShouldBe(["SAMEORIGIN"]);
         response.Headers.GetValues("Referrer-Policy").ShouldBe(["no-referrer"]);
+    }
+
+    [Fact]
+    public async Task Get_WebManifest_IsServedAsManifestJson()
+    {
+        // F18.R8: browsers ignore a manifest served with another type.
+        using var web = TempDirectory.Create();
+        await File.WriteAllTextAsync(web.Combine("index.html"), TestBackend.IndexHtml, Ct);
+        await File.WriteAllTextAsync(web.Combine("manifest.webmanifest"), """{"name":"Erable"}""", Ct);
+        await using var backend = await TestBackend.StartAsync(o => o with { WebRootPath = web.Path });
+
+        using var response = await backend.Client.GetAsync(new Uri("/manifest.webmanifest", UriKind.Relative), Ct);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/manifest+json");
     }
 
     [Theory]

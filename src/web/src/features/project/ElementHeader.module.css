@@ -27,7 +27,9 @@
   font-weight: var(--weight-semibold);
   line-height: 1.1;
   letter-spacing: var(--tracking-tight);
-  overflow-wrap: anywhere;
+
+  /* Between words first (« anywhere » would let the actions squeeze the title letter by letter, F18.R3). */
+  overflow-wrap: break-word;
 }
 
 .actions {

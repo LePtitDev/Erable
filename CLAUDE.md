@@ -203,6 +203,8 @@ pnpm -C src/web api:check        # CI : échoue si openapi.json ou schema.ts son
 pnpm -C src/web e2e              # Playwright Chromium + WebKit contre le vrai backend (build SPA + erable serve, ERABLE_TEST_MODE=1)
 pnpm -C src/web e2e:pr           # seulement les tests @pr
 pnpm -C src/web e2e:perf         # mesures de temps (@perf), seules, un worker (exclues des autres projets)
+pnpm -C src/web exec playwright test --project mobile   # scénarios @mobile (F18) sur un téléphone émulé (Pixel 7)
+node src/web/scripts/generate-icons.mjs   # régénère les icônes (manifeste web, lanceur Android) depuis le dessin du logo
 pnpm -C src/web e2e:trace        # traçabilité E2E-* ↔ tests ; `-- --enforce M1` échoue s'il manque un scénario ≤ M1
 pnpm -C src/web exec playwright install chromium webkit   # une fois par machine
 
