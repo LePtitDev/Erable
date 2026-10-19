@@ -5,7 +5,8 @@ namespace Erable.Mobile;
 /// <summary>
 /// Edge to edge (enforced from Android 15): the content pads itself with the system bars, the display cutout and the
 /// keyboard, so that nothing hides under them and the SPA shrinks above the keyboard (F18.R6). Before Android 11 the
-/// window fits the bars by itself and resizes for the keyboard (<c>adjustResize</c>).
+/// window fits the bars by itself and resizes for the keyboard (<c>adjustResize</c>). The padded view must be a
+/// container: a <c>WebView</c> ignores its own padding and would still draw under the bars.
 /// </summary>
 internal static class SystemBars
 {

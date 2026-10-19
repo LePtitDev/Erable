@@ -58,8 +58,11 @@ public sealed class WebActivity : Activity
         _web.SetWebViewClient(new Client(this));
         _web.SetWebChromeClient(new Chrome(this));
         _web.SetDownloadListener(new Downloads(this));
-        SetContentView(_web);
-        SystemBars.Pad(Window!, _web);
+        // A WebView draws the page under its own padding: the system bars pad a frame around it instead.
+        var frame = new FrameLayout(this);
+        frame.AddView(_web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MatchParent, ViewGroup.LayoutParams.MatchParent));
+        SetContentView(frame);
+        SystemBars.Pad(Window!, frame);
 
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
