@@ -1,9 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, Outlet, useParams, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Moon, PanelLeft, Search, Sun } from "lucide-react";
+import { Link, Outlet, useParams, useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Ellipsis,
+  LogOut,
+  Moon,
+  PanelLeft,
+  Search,
+  Settings,
+  Sun,
+} from "lucide-react";
+import { Dialog, DropdownMenu, VisuallyHidden } from "radix-ui";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { projectQuery } from "../../shared/api/projects";
+import { meQuery, projectQuery } from "../../shared/api/projects";
 import { treeQuery } from "../../shared/api/tree";
 import { useUiState } from "../../shared/api/uiState";
 import type { ElementId } from "../../shared/ids/elementId";
@@ -12,6 +23,7 @@ import { useWindowStore } from "../../shared/native/native";
 import { useSetTheme } from "../../shared/theme/useSetTheme";
 import { useSystemDark } from "../../shared/theme/useSystemDark";
 import { Logo } from "../../shared/ui/Logo";
+import { useIsNarrowScreen } from "../../shared/ui/media";
 import { useFormatCombo } from "../../shared/keyboard/useFormatCombo";
 import { useShortcut, useShortcuts } from "../../shared/keyboard/useShortcuts";
 import { QuickSearch } from "../search/QuickSearch";
@@ -20,6 +32,7 @@ import { Explorer } from "../explorer/Explorer";
 import { UserMenu } from "../auth/UserMenu";
 import { Notices } from "./Notices";
 import { PresenceAvatars } from "../presence/Presence";
+import { signOutAndReload } from "../../shared/api/auth";
 import { ApiError } from "../../shared/api/client";
 import { apiInfoQuery } from "../../shared/api/queries";
 import { useProjectServer } from "../../shared/api/servers";
@@ -90,7 +103,19 @@ function ShellFrame({
     };
   }, [projectName, setWindowProject]);
 
+  // Narrow layout (F18.R1): the explorer is a drawer over the content. It is open for the location it was opened
+  // at, so that any navigation closes it; the remembered layout of the wide screen is neither read nor written.
+  const narrow = useIsNarrowScreen();
+  const href = useRouterState({ select: (s) => s.location.href });
+  const [drawerAt, setDrawerAt] = useState<string | null>(null);
+  const drawerOpen = narrow && drawerAt === href;
+
   const { explorerOpen, explorerWidth } = layout.value;
+  const explorer = (
+    <nav id={explorerPanelId} aria-label={t("explorer.label")} className={styles["explorer"]}>
+      <Explorer projectId={projectId} />
+    </nav>
+  );
   return (
     <div
       className={styles["shell"]}
@@ -99,9 +124,11 @@ function ShellFrame({
       <TopBar
         projectId={projectId}
         projectName={projectName}
-        explorerOpen={explorerOpen}
+        narrow={narrow}
+        explorerOpen={narrow ? drawerOpen : explorerOpen}
         onToggleExplorer={() => {
-          layout.update((l) => ({ explorerOpen: !l.explorerOpen }));
+          if (narrow) setDrawerAt(drawerOpen ? null : href);
+          else layout.update((l) => ({ explorerOpen: !l.explorerOpen }));
         }}
         onPreferences={() => {
           setPreferences(true);
@@ -111,32 +138,45 @@ function ShellFrame({
         }}
       />
       <div className={styles["body"]}>
-        {explorerOpen && (
-          <>
-            <nav
-              id={explorerPanelId}
-              aria-label={t("explorer.label")}
-              className={styles["explorer"]}
-            >
-              <Explorer projectId={projectId} />
-            </nav>
-            <Splitter
-              label={t("shell.resizeExplorer")}
-              controls={explorerPanelId}
-              value={explorerWidth}
-              min={explorerBounds.min}
-              max={explorerBounds.max}
-              onChange={(width) => {
-                layout.update({ explorerWidth: width });
-              }}
-            />
-          </>
+        {narrow ? (
+          <Dialog.Root
+            open={drawerOpen}
+            onOpenChange={(open) => {
+              setDrawerAt(open ? href : null);
+            }}
+          >
+            <Dialog.Portal>
+              <Dialog.Overlay className={styles["drawerOverlay"]} />
+              <Dialog.Content className={styles["drawer"]} aria-describedby={undefined}>
+                <VisuallyHidden.Root asChild>
+                  <Dialog.Title>{t("explorer.label")}</Dialog.Title>
+                </VisuallyHidden.Root>
+                {explorer}
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        ) : (
+          explorerOpen && (
+            <>
+              {explorer}
+              <Splitter
+                label={t("shell.resizeExplorer")}
+                controls={explorerPanelId}
+                value={explorerWidth}
+                min={explorerBounds.min}
+                max={explorerBounds.max}
+                onChange={(width) => {
+                  layout.update({ explorerWidth: width });
+                }}
+              />
+            </>
+          )
         )}
         <main className={styles["main"]} id="main" data-scroll-restoration-id="main">
           <Outlet />
         </main>
       </div>
-      <StatusBar projectId={projectId} />
+      <StatusBar projectId={projectId} narrow={narrow} />
       <Notices />
       <PreferencesDialog open={preferences} onOpenChange={setPreferences} />
       <QuickSearch projectId={projectId} open={quickSearch} onOpenChange={setQuickSearch} />
@@ -147,6 +187,7 @@ function ShellFrame({
 function TopBar({
   projectId,
   projectName,
+  narrow,
   explorerOpen,
   onToggleExplorer,
   onPreferences,
@@ -154,6 +195,7 @@ function TopBar({
 }: {
   readonly projectId: ElementId;
   readonly projectName: string;
+  readonly narrow: boolean;
   readonly explorerOpen: boolean;
   readonly onToggleExplorer: () => void;
   readonly onPreferences: () => void;
@@ -186,58 +228,150 @@ function TopBar({
       <Link to="/p/$projectId" params={{ projectId }} className={styles["projectName"]}>
         {projectName}
       </Link>
-      <div className={styles["history"]}>
-        <button
-          type="button"
-          className={styles["iconButton"]}
-          aria-label={t("shell.back")}
-          onClick={() => {
-            router.history.back();
-          }}
-        >
-          <ArrowLeft aria-hidden size={18} />
-        </button>
-        <button
-          type="button"
-          className={styles["iconButton"]}
-          aria-label={t("shell.forward")}
-          onClick={() => {
-            router.history.forward();
-          }}
-        >
-          <ArrowRight aria-hidden size={18} />
-        </button>
-      </div>
-      <button type="button" className={styles["search"]} onClick={onSearch}>
-        <Search aria-hidden size={16} />
-        <span className={styles["searchText"]}>{t("shell.search")}</span>
-        {quickSearchKey !== "" && (
-          <kbd className={styles["kbd"]}>{formatCombo(quickSearchKey)}</kbd>
-        )}
-      </button>
-      <div className={styles["right"]}>
-        <PresenceAvatars />
-        <button
-          type="button"
-          className={styles["textButton"]}
-          onClick={onPreferences}
-          aria-label={t("shell.languageNamed", { language: i18n.language.toUpperCase() })}
-        >
-          {i18n.language.toUpperCase()}
-        </button>
-        <button
-          type="button"
-          className={styles["iconButton"]}
-          aria-label={t("shell.toggleTheme")}
-          onClick={() => {
-            setPreference(dark ? "light" : "dark");
-          }}
-        >
-          {dark ? <Sun aria-hidden size={18} /> : <Moon aria-hidden size={18} />}
-        </button>
-        <UserMenu />
-      </div>
+      {narrow ? (
+        // One line on a phone (F18.R2): search as an icon, the rest in the « More » menu.
+        <div className={styles["right"]}>
+          <button
+            type="button"
+            className={styles["iconButton"]}
+            aria-label={t("shell.searchShort")}
+            onClick={onSearch}
+          >
+            <Search aria-hidden size={18} />
+          </button>
+          <PresenceAvatars max={1} />
+          <MoreMenu
+            dark={dark}
+            onToggleTheme={() => {
+              setPreference(dark ? "light" : "dark");
+            }}
+            onPreferences={onPreferences}
+          />
+        </div>
+      ) : (
+        <>
+          <div className={styles["history"]}>
+            <button
+              type="button"
+              className={styles["iconButton"]}
+              aria-label={t("shell.back")}
+              onClick={() => {
+                router.history.back();
+              }}
+            >
+              <ArrowLeft aria-hidden size={18} />
+            </button>
+            <button
+              type="button"
+              className={styles["iconButton"]}
+              aria-label={t("shell.forward")}
+              onClick={() => {
+                router.history.forward();
+              }}
+            >
+              <ArrowRight aria-hidden size={18} />
+            </button>
+          </div>
+          <button type="button" className={styles["search"]} onClick={onSearch}>
+            <Search aria-hidden size={16} />
+            <span className={styles["searchText"]}>{t("shell.search")}</span>
+            {quickSearchKey !== "" && (
+              <kbd className={styles["kbd"]}>{formatCombo(quickSearchKey)}</kbd>
+            )}
+          </button>
+          <div className={styles["right"]}>
+            <PresenceAvatars />
+            <button
+              type="button"
+              className={styles["textButton"]}
+              onClick={onPreferences}
+              aria-label={t("shell.languageNamed", { language: i18n.language.toUpperCase() })}
+            >
+              {i18n.language.toUpperCase()}
+            </button>
+            <button
+              type="button"
+              className={styles["iconButton"]}
+              aria-label={t("shell.toggleTheme")}
+              onClick={() => {
+                setPreference(dark ? "light" : "dark");
+              }}
+            >
+              {dark ? <Sun aria-hidden size={18} /> : <Moon aria-hidden size={18} />}
+            </button>
+            <UserMenu />
+          </div>
+        </>
+      )}
     </header>
+  );
+}
+
+/** What the top bar of the narrow layout has no room for (F18.R2): history, preferences, theme, account. */
+function MoreMenu({
+  dark,
+  onToggleTheme,
+  onPreferences,
+}: {
+  readonly dark: boolean;
+  readonly onToggleTheme: () => void;
+  readonly onPreferences: () => void;
+}) {
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const info = useQuery(apiInfoQuery);
+  const me = useQuery(meQuery);
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button type="button" className={styles["iconButton"]} aria-label={t("shell.more")}>
+          <Ellipsis aria-hidden size={18} />
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content className={styles["menu"]} align="end" sideOffset={6}>
+          <DropdownMenu.Item
+            className={styles["menuItem"]}
+            onSelect={() => {
+              router.history.back();
+            }}
+          >
+            <ArrowLeft aria-hidden size={16} />
+            {t("shell.back")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            className={styles["menuItem"]}
+            onSelect={() => {
+              router.history.forward();
+            }}
+          >
+            <ArrowRight aria-hidden size={16} />
+            {t("shell.forward")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Separator className={styles["menuSeparator"]} />
+          <DropdownMenu.Item className={styles["menuItem"]} onSelect={onPreferences}>
+            <Settings aria-hidden size={16} />
+            {t("shell.preferences", { language: i18n.language.toUpperCase() })}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item className={styles["menuItem"]} onSelect={onToggleTheme}>
+            {dark ? <Sun aria-hidden size={16} /> : <Moon aria-hidden size={16} />}
+            {dark ? t("shell.lightTheme") : t("shell.darkTheme")}
+          </DropdownMenu.Item>
+          {info.data?.mode === "server" && me.isSuccess && (
+            <>
+              <DropdownMenu.Separator className={styles["menuSeparator"]} />
+              <DropdownMenu.Label className={styles["menuLabel"]}>
+                {t("auth.signedInAs", { name: me.data.name })}
+              </DropdownMenu.Label>
+              <DropdownMenu.Item className={styles["menuItem"]} onSelect={signOutAndReload}>
+                <LogOut aria-hidden size={16} />
+                {t("auth.logout")}
+              </DropdownMenu.Item>
+            </>
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }
 
@@ -273,7 +407,14 @@ function ConnectionStatus() {
   );
 }
 
-function StatusBar({ projectId }: { readonly projectId: ElementId }) {
+/** On a phone only the connection and the mode stay (F18.R2): counts and cursor have no room there. */
+function StatusBar({
+  projectId,
+  narrow,
+}: {
+  readonly projectId: ElementId;
+  readonly narrow: boolean;
+}) {
   const { t } = useTranslation();
   const tree = useQuery(treeQuery(projectId));
   const mode = useShellStore((s) => s.mode);
@@ -284,7 +425,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
   return (
     <footer className={styles["statusBar"]}>
       <ConnectionStatus />
-      {counts !== undefined && (
+      {counts !== undefined && !narrow && (
         <span>
           {[
             t("shell.status.pages", { count: counts.pages }),
@@ -294,7 +435,7 @@ function StatusBar({ projectId }: { readonly projectId: ElementId }) {
           ].join(" · ")}
         </span>
       )}
-      {cursor !== null && (
+      {cursor !== null && !narrow && (
         <span className={styles["cursor"]}>{t("shell.status.cursor", cursor)}</span>
       )}
       {mode === "edit" && validationErrors > 0 && (

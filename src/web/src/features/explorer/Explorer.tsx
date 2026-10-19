@@ -32,6 +32,7 @@ import { useUiState } from "../../shared/api/uiState";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
 import { roots } from "../../shared/ids/roots";
 import { KindBadge } from "../../shared/ui/KindBadge";
+import { useIsNarrowScreen } from "../../shared/ui/media";
 import { RecentViewedPanel } from "../recent/RecentViewedPanel";
 import { DeleteDialog } from "../trash/DeleteDialog";
 import styles from "./Explorer.module.css";
@@ -84,6 +85,8 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
   const state = useUiState<{ expanded: string[] }>(`tree-${projectId}`, { expanded: rootIds });
   const { update, create } = useTreeMutations(projectId);
   const canEdit = useCanEdit();
+  // In the drawer of a phone, opening a folder would close the drawer (F18.R1): a tap unfolds it instead.
+  const narrow = useIsNarrowScreen();
   // Members exist where accounts do: on a server, or for a project hosted by a connected one.
   const hosted = useQuery(apiInfoQuery).data?.folderProjects === false;
   const remote = useProjectServer(projectId) !== undefined;
@@ -440,7 +443,9 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
         onClick={() => {
           setFocusedId(node.id);
           treeRef.current?.focus();
-          if (node.id !== creatingId) open(node);
+          if (node.id === creatingId) return;
+          if (narrow && row.expandable && (isRoot || node.kind === "folder")) toggle(row);
+          else open(node);
         }}
         onDoubleClick={() => {
           if (canEdit && !isRoot) setEditing({ mode: "rename", id: node.id });

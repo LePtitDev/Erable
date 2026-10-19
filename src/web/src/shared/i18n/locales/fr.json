@@ -357,7 +357,12 @@
     "mode": {
       "read": "Lecture",
       "edit": "Édition"
-    }
+    },
+    "more": "Plus d’actions",
+    "preferences": "Préférences · {{language}}",
+    "darkTheme": "Thème sombre",
+    "lightTheme": "Thème clair",
+    "searchShort": "Rechercher"
   },
   "explorer": {
     "label": "Explorateur du projet",

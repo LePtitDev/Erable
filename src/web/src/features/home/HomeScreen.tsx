@@ -113,7 +113,7 @@ export function HomeScreen() {
             }}
           >
             <Settings aria-hidden size={18} />
-            {t("home.nav.preferences")}
+            <span className={styles["navLabel"]}>{t("home.nav.preferences")}</span>
           </button>
           <button
             type="button"
@@ -123,12 +123,12 @@ export function HomeScreen() {
             }}
           >
             <CircleQuestionMark aria-hidden size={18} />
-            {t("home.nav.help")}
+            <span className={styles["navLabel"]}>{t("home.nav.help")}</span>
           </button>
           {server && (
             <button type="button" className={styles["navItem"]} onClick={signOutAndReload}>
               <LogOut aria-hidden size={18} />
-              {t("auth.logout")}
+              <span className={styles["navLabel"]}>{t("auth.logout")}</span>
             </button>
           )}
         </div>

@@ -198,3 +198,63 @@
   background: var(--color-accent-soft);
   color: var(--color-accent-text);
 }
+
+/* Narrow layout (F18): the side bar becomes a header line, its secondary actions keep only their icon. */
+@media (width <= 720px) {
+  .aside {
+    flex: 1 1 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: none;
+    padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-3);
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .brand {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .footer {
+    flex-direction: row;
+    margin-top: 0;
+  }
+
+  .footer .navItem {
+    justify-content: center;
+    width: var(--size-bar);
+    padding: 0;
+  }
+
+  .navLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .main {
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+  }
+
+  .greeting {
+    font-size: var(--text-h2);
+  }
+}
+
+/* A dropped folder only exists with a mouse on a desktop (E2E-16-07). */
+@media (pointer: coarse) {
+  .dropZone {
+    display: none;
+  }
+}

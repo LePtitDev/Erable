@@ -357,7 +357,12 @@
     "mode": {
       "read": "Lectura",
       "edit": "Edición"
-    }
+    },
+    "more": "Más acciones",
+    "preferences": "Preferencias · {{language}}",
+    "darkTheme": "Tema oscuro",
+    "lightTheme": "Tema claro",
+    "searchShort": "Buscar"
   },
   "explorer": {
     "label": "Explorador del proyecto",

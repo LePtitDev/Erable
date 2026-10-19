@@ -1,11 +1,12 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HttpResponse } from "msw";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { requireElementId } from "../../shared/ids/elementId";
 import { roots } from "../../shared/ids/roots";
 import { http, server } from "../../test/msw";
 import { renderApp } from "../../test/render";
+import { narrowQuery } from "../../shared/ui/media";
 
 const projectId = requireElementId("CA0B0E5EC0A5D1E1");
 const lieux = requireElementId("8000000000000010");
@@ -188,6 +189,49 @@ describe("ProjectShell", () => {
     expect(separator).toHaveAttribute("aria-valuenow", "312");
     await waitFor(() => {
       expect(saved).toContainEqual(expect.objectContaining({ explorerWidth: 312 }));
+    });
+  });
+
+  describe("on a phone (F18.R1)", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("opens the explorer as a drawer that the next navigation closes, leaving the stored layout alone", async () => {
+      vi.stubGlobal("matchMedia", (query: string) => ({
+        matches: query === narrowQuery,
+        media: query,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      }));
+      const saved = mockProject({ explorerOpen: true, explorerWidth: 320, sidePanelOpen: true });
+      const user = userEvent.setup();
+      await renderApp(`/p/${projectId}/e/${lieux}`);
+
+      await screen.findByRole("heading", { level: 1, name: "Lieux" });
+      expect(screen.queryByRole("tree")).not.toBeInTheDocument();
+      expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: "Afficher l’explorateur" }));
+      const drawer = await screen.findByRole("dialog", { name: "Explorateur du projet" });
+      expect(drawer).toContainElement(screen.getByRole("tree"));
+
+      // A folder unfolds in the drawer instead of opening; a page opens.
+      const folder = await screen.findByRole("treeitem", { name: "Lieux" });
+      if (folder.getAttribute("aria-expanded") === "false") await user.click(folder);
+      expect(folder).toHaveAttribute("aria-expanded", "true");
+      expect(screen.getByRole("dialog", { name: "Explorateur du projet" })).toBeInTheDocument();
+      await user.click(await screen.findByRole("treeitem", { name: "Hautbois" }));
+      await waitFor(() => {
+        expect(
+          screen.queryByRole("dialog", { name: "Explorateur du projet" }),
+        ).not.toBeInTheDocument();
+      });
+      // The unfolded folders are saved as usual (the mock answers one value for every key); the layout of the wide
+      // screen keeps its values.
+      for (const value of saved) {
+        expect(value).toMatchObject({ explorerOpen: true, explorerWidth: 320 });
+      }
     });
   });
 });
