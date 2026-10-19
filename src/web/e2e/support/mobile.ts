@@ -65,10 +65,16 @@ export async function expectTouchTargets(page: Page, screen: string, minimum = 4
     return [...document.querySelectorAll(selector)]
       .filter((element) => visible(element) && element.closest("[aria-hidden=true]") === null)
       .map((element) => {
-        // A field wrapped in its label is reached through the whole label.
+        // A field wrapped in its label is reached through the whole label; a « stretched » link or button (an
+        // absolute ::after over its positioned ancestor, like the rows of the home screen) through that ancestor.
+        const stretchedOver =
+          element instanceof HTMLElement &&
+          getComputedStyle(element, "::after").position === "absolute"
+            ? element.offsetParent
+            : null;
         const target = element.matches("input, select, textarea")
           ? (element.closest("label") ?? element)
-          : element;
+          : (stretchedOver ?? element);
         const box = target.getBoundingClientRect();
         return {
           name:

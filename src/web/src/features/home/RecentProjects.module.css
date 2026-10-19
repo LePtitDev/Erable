@@ -315,15 +315,6 @@ a.name::after {
   color: var(--color-text-faint);
 }
 
-/* Touch screens (F18.R4). */
-@media (pointer: coarse) {
-  .name {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--size-touch);
-  }
-}
-
 /* Narrow layout (F18.R3): the name stays beside its initials, the badges and actions go to the next line. */
 @media (width <= 720px) {
   .filter {
