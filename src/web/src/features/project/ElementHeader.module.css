@@ -49,3 +49,20 @@
   color: var(--color-text-muted);
   font-size: var(--text-md);
 }
+
+/* Narrow layout (F18.R3): the title takes the whole width, the actions go under it. */
+@media (width <= 720px) {
+  .titleRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .title {
+    font-size: var(--text-display);
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+}

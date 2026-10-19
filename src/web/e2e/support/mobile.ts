@@ -1,28 +1,42 @@
 import { expect, type Page } from "@playwright/test";
 
-/** F18.R3: the document is never wider than the screen; wide blocks scroll inside their own frame. */
+/**
+ * F18.R3: the document is never wider than the screen, and nothing scrolls sideways (the work area included) except
+ * the wide blocks meant to: those carry `data-scroll-x` (tables, code, diff…). CodeMirror's own scroller counts as
+ * one. Hidden overflow is reported too when it cuts content off at the right edge of the screen. Soft assertions: one
+ * run lists every screen at fault.
+ */
 export async function expectNoHorizontalScroll(page: Page, screen: string): Promise<void> {
   const overflow = await page.evaluate(() => {
     const width = document.documentElement.clientWidth;
-    const culprits = [...document.querySelectorAll<HTMLElement>("body *")]
-      .filter((element) => {
-        const box = element.getBoundingClientRect();
-        if (box.width === 0 || box.right <= width + 1) return false;
-        // Inside a frame that scrolls on its own (table, code, diff), or clipped by an ancestor: not the page's.
-        for (let parent = element.parentElement; parent !== null; parent = parent.parentElement) {
-          const style = getComputedStyle(parent);
-          if (style.overflowX !== "visible" && parent.getBoundingClientRect().right <= width + 1) {
-            return false;
-          }
-        }
-        return true;
-      })
-      .slice(0, 5)
-      .map((element) => `${element.tagName.toLowerCase()}.${element.className}`);
-    return { scrollWidth: document.documentElement.scrollWidth, width, culprits };
+    const describe = (element: Element) =>
+      `${element.tagName.toLowerCase()}.${element.getAttribute("class") ?? ""}`;
+    const allowed = (element: Element) => element.closest("[data-scroll-x], .cm-scroller") !== null;
+    const scrolling = [...document.querySelectorAll<HTMLElement>("body *")].filter((element) => {
+      if (allowed(element)) return false;
+      const style = getComputedStyle(element);
+      return (
+        (style.overflowX === "auto" || style.overflowX === "scroll") &&
+        element.scrollWidth > element.clientWidth + 1
+      );
+    });
+    const outside = [...document.querySelectorAll<HTMLElement>("body *")].filter((element) => {
+      if (allowed(element)) return false;
+      const box = element.getBoundingClientRect();
+      return box.width > 0 && box.height > 0 && box.right > width + 1 && box.left < width;
+    });
+    return {
+      scrollWidth: document.documentElement.scrollWidth,
+      width,
+      scrolling: scrolling.slice(0, 5).map(describe),
+      outside: outside.slice(0, 5).map(describe),
+    };
   });
-  expect(overflow.culprits, `${screen}: elements wider than the screen`).toEqual([]);
-  expect(overflow.scrollWidth, `${screen}: document width`).toBeLessThanOrEqual(overflow.width);
+  expect.soft(overflow.scrolling, `${screen}: frames scrolling sideways`).toEqual([]);
+  expect.soft(overflow.outside, `${screen}: elements past the right edge`).toEqual([]);
+  expect
+    .soft(overflow.scrollWidth, `${screen}: document width`)
+    .toBeLessThanOrEqual(overflow.width);
 }
 
 /**

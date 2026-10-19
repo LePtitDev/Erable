@@ -21,7 +21,12 @@ export const screens: readonly Screen[] = [
     name: "page-read",
     async open(page, reference) {
       await page.goto(reference.url(chroniques.ilsa));
-      await expect(page.getByRole("navigation", { name: t("page.toc") })).toBeVisible();
+      // On a phone the table of contents is folded in the page panel (F18).
+      await expect(
+        page
+          .getByRole("navigation", { name: t("page.toc") })
+          .or(page.getByRole("button", { name: t("page.sidePanel") })),
+      ).toBeVisible();
     },
   },
   {

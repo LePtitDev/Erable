@@ -2,9 +2,12 @@ import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
 import { LoginPage } from "../pages/LoginPage";
 import { PageViewPage } from "../pages/PageViewPage";
+import { PagePropertiesPanel } from "../pages/PagePropertiesPanel";
 import { PreferencesDialog } from "../pages/PreferencesDialog";
 import { TreePanel } from "../pages/TreePanel";
 import { t } from "../support/i18n";
+import { expectNoHorizontalScroll } from "../support/mobile";
+import { screens } from "../support/screens";
 
 interface Manifest {
   name: string;
@@ -42,6 +45,73 @@ test.describe("F18 · Mobile version", () => {
       "aria-valuenow",
       "280",
     );
+  });
+
+  test("E2E-18-02 · No horizontal scrolling @mobile", async ({ page, reference }) => {
+    // The six screens of the mockup, then the others.
+    for (const screen of screens) {
+      await screen.open(page, reference);
+      await expectNoHorizontalScroll(page, screen.name);
+    }
+    const others = [
+      { name: "trash", url: `/p/${reference.id}/trash` },
+      { name: "history", url: `/p/${reference.id}/e/${chroniques.ilsa}/history` },
+      { name: "members", url: `/p/${reference.id}/members` },
+      { name: "folder", url: `/p/${reference.id}/e/0000000000000001` },
+    ];
+    for (const other of others) {
+      await page.goto(other.url);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await expectNoHorizontalScroll(page, other.name);
+    }
+    // Signed out: the login screen.
+    await page.context().clearCookies();
+    await page.goto("/");
+    await expect(new LoginPage(page).form).toBeVisible();
+    await expectNoHorizontalScroll(page, "login");
+  });
+
+  test("E2E-18-03 · Read a page on a phone @mobile @pr", async ({ page, reference }) => {
+    const view = new PageViewPage(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(view.title).toHaveText("Ilsa Varenne");
+
+    // Title, categories and the start of the text without scrolling.
+    const height = page.viewportSize()?.height ?? 0;
+    for (const visible of [view.title, new PagePropertiesPanel(page).categories, view.content]) {
+      await expect(visible).toBeInViewport();
+    }
+    expect((await view.title.boundingBox())?.y ?? height).toBeLessThan(height);
+    // Cut between words: every word of the title sits on one line.
+    const splitWords = await view.title.evaluate((title) => {
+      const text = title.firstChild;
+      if (text === null) return [];
+      const content = text.textContent ?? "";
+      const split: string[] = [];
+      let start = 0;
+      for (const word of content.split(" ")) {
+        const range = document.createRange();
+        range.setStart(text, start);
+        range.setEnd(text, start + word.length);
+        const lines = new Set([...range.getClientRects()].map((r) => Math.round(r.top)));
+        if (lines.size > 1) split.push(word);
+        start += word.length + 1;
+      }
+      return split;
+    });
+    expect(splitWords).toEqual([]);
+
+    // The page panel, folded above the content.
+    const panel = page.getByRole("button", { name: t("page.sidePanel") });
+    await expect(panel).toHaveAttribute("aria-expanded", "false");
+    await panel.tap();
+    const side = page.getByRole("complementary", { name: t("page.sidePanel") });
+    await expect(side).toContainText(t("page.via", { categories: "PNJ" }));
+    await expect(side).toContainText("Allié de");
+    await expect(side.getByRole("link", { name: "Capitaine Orsen" }).first()).toBeVisible();
+
+    await view.link("Hautbois").tap();
+    await expect(view.title).toHaveText("Hautbois");
   });
 
   test("E2E-18-09 · Preferences and account from the More menu @mobile", async ({

@@ -22,7 +22,9 @@
   font-weight: var(--weight-semibold);
   line-height: 1.1;
   letter-spacing: var(--tracking-tight);
-  overflow-wrap: anywhere;
+
+  /* Between words first: « anywhere » lets the actions squeeze the title letter by letter (F18.R3). */
+  overflow-wrap: break-word;
 }
 
 .iconButton {
@@ -356,4 +358,14 @@
 .fileAction:hover {
   background: var(--color-hover);
   color: var(--color-text);
+}
+
+@media (width <= 720px) {
+  .page {
+    padding-top: var(--space-6);
+  }
+
+  .title {
+    font-size: var(--text-display);
+  }
 }

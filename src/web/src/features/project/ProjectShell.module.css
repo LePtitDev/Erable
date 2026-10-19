@@ -1,6 +1,9 @@
 .shell {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+
+  /* Never wider than the window: a wide child (editor, table) scrolls in its own frame (F18.R3). */
+  grid-template-columns: minmax(0, 1fr);
   height: 100dvh;
 
   /* Notches and gesture bars once the page covers the whole screen (viewport-fit=cover, F18). */

@@ -115,7 +115,7 @@ function render(node: RootContent, context: RenderContext, state: RenderState): 
       const [head, ...body] = node.children;
       const align = (i: number) => node.align?.[i] ?? undefined;
       return (
-        <div className={styles["tableWrap"]}>
+        <div className={styles["tableWrap"]} data-scroll-x>
           <table>
             {head !== undefined && (
               <thead>
@@ -145,7 +145,7 @@ function render(node: RootContent, context: RenderContext, state: RenderState): 
     }
     case "code":
       return (
-        <pre className={styles["code"]}>
+        <pre className={styles["code"]} data-scroll-x>
           <code>{node.value}</code>
         </pre>
       );

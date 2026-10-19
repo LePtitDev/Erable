@@ -110,3 +110,13 @@
   color: var(--color-text);
   font: inherit;
 }
+
+@media (width <= 720px) {
+  .view {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+
+  .header {
+    flex-wrap: wrap;
+  }
+}

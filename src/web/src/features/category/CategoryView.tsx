@@ -429,7 +429,7 @@ function PropertyTable({
       {rows.length === 0 ? (
         <p className={styles["muted"]}>{t("category.noProperties")}</p>
       ) : (
-        <div className={styles["tableWrap"]}>
+        <div className={styles["tableWrap"]} data-scroll-x>
           <table className={styles["table"]}>
             <thead>
               <tr>
