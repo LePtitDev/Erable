@@ -163,6 +163,7 @@ Contre un **vrai backend** en mode serveur, lancé sur un projet « Chroniques d
 - **Chromium** : moteur du WebView2 (Windows) et des navigateurs web majoritaires.
 - **WebKit** : le plus proche de WKWebView (macOS) et de WebKitGTK (Linux), utilisés par Photino. C'est notre meilleur filet pour le risque identifié en §A-10.
 - Firefox : nightly seulement (usage web).
+- **Mobile** (M6, F18) : projet Playwright `mobile`, téléphone émulé (Chromium, profil Pixel 7 : 412 px, tactile, pointeur grossier), qui exécute **seulement** les scénarios `@mobile` ; ceux marqués `@pr` tournent à chaque PR. Les autres projets les excluent. Le moteur du WebView Android est Chromium : ce projet couvre aussi l'app Android, dont le shell natif est vérifié à part (§T-10.1).
 
 ### 9.2 Parcours couverts
 
@@ -207,6 +208,10 @@ Playwright ne pilote pas tous les WebViews natifs ; on combine donc deux approch
 - **Budget de démarrage** (E2E-16-01) : 3 s. Les runners partagés de la CI (rendu logiciel, Xvfb, disques froids) mesurent 3,3 à 3,6 s : les jobs desktop de `pr.yml` et `nightly.yml` fixent `ERABLE_STARTUP_BUDGET_MS=10000`, lu par `--self-test` comme par l'e2e Windows. La mesure figure toujours dans le rapport (`startup-budget`), pour suivre l'écart au budget de 3 s.
 
 ---
+
+### 10.1 Application Android
+
+Le shell (`src/Erable.Android`, décision Q11) n'a presque pas de logique : normalisation des adresses, compatibilité de version, politique de navigation. Elle vit dans des classes sans dépendance Android, compilées aussi par `tests/Erable.Android.Tests` (xUnit, dans `Erable.sln`). L'APK est construit par la CI de release ; le parcours sur appareil suit la liste de contrôle de `docs/release.md` (pas d'émulateur dans la CI).
 
 ## 11. Performance
 
@@ -310,5 +315,6 @@ Une fonctionnalité est livrable quand :
 | **M3** | Générateur de gros projets, budgets de performance, BenchmarkDotNet, e2e Recherche |
 | **M4** | Matrice d'autorisation, tests de concurrence et SignalR, e2e multi-utilisateur, NBomber, crash tests |
 | **M5** | Visuel + axe-core + pseudo-locale, pipeline release, Stryker et fuzzing hebdomadaires |
+| **M6** | Projet Playwright `mobile`, tests du shell Android, construction de l'APK en release |
 
 L'investissement est concentré sur **M0 et M1**. Une fois l'outillage et les conventions en place, ajouter des tests ne coûte presque rien. Les rajouter après coup à du code non conçu pour être testé coûte beaucoup plus.

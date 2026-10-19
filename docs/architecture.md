@@ -47,6 +47,7 @@ flowchart LR
 | **Desktop connecté** | SPA embarquée dans l'app | Serveur distant, **via le backend local** (Q9) | Compte serveur (jeton bearer, gardé par le backend) |
 | **Web** | Le serveur (ou un hébergement statique) | Serveur | Compte serveur (cookie httpOnly) |
 | **Serveur ad hoc** | `erable serve ./MonWiki --port 5080` | idem | Comptes locaux |
+| **Mobile** (navigateur ou app Android, Q11) | Le serveur, chargé dans le navigateur ou le WebView de l'app | Serveur | Compte serveur (cookie httpOnly, comme le web) |
 
 Le dernier mode est gratuit : c'est le même exécutable. Il permet à quelqu'un de partager un projet local sur le LAN sans Docker.
 
@@ -98,7 +99,7 @@ Erable/
 
 **Aucun état durable dans le navigateur** (décision Q7). En desktop, le port aléatoire change l'origine de la SPA à chaque lancement : `localStorage` et IndexedDB y sont perdus. Brouillons, état de l'arbre et préférences passent donc par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur.
 
-**Mobile plus tard.** Règles à respecter dès maintenant : pas d'API desktop dans la SPA, layout en grille dont les panneaux latéraux peuvent se replier, cibles cliquables ≥ 32 px, raccourcis clavier toujours doublés d'une action à la souris. Le premier « mobile » sera la SPA en PWA sur un serveur.
+**Mobile (M6, F18, décision Q11).** Une seule SPA : sous 720 px de large, la **mise en page étroite** empile ce que le bureau met côte à côte (explorateur en tiroir, panneau de la page en onglet, dialogues plein écran) ; avec un pointeur grossier (`pointer: coarse`), les cibles offrent 44 px et chaque action du survol ou du clic droit a un bouton. Le seuil vit dans un seul module (`shared/ui/media.ts`) et dans les `@media` des CSS Modules (les variables CSS ne s'utilisent pas dans une media query). La SPA servie par un serveur est installable (manifeste, sans service worker : pas de mode hors ligne). Règles inchangées : pas d'API desktop dans la SPA, raccourcis clavier toujours doublés d'une action à la souris ou au toucher.
 
 ---
 
@@ -400,7 +401,8 @@ Pour éviter les alertes « application non reconnue », il faut un compte Apple
 | **M3 — Retrouver** | FTS5, recherche Ctrl+K, page de filtres, récemment consultées / modifiées, historique et restauration | Écran Recherche conforme au mockup |
 | **M4 — Serveur** | Comptes, rôles, multi-projets, SignalR (événements, présence), concurrence optimiste + fusion, Docker, mode desktop connecté | Deux utilisateurs éditent le même projet sans perte de données |
 | **M5 — Finition** | i18n complète, accessibilité, raccourcis configurables, Velopack + mises à jour, sauvegarde Litestream documentée | Version 1.0 distribuable |
-| **v2 et après** | Co-édition CRDT, PWA mobile, OIDC, stockage S3 | — |
+| **M6 — Mobile** | SPA adaptée aux téléphones (F18), manifeste, app Android cliente des serveurs (F19), APK signé dans la release | Les parcours `@mobile` passent sur un téléphone émulé ; l'APK de la release ouvre un serveur et édite une page |
+| **v2 et après** | Co-édition CRDT, OIDC, stockage S3, projets locaux sur mobile | — |
 
 ---
 
@@ -416,3 +418,4 @@ Pour éviter les alertes « application non reconnue », il faut un compte Apple
 - **Q8.** Comptes et accès du mode serveur (M4-01). Mots de passe hachés par le hacheur d'ASP.NET Core Identity (sans EF Core ni schéma de cookie Identity) ; sessions opaques révocables, stockées par empreinte dans `data/server.db` (cookie `HttpOnly` `SameSite=Strict` + contrôle de `Origin`, ou jeton bearer pour le desktop connecté). Un non-membre reçoit **404** (aucune différence avec un projet inexistant), un membre au rôle insuffisant **403**. Chaque endpoint déclare sa règle d'accès (`AccessRule`) ; sans règle il est refusé. Les chemins de la machine (créer ou ouvrir un dossier) sont réservés au desktop.
 - **Q9.** Le desktop connecté parle au serveur **par son propre backend** (M4-07) : la SPA n'appelle jamais le serveur directement ; le backend du bureau reconnaît les projets d'un serveur et transmet les requêtes (et le hub SignalR) avec le jeton bearer, conservé dans le coffre du système (DPAPI, Keychain, libsecret, sinon mémoire). Le jeton n'atteint pas le JavaScript, les médias authentifiés fonctionnent et le CORS n'est pas requis (il reste disponible pour une SPA tierce, M4-06). Alternative écartée : appels directs de la SPA au serveur (jeton en mémoire de la page, pas de médias authentifiés).
 - **Q10.** Limites de sécurité du Markdown (M5-04, docs/markdown-syntax.md §6) : taille, longueur de ligne, répétitions, imbrication et longueur de paragraphe sont bornées par un pré-balayage linéaire, refusé en 422 à l'enregistrement (Core) et prévenu côté client ; une page existante qui les dépasse est affichée en texte brut. Elles bloquent, contrairement aux règles de propriétés (§A-5.4), car ce sont des garde-fous contre la saturation et non des règles métier. Alternative écartée : corriger Markdig et remark.
+- **Q11.** Mobile (M6) : **l'app Android est un client des serveurs Erable**, écrite en **.NET for Android** (C#, comme le reste). Elle garde une liste de serveurs, vérifie `GET /api/info` avant d'en ajouter un, puis ouvre la SPA **servie par le serveur** dans un WebView restreint à son origine : authentification par le cookie du web, pas de CORS, rien à embarquer de la SPA ni du backend. Le projet `src/Erable.Android` est hors d'`Erable.sln` (le workload `android` n'est pas exigé pour le reste) ; sa logique pure est testée par `tests/Erable.Android.Tests`, qui compile ses sources. Distribution : APK signé joint à la release GitHub (Play Store plus tard). Alternatives écartées : projets locaux sur le téléphone (ASP.NET Core n'est pas pris en charge sur Android), Capacitor (la SPA embarquée appellerait le serveur en cross-origin, contraire à Q9), Kotlin (second langage et Gradle, pour un APK plus léger).

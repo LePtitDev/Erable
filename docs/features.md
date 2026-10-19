@@ -34,6 +34,7 @@ Alors        la palette s'ouvre avec « Capitaine Orsen » en premier
 | `@multi` | nécessite plusieurs contextes navigateur (plusieurs utilisateurs) |
 | `@server` | nécessite le mode serveur (authentification) |
 | `@desktop` | rejoué dans le binaire desktop (§T-10) |
+| `@mobile` | exécuté dans le projet Playwright `mobile` (téléphone émulé, écran tactile, §T-9.1) ; avec `@pr`, à chaque PR |
 | `@a11y` | parcours au clavier uniquement, et contrôle axe-core |
 
 - **Jalon** : jalon à partir duquel le scénario doit passer (§A-12).
@@ -161,6 +162,8 @@ Les mots de passe de test sont dans `spec/projects/users.json`, propre à l'envi
 | F15 | Préférences : langue, thème, raccourcis | Accueil | M1 → M5 |
 | F16 | Application desktop | Accueil | M0 → M5 |
 | F17 | Accessibilité et clavier | toutes | M1 → M5 |
+| F18 | Version mobile (web) | toutes | M6 |
+| F19 | Application Android | — | M6 |
 
 ---
 
@@ -954,6 +957,100 @@ Alors        chaque écran du mockup, en clair et en sombre, ne présente aucune
 
 ---
 
+## F18 — Version mobile (web)
+
+La même SPA, adaptée aux téléphones : pas de seconde interface. La **mise en page étroite** s'applique sous 720 px de large ; les règles tactiles s'appliquent dès que le pointeur principal est grossier (`pointer: coarse`), quelle que soit la largeur. Le mockup ne décrit que le bureau : la mise en page mobile reprend ses composants, ses tokens et ses écrans, empilés (§A-3.1).
+
+**Règles**
+- **F18.R1** En mise en page étroite, l'explorateur devient un **tiroir** superposé au contenu : fermé à l'ouverture d'un écran, refermé après chaque navigation, par Échap, en touchant le fond ou par son bouton ; le focus y est piégé tant qu'il est ouvert. L'état « ouvert » et la largeur du panneau du bureau ne sont ni lus ni modifiés.
+- **F18.R2** La barre supérieure tient sur une ligne : accueil, explorateur, nom du projet, recherche (icône), menu « Plus » qui regroupe précédent / suivant, langue, thème, préférences et compte. La barre d'état se réduit à l'état de connexion et au mode.
+- **F18.R3** **Aucun défilement horizontal** de l'écran à 360 px de large, sur tous les écrans : seuls les blocs larges (tableaux, code, comparaison de révisions, grilles) défilent dans leur propre cadre. Le texte se coupe entre les mots, jamais au milieu (sauf ID et URL trop longs).
+- **F18.R4** Avec un pointeur grossier, toute cible interactive offre une zone de toucher d'au moins **44 × 44 px**, et aucune action n'est accessible seulement au survol ou au clic droit : les éléments de l'arbre et les lignes de liste ont un bouton « … » qui ouvre le même menu que le clic droit (un appui long l'ouvre aussi).
+- **F18.R5** Un élément de l'arbre se **déplace sans glisser-déposer** : l'action « Déplacer vers… » de son menu propose les destinations valides (même racine, pas sous lui-même) et produit le même déplacement que le glisser-déposer (F02).
+- **F18.R6** L'édition reste complète : la barre d'outils défile horizontalement, « Annuler » et « Enregistrer » restent visibles quand le clavier virtuel est ouvert, et le panneau de la page (propriétés, catégories, liens) passe sous un onglet au-dessus de l'éditeur au lieu de la colonne latérale. La palette d'insertion tient dans l'écran au-dessus du clavier.
+- **F18.R7** En mise en page étroite, les boîtes de dialogue et la recherche rapide occupent tout l'écran ; les filtres de l'écran Recherche s'ouvrent dans un panneau dédié.
+- **F18.R8** La SPA servie par un serveur est **installable** comme application web : manifeste (nom, icônes, couleur de thème, `display: standalone`, `start_url` à la racine). Pas de mode hors ligne ni de service worker, et toujours aucun état durable dans le navigateur (décision Q7).
+
+```gherkin
+E2E-18-01 · Explorateur en tiroir                             P0 · @mobile @pr · M6
+Étant donné  la page « Ilsa Varenne » ouverte sur un téléphone
+Alors        l'explorateur est masqué et la page occupe toute la largeur
+Quand        j'ouvre l'explorateur et touche « Hautbois »
+Alors        la page « Hautbois » s'affiche et le tiroir est refermé
+Et           sur un écran large, l'explorateur est toujours ouvert à sa largeur d'avant
+
+E2E-18-02 · Aucun défilement horizontal                       P1 · @mobile · M6
+Quand        je parcours l'accueil, une page en lecture et en édition, une catégorie, une propriété, la recherche, la corbeille, l'historique et les membres
+Alors        la largeur du document ne dépasse jamais celle de l'écran
+
+E2E-18-03 · Lire une page sur un téléphone                    P1 · @mobile @pr · M6
+Étant donné  la page « Ilsa Varenne » ouverte sur un téléphone
+Alors        le titre, les catégories et le début du texte sont visibles sans défiler, le titre coupé entre les mots
+Quand        je déplie « Panneau de la page »
+Alors        je vois « Hostile » hérité « via PNJ » et le lien « Allié de » vers « Capitaine Orsen »
+Quand        je touche le lien « Hautbois » du texte
+Alors        la page « Hautbois » s'affiche
+
+E2E-18-04 · Modifier et enregistrer une page                  P0 · @mobile @pr · M6
+Étant donné  la page « Ilsa Varenne » ouverte sur un téléphone
+Quand        je touche « Modifier », tape « [[orse » puis touche « Capitaine Orsen » dans la palette
+Et           je touche « Enregistrer »
+Alors        la page est en lecture et contient un lien vers « Capitaine Orsen »
+
+E2E-18-05 · Propriétés en édition sur un téléphone            P1 · @mobile · M6
+Étant donné  la page « Ilsa Varenne » en édition sur un téléphone
+Quand        j'ouvre l'onglet du panneau de la page et saisis « 50 » dans « Niveau » (72, hors règle)
+Alors        l'avertissement « Doit être inférieur ou égal à 60 » disparaît
+Quand        je touche « Enregistrer »
+Alors        la page en lecture affiche « Niveau » 50
+
+E2E-18-06 · Rechercher sur un téléphone                       P1 · @mobile @pr · M6
+Quand        je touche la recherche et tape « givre »
+Alors        la recherche rapide occupe l'écran et propose « Ordre du Givre »
+Quand        j'ouvre l'écran Recherche et le panneau des filtres, puis choisis la catégorie « PNJ »
+Alors        les résultats se limitent aux PNJ et le panneau se referme
+
+E2E-18-07 · Menu d'un élément sans clic droit                 P1 · @mobile · M6
+Quand        je touche le bouton « … » de « Hautbois » dans l'explorateur puis « Renommer »
+Et           je saisis « Hautbois-sur-Givre » et valide
+Alors        l'élément est renommé dans l'arbre et dans les références qui le citent
+
+E2E-18-08 · Déplacer un élément sans glisser-déposer          P1 · @mobile @pr · M6
+Quand        je choisis « Déplacer vers… » dans le menu de « Capitaine Orsen » puis le dossier « Lieux »
+Alors        « Capitaine Orsen » est rangé dans « Lieux » et ses références sont intactes
+Et           le menu de « Personnages » ne propose ni lui-même, ni « PNJ » (son descendant), ni une destination hors de Pages
+
+E2E-18-09 · Préférences et compte depuis le menu « Plus »     P2 · @mobile · M6
+Quand        j'ouvre le menu « Plus » de la barre supérieure
+Alors        je peux changer la langue et le thème, revenir en arrière et me déconnecter
+
+E2E-18-10 · Cibles tactiles                                   P1 · @mobile · M6
+Quand        j'affiche l'accueil, une page, l'édition et l'explorateur sur un téléphone
+Alors        chaque bouton, lien de navigation et champ visible offre une zone de toucher d'au moins 44 × 44 px
+
+E2E-18-11 · Application web installable                       P2 · @mobile · M6
+Alors        la SPA déclare un manifeste valide (nom, icônes 192 et 512 px accessibles, `display: standalone`) et une couleur de thème
+```
+
+---
+
+## F19 — Application Android
+
+Un client des serveurs Erable (décision Q11) : l'application ne contient ni backend ni projet. Elle garde une liste de serveurs et ouvre la SPA du serveur choisi dans un WebView ; l'authentification est celle du web (cookie du serveur).
+
+**Règles**
+- **F19.R1** L'utilisateur ajoute un serveur par son adresse. L'adresse est normalisée (schéma `https` par défaut, hôte en minuscules, pas de chemin de requête ni de fragment, barre finale retirée) et vérifiée par `GET /api/info` **avant** l'enregistrement : il faut `mode: "server"` et une version d'API prise en charge ; sinon un message indique la cause (injoignable, pas un serveur Erable, version incompatible avec les versions en présence, comme F16.R4).
+- **F19.R2** Le WebView ne navigue que dans l'origine du serveur ouvert : tout autre lien s'ouvre dans le navigateur du système ; `file:`, `content:` et `javascript:` sont refusés.
+- **F19.R3** HTTP en clair est accepté (serveur sur le réseau local) mais signalé dans la liste des serveurs ; HTTPS est proposé par défaut.
+- **F19.R4** Le bouton retour d'Android remonte l'historique du WebView, puis revient à la liste des serveurs.
+- **F19.R5** Les pièces jointes s'envoient par le sélecteur de fichiers d'Android et se téléchargent par le gestionnaire de téléchargements, avec la session de l'utilisateur.
+- **F19.R6** La session survit au redémarrage de l'application ; « Oublier ce serveur » le retire de la liste et efface ses cookies.
+- **F19.R7** L'interface native (liste, ajout, erreurs) suit la langue du système parmi `fr`, `en`, `de`, `es` (anglais sinon) ; la SPA garde la langue des préférences de l'utilisateur.
+
+**Vérification.** La normalisation, la compatibilité de version et la politique de navigation sont testées en xUnit (`tests/Erable.Android.Tests`). Le parcours sur appareil (ajout, connexion, lecture, édition, envoi et téléchargement d'une pièce jointe, retour, oubli) est une liste de contrôle manuelle de `docs/release.md`, faute d'émulateur dans la CI : pas de scénario `E2E-19-*` automatisé.
+
+---
+
 ## 4. Synthèse
 
 ### 4.1 Volume par jalon
@@ -966,6 +1063,7 @@ Alors        chaque écran du mockup, en clair et en sombre, ne présente aucune
 | M3 | F10, F11, F13 | 101 | 44 |
 | M4 | F14, plus E2E-01-06, 11-03, 16-06 | 114 | 52 |
 | M5 | E2E-05-07, 15-04, 17-04 | 117 | 53 |
+| M6 | F18 (F19 sans scénario automatisé) | 128 | 55 |
 
 Le pipeline PR exécute les 62 scénarios `@pr` (un peu plus de la moitié) ; le reste tourne la nuit (§T-13).
 
