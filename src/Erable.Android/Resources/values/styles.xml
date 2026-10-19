@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Light by default, dark with the system (values-night): the WebView then reports prefers-color-scheme to the SPA. -->
+  <style name="ErableTheme" parent="@android:style/Theme.DeviceDefault.Light">
+    <item name="android:colorPrimary">@color/accent</item>
+    <item name="android:colorAccent">@color/accent</item>
+  </style>
+
+  <style name="ErableTheme.Web" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar" />
+
+  <color name="accent">#2c6a55</color>
+  <color name="launcher_background">#2c6a55</color>
+</resources>

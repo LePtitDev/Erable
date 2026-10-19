@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Default (English): any language without its own folder. The reference wording is values-fr (CLAUDE.md §2). -->
+<resources>
+  <string name="app_name" translatable="false">Erable</string>
+  <string name="servers_title">Servers</string>
+  <string name="servers_empty">Add the address of an Erable server to read and edit its wikis.</string>
+  <string name="servers_add">Add a server</string>
+  <string name="add_title">Add a server</string>
+  <string name="add_hint">wiki.example.org</string>
+  <string name="add_help">The address your administrator gave you. Plain http:// works for a server of your local network.</string>
+  <string name="add_action">Add</string>
+  <string name="add_checking">Checking…</string>
+  <string name="cancel">Cancel</string>
+  <string name="forget_title">Forget %1$s?</string>
+  <string name="forget_message">The server leaves the list and its session ends on this phone. Nothing is deleted on the server.</string>
+  <string name="forget_action">Forget</string>
+  <string name="server_version">Erable %1$s</string>
+  <string name="cleartext">Not encrypted (http)</string>
+  <string name="error_invalid">This is not the address of a server, e.g. https://wiki.example.org.</string>
+  <string name="error_unreachable">The server cannot be reached. Check the address and your connection.</string>
+  <string name="error_not_erable">This address does not answer as an Erable server.</string>
+  <string name="error_not_server">This is an Erable desktop application, not a server.</string>
+  <string name="open_external_failed">No application can open this link.</string>
+  <string name="download_started">Download started: %1$s</string>
+  <string name="web_error">The page could not be loaded: %1$s</string>
+</resources>

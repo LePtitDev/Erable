@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Erable.Core;
 using Erable.Core.Accounts;
+using Erable.Core.Servers;
 using Erable.Server.Api;
 
 namespace Erable.Server.Servers;
@@ -33,7 +34,7 @@ public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets,
     public const string Unreachable = "server.unreachable";
     public const string NotErable = "server.notErable";
     public const string Incompatible = "server.incompatible";
-    public const string InvalidUrl = "server.invalidUrl";
+    public const string InvalidUrl = ServerAddress.InvalidUrl;
 
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
@@ -56,21 +57,7 @@ public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets,
     public bool TokensSurviveRestart => secrets.IsPersistent;
 
     /// <summary>The origin of an address typed by a person (<c>https://wiki.example.org/</c> → <c>https://wiki.example.org</c>).</summary>
-    public static Result<string> Normalize(string? address)
-    {
-        var text = address?.Trim() ?? string.Empty;
-        if (text.Length > 0 && !text.Contains("://", StringComparison.Ordinal))
-        {
-            text = "https://" + text;
-        }
-
-        return Uri.TryCreate(text, UriKind.Absolute, out var uri)
-            && uri.Scheme is "http" or "https"
-            && uri.UserInfo.Length == 0
-            && uri.Host.Length > 0
-            ? uri.GetLeftPart(UriPartial.Authority)
-            : new DomainError(InvalidUrl, "Give the address of the server, e.g. https://wiki.example.org.");
-    }
+    public static Result<string> Normalize(string? address) => ServerAddress.Normalize(address);
 
     /// <summary><c>GET /api/info</c> and nothing else: the first and, for an incompatible server, the only request (F16.R4).</summary>
     public async Task<Result<ServerProbe>> ProbeAsync(string? address, CancellationToken cancellationToken)
@@ -81,7 +68,7 @@ public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets,
             return url.Error;
         }
 
-        Handshake? info;
+        ServerHandshake? info;
         try
         {
             using var response = await Http.GetAsync(new Uri(url.Value + "/api/info"), cancellationToken).ConfigureAwait(false);
@@ -93,14 +80,7 @@ public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets,
             // Read by hand: a newer server may add or change fields (a mode this version does not know…).
             using var document = await JsonDocument.ParseAsync(
                 await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false), cancellationToken: cancellationToken).ConfigureAwait(false);
-            var root = document.RootElement;
-            info = root.ValueKind == JsonValueKind.Object
-                && root.TryGetProperty("apiVersion", out var api) && api.ValueKind == JsonValueKind.String
-                ? new Handshake(
-                    root.TryGetProperty("appVersion", out var app) && app.ValueKind == JsonValueKind.String ? app.GetString()! : "?",
-                    api.GetString()!,
-                    root.TryGetProperty("formatVersion", out var format) && format.TryGetInt32(out var number) ? number : 0)
-                : null;
+            info = ServerHandshake.Parse(document.RootElement);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException or NotSupportedException)
         {
@@ -109,7 +89,7 @@ public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets,
                 : new DomainError(Unreachable, $"{url.Value} cannot be reached: {ex.Message}");
         }
 
-        if (info is null || info.ApiVersion.Length == 0)
+        if (info is null)
         {
             return new DomainError(NotErable, $"{url.Value} does not look like an Erable server.");
         }
@@ -244,8 +224,6 @@ public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets,
             return new DomainError(Unreachable, $"{server.Url} cannot be reached: {ex.Message}");
         }
     }
-
-    private sealed record Handshake(string AppVersion, string ApiVersion, int FormatVersion);
 
     public static DomainError IncompatibleError(ServerProbe probe)
     {

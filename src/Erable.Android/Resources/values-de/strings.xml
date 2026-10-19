@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="servers_title">Server</string>
+  <string name="servers_empty">Fügen Sie die Adresse eines Erable-Servers hinzu, um seine Wikis zu lesen und zu bearbeiten.</string>
+  <string name="servers_add">Server hinzufügen</string>
+  <string name="add_title">Server hinzufügen</string>
+  <string name="add_hint">wiki.beispiel.de</string>
+  <string name="add_help">Die Adresse, die Ihr Administrator Ihnen gegeben hat. Einfaches http:// genügt für einen Server im lokalen Netz.</string>
+  <string name="add_action">Hinzufügen</string>
+  <string name="add_checking">Wird geprüft…</string>
+  <string name="cancel">Abbrechen</string>
+  <string name="forget_title">%1$s vergessen?</string>
+  <string name="forget_message">Der Server verschwindet aus der Liste und seine Sitzung endet auf diesem Telefon. Auf dem Server wird nichts gelöscht.</string>
+  <string name="forget_action">Vergessen</string>
+  <string name="server_version">Erable %1$s</string>
+  <string name="cleartext">Unverschlüsselt (http)</string>
+  <string name="error_invalid">Das ist keine Serveradresse, z. B. https://wiki.beispiel.de.</string>
+  <string name="error_unreachable">Der Server ist nicht erreichbar. Prüfen Sie die Adresse und Ihre Verbindung.</string>
+  <string name="error_not_erable">Diese Adresse antwortet nicht wie ein Erable-Server.</string>
+  <string name="error_not_server">Das ist eine Erable-Desktopanwendung, kein Server.</string>
+  <string name="open_external_failed">Keine Anwendung kann diesen Link öffnen.</string>
+  <string name="download_started">Download gestartet: %1$s</string>
+  <string name="web_error">Die Seite konnte nicht geladen werden: %1$s</string>
+</resources>

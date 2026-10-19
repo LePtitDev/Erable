@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="servers_title">Serveurs</string>
+  <string name="servers_empty">Ajoutez l’adresse d’un serveur Erable pour lire et modifier ses wikis.</string>
+  <string name="servers_add">Ajouter un serveur</string>
+  <string name="add_title">Ajouter un serveur</string>
+  <string name="add_hint">wiki.exemple.fr</string>
+  <string name="add_help">L’adresse donnée par votre administrateur. Un http:// simple convient à un serveur de votre réseau local.</string>
+  <string name="add_action">Ajouter</string>
+  <string name="add_checking">Vérification…</string>
+  <string name="cancel">Annuler</string>
+  <string name="forget_title">Oublier %1$s ?</string>
+  <string name="forget_message">Le serveur quitte la liste et sa session se ferme sur ce téléphone. Rien n’est supprimé sur le serveur.</string>
+  <string name="forget_action">Oublier</string>
+  <string name="server_version">Erable %1$s</string>
+  <string name="cleartext">Non chiffré (http)</string>
+  <string name="error_invalid">Ce n’est pas l’adresse d’un serveur, par exemple https://wiki.exemple.fr.</string>
+  <string name="error_unreachable">Le serveur est injoignable. Vérifiez l’adresse et votre connexion.</string>
+  <string name="error_not_erable">Cette adresse ne répond pas comme un serveur Erable.</string>
+  <string name="error_not_server">C’est une application Erable de bureau, pas un serveur.</string>
+  <string name="open_external_failed">Aucune application ne peut ouvrir ce lien.</string>
+  <string name="download_started">Téléchargement lancé : %1$s</string>
+  <string name="web_error">La page n’a pas pu être chargée : %1$s</string>
+</resources>

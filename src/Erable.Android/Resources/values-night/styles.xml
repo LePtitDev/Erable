@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="ErableTheme" parent="@android:style/Theme.DeviceDefault">
+    <item name="android:colorPrimary">@color/accent</item>
+    <item name="android:colorAccent">@color/accent</item>
+  </style>
+
+  <style name="ErableTheme.Web" parent="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+  <!-- The accent of the dark theme (color-accent in src/web/src/shared/theme/tokens.css). -->
+  <color name="accent">#6cc3a0</color>
+</resources>

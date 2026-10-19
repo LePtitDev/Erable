@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  F19.R3: a server of the local network often has no certificate (http://192.168.1.20:5080). Plain HTTP is allowed,
+  and the list of servers points it out; certificates are those of the system only (no user CA trusted by default).
+-->
+<network-security-config>
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="system" />
+    </trust-anchors>
+  </base-config>
+</network-security-config>
