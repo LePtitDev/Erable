@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using Erable.Server.Api;
 using Erable.Server.Hosting;
 using Erable.Server.Native;
+using Erable.Server.Projects;
 using Microsoft.Extensions.DependencyInjection;
 using Velopack;
 
@@ -25,7 +26,9 @@ internal static class Program
         var testMode = Environment.GetEnvironmentVariable("ERABLE_TEST_MODE") == "1";
         var profile = AppProfile.GetDirectory();
 
-        var shell = new PhotinoShell();
+        // The smoke journey always opens a window of the default size and leaves the user's placement alone.
+        var userProfile = new UserProfile(profile);
+        var shell = new PhotinoShell { Placement = selfTest ? null : WindowPlacement.Load(userProfile) };
         if (testMode)
         {
             shell.PickFolderOverride = Environment.GetEnvironmentVariable("ERABLE_TEST_PICK_FOLDER") is { Length: > 0 } picked ? picked : null;
@@ -103,6 +106,10 @@ internal static class Program
             }
 
             shell.Run(new Uri(baseAddress, "/" + fragment));
+            if (!selfTest)
+            {
+                shell.Placement?.Save(userProfile);
+            }
         }
         finally
         {

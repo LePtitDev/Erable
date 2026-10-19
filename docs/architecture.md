@@ -237,7 +237,7 @@ MonWiki/
    └─ 3a/7f/3a7f…e1         Pièces jointes, nommées par leur SHA-256
 ```
 
-« Ouvrir un projet comme dans un IDE » = ouvrir ce dossier. `formatVersion` est égal à la version du schéma (`PRAGMA user_version`) ; les migrations SQL sont embarquées et appliquées chacune dans une transaction, après une sauvegarde `erable.db.bak-<date>`. `erable.lock` est ouvert sans partage (verrou exclusif `flock` sous Linux et macOS) : le système le libère si le processus meurt, il n'y a donc jamais de verrou périmé ; il est supprimé à la fermeture. La liste des projets récents et les préférences de l'utilisateur sont dans le profil applicatif (`%APPDATA%/Erable`, `~/.config/erable`, `~/Library/Application Support/Erable`), pas dans le projet.
+« Ouvrir un projet comme dans un IDE » = ouvrir ce dossier. `formatVersion` est égal à la version du schéma (`PRAGMA user_version`) ; les migrations SQL sont embarquées et appliquées chacune dans une transaction, après une sauvegarde `erable.db.bak-<date>`. `erable.lock` est ouvert sans partage (verrou exclusif `flock` sous Linux et macOS) : le système le libère si le processus meurt, il n'y a donc jamais de verrou périmé ; il est supprimé à la fermeture. La liste des projets récents, les préférences de l'utilisateur et la place de la fenêtre desktop (`window.json` : taille, position, agrandie ou non) sont dans le profil applicatif (`%APPDATA%/Erable`, `~/.config/erable`, `~/Library/Application Support/Erable`), pas dans le projet.
 
 En mode serveur, chaque projet est un dossier de ce type sous `data/projects/<projectId>/`, plus une base `data/server.db` pour les comptes et les droits.
 

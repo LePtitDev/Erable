@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Erable.Server\Erable.Server.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Erable.Desktop.Tests" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using Erable.Server.Native;
 using Photino.NET;
@@ -25,6 +26,11 @@ internal sealed partial class PhotinoShell : INativeBridge
     /// </summary>
     public Action<string>? FolderDropped { get; set; }
 
+    /// <summary>
+    /// Where the window opens (null: default size, centered); after <see cref="Run"/>, where it was when closed.
+    /// </summary>
+    public WindowPlacement? Placement { get; set; }
+
     /// <summary>Test mode only: the folder « chosen » in the picker, which a test cannot click (E2E-16-03).</summary>
     public string? PickFolderOverride { get; set; }
 
@@ -38,13 +44,28 @@ internal sealed partial class PhotinoShell : INativeBridge
             .SetLogVerbosity(0)
             .SetTitle(_title)
             .SetUseOsDefaultSize(false)
-            .SetSize(1280, 820)
-            .SetMinSize(720, 480)
-            .Center()
+            .SetMinSize(WindowPlacement.MinWidth, WindowPlacement.MinHeight)
             .SetContextMenuEnabled(false)
             .SetDevToolsEnabled(IsDevToolsEnabled())
             .RegisterClosingHandler((_, e) => e.Cancel = Closing?.Invoke() ?? false)
-            .RegisterNavigationStartingHandler((_, e) => OnNavigationStarting(e));
+            .RegisterNavigationStartingHandler((_, e) => OnNavigationStarting(e))
+            .RegisterCreatedHandler((_, _) => OnCreated())
+            .RegisterSizeChangedHandler((_, _) => TrackPlacement())
+            .RegisterLocationChangedHandler((_, _) => TrackPlacement())
+            .RegisterStateChangedHandler((_, _) => TrackPlacement());
+        if (Placement is { } placement)
+        {
+            _window
+                .SetUseOsDefaultLocation(false)
+                .SetSize(placement.Width, placement.Height)
+                .SetLocation(new Point(placement.Left, placement.Top))
+                .SetMaximized(placement.Maximized);
+        }
+        else
+        {
+            _window.SetSize(1280, 820).Center();
+        }
+
         if (IconFile() is { } icon)
         {
             _window.SetIconFile(icon);
@@ -64,6 +85,44 @@ internal sealed partial class PhotinoShell : INativeBridge
         _window.Load(url);
         new PhotinoApplication().Run(_window);
         _window = null;
+    }
+
+    /// <summary>A saved position on a screen that is gone gives way to the center of the main screen.</summary>
+    private void OnCreated()
+    {
+        if (_window is { } window && Placement is { Maximized: false } placement
+            && !placement.IsVisibleOn(window.Monitors.Select(m => m.WorkArea)))
+        {
+            window.Center();
+        }
+
+        TrackPlacement();
+    }
+
+    /// <summary>
+    /// Follows the window: its bounds while it is neither maximized nor minimized (those it restores to), and whether
+    /// it is maximized. Minimized or full screen, the last placement stands.
+    /// </summary>
+    private void TrackPlacement()
+    {
+        if (_window is not { } window)
+        {
+            return;
+        }
+
+        switch (window.WindowState)
+        {
+            case PhotinoWindowState.Normal:
+                Placement = new WindowPlacement(window.Left, window.Top, window.Width, window.Height, Maximized: false);
+                break;
+            case PhotinoWindowState.Maximized:
+                Placement = (Placement ?? new WindowPlacement(window.Left, window.Top, window.Width, window.Height, false))
+                    with { Maximized = true };
+                break;
+            case PhotinoWindowState.Minimized:
+            case PhotinoWindowState.FullScreen:
+                break;
+        }
     }
 
     /// <summary>The SPA never leaves its origin for a local file: a dropped folder opens as a project, anything else is ignored.</summary>
