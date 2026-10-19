@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <!-- Provisional icon (a proper logo arrives with the release work, M5-03). -->
+    <!-- Rendered from the in-app logo by src/web/scripts/generate-icons.mjs. -->
     <ApplicationIcon>Assets\erable.ico</ApplicationIcon>
   </PropertyGroup>
 

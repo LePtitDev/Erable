@@ -219,7 +219,7 @@ internal sealed partial class PhotinoShell : INativeBridge
         return Task.CompletedTask;
     }
 
-    /// <summary>Provisional application icon, next to the executable (Windows wants an .ico).</summary>
+    /// <summary>Application icon, next to the executable (Windows wants an .ico).</summary>
     private static string? IconFile()
     {
         var path = Path.Combine(AppContext.BaseDirectory, OperatingSystem.IsWindows() ? "erable.ico" : "erable.png");
