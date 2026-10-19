@@ -1,6 +1,6 @@
 .page {
+  /* Never wraps: below its breakpoint (PageView.tsx) the side panel folds into the article instead. */
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-12);
   padding: var(--space-10) clamp(20px, 4vw, 56px) 64px;
@@ -108,6 +108,70 @@
   flex-direction: column;
   gap: var(--space-6);
   max-width: 340px;
+}
+
+/* Narrow page: the panel folds between the header and the content, as wide as the article. */
+.expander {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.expanderToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.expanderToggle:hover {
+  background: var(--color-hover);
+}
+
+.expanderChevron {
+  flex: none;
+  color: var(--color-text-muted);
+  transition: transform 0.15s ease;
+}
+
+.expanderToggle[aria-expanded="true"] .expanderChevron {
+  transform: rotate(90deg);
+}
+
+.expanderTitle {
+  flex: none;
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.expanderSummary {
+  overflow: hidden;
+  color: var(--color-text-faint);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expanderBody {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expanderChevron {
+    transition: none;
+  }
 }
 
 .panelSection {

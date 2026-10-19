@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { History, PanelRightClose, PanelRightOpen, Pencil, Plus } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { ChevronRight, History, PanelRightClose, PanelRightOpen, Pencil, Plus } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { pageQuery, resolveQuery, type PageView as PageData } from "../../shared/api/pages";
 import { projectQuery } from "../../shared/api/projects";
@@ -32,6 +32,14 @@ import contentStyles from "./markdown/MarkdownView.module.css";
 import styles from "./PageView.module.css";
 import { subPagesAnchor } from "./anchors";
 import { Toc } from "./Toc";
+import { useIsNarrow } from "./useIsNarrow";
+
+/**
+ * Below this content width the article (520px at least) and the side panel (260px) no longer fit side by side (gap
+ * 48px, PageView.module.css): the panel becomes an expander between the header and the content. The page never wraps,
+ * so this width alone decides.
+ */
+const sideBySideWidth = 520 + 48 + 260;
 
 /** Reading a page (F04, mockup « Page — lecture »). */
 export function PageView({
@@ -56,8 +64,17 @@ export function PageView({
     () => (page.data === undefined ? [] : page.data.properties.map(toPageProperty)),
     [page.data],
   );
+  const pageRef = useRef<HTMLDivElement>(null);
+  const narrow = useIsNarrow(pageRef, sideBySideWidth);
+  // Narrow, the panel is collapsed on every page opened; wide, it keeps the persisted choice (layout).
+  const [expandedPage, setExpandedPage] = useState<ElementId | null>(null);
+  const expanded = expandedPage === element.id;
+  const toggleExpanded = () => {
+    setExpandedPage(expanded ? null : element.id);
+  };
   const sidePanelOpen = layout.value.sidePanelOpen;
-  const toggleSidePanel = (
+  // Narrow, the expander has its own toggle: the button of the side panel goes away.
+  const toggleSidePanel = !narrow && (
     <button
       type="button"
       className={styles["iconButton"]}
@@ -75,9 +92,25 @@ export function PageView({
       )}
     </button>
   );
+  const panel = page.isSuccess && (
+    <aside
+      id="page-side-panel"
+      className={narrow ? styles["expanderBody"] : styles["side"]}
+      aria-label={t("page.sidePanel")}
+    >
+      <PagePropertiesView projectId={projectId} properties={properties} />
+      <PageLinksPanel projectId={projectId} pageId={element.id} />
+      <Toc markdown={page.data.markdown} hasSubPages={page.data.subPages.length > 0} />
+      <AttachmentsPanel
+        projectId={projectId}
+        pageId={element.id}
+        attachments={page.data.attachments}
+      />
+    </aside>
+  );
 
   return (
-    <div className={styles["page"]}>
+    <div ref={pageRef} className={styles["page"]}>
       <article className={styles["article"]} aria-labelledby="page-title">
         <ElementHeader
           projectId={projectId}
@@ -129,6 +162,22 @@ export function PageView({
           }
         />
         <EditingBanner elementId={element.id} />
+        {narrow && page.isSuccess && (
+          <div className={styles["expander"]}>
+            <button
+              type="button"
+              className={styles["expanderToggle"]}
+              aria-expanded={expanded}
+              aria-controls="page-side-panel"
+              onClick={toggleExpanded}
+            >
+              <ChevronRight aria-hidden size={16} className={styles["expanderChevron"]} />
+              <span className={styles["expanderTitle"]}>{t("page.sidePanel")}</span>
+              <span className={styles["expanderSummary"]}>{t("page.panelSummary")}</span>
+            </button>
+            {expanded && panel}
+          </div>
+        )}
         {page.isSuccess ? (
           <PageBody
             projectId={projectId}
@@ -139,18 +188,7 @@ export function PageView({
           <p aria-busy="true">{t("common.loading")}</p>
         )}
       </article>
-      {sidePanelOpen && page.isSuccess && (
-        <aside id="page-side-panel" className={styles["side"]} aria-label={t("page.sidePanel")}>
-          <PagePropertiesView projectId={projectId} properties={properties} />
-          <PageLinksPanel projectId={projectId} pageId={element.id} />
-          <Toc markdown={page.data.markdown} hasSubPages={page.data.subPages.length > 0} />
-          <AttachmentsPanel
-            projectId={projectId}
-            pageId={element.id}
-            attachments={page.data.attachments}
-          />
-        </aside>
-      )}
+      {!narrow && sidePanelOpen && panel}
     </div>
   );
 }

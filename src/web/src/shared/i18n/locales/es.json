@@ -543,6 +543,7 @@
     "newSubPage": "Nueva subpágina",
     "newSubPageName": "Nueva página",
     "sidePanel": "Panel de la página",
+    "panelSummary": "Propiedades, enlaces, índice, archivos adjuntos",
     "propertiesTitle": "Propiedades",
     "valueCount_one": "{{count}} valor",
     "valueCount_other": "{{count}} valores",

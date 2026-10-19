@@ -535,6 +535,7 @@
     "newSubPage": "Neue Unterseite",
     "newSubPageName": "Neue Seite",
     "sidePanel": "Seitenleiste der Seite",
+    "panelSummary": "Eigenschaften, Verknüpfungen, Inhalt, Anhänge",
     "propertiesTitle": "Eigenschaften",
     "valueCount_one": "{{count}} Wert",
     "valueCount_other": "{{count}} Werte",

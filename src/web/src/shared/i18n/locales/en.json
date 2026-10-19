@@ -535,6 +535,7 @@
     "newSubPage": "New sub-page",
     "newSubPageName": "New page",
     "sidePanel": "Page panel",
+    "panelSummary": "Properties, links, contents, attachments",
     "propertiesTitle": "Properties",
     "valueCount_one": "{{count}} value",
     "valueCount_other": "{{count}} values",
