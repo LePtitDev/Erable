@@ -323,3 +323,20 @@ a.name::after {
     min-height: var(--size-touch);
   }
 }
+
+/* Narrow layout (F18.R3): the name stays beside its initials, the badges and actions go to the next line. */
+@media (width <= 720px) {
+  .filter {
+    width: 100%;
+  }
+
+  .item {
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  /* The rest of the first line, beside the 40 px initials. */
+  .text {
+    flex-basis: calc(100% - 40px - var(--space-3));
+  }
+}

@@ -201,8 +201,13 @@
 
 /* Narrow layout (F18): the side bar becomes a header line, its secondary actions keep only their icon. */
 @media (width <= 720px) {
+  /* A column, not wrapped lines: wrapped, the spare height of 100dvh was shared out and swelled the header. */
+  .home {
+    flex-flow: column nowrap;
+  }
+
   .aside {
-    flex: 1 1 100%;
+    flex: none;
     flex-direction: row;
     align-items: center;
     gap: var(--space-2);
@@ -216,6 +221,16 @@
     flex: 1;
     min-width: 0;
     padding: 0;
+  }
+
+  .brandText {
+    min-width: 0;
+  }
+
+  .version {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .nav {
@@ -243,6 +258,7 @@
   }
 
   .main {
+    flex: 1 0 auto;
     gap: var(--space-6);
     padding: var(--space-6) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
   }
