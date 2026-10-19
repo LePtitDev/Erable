@@ -633,7 +633,9 @@
     "leaveDescription": "¿Guardar la página antes de salir?",
     "conflict": "La página se ha modificado en otro lugar desde que se abrió. Copie sus cambios y recargue la página antes de guardar.",
     "closeTitle": "¿Cerrar Erable?",
-    "closeDescription": "La página actual tiene cambios sin guardar."
+    "closeDescription": "La página actual tiene cambios sin guardar.",
+    "panes": "Vista del editor",
+    "textPane": "Texto"
   },
   "time": {
     "justNow": "ahora mismo"

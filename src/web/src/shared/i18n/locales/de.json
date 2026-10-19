@@ -624,7 +624,9 @@
     "leaveDescription": "Die Seite vor dem Verlassen speichern?",
     "conflict": "Die Seite wurde seit dem Öffnen anderswo geändert. Kopieren Sie Ihre Änderungen und laden Sie die Seite vor dem Speichern neu.",
     "closeTitle": "Erable schließen?",
-    "closeDescription": "Die aktuelle Seite hat nicht gespeicherte Änderungen."
+    "closeDescription": "Die aktuelle Seite hat nicht gespeicherte Änderungen.",
+    "panes": "Editoransicht",
+    "textPane": "Text"
   },
   "time": {
     "justNow": "gerade eben"

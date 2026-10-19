@@ -2,8 +2,12 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <!-- viewport-fit=cover: the shell pads itself with the safe areas (notches, gesture bar), F18. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- viewport-fit=cover: the shell pads itself with the safe areas (notches, gesture bar). resizes-content: the
+         virtual keyboard shrinks the layout, so that « Enregistrer » stays in sight while typing (F18.R6). -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#191d1b" media="(prefers-color-scheme: dark)" />
     <link rel="manifest" href="/manifest.webmanifest" />

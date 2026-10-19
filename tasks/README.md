@@ -102,7 +102,7 @@ Ce dossier découpe les jalons de `docs/architecture.md` §12 en tâches exécut
 | [M6-01](M6-01-mobile-foundations.md) | Fondations mobiles, manifeste, projet de test `mobile` | M5-02 | review |
 | [M6-02](M6-02-mobile-shell.md) | Coque mobile : barre supérieure, tiroir, barre d'état | M6-01 | review |
 | [M6-03](M6-03-mobile-reading.md) | Lecture et écrans d'élément sur téléphone | M6-02 | todo |
-| [M6-04](M6-04-mobile-editing.md) | Édition sur téléphone | M6-03 | todo |
+| [M6-04](M6-04-mobile-editing.md) | Édition sur téléphone | M6-03 | review |
 | [M6-05](M6-05-mobile-search-dialogs.md) | Recherche et boîtes de dialogue | M6-02 | todo |
 | [M6-06](M6-06-touch.md) | Tactile : menus, « Déplacer vers… », cibles de 44 px | M6-02 | todo |
 | [M6-07](M6-07-android-shell.md) | Shell Android (.NET for Android) | M6-01 | todo |

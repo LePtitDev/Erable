@@ -173,3 +173,14 @@
   color: var(--color-text);
   font: inherit;
 }
+
+.panel[hidden] {
+  display: none;
+}
+
+@media (width <= 720px) {
+  .panel {
+    flex: 1;
+    border-left: 0;
+  }
+}

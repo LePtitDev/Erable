@@ -42,6 +42,7 @@ import { ariaKeyShortcuts, useFormatCombo } from "../../shared/keyboard/useForma
 import { useShortcuts } from "../../shared/keyboard/useShortcuts";
 import { approveClose, useWindowStore } from "../../shared/native/native";
 import { Breadcrumb } from "../../shared/ui/Breadcrumb";
+import { useIsNarrowScreen } from "../../shared/ui/media";
 import { useShellStore } from "../project/shellStore";
 import { EditingBanner } from "../presence/Presence";
 import { ConflictResolution, type Resolution } from "./ConflictResolution";
@@ -58,6 +59,9 @@ interface PageEditorProps {
   /** Focus and select the title (a page just created, E2E-02-01). */
   readonly focusTitle: boolean;
 }
+
+/** The two halves of the narrow editor (F18.R6). */
+const editorPanes = ["text", "panel"] as const;
 
 /** Editing a page (F05, mockup « Page — édition »). Loads the content, then hands it to {@link EditorScreen}. */
 export function PageEditor({ projectId, element, focusTitle }: PageEditorProps) {
@@ -131,6 +135,9 @@ function EditorScreen({
   const [doc, setDoc] = useState(initialSaved);
   const [title, setTitle] = useState(element.name);
   const [rawIds, setRawIds] = useState(false);
+  // Narrow layout (F18.R6): the text and the page panel take turns, as two tabs above the editor.
+  const narrow = useIsNarrowScreen();
+  const [pane, setPane] = useState<"text" | "panel">("text");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   // A save that could not be merged: both versions of the passages in conflict, to settle (M4-05).
@@ -431,7 +438,9 @@ function EditorScreen({
             }}
           />
           <span className={styles["chip"]}>{t("shell.mode.edit")}</span>
-          <CategoryChips projectId={projectId} categories={structure.categories} />
+          <span className={styles["categories"]}>
+            <CategoryChips projectId={projectId} categories={structure.categories} />
+          </span>
           <span className={styles["draftState"]} role="status">
             {draftSavedAt !== null && dirty
               ? t("editor.draftSaved", { when: format.relative(draftSavedAt) })
@@ -522,7 +531,12 @@ function EditorScreen({
         </div>
       )}
 
-      <div role="toolbar" aria-label={t("editor.toolbar")} className={styles["toolbar"]}>
+      <div
+        role="toolbar"
+        aria-label={t("editor.toolbar")}
+        className={styles["toolbar"]}
+        data-scroll-x
+      >
         {tool(t("editor.heading"), <Heading aria-hidden size={16} />, (s) => setHeading(s, 2))}
         {tool(t("editor.bold"), <Bold aria-hidden size={16} />, (s) => toggleInline(s, "**"))}
         {tool(t("editor.italic"), <Italic aria-hidden size={16} />, (s) => toggleInline(s, "*"))}
@@ -584,8 +598,30 @@ function EditorScreen({
         </span>
       </div>
 
+      {narrow && (
+        <div role="group" aria-label={t("editor.panes")} className={styles["panes"]}>
+          {editorPanes.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className={styles["pane"]}
+              aria-pressed={pane === value}
+              onClick={() => {
+                setPane(value);
+              }}
+            >
+              {value === "text" ? t("editor.textPane") : t("page.sidePanel")}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className={styles["body"]}>
-        <section className={styles["surface"]} aria-label={t("editor.content")}>
+        <section
+          className={styles["surface"]}
+          aria-label={t("editor.content")}
+          hidden={narrow && pane !== "text"}
+        >
           <MarkdownEditor
             ref={editor}
             initial={initialSaved}
@@ -606,6 +642,7 @@ function EditorScreen({
           {palette.popup !== null && <PalettePopup {...palette.popup} />}
         </section>
         <PageStructurePanel
+          hidden={narrow && pane !== "panel"}
           projectId={projectId}
           pageId={element.id}
           properties={structure.properties}

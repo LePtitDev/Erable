@@ -633,7 +633,9 @@
     "leaveDescription": "Enregistrer la page avant de la quitter ?",
     "conflict": "La page a été modifiée ailleurs depuis son ouverture. Copiez vos changements, puis rechargez la page avant d’enregistrer.",
     "closeTitle": "Fermer Erable ?",
-    "closeDescription": "La page en cours a des modifications non enregistrées."
+    "closeDescription": "La page en cours a des modifications non enregistrées.",
+    "panes": "Vue de l’éditeur",
+    "textPane": "Texte"
   },
   "time": {
     "justNow": "à l’instant"

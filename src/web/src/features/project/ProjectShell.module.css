@@ -237,34 +237,6 @@
   background: var(--color-border);
 }
 
-@media (width <= 720px) {
-  .topBar {
-    flex-wrap: nowrap;
-    gap: var(--space-1);
-    padding: var(--space-1) var(--space-2);
-  }
-
-  .projectName {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .right {
-    gap: var(--space-1);
-  }
-
-  .statusBar {
-    flex-wrap: nowrap;
-    gap: var(--space-3);
-    padding: 0 var(--space-3);
-    overflow: hidden;
-    white-space: nowrap;
-  }
-}
-
 /* ─── Status bar ──────────────────────────────────────────────────────── */
 
 .statusBar {
@@ -308,4 +280,51 @@
 
 .mode {
   margin-left: auto;
+}
+
+/* Last: overrides the rules above in the narrow layout (F18.R2). */
+@media (width <= 720px) {
+  .topBar {
+    flex-wrap: nowrap;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .projectName {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .right {
+    gap: var(--space-1);
+  }
+
+  .statusBar {
+    flex-wrap: nowrap;
+    gap: var(--space-3);
+    padding: 0 var(--space-3);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* The connection gives way (ellipsis); warnings and mode keep their room. */
+  .connection {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .connection .dot {
+    display: inline-block;
+    margin-right: var(--space-1-5);
+  }
+
+  .statusBar > :not(.connection) {
+    flex: none;
+  }
 }

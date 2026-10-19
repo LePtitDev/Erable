@@ -33,6 +33,8 @@ interface PanelProps {
   readonly draft: StructureDraft;
   readonly onDraft: (draft: StructureDraft) => void;
   readonly attachments: readonly AttachmentItem[];
+  /** Hidden but kept (the narrow editor shows the text or the panel, F18.R6). */
+  readonly hidden?: boolean;
 }
 
 /** What a property would be without the value the page defines, whatever the preview already knows. */
@@ -51,7 +53,7 @@ function fallbackOf(row: EditedProperty): Fallback | null {
 export function PageStructurePanel(props: PanelProps) {
   const { t } = useTranslation();
   return (
-    <Tabs.Root defaultValue={tabs[0]} className={styles["panel"]}>
+    <Tabs.Root defaultValue={tabs[0]} className={styles["panel"]} hidden={props.hidden}>
       <Tabs.List className={styles["tabs"]} aria-label={t("page.tabs.label")}>
         {tabs.map((tab) => (
           <Tabs.Trigger key={tab} value={tab} className={styles["tab"]}>

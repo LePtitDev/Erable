@@ -1,5 +1,6 @@
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
+import { EditorPage, InsertPalette } from "../pages/EditorPage";
 import { LoginPage } from "../pages/LoginPage";
 import { PageViewPage } from "../pages/PageViewPage";
 import { PagePropertiesPanel } from "../pages/PagePropertiesPanel";
@@ -112,6 +113,56 @@ test.describe("F18 · Mobile version", () => {
 
     await view.link("Hautbois").tap();
     await expect(view.title).toHaveText("Hautbois");
+  });
+
+  test("E2E-18-04 · Edit and save a page @mobile @pr", async ({ page, reference }) => {
+    const view = new PageViewPage(page);
+    const editor = new EditorPage(page);
+    const palette = new InsertPalette(page);
+    await page.goto(reference.url(chroniques.ilsa));
+    await expect(view.link("Capitaine Orsen")).toBeVisible();
+    const before = await view.content.getByRole("link", { name: "Capitaine Orsen" }).count();
+
+    await page.getByRole("button", { name: t("page.edit") }).tap();
+    await expect(editor.content).toBeVisible();
+    // The editor takes the width; the panel waits behind its own button (F18.R6).
+    await expect(page.getByRole("tablist", { name: t("page.tabs.label") })).toBeHidden();
+    await editor.content.tap();
+    await page.keyboard.press("Control+End");
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Enter");
+    await editor.type("Voir [[orse");
+    await expect(palette.dialog).toBeVisible();
+    await expect(palette.dialog).toBeInViewport({ ratio: 1 });
+    await palette.options.filter({ hasText: "Capitaine Orsen" }).first().tap();
+    await expect(palette.dialog).toBeHidden();
+
+    await page.getByRole("button", { name: t("editor.save") }).tap();
+    await expect(page).not.toHaveURL(/edit=true/);
+    await expect(view.content.getByRole("link", { name: "Capitaine Orsen" })).toHaveCount(
+      before + 1,
+    );
+  });
+
+  test("E2E-18-05 · Properties while editing on a phone @mobile", async ({ page, reference }) => {
+    const panel = new PagePropertiesPanel(page);
+    const view = new PageViewPage(page);
+    await page.goto(`${reference.url(chroniques.ilsa)}?edit=true`);
+    const panelButton = page.getByRole("button", { name: t("page.sidePanel") });
+    await expect(panelButton).toHaveAttribute("aria-pressed", "false");
+
+    await panelButton.tap();
+    await expect(page.getByRole("textbox", { name: t("editor.content") })).toBeHidden();
+    const niveau = panel.field("Niveau");
+    await expect(niveau).toContainText(t("property.violation.less_or_equal", { value: 60 }));
+    await niveau.getByRole("textbox", { name: "Niveau" }).fill("50");
+    await expect(niveau).not.toContainText(t("property.violation.less_or_equal", { value: 60 }));
+
+    await page.getByRole("button", { name: t("editor.save") }).tap();
+    await expect(page).not.toHaveURL(/edit=true/);
+    await page.getByRole("button", { name: t("page.sidePanel") }).tap();
+    await expect(panel.row("Niveau")).toContainText("50");
+    await expect(view.title).toHaveText("Ilsa Varenne");
   });
 
   test("E2E-18-09 · Preferences and account from the More menu @mobile", async ({

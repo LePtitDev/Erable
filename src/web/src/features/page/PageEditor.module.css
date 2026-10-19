@@ -54,6 +54,11 @@
   font-weight: var(--weight-semibold);
 }
 
+/* Wraps the category chips for the narrow layout only. */
+.categories {
+  display: contents;
+}
+
 .draftState {
   min-width: 0;
   color: var(--color-text-muted);
@@ -173,4 +178,88 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+}
+
+.surface[hidden] {
+  display: none;
+}
+
+/* ─── Narrow layout (F18.R6) ──────────────────────────────────────────── */
+
+.panes {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.pane {
+  flex: 1;
+  min-height: var(--size-control-md);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.pane[aria-pressed="true"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+@media (width <= 720px) {
+  .header {
+    gap: var(--space-1-5);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .titleRow {
+    gap: var(--space-2);
+  }
+
+  .title {
+    flex-basis: 100%;
+    font-size: var(--text-2xl);
+  }
+
+  /* The mode is in the status bar, the categories in the page panel: the header keeps the title and the buttons. */
+  .chip,
+  .categories {
+    display: none;
+  }
+
+  .draftState {
+    flex: 1;
+    font-size: var(--text-xs);
+  }
+
+  .textTool {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  /* One line that scrolls sideways rather than three that eat the editor. */
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .toolbarEnd {
+    flex: none;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
+/* No physical keyboard to show shortcuts for. */
+@media (pointer: coarse) {
+  .kbd {
+    display: none;
+  }
 }

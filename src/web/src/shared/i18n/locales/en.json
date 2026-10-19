@@ -624,7 +624,9 @@
     "leaveDescription": "Save the page before leaving it?",
     "conflict": "The page was changed elsewhere since it was opened. Copy your changes, then reload the page before saving.",
     "closeTitle": "Close Erable?",
-    "closeDescription": "The current page has unsaved changes."
+    "closeDescription": "The current page has unsaved changes.",
+    "panes": "Editor view",
+    "textPane": "Text"
   },
   "time": {
     "justNow": "just now"
