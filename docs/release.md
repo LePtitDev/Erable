@@ -11,6 +11,7 @@ Une version est un **tag Git `vX.Y.Z` ou `X.Y.Z`**. Deux façons de la créer, a
 |---|---|
 | `notes` | notes de version générées depuis les Conventional Commits depuis le tag précédent (`build/release-notes.mjs`) |
 | `package` (×4) | `win-x64`, `linux-x64`, `osx-arm64`, `osx-x64` : publication autonome (binaires estampillés de la version du tag) puis **Velopack** (`build/pack-desktop.mjs`) et `erable-cli` ; fichiers joints à la release |
+| `android` | APK de l'application Android (`build/publish-android.mjs`), signé par le keystore de release et joint à la release ; sans keystore, construit mais **non joint** (avertissement). Ce job ne bloque pas `publish` |
 | `image` | image Docker du serveur, scan Trivy (HIGH/CRITICAL corrigeables = échec), publication sur `ghcr.io/<propriétaire>/erable:<version>` et `latest` |
 | `publish` | passage du brouillon en release publiée (sans effet si elle l'est déjà) |
 
@@ -29,6 +30,8 @@ Pour produire un installeur sur sa machine, sans CI : `scripts/publish.sh` (ou `
 | Linux | `Erable-linux-x86_64.AppImage`, `Erable-linux-Portable.zip`, paquets de mise à jour |
 | Tous | `releases.<canal>.json` et `RELEASES-*` : le manifeste que l'application interroge |
 | Tous | `erable-cli-<rid>.zip` (Windows) ou `.tar.gz` : l'outil `erable-cli` en un exécutable autonome (`docs/cli.md`), dans `artifacts/cli/` |
+
+| Android | `Erable-<version>.apk` (dans `artifacts/android/`) : à installer à la main (*Sources inconnues*), Android 8 ou plus récent ; c'est un client des serveurs Erable (décision Q11) |
 
 Les noms exacts sont ceux de `vpk` (Velopack).
 
@@ -72,6 +75,31 @@ Sans signature, tout fonctionne mais Windows SmartScreen et macOS Gatekeeper aff
 | Signature Windows | **Azure Trusted Signing** (compte Azure, validation d'identité, ~10 $/mois) : un compte de signature et un profil de certificat | `ERABLE_SIGN_AZURE_METADATA` : contenu du fichier `metadata.json` (endpoint, compte, profil). L'authentification Azure (service principal, variables `AZURE_*`) se branche quand le compte existe |
 | Signature et notarisation macOS | **Apple Developer Program** (~99 $/an) : certificats *Developer ID Application* et *Developer ID Installer* | `ERABLE_SIGN_APPLE_APP_IDENTITY` (nom du certificat d'application), `ERABLE_SIGN_APPLE_INSTALL_IDENTITY` (nom du certificat d'installeur), `ERABLE_NOTARY_PROFILE` (profil `notarytool` enregistré dans le trousseau du runner) ; les certificats `.p12` doivent être importés dans le trousseau du runner avant l'étape *Package* |
 | Linux | rien de payant | — |
+| Android | rien de payant : un **keystore** que vous créez et gardez (voir ci-dessous) | `ERABLE_ANDROID_KEYSTORE_BASE64` (le fichier en base64), `ERABLE_ANDROID_KEY_ALIAS`, `ERABLE_ANDROID_KEYSTORE_PASSWORD`, `ERABLE_ANDROID_KEY_PASSWORD` (facultatif : celui du keystore par défaut) |
+
+### Keystore Android
+
+Android n'installe une mise à jour que si elle est signée par **la même clé** que la version installée : le keystore se crée une fois et ne se perd pas (sans lui, les utilisateurs devraient désinstaller l'application pour passer à la version suivante). À faire par vous, avec le `keytool` d'un JDK 17 :
+
+```bash
+keytool -genkeypair -v -keystore erable-release.keystore -alias erable -keyalg RSA -keysize 4096 -validity 10000
+```
+
+Puis créer les secrets GitHub (`base64 -w0 erable-release.keystore` donne la valeur de `ERABLE_ANDROID_KEYSTORE_BASE64`) et garder une copie du fichier et des mots de passe hors du dépôt. En local, les mêmes variables sans `_BASE64` : `ERABLE_ANDROID_KEYSTORE` (chemin du fichier), `ERABLE_ANDROID_KEY_ALIAS`, `ERABLE_ANDROID_KEYSTORE_PASSWORD`, puis `scripts/publish.sh --android`. Sans elles, l'APK est signé par la clé de debug de la machine : bon pour un essai, pas pour une diffusion.
+
+`versionCode` (ce qu'Android compare) vient de la version : `((majeure × 1000 + mineure) × 1000 + correctif) × 100 + n`, avec `n = 99` pour une release et le numéro du build pour `x.y.z-dev.N` (au plus 98) ; une version majeure au plus 20.
+
+### Vérifier l'application Android sur un appareil
+
+La CI construit l'APK mais n'a pas d'émulateur : avant une release, sur un téléphone (ou un émulateur Android Studio) avec un serveur de test (`scripts/serve.sh`, option `--lan` pour le réseau local) :
+
+1. Installer l'APK, l'ouvrir : la liste des serveurs est vide, dans la langue du téléphone (fr, en, de, es ; anglais sinon).
+2. *Ajouter un serveur* avec une adresse fausse (`exemple.invalid`) : « injoignable » ; avec l'adresse d'un site quelconque : « ne répond pas comme un serveur Erable » ; avec celle du serveur : il s'ouvre. En `http://`, la liste affiche « Non chiffré (http) ».
+3. Se connecter, ouvrir une page, la modifier : le clavier ne cache pas *Enregistrer* ; les encoches et la barre de gestes ne cachent rien.
+4. Ajouter une pièce jointe depuis l'éditeur (sélecteur Android), puis télécharger une pièce jointe : elle arrive dans *Téléchargements*.
+5. Un lien vers un autre site s'ouvre dans le navigateur ; le bouton retour remonte l'historique, puis revient à la liste.
+6. Fermer l'application (la tuer depuis les applications récentes), la rouvrir : la session est toujours là.
+7. Appui long sur le serveur → *Oublier* : il quitte la liste ; ajouté de nouveau, il redemande la connexion.
 
 Les étapes de câblage (authentification Azure, import du trousseau Apple) dépendent de comptes qui n'existent pas encore : elles ne sont donc pas écrites dans `release.yml` et s'ajouteront avec les secrets. `build/pack-desktop.mjs` lit déjà les variables ci-dessus et signe quand elles sont présentes.
 
@@ -80,3 +108,4 @@ Les étapes de câblage (authentification Azure, import du trousseau Apple) dép
 1. Rejouer la vérification de mise à jour ci-dessus.
 2. Lancer le workflow à la main avec la version `0.0.0-test` pour vérifier que les installeurs se construisent.
 3. Vérifier `docs/deployment.md` (image publiée sous `ghcr.io/...`).
+4. Créer le keystore Android et ses secrets, puis dérouler la vérification sur appareil ci-dessus.

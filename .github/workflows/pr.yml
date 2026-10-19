@@ -159,6 +159,39 @@ jobs:
             src/web/test-results/
           retention-days: 14
 
+  # The Android application (M6-07, M6-08): it must keep building; signed by the debug key of the runner. Its logic is
+  # tested by tests/Erable.Android.Tests in the unit job; the WebView runs the SPA tested by the « mobile » project.
+  android:
+    name: Android APK (build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # Read by MSBuild as properties: the SDK and JDK 17 of the runner image.
+      AndroidSdkDirectory: /usr/local/lib/android/sdk
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-android-${{ hashFiles('Directory.Packages.props', '**/*.csproj', 'global.json') }}
+          restore-keys: nuget-android-
+      - name: Android workload
+        run: dotnet workload install android
+      - name: Android platform of the target API
+        run: |
+          echo "JavaSdkDirectory=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          JavaSdkDirectory="$JAVA_HOME_17_X64" dotnet build src/Erable.Android -t:InstallAndroidDependencies -p:AcceptAndroidSDKLicenses=true
+      - name: Build the APK
+        run: node build/publish-android.mjs --version "0.0.0-ci.${{ github.run_number }}"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: erable-android
+          path: artifacts/android/*.apk
+          retention-days: 7
+
   desktop:
     name: Desktop artifact and smoke (${{ matrix.rid }})
     strategy:

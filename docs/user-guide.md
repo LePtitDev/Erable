@@ -15,6 +15,8 @@ Sous Linux, l'application a besoin de WebKitGTK 4.1 et de libnotify (Debian / Ub
 
 Les préférences (langue de l'interface, thème clair ou sombre, raccourcis) se règlent depuis l'accueil (*Préférences*) comme depuis la barre du haut d'un projet.
 
+**Sur un téléphone.** Un serveur Erable s'utilise aussi depuis le navigateur d'un téléphone, qui peut l'*ajouter à l'écran d'accueil* comme une application. L'arbre s'ouvre par le bouton à gauche de la barre du haut (toucher un dossier le déplie) ; le menu « … » de la barre regroupe précédent / suivant, préférences, thème et déconnexion. Chaque élément de l'arbre a son bouton « … » (ou un appui long) pour le menu, et *Déplacer vers…* remplace le glisser-déposer. En édition, *Texte* et *Panneau de la page* (propriétés, catégories, liens, fichiers) alternent au-dessus de l'éditeur. Sur Android, l'**application Erable** (APK des releases) fait la même chose en gardant la liste de vos serveurs : *Ajouter un serveur*, son adresse, puis la connexion habituelle ; un appui long sur un serveur l'oublie. Elle n'ouvre pas de projet local : il faut un serveur.
+
 ## 2. Relier les pages : la syntaxe `[[ID]]`
 
 Chaque élément — page, catégorie, propriété, pièce jointe — a un **identifiant** de 16 caractères hexadécimaux, qui ne change jamais. On y renvoie en l'écrivant entre doubles crochets :

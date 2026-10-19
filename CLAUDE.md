@@ -14,7 +14,7 @@ Ce fichier s'adresse aux agents IA qui implémentent le projet. Il est **priorit
 | `docs/features.md` | Fonctionnalités `Fnn`, règles `Fnn.Rn`, scénarios `E2E-nn-nn` (= critères d'acceptation) | Fnn / E2E-nn-nn |
 | `docs/testing.md` | Stratégie de test, outillage, définition de « terminé » | §T-x |
 | `docs/deployment.md` | Installer un serveur : `erable serve`, Docker, Compose + Caddy, variables `ERABLE_*`, sauvegarde continue Litestream | — |
-| `docs/release.md` | Publier une version : tag `vX.Y.Z` ou `X.Y.Z`, installeurs Velopack, mise à jour, signature | — |
+| `docs/release.md` | Publier une version : tag `vX.Y.Z` ou `X.Y.Z`, installeurs Velopack, APK Android, mise à jour, signature | — |
 | `docs/cli.md` | `erable-cli` : extraction en lecture seule d'un projet, **contrat** de commandes et de JSON (`erable-cli/1`) à ne pas casser | — |
 | `docs/user-guide.md` | Guide de l'utilisateur : démarrage, `[[ID]]`, raccourcis, dossiers et sous-pages | — |
 | `docs/i18n-review.md` | Traductions : vérifications automatiques et liste à relire | — |
@@ -125,6 +125,7 @@ Erable/
 │  ├─ Erable.Server/      ASP.NET Core Minimal API, SignalR, auth, OpenAPI, CLI (serve, doctor)
 │  ├─ Erable.Desktop/     shell Photino
 │  ├─ Erable.Cli/         erable-cli : extraction en lecture seule (JSON, Markdown), contrat docs/cli.md
+│  ├─ Erable.Android/     app Android (.NET for Android), cliente des serveurs ; hors Erable.sln (Q11)
 │  └─ web/                SPA React/TS (pnpm + Vite) ; e2e Playwright dans web/e2e/
 ├─ tests/                 Erable.Core.Tests, Erable.Storage.Tests, Erable.Server.Tests, …
 ├─ spec/
@@ -168,7 +169,7 @@ Raccourcis (`.bat` sous Windows, `.sh` ailleurs) dans `scripts/` :
 scripts/build.sh [Debug|Release]            # dépendances web, SPA, solution .NET
 scripts/run.sh [desktop|server [dossier] [port]|dev]
 scripts/test.sh [--e2e] [--desktop]         # contrôles du pipeline PR ; --desktop : publication + fumée
-scripts/publish.sh [--version x.y.z] [--rid <rid>]  # installeur desktop de cette machine (Velopack) dans artifacts/release/<rid>/ et erable-cli dans artifacts/cli/ ; version par défaut : dernier tag Git
+scripts/publish.sh [--version x.y.z] [--rid <rid>] [--android]  # --android : APK seul ; sinon installeur desktop de cette machine (Velopack) dans artifacts/release/<rid>/ et erable-cli dans artifacts/cli/ ; version par défaut : dernier tag Git
 scripts/serve.sh [dossier] [--port 5080] [--lan] [--rebuild] [-- options]   # héberger sans Docker : publie en Release (artifacts/server, refait si le commit change) puis erable serve ; dossier par défaut data/
 scripts/compose.sh [--litestream] setup|up|update|down|status|logs|backup|restore|doctor   # héberger avec Docker Compose + Caddy (deploy/.env)
 ```
@@ -221,6 +222,11 @@ dotnet run -c Release --project tests/Erable.Benchmarks -- load [--users 50] [--
 
 # Desktop
 node build/publish-desktop.mjs win-x64     # ou linux-x64, osx-arm64, osx-x64 → artifacts/desktop/
+
+# Android (M6, décision Q11) : workload requis (`dotnet workload install android`), projet hors Erable.sln
+dotnet build src/Erable.Android                       # APK de debug
+node build/publish-android.mjs [--version x.y.z]      # APK signé → artifacts/android/ (keystore : docs/release.md ; sinon clé de debug)
+dotnet test --project tests/Erable.Android.Tests       # logique du shell, sans workload (dans Erable.sln)
 pnpm -C src/web e2e:desktop                # Windows : E2E-16-01/02 sur le binaire publié (CDP)
 artifacts/desktop/<rid>/Erable/Erable.Desktop [dossier] --self-test [--self-test-report rapport.json]   # code de sortie 0/1
 # Desktop : ERABLE_STARTUP_BUDGET_MS=<ms> remplace le budget de démarrage de 3 s (10000 en CI) ; ERABLE_E2E_WEBVIEW_LANG change la langue forcée des e2e (fr-FR)

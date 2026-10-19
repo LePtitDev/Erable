@@ -59,7 +59,7 @@ Runs the checks of the PR pipeline (`docs/testing.md` §13): .NET format check, 
 ## publish
 
 ```bash
-scripts/publish.sh [--version x.y.z] [--rid win-x64|linux-x64|osx-arm64|osx-x64]
+scripts/publish.sh [--version x.y.z] [--rid win-x64|linux-x64|osx-arm64|osx-x64] [--android]
 ```
 
 Builds the desktop installer locally, as the release workflow does (`docs/release.md`): installs the web dependencies, publishes the self-contained application (SPA included) with the version stamped in the binaries, then packs it with Velopack (`build/pack-desktop.mjs`, the `vpk` tool of `.config/dotnet-tools.json`). The files land in `artifacts/release/<rid>/`: `Erable-win-Setup.exe`, `Erable-linux-x86_64.AppImage` or `Erable-osx-<arch>-Setup.pkg`, a portable archive and the update packages. It also publishes `erable-cli` (`docs/cli.md`) as one self-contained executable in `artifacts/cli/<rid>/`, archived as `artifacts/cli/erable-cli-<rid>.zip` (or `.tar.gz`).
@@ -68,6 +68,7 @@ Builds the desktop installer locally, as the release workflow does (`docs/releas
 |---|---|---|
 | `--version x.y.z` | from Git | The tag of `HEAD` (`v1.2.0` or `1.2.0` gives `1.2.0`); after the last tag, `x.y.(z+1)-dev.N` with N commits since it, which sorts after that release and before the next one |
 | `--rid <rid>` (`.sh` only) | this machine | Target system. Velopack packs for the system it runs on; macOS can pack both architectures. `.bat` always builds `win-x64` |
+| `--android` | — | Only the Android APK (`build/publish-android.mjs`), in `artifacts/android/Erable-<version>.apk`. Needs the android workload (`dotnet workload install android`); signed with the release keystore of `docs/release.md` when its variables are set, with the debug key otherwise |
 
 The packages are unsigned unless the `ERABLE_SIGN_*` variables of `docs/release.md` are set: Windows SmartScreen and macOS Gatekeeper then warn on first launch. An installed application checks GitHub for updates; set `ERABLE_DISABLE_UPDATES=1` to keep a local build as it is.
 
