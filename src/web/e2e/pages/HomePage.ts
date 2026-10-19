@@ -51,6 +51,7 @@ export class HomePage {
   }
 
   async openRecent(name: string) {
-    await this.recent(name).getByRole("button", { name }).click();
+    // Exact: the row also has « Actions sur <name> ».
+    await this.recent(name).getByRole("button", { name, exact: true }).click();
   }
 }
