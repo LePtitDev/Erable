@@ -265,7 +265,9 @@
         "notAProject": "Not found",
         "tooNew": "Newer version",
         "invalid": "Unreadable"
-      }
+      },
+      "actions": "Actions for {{name}}",
+      "removeFromList": "Remove from the list"
     },
     "dropZone": "Drop a project folder here to open it",
     "migrate": {
@@ -967,6 +969,13 @@
     "reconnect": "Sign in again",
     "forget": "Remove",
     "forgetNamed": "Remove the server {{name}}",
+    "actions": "Actions for the server {{name}}",
+    "state": {
+      "online": "connected",
+      "unreachable": "unreachable",
+      "signedOut": "signed out",
+      "checking": "checking"
+    },
     "signedOut": "Session ended: sign in again to see the projects of this server.",
     "projectsOf": "Projects of {{name}}",
     "connect": {

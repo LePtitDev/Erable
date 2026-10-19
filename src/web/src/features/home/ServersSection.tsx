@@ -11,8 +11,10 @@ import {
   useServers,
   type ServerItem,
 } from "../../shared/api/servers";
+import { useFormatters } from "../../shared/i18n/format";
 import { Button } from "../../shared/ui/Button";
 import styles from "./RecentProjects.module.css";
+import { RowMenu } from "./RowMenu";
 
 /**
  * The servers the application connected to, in the recent list with the mode « Serveur » (F01.R2, E2E-01-06). A
@@ -62,15 +64,24 @@ function ServerRow({
   readonly onReconnect: (server: ServerItem) => void;
 }) {
   const { t } = useTranslation();
+  const format = useFormatters();
   const forget = useForgetServer();
   // Open by the user's choice, else open for the server just connected to.
   const [toggled, setToggled] = useState<boolean | null>(null);
   const open = toggled ?? initiallyOpen;
+  // Asked even when closed: its answer colours the badge (a server that does not answer shows red).
   const projects = useQuery({
     ...serverProjectsQuery(server.id),
-    enabled: open && server.connected,
+    enabled: server.connected,
     retry: false,
   });
+  const state = !server.connected
+    ? "signedOut"
+    : projects.isError
+      ? "unreachable"
+      : projects.isSuccess
+        ? "online"
+        : "checking";
 
   return (
     <li className={`${styles["item"] ?? ""} ${styles["server"] ?? ""}`}>
@@ -95,13 +106,10 @@ function ServerRow({
             {server.userName !== null && ` · ${server.userName}`}
           </span>
         </span>
-        <span className={styles["mode"]}>
-          <span className={styles["dot"]} aria-hidden />
-          {t("servers.mode")}
-        </span>
         {!server.connected && (
           <Button
             size="sm"
+            className={styles["above"]}
             onClick={() => {
               onReconnect(server);
             }}
@@ -109,16 +117,30 @@ function ServerRow({
             {t("servers.reconnect")}
           </Button>
         )}
-        <Button
-          size="sm"
-          aria-label={t("servers.forgetNamed", { name: server.name })}
-          disabled={forget.isPending}
-          onClick={() => {
-            forget.mutate(server.id);
-          }}
+        <span className={styles["mode"]} title={t(`servers.state.${state}`)}>
+          <span className={`${styles["dot"] ?? ""} ${styles[state] ?? ""}`} aria-hidden />
+          <span className={styles["label"]}>{t("servers.mode")}</span>
+          <span className={styles["srOnly"]}>{` · ${t(`servers.state.${state}`)}`}</span>
+        </span>
+        <time
+          className={styles["when"]}
+          dateTime={server.lastUsedAt}
+          title={format.dateTime(new Date(server.lastUsedAt))}
         >
-          {t("servers.forget")}
-        </Button>
+          {format.relative(new Date(server.lastUsedAt))}
+        </time>
+        <RowMenu
+          label={t("servers.actions", { name: server.name })}
+          items={[
+            {
+              label: t("servers.forget"),
+              disabled: forget.isPending,
+              onSelect: () => {
+                forget.mutate(server.id);
+              },
+            },
+          ]}
+        />
       </div>
       {open && !server.connected && <p className={styles["empty"]}>{t("servers.signedOut")}</p>}
       {open && projects.isError && (

@@ -184,14 +184,49 @@ a.name::after {
   font-weight: var(--weight-medium);
 }
 
+/* Same width for every badge: their left edges line up from one row to the next. */
+.mode {
+  min-width: 96px;
+}
+
+/* The dot stays on the left; the label is centred in the rest of the badge. */
+.label {
+  flex: 1;
+  text-align: center;
+}
+
 .dot {
+  flex: none;
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--color-accent);
 }
 
+.dot.checking {
+  background: var(--color-text-faint);
+}
+
+.dot.signedOut {
+  background: var(--color-warning);
+}
+
+.dot.unreachable {
+  background: var(--color-danger);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Fixed width, like the menu after it: the badges before them stay in one column. */
 .when {
+  flex: none;
   width: 120px;
   color: var(--color-text-muted);
   font-size: var(--text-md);
@@ -213,4 +248,69 @@ a.name::after {
   border-radius: var(--radius-md);
   background: var(--color-danger-soft);
   color: var(--color-danger);
+}
+
+/* Above the click target of the row (the ::after of its name). */
+.above {
+  position: relative;
+  z-index: 1;
+}
+
+.menuTrigger {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control-md);
+  height: var(--size-control-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.menuTrigger:hover,
+.menuTrigger[data-state="open"] {
+  background: var(--color-sunken);
+  color: var(--color-text);
+}
+
+.menuTrigger:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.menu {
+  z-index: 60;
+  min-width: 200px;
+  padding: var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-pop);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-control-md);
+  padding: 0 var(--space-2-5);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-md);
+  outline: none;
+  cursor: default;
+}
+
+.menuItem[data-highlighted] {
+  background: var(--color-hover);
+}
+
+.menuItem[data-disabled] {
+  color: var(--color-text-faint);
 }

@@ -265,7 +265,9 @@
         "notAProject": "No encontrado",
         "tooNew": "Versión más reciente",
         "invalid": "Ilegible"
-      }
+      },
+      "actions": "Acciones de {{name}}",
+      "removeFromList": "Quitar de la lista"
     },
     "dropZone": "Arrastre aquí la carpeta de un proyecto para abrirla",
     "migrate": {
@@ -993,6 +995,13 @@
     "reconnect": "Iniciar sesión de nuevo",
     "forget": "Quitar",
     "forgetNamed": "Quitar el servidor {{name}}",
+    "actions": "Acciones del servidor {{name}}",
+    "state": {
+      "online": "conectado",
+      "unreachable": "inaccesible",
+      "signedOut": "sesión cerrada",
+      "checking": "comprobando"
+    },
     "signedOut": "Sesión terminada: inicie sesión de nuevo para ver los proyectos de este servidor.",
     "projectsOf": "Proyectos de {{name}}",
     "connect": {

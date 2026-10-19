@@ -117,6 +117,97 @@ describe("HomeScreen", () => {
     });
   });
 
+  it("takes an available project off the list from its menu, without opening it", async () => {
+    mockHome([{ name: "Chroniques", status: "project" }]);
+    let removed: string | undefined;
+    server.use(
+      http.delete("/api/v1/me/recent-projects/{projectId}", ({ params, response }) => {
+        removed = params.projectId;
+        return response(204).empty();
+      }),
+    );
+    const user = userEvent.setup();
+    await renderApp("/");
+
+    await user.click(await screen.findByRole("button", { name: "Actions sur Chroniques" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Retirer de la liste" }));
+
+    await waitFor(() => {
+      expect(removed).toBe(chroniquesId);
+    });
+    expect(screen.getByRole("heading", { level: 1, name: "Bonjour, Arthur" })).toBeInTheDocument();
+  });
+
+  describe("servers (E2E-01-06)", () => {
+    const serverId = "A1B2C3D4E5F60718";
+
+    function mockServer(projects: "ok" | "unreachable") {
+      server.use(
+        http.get("/api/v1/servers", ({ response }) =>
+          response(200).json({
+            tokensSurviveRestart: true,
+            servers: [
+              {
+                id: serverId,
+                name: "wiki.example.org",
+                url: "https://wiki.example.org",
+                userId: "camille",
+                userName: "Camille R.",
+                connected: true,
+                lastUsedAt: "2026-10-13T06:00:00.000Z",
+                projectIds: [],
+              },
+            ],
+          }),
+        ),
+        http.get("/api/v1/servers/{serverId}/projects", ({ response }) =>
+          projects === "ok" ? response(200).json([]) : response.untyped(HttpResponse.error()),
+        ),
+      );
+    }
+
+    it("says on the badge, even closed, that the server is reachable", async () => {
+      mockHome();
+      mockServer("ok");
+      await renderApp("/");
+
+      const servers = await screen.findByRole("region", { name: "Serveurs" });
+      expect(await within(servers).findByText(/· connecté/)).toBeInTheDocument();
+    });
+
+    it("says on the badge that the server does not answer", async () => {
+      mockHome();
+      mockServer("unreachable");
+      await renderApp("/");
+
+      const servers = await screen.findByRole("region", { name: "Serveurs" });
+      expect(await within(servers).findByText(/· injoignable/)).toBeInTheDocument();
+    });
+
+    it("forgets a server from its menu", async () => {
+      mockHome();
+      mockServer("unreachable");
+      let forgotten: string | undefined;
+      server.use(
+        http.delete("/api/v1/servers/{serverId}", ({ params, response }) => {
+          forgotten = params.serverId;
+          return response(204).empty();
+        }),
+      );
+      const user = userEvent.setup();
+      await renderApp("/");
+
+      await user.click(
+        await screen.findByRole("button", { name: "Actions sur le serveur wiki.example.org" }),
+      );
+      await user.click(await screen.findByRole("menuitem", { name: "Retirer" }));
+
+      await waitFor(() => {
+        expect(forgotten).toBe(serverId);
+      });
+    });
+  });
+
   it("creates a project in the default folder with the chosen content language", async () => {
     mockHome();
     let body: unknown;

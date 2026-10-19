@@ -14,13 +14,17 @@ import { useFormatters } from "../../shared/i18n/format";
 import type { ElementId } from "../../shared/ids/elementId";
 import { Button } from "../../shared/ui/Button";
 import styles from "./RecentProjects.module.css";
+import { RowMenu } from "./RowMenu";
 import { useMigratingOpen } from "./useMigratingOpen";
 
 interface RecentProjectsProps {
   readonly onOpened: (project: ProjectSummary, lastElementId?: ElementId | null) => void;
 }
 
-/** Recent projects of the user profile (F01.R2): a missing folder stays listed, greyed, with « Retirer ». */
+/**
+ * Recent projects of the user profile (F01.R2): a missing folder stays listed, greyed, with « Retirer ». Every row
+ * also has a « ⋯ » menu to take it off the list; the folder itself is never touched.
+ */
 export function RecentProjects({ onOpened }: RecentProjectsProps) {
   const { t } = useTranslation();
   const format = useFormatters();
@@ -103,26 +107,27 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
                   )}
                   <span className={styles["path"]}>{project.folder}</span>
                 </span>
+                {!available && (
+                  <Button
+                    size="sm"
+                    className={styles["above"]}
+                    onClick={() => {
+                      remove.mutate(project.projectId);
+                    }}
+                    aria-label={t("home.recent.removeNamed", { name: project.name })}
+                  >
+                    {t("home.recent.remove")}
+                  </Button>
+                )}
                 {available ? (
                   <span className={styles["mode"]}>
                     <span className={styles["dot"]} aria-hidden />
-                    {t("home.recent.local")}
+                    <span className={styles["label"]}>{t("home.recent.local")}</span>
                   </span>
                 ) : (
-                  <>
-                    <span className={styles["status"]}>
-                      {t(`home.recent.status.${project.status}`)}
-                    </span>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        remove.mutate(project.projectId);
-                      }}
-                      aria-label={t("home.recent.removeNamed", { name: project.name })}
-                    >
-                      {t("home.recent.remove")}
-                    </Button>
-                  </>
+                  <span className={styles["status"]}>
+                    {t(`home.recent.status.${project.status}`)}
+                  </span>
                 )}
                 <time
                   className={styles["when"]}
@@ -131,6 +136,17 @@ export function RecentProjects({ onOpened }: RecentProjectsProps) {
                 >
                   {format.relative(new Date(project.lastOpenedAt))}
                 </time>
+                <RowMenu
+                  label={t("home.recent.actions", { name: project.name })}
+                  items={[
+                    {
+                      label: t("home.recent.removeFromList"),
+                      onSelect: () => {
+                        remove.mutate(project.projectId);
+                      },
+                    },
+                  ]}
+                />
               </li>
             );
           })}
