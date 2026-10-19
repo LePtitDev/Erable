@@ -455,3 +455,46 @@
   box-shadow: var(--shadow-sm);
   color: var(--color-text);
 }
+
+/* ─── Filters in a full-screen panel (narrow layout, F18.R7) ──────────── */
+
+.sheetOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--color-overlay);
+}
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+  background: var(--color-surface);
+  outline: none;
+}
+
+.sheetBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.sheet .filters {
+  min-height: 0;
+  border: 0;
+}
+
+.sheetFooter {
+  display: flex;
+  justify-content: stretch;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.sheetFooter > * {
+  flex: 1;
+}

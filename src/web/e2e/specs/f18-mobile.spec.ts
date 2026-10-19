@@ -5,6 +5,8 @@ import { LoginPage } from "../pages/LoginPage";
 import { PageViewPage } from "../pages/PageViewPage";
 import { PagePropertiesPanel } from "../pages/PagePropertiesPanel";
 import { PreferencesDialog } from "../pages/PreferencesDialog";
+import { QuickSearchPage } from "../pages/QuickSearchPage";
+import { SearchPage } from "../pages/SearchPage";
 import { TreePanel } from "../pages/TreePanel";
 import { t } from "../support/i18n";
 import { expectNoHorizontalScroll } from "../support/mobile";
@@ -163,6 +165,41 @@ test.describe("F18 · Mobile version", () => {
     await page.getByRole("button", { name: t("page.sidePanel") }).tap();
     await expect(panel.row("Niveau")).toContainText("50");
     await expect(view.title).toHaveText("Ilsa Varenne");
+  });
+
+  test("E2E-18-06 · Search on a phone @mobile @pr", async ({ page, reference }) => {
+    const quick = new QuickSearchPage(page);
+    const search = new SearchPage(page);
+    const width = page.viewportSize()?.width ?? 0;
+    await page.goto(reference.url(chroniques.ilsa));
+
+    // The quick search takes the screen.
+    await page.getByRole("button", { name: t("shell.searchShort") }).tap();
+    await expect(quick.field).toBeVisible();
+    expect((await quick.dialog.boundingBox())?.width).toBe(width);
+    await quick.field.fill("ilsa");
+    await expect(quick.options.filter({ hasText: "Ilsa Varenne" }).first()).toBeVisible();
+
+    // The search screen: the filters wait in their own panel.
+    await quick.dialog.getByRole("button", { name: t("search.quick.advanced") }).tap();
+    await expect(search.field).toBeVisible();
+    await expect(search.filters).toBeHidden();
+    await page.getByRole("button", { name: t("search.filters"), exact: true }).tap();
+    await expect(search.filters).toBeVisible();
+    await search.chooseCategory("PNJ");
+    const count = String.raw`\d+`;
+    const show = new RegExp(
+      `^(${t("search.showResults_one", { count })}|${t("search.showResults_other", { count })})$`,
+    );
+    await page.getByRole("button", { name: show }).tap();
+
+    await expect(search.filters).toBeHidden();
+    await expect(page.getByRole("button", { name: t("search.filtersActive") })).toBeVisible();
+    await expect(search.result("Ilsa Varenne")).toBeVisible();
+    // Only PNJ (Ilsa Varenne, Capitaine Orsen) are left.
+    for (const title of await search.titles.allTextContents()) {
+      expect(["Ilsa Varenne", "Capitaine Orsen"]).toContain(title);
+    }
   });
 
   test("E2E-18-09 · Preferences and account from the More menu @mobile", async ({

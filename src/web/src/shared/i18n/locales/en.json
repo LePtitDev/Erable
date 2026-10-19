@@ -468,7 +468,10 @@
       "escape": "Esc to close",
       "results": "Results",
       "advanced": "Advanced search"
-    }
+    },
+    "showResults_one": "Show {{count}} result",
+    "showResults_other": "Show {{count}} results",
+    "filtersActive": "Filters (active)"
   },
   "history": {
     "button": "History",

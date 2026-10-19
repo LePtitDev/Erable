@@ -476,7 +476,11 @@
       "escape": "Esc para cerrar",
       "results": "Resultados",
       "advanced": "Búsqueda avanzada"
-    }
+    },
+    "showResults_one": "Mostrar {{count}} resultado",
+    "showResults_many": "Mostrar {{count}} resultados",
+    "showResults_other": "Mostrar {{count}} resultados",
+    "filtersActive": "Filtros (activos)"
   },
   "history": {
     "button": "Historial",

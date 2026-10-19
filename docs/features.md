@@ -968,7 +968,7 @@ La même SPA, adaptée aux téléphones : pas de seconde interface. La **mise en
 - **F18.R4** Avec un pointeur grossier, toute cible interactive offre une zone de toucher d'au moins **44 × 44 px**, et aucune action n'est accessible seulement au survol ou au clic droit : les éléments de l'arbre et les lignes de liste ont un bouton « … » qui ouvre le même menu que le clic droit (un appui long l'ouvre aussi).
 - **F18.R5** Un élément de l'arbre se **déplace sans glisser-déposer** : l'action « Déplacer vers… » de son menu propose les destinations valides (même racine, pas sous lui-même) et produit le même déplacement que le glisser-déposer (F02).
 - **F18.R6** L'édition reste complète : la barre d'outils défile horizontalement, « Annuler » et « Enregistrer » restent visibles quand le clavier virtuel est ouvert, et le panneau de la page (propriétés, catégories, liens) passe sous un onglet au-dessus de l'éditeur au lieu de la colonne latérale. La palette d'insertion tient dans l'écran au-dessus du clavier.
-- **F18.R7** En mise en page étroite, les boîtes de dialogue et la recherche rapide occupent tout l'écran ; les filtres de l'écran Recherche s'ouvrent dans un panneau dédié.
+- **F18.R7** En mise en page étroite, la recherche rapide et les boîtes de dialogue occupent tout l'écran (les confirmations courtes restent des cartes centrées) ; les filtres de l'écran Recherche s'ouvrent dans un panneau plein écran, refermé par « Afficher les N résultats », pour en combiner plusieurs.
 - **F18.R8** La SPA servie par un serveur est **installable** comme application web : manifeste (nom, icônes, couleur de thème, `display: standalone`, `start_url` à la racine). Pas de mode hors ligne ni de service worker, et toujours aucun état durable dans le navigateur (décision Q7).
 
 ```gherkin
@@ -1005,10 +1005,10 @@ Quand        je touche « Enregistrer »
 Alors        la page en lecture affiche « Niveau » 50
 
 E2E-18-06 · Rechercher sur un téléphone                       P1 · @mobile @pr · M6
-Quand        je touche la recherche et tape « givre »
-Alors        la recherche rapide occupe l'écran et propose « Ordre du Givre »
-Quand        j'ouvre l'écran Recherche et le panneau des filtres, puis choisis la catégorie « PNJ »
-Alors        les résultats se limitent aux PNJ et le panneau se referme
+Quand        je touche la recherche et tape « ilsa »
+Alors        la recherche rapide occupe l'écran et propose « Ilsa Varenne »
+Quand        j'ouvre l'écran Recherche et le panneau des filtres, choisis la catégorie « PNJ » puis touche « Afficher les résultats »
+Alors        le panneau se referme et les résultats se limitent aux PNJ
 
 E2E-18-07 · Menu d'un élément sans clic droit                 P1 · @mobile · M6
 Quand        je touche le bouton « … » de « Hautbois » dans l'explorateur puis « Renommer »

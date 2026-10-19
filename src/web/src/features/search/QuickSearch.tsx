@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useEffect, useId, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -165,6 +165,15 @@ function Palette({
           onKeyDown={onKeyDown}
         />
         <kbd className={styles["kbd"]}>{t("search.quick.escape")}</kbd>
+        {/* No Escape key on a touch screen (F18.R7). */}
+        <button
+          type="button"
+          className={styles["close"]}
+          aria-label={t("common.close")}
+          onClick={onClose}
+        >
+          <X aria-hidden size={18} />
+        </button>
       </label>
       <div role="status" className={styles["hidden"]}>
         {status}

@@ -56,3 +56,32 @@
   gap: var(--space-2);
   margin-top: var(--space-2);
 }
+
+/* Narrow layout (F18.R7): a dialog with content takes the whole screen; a short confirmation stays a card. */
+@media (width <= 720px) {
+  .md,
+  .lg {
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    padding: calc(var(--space-5) + env(safe-area-inset-top)) var(--space-4)
+      calc(var(--space-5) + env(safe-area-inset-bottom));
+    border: 0;
+    border-radius: 0;
+    transform: none;
+  }
+
+  /* Always in reach, at the bottom of the screen, while the content scrolls. */
+  .md .footer,
+  .lg .footer {
+    position: sticky;
+    bottom: calc(-1 * (var(--space-5) + env(safe-area-inset-bottom)));
+    margin: auto calc(-1 * var(--space-4)) calc(-1 * (var(--space-5) + env(safe-area-inset-bottom)));
+    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+}

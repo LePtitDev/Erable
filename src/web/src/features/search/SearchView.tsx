@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { Dialog, VisuallyHidden } from "radix-ui";
 import { useEffect, useId, useMemo, useRef, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { errorMessage } from "../../shared/api/errors";
@@ -8,6 +9,7 @@ import { searchInfiniteQuery } from "../../shared/api/search";
 import type { ElementKind } from "../../shared/api/tree";
 import type { ElementId } from "../../shared/ids/elementId";
 import { Button } from "../../shared/ui/Button";
+import { useIsNarrowScreen } from "../../shared/ui/media";
 import { ActivityPanel } from "./ActivityPanel";
 import { FiltersPanel } from "./FiltersPanel";
 import { ResultCard } from "./ResultCard";
@@ -42,6 +44,9 @@ function SearchScreen({ projectId }: { readonly projectId: ElementId }) {
   const navigate = useNavigate({ from: "/p/$projectId/search" });
   const state = useMemo(() => parseSearchParams(raw), [raw]);
   const sortId = useId();
+  // Narrow layout (F18.R7): the filters open in a full-screen panel, to combine several before looking.
+  const narrow = useIsNarrowScreen();
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const setState = (next: SearchState) => {
     void navigate({ to: ".", search: toSearchParams(next), replace: true });
@@ -61,19 +66,46 @@ function SearchScreen({ projectId }: { readonly projectId: ElementId }) {
   if (results.isError && results.data === undefined) throw results.error;
   const total = first?.total ?? 0;
   const searched = state.q.trim() !== "";
+  const filters = (
+    <FiltersPanel
+      projectId={projectId}
+      state={state}
+      facets={facets}
+      onChange={setState}
+      onReset={() => {
+        setState(resetFilters(state));
+      }}
+    />
+  );
 
   return (
     <div className={styles["screen"]}>
       <h1 className={styles["visuallyHidden"]}>{t("search.title")}</h1>
-      <FiltersPanel
-        projectId={projectId}
-        state={state}
-        facets={facets}
-        onChange={setState}
-        onReset={() => {
-          setState(resetFilters(state));
-        }}
-      />
+      {narrow ? (
+        <Dialog.Root open={filtersOpen} onOpenChange={setFiltersOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className={styles["sheetOverlay"]} />
+            <Dialog.Content className={styles["sheet"]} aria-describedby={undefined}>
+              <VisuallyHidden.Root asChild>
+                <Dialog.Title>{t("search.filters")}</Dialog.Title>
+              </VisuallyHidden.Root>
+              <div className={styles["sheetBody"]}>{filters}</div>
+              <div className={styles["sheetFooter"]}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setFiltersOpen(false);
+                  }}
+                >
+                  {t("search.showResults", { count: total })}
+                </Button>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      ) : (
+        filters
+      )}
       <section
         className={styles["results"]}
         aria-label={t("search.title")}
@@ -95,6 +127,16 @@ function SearchScreen({ projectId }: { readonly projectId: ElementId }) {
                   : t("search.results", { count: total })}
             </h2>
           </div>
+          {narrow && (
+            <Button
+              onClick={() => {
+                setFiltersOpen(true);
+              }}
+            >
+              <SlidersHorizontal aria-hidden size={16} />
+              {isFiltered(state) ? t("search.filtersActive") : t("search.filters")}
+            </Button>
+          )}
           <label className={styles["sort"]} htmlFor={sortId}>
             {t("search.sortBy")}
             <select
