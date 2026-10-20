@@ -15,7 +15,7 @@ test.describe("F15 · Preferences", () => {
     await preferences.language.selectOption({ label: "English" });
     await page.keyboard.press("Escape");
 
-    // English labels (« Properties » joins with the properties panel, M2-06).
+    // English labels (« Properties » joins with the properties panel).
     await expect(page.getByRole("heading", { name: "Explorer", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Edit", exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");

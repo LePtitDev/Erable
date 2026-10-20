@@ -15,7 +15,7 @@ public sealed partial class ProjectService
     /// <summary>Upper bound of items per list of <see cref="GetRecent"/>.</summary>
     public const int MaxRecent = 50;
 
-    // ─── Recently viewed and edited (M3-04, F11) ────────────────────────────
+    // ─── Recently viewed and edited (F11) ────────────────────────────
 
     /// <summary>
     /// Counts a view of <paramref name="id"/> by <paramref name="userId"/> (F11.R1: the caller decides what counts as a view;

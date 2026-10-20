@@ -42,7 +42,7 @@ function conflictOf(body: ProblemDetails = problem): MergeConflict {
   return parsed;
 }
 
-describe("mergeConflictOf (M4-05)", () => {
+describe("mergeConflictOf", () => {
   it("reads the blocks, the revision and the other editors", () => {
     const conflict = conflictOf();
 

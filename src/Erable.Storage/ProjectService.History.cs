@@ -43,7 +43,7 @@ public sealed record RevisionRestored(long Revision, int SkippedCategories, int 
 
 public sealed partial class ProjectService
 {
-    // ─── History (M3-05, F13) ───────────────────────────────────────────────
+    // ─── History (F13) ───────────────────────────────────────────────
 
     /// <summary>The history of an element, newest first; null when the element does not exist (deleted ones have one too).</summary>
     public IReadOnlyList<RevisionEntry>? ListRevisions(ElementId id)

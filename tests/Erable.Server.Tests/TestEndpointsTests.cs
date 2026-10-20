@@ -176,7 +176,7 @@ public sealed class TestEndpointsTests
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
-    /// <summary>Release builds compile the endpoints out (CLAUDE.md §6.12): nothing to test there but their absence.</summary>
+    /// <summary>Release builds compile the endpoints out (CONTRIBUTING.md, invariant 12): nothing to test there but their absence.</summary>
     private static void SkipWhenCompiledOut()
     {
         if (!ErableHost.TestEndpointsCompiled)

@@ -4,7 +4,7 @@ namespace Erable.Core.Tests;
 
 public sealed class ArchitectureTests
 {
-    // Core must stay pure: no IO, database, HTTP or hosting dependency (CLAUDE.md §6.2).
+    // Core must stay pure: no IO, database, HTTP or hosting dependency (CONTRIBUTING.md, invariant 2).
     private static readonly string[] ForbiddenPrefixes =
     [
         "Microsoft.Data",

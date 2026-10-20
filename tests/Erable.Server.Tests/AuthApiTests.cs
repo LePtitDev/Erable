@@ -14,7 +14,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Accounts, sessions and roles (M4-01; E2E-14-01 to E2E-14-04 at API level).</summary>
+/// <summary>Accounts, sessions and roles (E2E-14-01 to E2E-14-04 at API level).</summary>
 public sealed class AuthApiTests
 {
     private static readonly DateTimeOffset Start = new(2026, 10, 13, 8, 0, 0, TimeSpan.Zero);

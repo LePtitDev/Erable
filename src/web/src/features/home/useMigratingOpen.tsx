@@ -14,7 +14,7 @@ interface Asked {
 }
 
 /**
- * Opens a project, asking first when its format is older (F01.R3, M2-09): the backend answers « migration required »
+ * Opens a project, asking first when its format is older (F01.R3): the backend answers « migration required »
  * and nothing is written until the user confirms in the dialog this hook provides.
  */
 export function useMigratingOpen() {

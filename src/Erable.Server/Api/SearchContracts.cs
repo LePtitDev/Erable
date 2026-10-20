@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Erable.Server.Api;
 
-// Search (M3-01, F10). The whole state of a search is in the query string, so that the SPA can mirror it in its URL
+// Search (F10). The whole state of a search is in the query string, so that the SPA can mirror it in its URL
 // (F10.R4): a search is a link.
 
 /// <summary>

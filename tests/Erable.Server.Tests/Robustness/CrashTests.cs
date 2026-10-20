@@ -10,7 +10,7 @@ using Erable.Testing;
 namespace Erable.Server.Tests.Robustness;
 
 /// <summary>
-/// A wiki must survive a power cut (docs/testing.md §6.1, M4-09): the real server process is killed at random moments in
+/// A wiki must survive a power cut (docs/testing.md §6.1): the real server process is killed at random moments in
 /// the middle of bursts of writes (pages, new pages, attachments), then the project is examined with the doctor and the
 /// server is started again on it. Every write the server acknowledged must still be there, whole; the one that was
 /// in flight is there whole or not at all; nothing is left half-written or referenced without its file.

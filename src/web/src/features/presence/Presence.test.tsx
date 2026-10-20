@@ -48,7 +48,7 @@ beforeEach(() => {
 
 afterEach(clearPresence);
 
-describe("presence (M4-04, F14.R3)", () => {
+describe("presence (F14.R3)", () => {
   it("tells who edits the page and which section", async () => {
     setPresenceUsers([
       user("camille", "Camille R.", { mode: "edit", section: "Histoire" }),

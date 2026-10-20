@@ -75,7 +75,7 @@ public static class StorageErrors
     public const string Inaccessible = "project.inaccessible";
 
     /// <summary>
-    /// An older project needs its format migrated, which only happens once the user confirmed (F01.R3, M2-09);
+    /// An older project needs its format migrated, which only happens once the user confirmed (F01.R3);
     /// <c>fromVersion</c> and <c>toVersion</c> in the extensions.
     /// </summary>
     public const string MigrationRequired = "project.migration.required";

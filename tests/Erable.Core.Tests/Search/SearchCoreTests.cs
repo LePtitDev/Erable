@@ -5,7 +5,7 @@ using Erable.Core.Search;
 
 namespace Erable.Core.Tests.Search;
 
-/// <summary>The pure parts of the search (M3-01): what reaches FTS5, folding, conditions.</summary>
+/// <summary>The pure parts of the search: what reaches FTS5, folding, conditions.</summary>
 public sealed partial class SearchCoreTests
 {
     private static readonly ElementId Property = ElementId.Parse("44B107E9C2A63F58");

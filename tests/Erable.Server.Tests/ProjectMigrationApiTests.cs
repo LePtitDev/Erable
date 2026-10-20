@@ -9,7 +9,7 @@ using Erable.Testing;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Opening a project of an older format over HTTP: only after the user confirmed (F01.R3, M2-09).</summary>
+/// <summary>Opening a project of an older format over HTTP: only after the user confirmed (F01.R3).</summary>
 public sealed class ProjectMigrationApiTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

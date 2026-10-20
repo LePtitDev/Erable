@@ -6,7 +6,7 @@ import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
 import styles from "./HelpDialog.module.css";
 
-/** The shortcuts that cannot be changed; the others come from the table of shortcuts (M5-01). */
+/** The shortcuts that cannot be changed; the others come from the table of shortcuts. */
 const fixed = ["rename", "palette", "close"] as const;
 
 export function HelpDialog({

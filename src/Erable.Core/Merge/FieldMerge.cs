@@ -13,7 +13,7 @@ public sealed record ValuesMerge(IReadOnlyDictionary<string, JsonNode?> Merged, 
 
 /// <summary>
 /// Field-by-field three-way merge of what a page holds besides its text: its categories and its property values
-/// (M4-05, F14.R5). A field only one editor changed takes that change; a field both changed the same way keeps it; only
+/// (F14.R5). A field only one editor changed takes that change; a field both changed the same way keeps it; only
 /// a field both changed differently is a conflict.
 /// </summary>
 public static class FieldMerge

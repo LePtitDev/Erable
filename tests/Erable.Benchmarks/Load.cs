@@ -12,7 +12,7 @@ using NBomber.CSharp;
 namespace Erable.Benchmarks;
 
 /// <summary>
-/// The load test of docs/testing.md §11.2 (M4-09): a team of virtual users (80 % reading, 20 % writing) on a server for
+/// The load test of docs/testing.md §11.2: a team of virtual users (80 % reading, 20 % writing) on a server for
 /// several minutes. Fails on any error, on a p95 over the budgets of §11.1, or on a working set that keeps growing.
 /// </summary>
 internal static class Load

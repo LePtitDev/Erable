@@ -4,7 +4,7 @@ using Erable.Core.Elements;
 namespace Erable.Core.Properties;
 
 /// <summary>
-/// Data the <c>kind</c> and <c>in_category</c> rules need (M2-02, « Points d'attention »): the evaluator never reads
+/// Data the <c>kind</c> and <c>in_category</c> rules need (« Points d'attention »): the evaluator never reads
 /// the storage itself.
 /// </summary>
 public interface IRuleContext

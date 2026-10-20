@@ -9,7 +9,7 @@ using Erable.Server.Tests.Infrastructure;
 
 namespace Erable.Server.Tests;
 
-/// <summary>The name a user is shown under, changed from the preferences (M5-06, F15).</summary>
+/// <summary>The name a user is shown under, changed from the preferences (F15).</summary>
 public sealed class DisplayNameApiTests
 {
     private const string MeName = "/api/v1/me/name";

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Presence (M4-04, F14.R3): who reads or edits which page, and which section.</summary>
+/// <summary>Presence (F14.R3): who reads or edits which page, and which section.</summary>
 public sealed class PresenceTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

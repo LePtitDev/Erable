@@ -8,7 +8,7 @@ using Erable.Testing.Reference;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Recently viewed and edited elements over HTTP (M3-04, F11).</summary>
+/// <summary>Recently viewed and edited elements over HTTP (F11).</summary>
 public sealed class RecentApiTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

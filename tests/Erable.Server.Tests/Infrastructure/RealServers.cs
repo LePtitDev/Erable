@@ -20,7 +20,7 @@ namespace Erable.Server.Tests.Infrastructure;
 
 /// <summary>
 /// An Erable server in server mode on a real loopback port: the kind of server a desktop application connects to
-/// (M4-07). Comes with a project and three members.
+///. Comes with a project and three members.
 /// </summary>
 public sealed class RealServer : IAsyncDisposable
 {

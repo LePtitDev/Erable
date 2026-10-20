@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { api, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
-// Categories, property definitions and resolved values (docs/architecture.md §8.1, M2-03). Values and rules are free
+// Categories, property definitions and resolved values (docs/architecture.md §8.1). Values and rules are free
 // JSON: read them with src/shared/properties (parseValue, parseRules) through features/properties/definitions.ts.
 
 export type CategoryListItem = Rebrand<Schemas["CategoryListItem"]>;

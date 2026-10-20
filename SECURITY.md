@@ -1,21 +1,21 @@
-# Politique de sécurité
+# Security policy
 
-## Signaler une vulnérabilité
+## Reporting a vulnerability
 
-**N'ouvrez pas d'issue publique** pour une faille de sécurité. Utilisez le signalement privé de GitHub : onglet *Security* du dépôt, puis *Report a vulnerability* (« Privately report a vulnerability »).
+**Do not open a public issue** for a security problem. Use GitHub private reporting: the *Security* tab of the repository, then *Report a vulnerability*.
 
-Indiquez si possible :
+If possible, include:
 
-- la version d'Erable (`/api/info`, ou *Aide* dans l'application) et le mode (bureau ou serveur) ;
-- les étapes pour reproduire, et ce qu'un attaquant obtient (lecture, écriture, exécution, déni de service) ;
-- toute preuve de concept utile.
+- the Erable version (`/api/info`, or *Help* in the application) and the mode (desktop or server);
+- the steps to reproduce, and what an attacker gains (read, write, execution, denial of service);
+- any useful proof of concept.
 
-Nous accusons réception sous 7 jours et vous tenons informé de la correction. Une fois la version corrigée publiée, la faille est décrite dans une *security advisory* GitHub, avec votre nom si vous le souhaitez.
+Erable is maintained in limited free time: reports are read as soon as possible, without a guaranteed response time. Once a fixed version is published, the vulnerability is described in a GitHub security advisory, with your name if you wish.
 
-## Versions suivies
+## Supported versions
 
-Seule la **dernière version publiée** reçoit des correctifs de sécurité : l'application de bureau se met à jour seule, et l'image Docker se met à jour en retirant la nouvelle étiquette (`docs/deployment.md`).
+Only the **latest published version** receives security fixes: the desktop application updates itself, and the Docker image is updated by pulling the new tag (`docs/deployment.md`).
 
-## Périmètre
+## Scope
 
-Les mesures en place et leurs limites sont décrites dans `docs/architecture.md` §9 (sécurité) et `docs/deployment.md` §4 (ce que le serveur protège). Sont hors périmètre : un serveur exposé sans HTTPS, un administrateur malveillant, et l'accès au disque de la machine qui héberge les projets.
+The measures in place and their limits are described in `docs/architecture.md` §9 (security) and `docs/deployment.md` §4 (what the server protects). Out of scope: a server exposed without HTTPS, a malicious administrator, and access to the disk of the machine hosting the projects.

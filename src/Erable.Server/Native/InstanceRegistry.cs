@@ -18,7 +18,7 @@ public sealed record InstanceInfo(int ProcessId, int Port, string IpcToken);
 public sealed record ActivateRequest(string? Folder);
 
 /// <summary>
-/// Single instance per project (F16.R2, decision P-04). Each desktop instance writes <c>instances/&lt;pid&gt;.json</c>
+/// Single instance per project (F16.R2). Each desktop instance writes <c>instances/&lt;pid&gt;.json</c>
 /// in the application profile (port and IPC token) while it runs. An instance that finds a project locked asks the
 /// other instances, through <c>POST /ipc/activate</c> on their loopback port, which one has it: that one comes to the
 /// front. The IPC token grants nothing else (it is not the session token).

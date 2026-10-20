@@ -111,7 +111,7 @@ test.describe("F01 · Home and projects", () => {
     rmSync(folder, { recursive: true, force: true });
   });
 
-  test("M1-17 · Opening a folder lands on the project, not on an element named after its path @pr", async ({
+  test("Opening a folder lands on the project, not on an element named after its path @pr", async ({
     home,
     page,
     reference,

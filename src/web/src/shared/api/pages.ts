@@ -62,7 +62,7 @@ export function pageContentQuery(projectId: ElementId, id: ElementId) {
   });
 }
 
-/** The categories of a page and every value it defines (full replacement), saved with its content (M2-06). */
+/** The categories of a page and every value it defines (full replacement), saved with its content. */
 export interface PageStructure {
   readonly categories: readonly ElementId[];
   readonly properties: readonly { readonly propertyId: ElementId; readonly value: unknown }[];
@@ -98,7 +98,7 @@ export function savePageContent(
   );
 }
 
-/** What saving the structure would give, without saving it: the live panel of the editor (M2-06). */
+/** What saving the structure would give, without saving it: the live panel of the editor. */
 export function pagePreviewQuery(projectId: ElementId, id: ElementId, structure: PageStructure) {
   return queryOptions({
     queryKey: [...queryKeys.page(projectId, id), "preview", JSON.stringify(structure)],

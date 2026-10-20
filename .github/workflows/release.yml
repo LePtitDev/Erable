@@ -1,4 +1,4 @@
-# Release pipeline (M5-03, docs/testing.md §13, docs/release.md): a version tag (`v1.2.3` or `1.2.3`) builds the desktop
+# Release pipeline (docs/testing.md §13, docs/release.md): a version tag (`v1.2.3` or `1.2.3`) builds the desktop
 # installers and erable-cli on the three systems, builds and scans the server image, then publishes. No tests run here: the
 # tagged commit has already been through the PR pipeline. A tag pushed with Git gets a draft release, published once
 # everything is green; a release created on GitHub (which pushes its tag) is kept as it is and receives the installers.
@@ -134,7 +134,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "$TAG" artifacts/release/${{ matrix.rid }}/* artifacts/cli/erable-cli-${{ matrix.rid }}.* --clobber
 
-  # The Android APK (M6-08, docs/release.md). Signed with the release keystore when its secrets exist; without them it is
+  # The Android APK (docs/release.md). Signed with the release keystore when its secrets exist; without them it is
   # only built (a debug key differs on every runner: such an APK could not be updated), and not attached.
   android:
     name: Android APK

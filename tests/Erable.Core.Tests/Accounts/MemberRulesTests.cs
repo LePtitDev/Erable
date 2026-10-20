@@ -3,7 +3,7 @@ using Erable.Core.Accounts;
 
 namespace Erable.Core.Tests.Accounts;
 
-/// <summary>A project is never left without an administrator (M4-08).</summary>
+/// <summary>A project is never left without an administrator.</summary>
 public sealed class MemberRulesTests
 {
     private static MemberRoleEntry Member(string id, ProjectRole role, bool active = true) => new(id, role, active);

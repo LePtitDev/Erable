@@ -1,4 +1,4 @@
-# Continuous replication of the SQLite databases of an Erable server (docs/deployment.md §6, M5-05).
+# Continuous replication of the SQLite databases of an Erable server (docs/deployment.md §6).
 # The databases are in WAL mode, which Litestream needs. The attachments (blobs/) are NOT SQLite: see the guide.
 # Environment variables are expanded by Litestream.
 dbs:

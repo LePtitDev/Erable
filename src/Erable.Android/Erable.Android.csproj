@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    The Android application (M6-07, decision Q11): a client of Erable servers. It keeps a list of servers and shows the
+    The Android application (decision Q11): a client of Erable servers. It keeps a list of servers and shows the
     SPA of the chosen one in a WebView; nothing of the backend or of the SPA is embedded. Out of Erable.sln: building
     it needs the android workload (`dotnet workload install android`); its pure logic (Shell/) is tested by
-    tests/Erable.Android.Tests. Packaged by build/publish-android.mjs (M6-08).
+    tests/Erable.Android.Tests. Packaged by build/publish-android.mjs.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0-android</TargetFramework>

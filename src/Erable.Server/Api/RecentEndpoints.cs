@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Erable.Server.Api;
 
-// Recently viewed and edited (M3-04, F11).
+// Recently viewed and edited (F11).
 
 /// <summary>An element the user viewed, newest first.</summary>
 public sealed record ViewedItem(ElementId Id, ElementKind Kind, string Name, DateTimeOffset ViewedAt);

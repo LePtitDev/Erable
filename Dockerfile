@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Erable server image (M4-06, docs/deployment.md). Build from the repository root:
+# Erable server image (docs/deployment.md). Build from the repository root:
 #   docker build -t erable .
 #   docker build -t erable --build-arg ERABLE_VERSION="$(node build/version.mjs)" .   (the version it shows)
 # Run:   docker run -p 8080:8080 -v erable-data:/data -e ERABLE_ADMIN_LOGIN=admin -e ERABLE_ADMIN_PASSWORD=... erable

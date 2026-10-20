@@ -35,7 +35,7 @@ public static class ErrorCodes
     /// <summary>The file exceeds the configured maximum attachment size (F06.R5).</summary>
     public const string AttachmentTooLarge = "attachment.tooLarge";
 
-    /// <summary>The project has used the room the server grants to its attachments (M4-06).</summary>
+    /// <summary>The project has used the room the server grants to its attachments.</summary>
     public const string AttachmentQuotaExceeded = "attachment.quotaExceeded";
 
     /// <summary>The chosen parent category does not exist.</summary>
@@ -124,7 +124,7 @@ public static class ErrorCodes
     /// <summary>Only the revisions of a live page can be restored.</summary>
     public const string RevisionNotRestorable = "revision.notRestorable";
 
-    // ─── Accounts and access (M4-01) ────────────────────────────────────────
+    // ─── Accounts and access ────────────────────────────────────────
 
     public const string AccountLoginInvalid = "account.login.invalid";
     public const string AccountNameInvalid = "account.name.invalid";
@@ -135,7 +135,7 @@ public static class ErrorCodes
 
     public const string AccountNotFound = "account.notFound";
 
-    /// <summary>The project must keep at least one administrator (M4-08).</summary>
+    /// <summary>The project must keep at least one administrator.</summary>
     public const string MemberLastAdmin = "member.lastAdmin";
 
     /// <summary>The server must keep at least one active administrator.</summary>

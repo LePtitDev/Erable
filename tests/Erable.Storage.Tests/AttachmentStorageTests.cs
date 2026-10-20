@@ -109,7 +109,7 @@ public sealed class AttachmentStorageTests : IDisposable
     {
         var page = await PageAsync("Hautbois");
         var attachment = (await AttachAsync(page, "carte.png", Png)).Value;
-        // A purged attachment (M2-08): the row goes, its revision stays.
+        // A purged attachment: the row goes, its revision stays.
         _project.Database.Write((c, t) => c.Execute("DELETE FROM attachments WHERE id = @Id", new { Id = attachment.Id.ToInt64() }, t));
 
         var deleted = await _service.CollectGarbageAsync(Ct);

@@ -1,4 +1,4 @@
-// Development-only page for the visual review of the design tokens (M0-05). Not part of production builds.
+// Development-only page for the visual review of the design tokens. Not part of production builds.
 import { useSyncExternalStore } from "react";
 import { contrastRatio } from "../shared/theme/contrast";
 import { ThemeSwitcher } from "../shared/theme/ThemeSwitcher";

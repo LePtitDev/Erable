@@ -2,7 +2,7 @@ using Erable.Core.Elements;
 
 namespace Erable.Core.Tests.Tree;
 
-/// <summary>The default labels of the content follow the language of the project (decision Q1, M5-05).</summary>
+/// <summary>The default labels of the content follow the language of the project (decision Q1).</summary>
 public sealed class RootsTests
 {
     public static TheoryData<string> Languages => [.. ContentLanguages.All];

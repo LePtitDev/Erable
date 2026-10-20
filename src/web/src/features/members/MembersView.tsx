@@ -24,7 +24,7 @@ import styles from "./MembersView.module.css";
 
 const roles: readonly ProjectRole[] = ["reader", "editor", "admin"];
 
-/** « Membres » (M4-08, E2E-14-10): who may do what in the project. For its administrators only. */
+/** « Membres » (E2E-14-10): who may do what in the project. For its administrators only. */
 export function MembersView() {
   const { projectId } = useParams({ from: "/p/$projectId/members" });
   const access = useProjectAccess();

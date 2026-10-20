@@ -14,7 +14,7 @@ public enum ThemePreference
 /// </summary>
 /// <param name="Language">Interface language (<c>fr</c>, <c>en</c>, <c>de</c>, <c>es</c>); null follows the browser.</param>
 /// <param name="Theme">Light, dark, or following the OS.</param>
-/// <param name="Shortcuts">Command → key combination overrides; an empty value means no shortcut (F15.R4, M5-01).</param>
+/// <param name="Shortcuts">Command → key combination overrides; an empty value means no shortcut (F15.R4).</param>
 public sealed record UserPreferences(string? Language, ThemePreference Theme, IReadOnlyDictionary<string, string>? Shortcuts)
 {
     public const int MaxShortcuts = 200;

@@ -7,7 +7,7 @@ using Erable.Core.Markdown;
 namespace Erable.Core.Tests.Markdown;
 
 /// <summary>
-/// Fuzzing of the Markdown analysis (docs/testing.md §12, M5-04): random inputs built from the tokens that matter to
+/// Fuzzing of the Markdown analysis (docs/testing.md §12): random inputs built from the tokens that matter to
 /// the grammar must never throw, never hang, and cost time linear in the size of the input. A short run belongs to the
 /// regular suite; the weekly workflow sets <c>ERABLE_FUZZ_SECONDS=600</c>. A failing input is written to
 /// <c>artifacts/fuzz/</c> (or <c>ERABLE_FUZZ_OUTPUT</c>) to be added to <c>spec/fixtures/markdown/edge-cases.json</c>.
@@ -19,7 +19,7 @@ public sealed class MarkdownFuzzTests
     private static readonly TimeSpan PerInputLimit = TimeSpan.FromSeconds(5);
 
     // No tab: inside a list item, Markdig's precise source locations drift by the width of the tab (« * ##<TAB>#    [[ID]] »
-    // reports the reference two characters early, R10). Upstream behaviour, recorded in tasks/M5-04; remove this
+    // reports the reference two characters early, R10). Upstream behaviour; remove this
     // restriction when it is fixed.
     private static readonly string[] Tokens =
     [
@@ -37,7 +37,7 @@ public sealed class MarkdownFuzzTests
     ];
 
     /// <summary>
-    /// Found by this fuzzing (M5-04): Markdig takes quadratic time on these before it gives up on the nesting depth
+    /// Found by this fuzzing: Markdig takes quadratic time on these before it gives up on the nesting depth
     /// (« [a]( » × 16 000 = 64 KB takes about a second, × 4 for each doubling). Not fixed upstream: the limits of
     /// <see cref="MarkdownLimits"/> refuse them before the parser runs (docs/markdown-syntax.md §6).
     /// </summary>

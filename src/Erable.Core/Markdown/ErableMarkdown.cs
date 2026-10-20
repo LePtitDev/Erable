@@ -38,7 +38,7 @@ public static partial class ErableMarkdown
         {
             // Markdig refuses input nested deeper than its limit (« [ » or « > » repeated thousands of times). The page is
             // not sensible Markdown but it is the user's text: it is kept and indexed as plain text, with no reference and no
-            // heading, instead of failing the save (found by the fuzzing of M5-04).
+            // heading, instead of failing the save (found by fuzzing).
             return new MarkdownAnalysis([], [], NormalizeWhitespace(markdown));
         }
 
@@ -126,7 +126,7 @@ public static partial class ErableMarkdown
     /// <summary>
     /// The text of the inlines in document order. Iterative on purpose: a hostile page can nest thousands of inlines
     /// (« [[ » repeated 5 000 times), which a recursive walk turns into a stack overflow that no handler can catch and
-    /// that takes the whole server down (found by the fuzzing of M5-04).
+    /// that takes the whole server down (found by fuzzing).
     /// </summary>
     private static void AppendInlines(StringBuilder text, ContainerInline? container)
     {

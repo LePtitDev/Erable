@@ -14,7 +14,6 @@ test.describe("F04 · Reading a page", () => {
     await expect(view.breadcrumb).toHaveText(
       /Pages\s*\/\s*Personnages\s*\/\s*PNJ\s*\/\s*Ilsa Varenne/,
     );
-    // Category chips arrive with M2-06 (no category data in M1).
     await expect(view.article).toContainText("Modifiée il y a 2 h par Camille R.");
     for (const name of ["Hautbois", "Ordre du Givre", "Capitaine Orsen"]) {
       await expect(view.link(name)).toBeVisible();
@@ -144,7 +143,7 @@ test.describe("F03 · Stable identifiers", () => {
 test.describe("perf · page opening", () => {
   test.use({ fakeClock: false });
 
-  test("perf · Opening a page takes less than 200 ms (indicative, budget M3-06) @perf", async ({
+  test("perf · Opening a page takes less than 200 ms (indicative, budget docs/testing.md §11.1) @perf", async ({
     page,
     reference,
   }) => {

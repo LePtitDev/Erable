@@ -5,7 +5,7 @@ using Erable.Core;
 namespace Erable.Storage;
 
 /// <summary>
-/// Single-instance lock of a project (F16.R2, decision P-04): <c>erable.lock</c> opened without sharing for as long
+/// Single-instance lock of a project (F16.R2): <c>erable.lock</c> opened without sharing for as long
 /// as the project is open. Windows enforces it with a sharing violation, Linux and macOS with an exclusive
 /// <c>flock</c> (how .NET implements <see cref="FileShare.None"/>). The operating system releases it when the process
 /// dies, so a crash never leaves a stale lock. The file holds the PID for diagnostics only

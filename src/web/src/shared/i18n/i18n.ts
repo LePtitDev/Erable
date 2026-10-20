@@ -66,7 +66,7 @@ export function availableLanguages(): string[] {
 }
 
 /**
- * Initial language: `<html lang>` (written by the backend from the user's preference, decision P-03),
+ * Initial language: `<html lang>` (written by the backend from the user's preference, decision Q7),
  * then the browser languages, then French.
  */
 export function initialLanguage(): string {

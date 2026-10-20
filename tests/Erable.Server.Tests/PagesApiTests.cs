@@ -224,7 +224,7 @@ public sealed class PagesApiTests
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
         }
 
-        // Budget 100 ms (docs/testing.md §11.1, measured formally in M3-06); generous bound against CI noise.
+        // Budget 100 ms (docs/testing.md §11.1, measured formally by the benchmarks); generous bound against CI noise.
         durations.Order().ElementAt(durations.Count / 2).ShouldBeLessThan(250);
     }
 

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Erable.Server.Api;
 
-// Revision history (M3-05, F13).
+// Revision history (F13).
 
 /// <summary>A line of the history. <c>changes</c>: created, name, text, categories, properties, other.</summary>
 public sealed record RevisionItem(

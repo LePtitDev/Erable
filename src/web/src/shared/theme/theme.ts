@@ -9,7 +9,7 @@ function isThemePreference(value: unknown): value is ThemePreference {
 
 /**
  * The backend writes the user's preference into `<html data-theme>` before serving index.html,
- * so the first paint already has the right theme (F15.R3, decision P-03).
+ * so the first paint already has the right theme (F15.R3, decision Q7).
  */
 export function readInitialTheme(root: HTMLElement = document.documentElement): ThemePreference {
   const value = root.dataset["theme"];

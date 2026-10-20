@@ -6,7 +6,7 @@ using Erable.Testing;
 
 namespace Erable.Server.Tests;
 
-/// <summary>`erable serve`: command line and ERABLE_* variables become host options (M4-06).</summary>
+/// <summary>`erable serve`: command line and ERABLE_* variables become host options.</summary>
 public sealed class ServeConfigurationTests
 {
     private static Func<string, string?> Env(params (string Name, string Value)[] variables)

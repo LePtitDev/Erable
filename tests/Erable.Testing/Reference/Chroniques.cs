@@ -128,7 +128,7 @@ public static class Chroniques
             .Stamped("portrait_ilsa.png", Date(2026, 3, 12, 11, 0), "malo");
 
         // Structure (docs/features.md §2.1, §2.2). Categories are flat in the tree: their inheritance is an attribute of
-        // the category (decision P-14). Keys disambiguate the names used twice (« Région », « Personnages », « PNJ »).
+        // the category. Keys disambiguate the names used twice (« Région », « Personnages », « PNJ »).
         // Properties come first: category defaults refer to them.
         p.WithFolder("Personnages", under: "Propriétés", key: "Propriétés/Personnages");
         p.WithProperty("Niveau", under: "Propriétés/Personnages", id: Niveau.ToString(), type: "int",

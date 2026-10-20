@@ -58,7 +58,7 @@ const admin: Member = {
 };
 const lea: Member = { userId: "lea", name: "Léa M.", role: "reader", disabled: false, isMe: false };
 
-describe("Members (M4-08)", () => {
+describe("Members", () => {
   it("lists the members with their role", async () => {
     mockMembers([admin, lea]);
 

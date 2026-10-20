@@ -83,7 +83,7 @@ public static class ErableCli
     }
 
     /// <summary>
-    /// Starts the server (M4-06). The first start of a server without any account asks for the first administrator, or
+    /// Starts the server. The first start of a server without any account asks for the first administrator, or
     /// takes it from <c>ERABLE_ADMIN_LOGIN</c> / <c>ERABLE_ADMIN_PASSWORD</c>; without either it stops, since nobody could sign in.
     /// </summary>
     internal static async Task<int> ServeAsync(

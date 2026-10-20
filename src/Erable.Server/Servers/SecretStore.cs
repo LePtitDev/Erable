@@ -7,7 +7,7 @@ using System.Text;
 namespace Erable.Server.Servers;
 
 /// <summary>
-/// Where the desktop application keeps the sign-in token of a server (M4-07, docs/architecture.md §9): never in
+/// Where the desktop application keeps the sign-in token of a server (docs/architecture.md §9): never in
 /// clear text on disk, never in the web page. Each platform has its own vault; where none is available the token is
 /// kept in memory only and the user signs in again at the next launch.
 /// </summary>

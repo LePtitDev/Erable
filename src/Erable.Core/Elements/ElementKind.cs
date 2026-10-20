@@ -15,7 +15,7 @@ public enum ElementKind
     LinkType,
 
     /// <summary>
-    /// File attached to a page (decision P-02): an element of the shared ID space whose parent is its page.
+    /// File attached to a page: an element of the shared ID space whose parent is its page.
     /// It is not shown in the explorer and is never moved through the tree.
     /// </summary>
     Attachment,

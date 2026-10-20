@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Performance tooling (M3-06, docs/testing.md §11): large project generator, budgets over HTTP, BenchmarkDotNet. -->
+  <!-- Performance tooling (docs/testing.md §11): large project generator, budgets over HTTP, BenchmarkDotNet. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>

@@ -18,7 +18,7 @@ const probe = {
   appFormatVersion: 4,
 };
 
-describe("ConnectServerDialog (M4-07, E2E-01-06, E2E-16-06)", () => {
+describe("ConnectServerDialog (E2E-01-06, E2E-16-06)", () => {
   it("checks the server first, then signs in", async () => {
     const user = userEvent.setup();
     const onConnected = vi.fn();

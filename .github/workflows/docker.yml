@@ -1,4 +1,4 @@
-# Server image (M4-06): built, scanned for known vulnerabilities, started and checked.
+# Server image: built, scanned for known vulnerabilities, started and checked.
 # Third-party actions are pinned by commit SHA (tag in comment); Renovate will bump them.
 name: Docker image
 

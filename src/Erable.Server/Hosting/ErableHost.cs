@@ -85,7 +85,7 @@ public static class ErableHost
         builder.Services.AddSingleton<LoginThrottle>();
         if (options.Mode == HostMode.Desktop)
         {
-            // The servers the application connects to (M4-07): their registry, the vault of their tokens, the forwarding.
+            // The servers the application connects to: their registry, the vault of their tokens, the forwarding.
             builder.Services.AddHttpForwarder();
             builder.Services.TryAddSingleton<ISecretStore>(services =>
                 SecretStores.Create(services.GetRequiredService<UserProfiles>().Default.Directory));

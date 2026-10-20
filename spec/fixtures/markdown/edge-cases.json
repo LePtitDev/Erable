@@ -367,7 +367,7 @@
         }
       ],
       "knownFailure": "csharp",
-      "note": "Markdig (UsePreciseSourceLocation) reports 8..28 instead of 10..30: known gap, tasks/M5-04 point 3. Remove knownFailure once fixed."
+      "note": "Markdig (UsePreciseSourceLocation) reports 8..28 instead of 10..30: known upstream gap. Remove knownFailure once fixed."
     }
   ]
 }

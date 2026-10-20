@@ -44,7 +44,7 @@ const empty = "";
 const sides = ["mine", "theirs"] as const;
 
 /**
- * The resolution view (M4-05, E2E-14-08): both versions of each passage both editors changed, a choice for each —
+ * The resolution view (E2E-14-08): both versions of each passage both editors changed, a choice for each —
  * mine, theirs, both, or by hand — and the properties changed on both sides. Saving needs every passage settled; the
  * version that is not kept stays in the history of the page, nothing is ever lost.
  */

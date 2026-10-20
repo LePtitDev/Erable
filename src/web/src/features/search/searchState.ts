@@ -2,7 +2,7 @@ import type { ElementKind } from "../../shared/api/tree";
 import { parseElementId, type ElementId } from "../../shared/ids/elementId";
 import type { ScalarType } from "../../shared/properties/types";
 
-// The whole state of a search lives in the URL (F10.R4, M3-03): this module reads it from there, writes it back
+// The whole state of a search lives in the URL (F10.R4): this module reads it from there, writes it back
 // and turns it into the query of `GET search`. No React in here.
 
 export type SearchSort = "relevance" | "modified" | "name";

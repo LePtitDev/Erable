@@ -3,7 +3,7 @@ using Erable.Testing;
 
 namespace Erable.Core.Tests.Markdown;
 
-/// <summary>spec/fixtures/limits, shared with src/web/src/shared/markdown/limits.fixtures.test.ts (M5-04).</summary>
+/// <summary>spec/fixtures/limits, shared with src/web/src/shared/markdown/limits.fixtures.test.ts.</summary>
 public sealed class MarkdownLimitsTests
 {
     public static TheoryData<FixtureCase> Cases => SharedFixtures.Load("limits");

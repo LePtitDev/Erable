@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { api, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
-// Link types and typed links between pages (docs/architecture.md §5.5, F09, M2-07).
+// Link types and typed links between pages (docs/architecture.md §5.5, F09).
 
 export type LinkTypeItem = Rebrand<Schemas["LinkTypeItem"]>;
 export type LinkTypeView = Rebrand<Schemas["LinkTypeView"]>;

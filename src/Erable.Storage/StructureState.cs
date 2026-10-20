@@ -109,7 +109,7 @@ public sealed class StructureState : IRuleContext
 
     /// <summary>
     /// Replaces the categories and the own values of a page in this snapshot, without writing anything: the resolution
-    /// that follows shows what saving them would give (live preview of the page editor, M2-06). Unknown categories are
+    /// that follows shows what saving them would give (live preview of the page editor). Unknown categories are
     /// ignored.
     /// </summary>
     public void Overlay(ElementId pageId, IReadOnlyList<ElementId> categories, IReadOnlyList<(ElementId Property, PropertyValue Value)> values)

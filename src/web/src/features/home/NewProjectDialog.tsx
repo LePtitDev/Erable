@@ -33,7 +33,7 @@ export function NewProjectDialog({
   const { t, i18n } = useTranslation();
   const ids = { name: useId(), language: useId(), location: useId() };
   const me = useQuery(meQuery);
-  // A server hosts the project itself: the user gives a name, not a place (M4-01).
+  // A server hosts the project itself: the user gives a name, not a place.
   const hosted = useQuery(apiInfoQuery).data?.folderProjects === false;
   const create = useCreateProject();
   const [name, setName] = useState(defaultName);

@@ -9,7 +9,7 @@ const embedGlyph =
 
 /**
  * Editor look of the mockup « Page — édition »: IBM Plex Mono 14/26, line numbers, pills in the UI font with the
- * colours of their kind. Only design tokens: light and dark come from the CSS variables (CLAUDE.md §6.8).
+ * colours of their kind. Only design tokens: light and dark come from the CSS variables (CONTRIBUTING.md, invariant 8).
  */
 export const editorTheme: Extension = [
   EditorView.theme({

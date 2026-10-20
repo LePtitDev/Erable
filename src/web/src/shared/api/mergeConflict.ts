@@ -19,7 +19,7 @@ export interface ValueConflict {
 }
 
 /**
- * The answer of a save that cannot be merged (409 `page.revisionConflict` with details, M4-05): the page as the other
+ * The answer of a save that cannot be merged (409 `page.revisionConflict` with details): the page as the other
  * editor left it, the merged text in blocks, and the structure the page would have if the conflicts went their way.
  */
 export interface MergeConflict {

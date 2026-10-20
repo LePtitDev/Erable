@@ -7,7 +7,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Storage.Tests;
 
-/// <summary>Link types and typed links on the reference project (M2-07, F09).</summary>
+/// <summary>Link types and typed links on the reference project (F09).</summary>
 public sealed class LinkStorageTests : IDisposable
 {
     private readonly TempDirectory _dir = TempDirectory.Create();

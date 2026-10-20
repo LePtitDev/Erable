@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Erable.Storage;
 
-/// <summary>What a save that arrived late was merged with (M4-05): the page as saved, and who else had changed it.</summary>
+/// <summary>What a save that arrived late was merged with: the page as saved, and who else had changed it.</summary>
 /// <param name="Markdown">The text after the merge: the client shows it instead of what it sent.</param>
 /// <param name="Categories">The categories after the merge; null when the save did not carry any.</param>
 /// <param name="Values">The own values after the merge (property ID → JSON); null when the save did not carry any.</param>
@@ -30,7 +30,7 @@ public sealed record MergeCurrent(long Revision, string Markdown, IReadOnlyList<
 
 public sealed partial class ProjectService
 {
-    // ─── Concurrent saves (M4-05, F14.R5, P-05) ──────────────────────────────
+    // ─── Concurrent saves (F14.R5) ────────────────────────────────────
 
     /// <summary>The stale save, merged: text, structure to write, and what to tell the client.</summary>
     private sealed record MergedSave(string Markdown, PageStructureInput? Structure, PageMerge Info);

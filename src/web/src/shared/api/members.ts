@@ -7,7 +7,7 @@ export type MemberItem = Rebrand<Schemas["MemberItem"]>;
 export type AccountItem = Rebrand<Schemas["AccountItem"]>;
 export type ProjectRole = Schemas["MemberItem"]["role"];
 
-/** The members of a project; administrators of the project only (M4-08, F14.R1). */
+/** The members of a project; administrators of the project only (F14.R1). */
 export function membersQuery(projectId: ElementId) {
   return queryOptions({
     queryKey: queryKeys.members(projectId),

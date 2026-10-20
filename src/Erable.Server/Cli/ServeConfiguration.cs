@@ -16,7 +16,7 @@ public sealed record ServeArguments(
 public sealed record ServePlan(ErableHostOptions Options, bool SharedProject);
 
 /// <summary>
-/// Turns the command line and the <c>ERABLE_*</c> environment variables into host options (M4-06, docs/deployment.md).
+/// Turns the command line and the <c>ERABLE_*</c> environment variables into host options (docs/deployment.md).
 /// The command line wins over the environment, which wins over the defaults. Every error names the setting at fault:
 /// a misspelled value must stop the server, not silently run with the default.
 /// </summary>

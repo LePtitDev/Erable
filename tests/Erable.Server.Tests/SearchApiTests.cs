@@ -10,7 +10,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Search over HTTP (M3-01, F10), on the reference project with the clock of the test mode.</summary>
+/// <summary>Search over HTTP (F10), on the reference project with the clock of the test mode.</summary>
 public sealed class SearchApiTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

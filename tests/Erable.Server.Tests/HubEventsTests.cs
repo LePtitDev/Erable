@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Real-time events (M4-03, F14.R4): a write is announced to the members who joined the project, after the commit.</summary>
+/// <summary>Real-time events (F14.R4): a write is announced to the members who joined the project, after the commit.</summary>
 public sealed class HubEventsTests
 {
     private static readonly TimeSpan Wait = TimeSpan.FromSeconds(10);

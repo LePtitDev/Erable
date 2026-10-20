@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { api, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
-// Deleting elements and the trash (docs/architecture.md §7.4, F12, M2-08).
+// Deleting elements and the trash (docs/architecture.md §7.4, F12).
 
 export type DeleteImpactView = Rebrand<Schemas["DeleteImpactView"]>;
 export type TrashEntryView = Rebrand<Schemas["TrashEntryView"]>;

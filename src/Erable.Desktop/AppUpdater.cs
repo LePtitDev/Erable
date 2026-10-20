@@ -5,7 +5,7 @@ using Velopack.Sources;
 namespace Erable.Desktop;
 
 /// <summary>
-/// Checks for a new version at startup (M5-03): when the application was installed with Velopack, the update is
+/// Checks for a new version at startup: when the application was installed with Velopack, the update is
 /// downloaded in the background and applied the next time the application quits. Nothing is installed in the middle
 /// of a session, and a development build (not installed) never checks.
 /// </summary>

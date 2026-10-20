@@ -77,7 +77,7 @@ export const trashRoute = createRoute({
   component: TrashView,
 });
 
-/** The members of the project (M4-08): administrators only. */
+/** The members of the project: administrators only. */
 export const membersRoute = createRoute({
   getParentRoute: () => projectRoute,
   path: "/members",

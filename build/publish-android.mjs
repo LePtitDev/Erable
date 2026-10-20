@@ -1,4 +1,4 @@
-// Publishes the Android application (M6-08, decision Q11) as one signed APK.
+// Publishes the Android application (decision Q11) as one signed APK.
 // Usage: node build/publish-android.mjs [--version <x.y.z>]
 //   --version: default from Git, as build/publish-cli.mjs
 // Signing (docs/release.md): with ERABLE_ANDROID_KEYSTORE (path of a .jks / .keystore), ERABLE_ANDROID_KEY_ALIAS,

@@ -4,7 +4,7 @@ using Erable.Server.Projects;
 namespace Erable.Server.Hosting;
 
 /// <summary>
-/// Server mode startup (M4-01): creates the first administrator from the configuration, opens the hosted projects and
+/// Server mode startup: creates the first administrator from the configuration, opens the hosted projects and
 /// purges the expired sessions. Runs before Kestrel starts listening, so no request meets a half-ready server.
 /// </summary>
 internal sealed class ServerStartup(

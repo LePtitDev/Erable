@@ -36,7 +36,7 @@ export function HomeScreen() {
   const navigate = useNavigate();
   const info = useQuery(apiInfoQuery);
   const me = useQuery(meQuery);
-  // On a server (M4-01): the projects are the ones the user is a member of; only a server administrator creates
+  // On a server: the projects are the ones the user is a member of; only a server administrator creates
   // one, and a path of the machine means nothing unless the backend was told to open folders.
   const server = info.data?.mode === "server";
   const folders = info.data?.folderProjects !== false;

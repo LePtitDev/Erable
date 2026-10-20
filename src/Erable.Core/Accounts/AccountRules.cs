@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Erable.Core.Accounts;
 
-/// <summary>Business rules of server accounts (M4-01): login names, display names and passwords.</summary>
+/// <summary>Business rules of server accounts: login names, display names and passwords.</summary>
 public static partial class AccountRules
 {
     public const int MinLoginLength = 2;
@@ -51,7 +51,7 @@ public static partial class AccountRules
 /// <param name="Active">False for a disabled account: it cannot administer anything.</param>
 public sealed record MemberRoleEntry(string UserId, ProjectRole Role, bool Active);
 
-/// <summary>Rules on the members of a project (M4-08, F14.R1, decision Q5).</summary>
+/// <summary>Rules on the members of a project (F14.R1, decision Q5).</summary>
 public static class MemberRules
 {
     /// <summary>

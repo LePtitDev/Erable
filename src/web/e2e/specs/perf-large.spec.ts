@@ -5,7 +5,7 @@ import { EditorPage } from "../pages/EditorPage";
 import { PageViewPage } from "../pages/PageViewPage";
 import { TreePanel } from "../pages/TreePanel";
 
-// Browser budgets on the large generated project (docs/testing.md §11.1, M3-06). Run them alone:
+// Browser budgets on the large generated project (docs/testing.md §11.1). Run them alone:
 //   ERABLE_LARGE_PROJECT=<folder made by `erable.benchmarks generate --light`> pnpm e2e:perf
 // They are skipped when the project is not there. The attachments of the light project are small on purpose.
 const large = process.env["ERABLE_LARGE_PROJECT"];

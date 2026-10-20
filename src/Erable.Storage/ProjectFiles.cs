@@ -10,7 +10,7 @@ public static class ProjectFiles
     public const string Database = "erable.db";
     public const string Blobs = "blobs";
 
-    /// <summary>Single-instance lock (F16.R2, decision P-04); ignored by <c>erable doctor</c>.</summary>
+    /// <summary>Single-instance lock (F16.R2); ignored by <c>erable doctor</c>.</summary>
     public const string Lock = "erable.lock";
 
     /// <summary>Prefix of the database backups made before a migration: <c>erable.db.bak-20261013-080000</c>.</summary>

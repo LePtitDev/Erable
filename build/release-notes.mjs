@@ -1,4 +1,4 @@
-// Release notes from the Conventional Commits since the previous tag (M5-03).
+// Release notes from the Conventional Commits since the previous tag (docs/release.md).
 // Usage: node build/release-notes.mjs <tag> [--previous <tag>]   → Markdown on stdout
 import { execFileSync } from "node:child_process";
 
@@ -22,7 +22,7 @@ const previousIndex = process.argv.indexOf("--previous");
 let previous = previousIndex > 0 ? process.argv[previousIndex + 1] : undefined;
 if (!previous) {
   try {
-    // Version tags, with or without the « v » (a release created on GitHub may have either).
+    // Version tags, with or without the "v" (a release created on GitHub may have either).
     previous = git("describe", "--tags", "--abbrev=0", "--match", "v[0-9]*", "--match", "[0-9]*", `${head}^`);
   } catch {
     previous = undefined; // first release: the whole history
@@ -33,22 +33,22 @@ const range = previous ? `${previous}..${head}` : head;
 const subjects = git("log", "--no-merges", "--format=%s", range).split("\n").filter(Boolean);
 
 const sections = [
-  ["feat", "Nouveautés"],
-  ["fix", "Corrections"],
+  ["feat", "Features"],
+  ["fix", "Fixes"],
   ["perf", "Performance"],
   ["docs", "Documentation"],
   ["test", "Tests"],
-  ["build", "Construction et livraison"],
-  ["ci", "Construction et livraison"],
-  ["refactor", "Autres changements"],
-  ["chore", "Autres changements"],
+  ["build", "Build and delivery"],
+  ["ci", "Build and delivery"],
+  ["refactor", "Other changes"],
+  ["chore", "Other changes"],
 ];
 const titles = [...new Set(sections.map(([, title]) => title))];
 const grouped = new Map(titles.map((title) => [title, []]));
 for (const subject of subjects) {
   const match = /^(\w+)(?:\(([^)]+)\))?(!)?: (.+)$/.exec(subject);
-  const title = match ? (sections.find(([type]) => type === match[1])?.[1] ?? "Autres changements") : "Autres changements";
-  const text = match ? `${match[2] ? `**${match[2]}** : ` : ""}${match[3] ? "⚠️ rupture : " : ""}${match[4]}` : subject;
+  const title = match ? (sections.find(([type]) => type === match[1])?.[1] ?? "Other changes") : "Other changes";
+  const text = match ? `${match[2] ? `**${match[2]}**: ` : ""}${match[3] ? "⚠️ breaking: " : ""}${match[4]}` : subject;
   grouped.get(title).push(text);
 }
 
@@ -60,9 +60,9 @@ for (const [title, items] of grouped) {
 lines.push(
   "## Installation",
   "",
-  "- **Windows** : `Erable-win-Setup.exe`. **macOS** : paquet `.pkg`. **Linux** : `.AppImage`.",
-  "- **Serveur** : `docker pull ghcr.io/leptitdev/erable:" + tag.replace(/^v/, "") + "` (voir `docs/deployment.md`).",
-  "- Les installations existantes se mettent à jour seules au démarrage.",
+  "- **Windows**: `Erable-win-Setup.exe`. **macOS**: `.pkg` package. **Linux**: `.AppImage`.",
+  "- **Server**: `docker pull ghcr.io/leptitdev/erable:" + tag.replace(/^v/, "") + "` (see `docs/deployment.md`).",
+  "- Existing installations update themselves at startup.",
   "",
 );
 process.stdout.write(lines.join("\n"));

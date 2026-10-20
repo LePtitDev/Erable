@@ -10,7 +10,7 @@ using Erable.Testing.Reference;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Categories, properties and page values over HTTP (M2-03), on the reference project.</summary>
+/// <summary>Categories, properties and page values over HTTP, on the reference project.</summary>
 public sealed class StructureApiTests
 {
     private static readonly ElementId Marchand = Chroniques.IdOf("Marchand");

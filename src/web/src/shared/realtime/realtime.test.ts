@@ -25,7 +25,7 @@ function seeded() {
   return { client, keys, stale };
 }
 
-describe("invalidation by events (M4-03)", () => {
+describe("invalidation by events", () => {
   it("refreshes what shows the element but neither the tree nor the other projects", async () => {
     const { client, keys, stale } = seeded();
 

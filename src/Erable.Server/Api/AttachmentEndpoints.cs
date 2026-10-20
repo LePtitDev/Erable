@@ -47,7 +47,7 @@ public static class AttachmentEndpoints
         }
 
         var maxSize = settings.MaxSize;
-        // The room left to the project (M4-06): a file that does not fit is refused as it streams in, like an oversized one.
+        // The room left to the project: a file that does not fit is refused as it streams in, like an oversized one.
         var remaining = options.ProjectQuota is { } quota ? Math.Max(0, quota - service.Project.Repository.GetAttachmentsTotalSize()) : long.MaxValue;
         var limit = Math.Min(maxSize, remaining);
         if (remaining <= 0)

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Erable.Server.Api;
 
-/// <summary>A member of a project, for its administrators (M4-08, F14.R1).</summary>
+/// <summary>A member of a project, for its administrators (F14.R1).</summary>
 public sealed record MemberItem(string UserId, string Name, ProjectRole Role, bool Disabled, bool IsMe);
 
 public sealed record SetMemberRequest(ProjectRole Role);
@@ -27,7 +27,7 @@ public sealed record UpdateAccountRequest(string? Name = null, bool? Disabled = 
 
 /// <summary>
 /// The members of a project (administrators of the project only) and the accounts of the server (administrators of the
-/// server only) — M4-08, F14.R1, decision Q5. Accounts are created by a server administrator: no free sign-up in v1.
+/// server only) — F14.R1, decision Q5. Accounts are created by a server administrator: no free sign-up in v1.
 /// </summary>
 public static class MemberEndpoints
 {

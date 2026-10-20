@@ -190,7 +190,7 @@ test.describe("F06 · Attachments", () => {
     expect(await blobs()).toHaveLength(before.length + 1);
   });
 
-  test("M1-14 · A failed upload leaves no pill in the text @pr", async ({ page, reference }) => {
+  test("A failed upload leaves no pill in the text @pr", async ({ page, reference }) => {
     const editor = new EditorPage(page);
     await page.route("**/attachments", (route) => route.abort("connectionreset"));
     await page.goto(reference.url(chroniques.hautbois));

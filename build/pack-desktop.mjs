@@ -1,4 +1,4 @@
-// Packs the published desktop application with Velopack: installer, update packages and release manifest (M5-03).
+// Packs the published desktop application with Velopack: installer, update packages and release manifest.
 // Usage: node build/pack-desktop.mjs <rid> [--version <x.y.z>] [--skip-publish] [--channel <name>]
 //   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64   (run on the matching OS: vpk packs a macOS app on macOS only)
 //   --version: default from Git: the version tag of HEAD, or after the last one x.y.(z+1)-dev.<commits since>, which

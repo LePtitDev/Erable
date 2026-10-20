@@ -140,7 +140,7 @@ function EditorScreen({
   const [pane, setPane] = useState<"text" | "panel">("text");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  // A save that could not be merged: both versions of the passages in conflict, to settle (M4-05).
+  // A save that could not be merged: both versions of the passages in conflict, to settle.
   const [conflict, setConflict] = useState<MergeConflict | null>(null);
   const notify = useNoticeStore((n) => n.push);
   const remoteChange = useShellStore((st) => st.remoteChange);
@@ -249,7 +249,7 @@ function EditorScreen({
   /**
    * Saves a page against a revision (If-Match), then the title; true when everything is saved. A save that arrives
    * after another one is merged by the server (« Fusionné avec les modifications de … »); when the two edits touch the
-   * same passages nothing is written and the resolution view opens with both versions (M4-05, F14.R5).
+   * same passages nothing is written and the resolution view opens with both versions (F14.R5).
    */
   const persist = useCallback(
     async (plan: {

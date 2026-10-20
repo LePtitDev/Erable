@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { analyzeMarkdown } from "./analyze";
 import { checkMarkdownLimits } from "./limits";
 
-// Fuzzing of the Markdown analysis (docs/testing.md §12, M5-04), twin of MarkdownFuzzTests.cs: random inputs made of the
+// Fuzzing of the Markdown analysis (docs/testing.md §12), twin of MarkdownFuzzTests.cs: random inputs made of the
 // tokens that matter to the grammar never throw and cost time linear in their size. A short run belongs to the regular
 // suite; the weekly workflow sets VITE_ERABLE_FUZZ_SECONDS=600. A failing input is printed: add it to
 // spec/fixtures/markdown/edge-cases.json.
@@ -94,9 +94,9 @@ const pathological = [
   "# ",
 ];
 
-// Found by this fuzzing (M5-04), in remark/micromark itself (the parser without the Erable extension does the same):
+// Found by this fuzzing, in remark/micromark itself (the parser without the Erable extension does the same):
 // quadratic time on these, and a stack overflow (RangeError) on deeply nested quotes and lists. Recorded in
-// tasks/M5-04. `it.fails` turns red when one is fixed or bounded (page size limit): then move it to the list above.
+// `it.fails` turns red when one is fixed or bounded (page size limit): then move it to the list above.
 const guarded = ["]", "> ", "1. ", "[a]("];
 
 const seconds = Number(import.meta.env["VITE_ERABLE_FUZZ_SECONDS"] ?? "1");

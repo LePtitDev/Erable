@@ -92,7 +92,7 @@ public sealed record ErableHostOptions
     public string? BootstrapAdminPassword { get; init; }
 
     /// <summary>
-    /// Room for the attachments of one project, in bytes; null for none (M4-06, docs/architecture.md §9). A server
+    /// Room for the attachments of one project, in bytes; null for none (docs/architecture.md §9). A server
     /// shared by several teams sets it so that one project cannot fill the disk.
     /// </summary>
     public long? ProjectQuota { get; init; }
@@ -104,7 +104,7 @@ public sealed record ErableHostOptions
     public IReadOnlyList<string> CorsOrigins { get; init; } = [];
 
     /// <summary>
-    /// Pages served from a loopback address may call the API (the desktop application connected to a server, M4-07):
+    /// Pages served from a loopback address may call the API (the desktop application connected to a server):
     /// they carry a bearer token, never a cookie.
     /// </summary>
     public bool AllowLoopbackOrigins { get; init; } = true;

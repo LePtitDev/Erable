@@ -49,7 +49,7 @@ internal static class TestEndpoints
         var source = fixture switch
         {
             "none" => null,
-            // The large project of the performance tests (M3-06) is generated, not versioned: its folder is given by the
+            // The large project of the performance tests is generated, not versioned: its folder is given by the
             // environment (`erable.benchmarks generate --light`).
             "large" => Environment.GetEnvironmentVariable("ERABLE_LARGE_PROJECT") ?? string.Empty,
             _ => Path.Combine(options.FixturesDirectory ?? string.Empty, fixture),

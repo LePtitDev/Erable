@@ -8,7 +8,7 @@ import { Dialog } from "../../shared/ui/Dialog";
 import field from "../../shared/ui/Field.module.css";
 
 /**
- * The desktop application worked on a project of a server and its token ended (M4-07): the password of the same
+ * The desktop application worked on a project of a server and its token ended: the password of the same
  * account is asked over the screen, and the request that failed is replayed — nothing the user wrote is lost, as for
  * a session that expires on a server (E2E-14-09).
  */

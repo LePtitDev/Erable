@@ -30,7 +30,7 @@ public sealed record DiffRow(DiffRowKind Kind, DiffLine? Old, DiffLine? New);
 
 /// <summary>
 /// Diff of two texts, line by line and word by word inside a modified line (F13.R2). A thin layer over DiffPlex that
-/// returns plain records: the rows rebuild both texts exactly, which the tests check. M4-05 builds on it.
+/// returns plain records: the rows rebuild both texts exactly, which the tests check. The three-way merge builds on it.
 /// </summary>
 public static class TextDiff
 {

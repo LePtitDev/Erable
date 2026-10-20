@@ -10,7 +10,7 @@
     <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
   </PropertyGroup>
 
-  <!-- /_test endpoints exist only outside Release builds (CLAUDE.md §6.12). -->
+  <!-- /_test endpoints exist only outside Release builds (CONTRIBUTING.md, invariant 12). -->
   <PropertyGroup Condition="'$(Configuration)' != 'Release'">
     <DefineConstants>$(DefineConstants);ERABLE_TEST_ENDPOINTS</DefineConstants>
   </PropertyGroup>

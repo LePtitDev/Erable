@@ -6,7 +6,7 @@ import type { ElementId } from "../ids/elementId";
 
 /**
  * The desktop shell's few OS features (docs/architecture.md §10, F16), always through the API: the SPA never talks
- * to the OS itself (CLAUDE.md §6.3). Server mode answers 404 `native.unavailable`; the UI hides them there.
+ * to the OS itself (CONTRIBUTING.md, invariant 3). Server mode answers 404 `native.unavailable`; the UI hides them there.
  */
 export function useIsDesktop(): boolean {
   return useQuery(apiInfoQuery).data?.mode === "desktop";

@@ -7,7 +7,7 @@ using Erable.Storage;
 namespace Erable.Server.Projects;
 
 /// <summary>
-/// The projects a server hosts (M4-01): <c>data/projects/&lt;projectId&gt;/</c>, each registered in <c>server.db</c>
+/// The projects a server hosts: <c>data/projects/&lt;projectId&gt;/</c>, each registered in <c>server.db</c>
 /// with its members. Opens them all at startup so that every request finds its project in the
 /// <see cref="ProjectWorkspace"/>. In desktop mode there is no registry and every method does nothing.
 /// </summary>

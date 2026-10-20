@@ -2,7 +2,7 @@ using Erable.Core.Merge;
 
 namespace Erable.Core.Tests.Merge;
 
-/// <summary>Examples of the three-way merge (M4-05, F14.R5); the invariants are in <see cref="ThreeWayMergePropertyTests"/>.</summary>
+/// <summary>Examples of the three-way merge (F14.R5); the invariants are in <see cref="ThreeWayMergePropertyTests"/>.</summary>
 public sealed class ThreeWayMergeTests
 {
     private const string Page = """

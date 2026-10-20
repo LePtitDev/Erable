@@ -159,7 +159,7 @@ jobs:
             src/web/test-results/
           retention-days: 14
 
-  # The Android application (M6-07, M6-08): it must keep building; signed by the debug key of the runner. Its logic is
+  # The Android application: it must keep building; signed by the debug key of the runner. Its logic is
   # tested by tests/Erable.Android.Tests in the unit job; the WebView runs the SPA tested by the « mobile » project.
   android:
     name: Android APK (build)

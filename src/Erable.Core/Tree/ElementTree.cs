@@ -135,7 +135,7 @@ public sealed class ElementTree
 
     /// <summary>
     /// Every element that shares its name with a sibling, found in one pass over the tree: the same answer as
-    /// <see cref="HasDuplicateName"/> for each node, without listing the siblings of each of them (M3-06: 10 000 nodes).
+    /// <see cref="HasDuplicateName"/> for each node, without listing the siblings of each of them (10 000 nodes in the performance budgets).
     /// </summary>
     public HashSet<ElementId> DuplicateNames()
     {
@@ -307,7 +307,7 @@ public sealed class ElementTree
         return new TreeChange(_nodes[id], changed);
     }
 
-    /// <summary>Removes an element and its descendants (trash, M2-08); returns the removed nodes.</summary>
+    /// <summary>Removes an element and its descendants (trash); returns the removed nodes.</summary>
     public Result<IReadOnlyList<TreeNode>> Remove(ElementId id)
     {
         var node = Find(id);

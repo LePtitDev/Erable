@@ -1,4 +1,4 @@
-# Nightly pipeline (M5-04, docs/testing.md §13): everything the PR pipeline leaves out. Target < 45 min: the jobs run in
+# Nightly pipeline (docs/testing.md §13): everything the PR pipeline leaves out. Target < 45 min: the jobs run in
 # parallel. Crash tests and load are in nightly-robustness.yml. A failure opens an issue (nightly-issue.yml).
 # Third-party actions are pinned by commit SHA (tag in comment); Renovate bumps them.
 name: Nightly

@@ -9,7 +9,7 @@ import { ReloginDialog } from "./ReloginDialog";
 import { RemoteReloginDialog } from "./RemoteReloginDialog";
 
 /**
- * On a server, nothing shows before the user is signed in (M4-01). The desktop application has no accounts and
+ * On a server, nothing shows before the user is signed in. The desktop application has no accounts and
  * renders at once. Once signed in, an expired session asks for the password again over the current screen.
  */
 /** Added by the desktop backend to what it forwards to a server: which server an answer comes from. */

@@ -3,7 +3,7 @@ import { api, unwrap, type Rebrand, type Schemas } from "./client";
 
 export type SessionResult = Rebrand<Schemas["SessionResult"]>;
 
-/** Opens a session: the backend answers with an HttpOnly cookie, never readable by scripts (M4-01). */
+/** Opens a session: the backend answers with an HttpOnly cookie, never readable by scripts. */
 export function login(loginName: string, password: string): Promise<SessionResult> {
   return unwrap(
     api.POST("/api/v1/auth/login", { body: { login: loginName, password, issueToken: false } }),
@@ -41,7 +41,7 @@ export function signOutAndReload(): void {
 interface AuthState {
   /** The session expired while the user was working: the sign-in dialog is shown over the screen. */
   readonly reloginOpen: boolean;
-  /** The desktop application: the token of this server (by id) is no good any more, the password is asked again (M4-07). */
+  /** The desktop application: the token of this server (by id) is no good any more, the password is asked again. */
   readonly remoteRelogin: string | null;
 }
 

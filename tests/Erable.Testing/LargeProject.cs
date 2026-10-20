@@ -23,7 +23,7 @@ public sealed record LargeProjectOptions(
 }
 
 /// <summary>
-/// Generator of large projects with a fixed seed (M3-06): the same options always give the same project, down to the
+/// Generator of large projects with a fixed seed: the same options always give the same project, down to the
 /// IDs, so that measurements compare from one run to the next. Pages, categories, properties with rules, values,
 /// references, modification dates over the last 90 days, and attachments of pseudo-random content.
 /// </summary>

@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { api, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
-// Revision history of an element (docs/architecture.md §8.1 `elements/{id}/revisions`, F13, M3-05).
+// Revision history of an element (docs/architecture.md §8.1 `elements/{id}/revisions`, F13).
 
 export type RevisionItem = Rebrand<Schemas["RevisionItem"]>;
 export type RevisionDiff = Rebrand<Schemas["RevisionDiffView"]>;

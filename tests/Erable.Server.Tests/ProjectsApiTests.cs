@@ -141,7 +141,7 @@ public sealed class ProjectsApiTests
 
         using var response = await backend.Client.GetAsync(new Uri("/api/v1/projects/12", UriKind.Relative), TestContext.Current.CancellationToken);
 
-        // A text that is no ID names no project the caller belongs to: same answer as any project they cannot see (M4-02).
+        // A text that is no ID names no project the caller belongs to: same answer as any project they cannot see.
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 

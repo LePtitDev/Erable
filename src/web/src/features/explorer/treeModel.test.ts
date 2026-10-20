@@ -182,7 +182,7 @@ describe("tree invariants under random valid moves (docs/testing.md §4.1)", () 
   });
 });
 
-describe("performance (indicative, formal budget in M3-06)", () => {
+describe("performance (indicative, formal budget in docs/testing.md §11)", () => {
   it("indexes 10 000 elements and computes the visible lines", () => {
     const nodes: TreeNodeItem[] = [node(roots.pages, "root", null, "Pages")];
     const folders: ElementId[] = [];

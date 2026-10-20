@@ -5,7 +5,7 @@ using Erable.Storage;
 
 namespace Erable.Server.Projects;
 
-/// <summary>A project in the recent list (F01.R2). Local projects only until M4-07 adds servers.</summary>
+/// <summary>A project in the recent list (F01.R2).</summary>
 public sealed record RecentProject(ElementId ProjectId, string Name, string Folder, DateTimeOffset LastOpenedAt, ElementId? LastElementId);
 
 /// <summary>

@@ -55,7 +55,7 @@ export function inspectFolder(folder: string): Promise<FolderInspection> {
   return unwrap(api.POST("/api/v1/projects/inspect", { body: { folder } }));
 }
 
-/** What an older project needs before it opens: the formats involved (F01.R3, M2-09). */
+/** What an older project needs before it opens: the formats involved (F01.R3). */
 export interface MigrationNeed {
   readonly fromVersion: number;
   readonly toVersion: number;

@@ -20,7 +20,7 @@ public sealed record AuthenticatedSession(AccountRecord Account, SessionRecord S
 public sealed record IssuedSession(string Token, DateTimeOffset ExpiresAt);
 
 /// <summary>
-/// Accounts, sessions and project roles of the server (M4-01). Passwords are hashed with the ASP.NET Core Identity
+/// Accounts, sessions and project roles of the server. Passwords are hashed with the ASP.NET Core Identity
 /// hasher (PBKDF2, per-password salt, algorithm upgrades handled by <see cref="PasswordHasher{TUser}"/>); the rest of
 /// Identity (EF stores, cookie scheme) is not used: sessions need server-side revocation and the storage is Dapper.
 /// Without a store (desktop mode) the only user is the local one.
@@ -90,7 +90,7 @@ public sealed class AccountService
     public AccountRecord? Find(string login) => Store.GetAccount(login);
 
     /// <summary>
-    /// Changes an account (M4-08). Disabling it, changing its password or taking its administration away ends its
+    /// Changes an account. Disabling it, changing its password or taking its administration away ends its
     /// sessions; the server keeps at least one active administrator.
     /// </summary>
     public Result<AccountRecord> UpdateAccount(string login, string? name, bool? disabled, bool? isServerAdmin, string? password)

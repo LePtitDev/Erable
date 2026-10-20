@@ -84,7 +84,7 @@ function ShellFrame({
 }) {
   const { t } = useTranslation();
   const layout = useUiState<Layout>("layout", defaultLayout);
-  // What the others do shows up without reloading (M4-03).
+  // What the others do shows up without reloading.
   useProjectEvents(projectId);
   const [preferences, setPreferences] = useState(false);
   const [quickSearch, setQuickSearch] = useState(false);
@@ -375,7 +375,7 @@ function MoreMenu({
   );
 }
 
-/** « Connecté à … · synchronisé » on a server (M4-03); « Local » on the desktop, which has nobody to sync with. */
+/** « Connecté à … · synchronisé » on a server; « Local » on the desktop, which has nobody to sync with. */
 function ConnectionStatus() {
   const { t } = useTranslation();
   const info = useQuery(apiInfoQuery);

@@ -29,7 +29,7 @@ public sealed record RevisionSnapshot(
     /// <summary>Definition of a property (key, type, default, rules, options).</summary>
     public JsonObject? Definition { get; init; }
 
-    /// <summary>The revision this one restores (F13.R3, M3-05); absent from every other revision.</summary>
+    /// <summary>The revision this one restores (F13.R3); absent from every other revision.</summary>
     public long? RestoredFrom { get; init; }
 
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)

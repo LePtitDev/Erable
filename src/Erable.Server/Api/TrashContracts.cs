@@ -3,7 +3,7 @@ using Erable.Core.Elements;
 
 namespace Erable.Server.Api;
 
-// Deletion and trash (M2-08, F12).
+// Deletion and trash (F12).
 
 /// <summary>An element, by ID and name.</summary>
 public sealed record ImpactItemView(ElementId Id, string Name);

@@ -1,61 +1,61 @@
-# Erable — Guide de l'utilisateur
+# Erable — User guide
 
-Erable est un wiki structuré, « façon IDE » : des pages en Markdown, rangées dans un arbre, reliées entre elles par leur identifiant, décrites par des catégories et des propriétés. Ce guide tient en quatre points ; le reste de l'application se découvre en l'utilisant.
+Erable is a structured, "IDE-style" wiki: Markdown pages, arranged in a tree, linked to each other by their identifier, described by categories and properties. This guide fits in four points; the rest of the application is discovered by using it.
 
-## 1. Démarrer
+## 1. Getting started
 
-1. **Accueil.** Au premier lancement, choisissez *Nouveau projet* : un nom, la **langue du contenu** (les pages seront écrites dans cette langue ; elle ne change plus ensuite) et un emplacement. *Ouvrir un dossier…* rouvre un projet existant (`Ctrl+O`), *Projets récents* retrouve les derniers.
-2. **L'arbre** (à gauche) a quatre racines fixes : **Pages**, **Catégories**, **Propriétés**, **Liens**. Le menu contextuel (clic droit) crée un dossier ou une page ; `F2` renomme l'élément sélectionné ; on déplace par glisser-déposer, ou au clavier avec `Ctrl+X` puis `Ctrl+V`.
-3. **Une page** s'ouvre en lecture ; *Modifier* passe en édition. `Ctrl+S` enregistre. Un brouillon est gardé automatiquement : si l'application se ferme avant l'enregistrement, il vous est proposé à la réouverture.
-4. **Retrouver** : `Ctrl+K` ouvre la recherche rapide (un nom, `Entrée`) ; la page *Recherche* ajoute des filtres sur les catégories et les propriétés.
-5. Rien n'est perdu par erreur : les éléments supprimés vont dans la **corbeille** et chaque enregistrement crée une **révision** que l'on peut comparer et restaurer (*Historique*).
-6. **Sauvegarder** un projet local, c'est copier son dossier quand l'application est fermée. Pour travailler à plusieurs, un administrateur installe un serveur (`docs/deployment.md`).
+1. **Home.** On the first launch, choose *New project*: a name, the **content language** (pages will be written in this language; it cannot be changed afterwards) and a location. *Open a folder…* reopens an existing project (`Ctrl+O`), *Recent projects* lists the latest ones.
+2. **The tree** (on the left) has four fixed roots: **Pages**, **Categories**, **Properties**, **Links**. The context menu (right click) creates a folder or a page; `F2` renames the selected element; elements are moved by drag and drop, or with the keyboard with `Ctrl+X` then `Ctrl+V`.
+3. **A page** opens in reading mode; *Edit* switches to editing. `Ctrl+S` saves. A draft is kept automatically: if the application closes before saving, it is offered back when the page is reopened.
+4. **Finding things**: `Ctrl+K` opens the quick search (a name, `Enter`); the *Search* page adds filters on categories and properties.
+5. Nothing is lost by mistake: deleted elements go to the **trash**, and every save creates a **revision** that can be compared and restored (*History*).
+6. **Backing up** a local project means copying its folder while the application is closed. To work together, an administrator installs a server (`docs/deployment.md`).
 
-Sous Linux, l'application a besoin de WebKitGTK 4.1 et de libnotify (Debian / Ubuntu : `sudo apt install libwebkit2gtk-4.1-0 libnotify4`).
+On Linux, the application needs WebKitGTK 4.1 and libnotify (Debian / Ubuntu: `sudo apt install libwebkit2gtk-4.1-0 libnotify4`).
 
-Les préférences (langue de l'interface, thème clair ou sombre, raccourcis) se règlent depuis l'accueil (*Préférences*) comme depuis la barre du haut d'un projet.
+Preferences (interface language, light or dark theme, shortcuts) are set from the home screen (*Preferences*) as well as from the top bar of a project.
 
-**Sur un téléphone.** Un serveur Erable s'utilise aussi depuis le navigateur d'un téléphone, qui peut l'*ajouter à l'écran d'accueil* comme une application. L'arbre s'ouvre par le bouton à gauche de la barre du haut (toucher un dossier le déplie) ; le menu « … » de la barre regroupe précédent / suivant, préférences, thème et déconnexion. Chaque élément de l'arbre a son bouton « … » (ou un appui long) pour le menu, et *Déplacer vers…* remplace le glisser-déposer. En édition, *Texte* et *Panneau de la page* (propriétés, catégories, liens, fichiers) alternent au-dessus de l'éditeur. Sur Android, l'**application Erable** (APK des releases) fait la même chose en gardant la liste de vos serveurs : *Ajouter un serveur*, son adresse, puis la connexion habituelle ; un appui long sur un serveur l'oublie. Elle n'ouvre pas de projet local : il faut un serveur.
+**On a phone.** An Erable server can also be used from a phone's browser, which can *add it to the home screen* like an application. The tree opens with the button on the left of the top bar (tapping a folder expands it); the "…" menu of the bar groups back / forward, preferences, theme and sign-out. Each element of the tree has its own "…" button (or a long press) for its menu, and *Move to…* replaces drag and drop. When editing, *Text* and *Page panel* (properties, categories, links, files) alternate above the editor. On Android, the **Erable application** (APK of the releases) does the same while keeping the list of your servers: *Add a server*, its address, then the usual sign-in; a long press on a server forgets it. It does not open local projects: a server is required.
 
-## 2. Relier les pages : la syntaxe `[[ID]]`
+## 2. Linking pages: the `[[ID]]` syntax
 
-Chaque élément — page, catégorie, propriété, pièce jointe — a un **identifiant** de 16 caractères hexadécimaux, qui ne change jamais. On y renvoie en l'écrivant entre doubles crochets :
+Every element — page, category, property, attachment — has an **identifier** of 16 hexadecimal characters that never changes. You refer to it by writing it between double square brackets:
 
-| Vous écrivez | Résultat |
+| You write | Result |
 |---|---|
-| `[[3F2A9C14E07B5D21]]` | un lien vers l'élément, affiché sous **son nom actuel** |
-| `[[3F2A9C14E07B5D21\|la marchande]]` | le même lien avec un libellé de votre choix |
-| `[[3F2A9C14E07B5D21#histoire]]` | un lien vers le titre « Histoire » de la page |
-| `![[3F2A9C14E07B5D21]]` | l'élément **intégré** (une image, un fichier) |
-| `![[3F2A9C14E07B5D21]]{width=320 align=right}` | une intégration à 320 px de large, alignée à droite |
+| `[[3F2A9C14E07B5D21]]` | a link to the element, shown under **its current name** |
+| `[[3F2A9C14E07B5D21\|the merchant]]` | the same link with a label of your choice |
+| `[[3F2A9C14E07B5D21#history]]` | a link to the "History" heading of the page |
+| `![[3F2A9C14E07B5D21]]` | the element **embedded** (an image, a file) |
+| `![[3F2A9C14E07B5D21]]{width=320 align=right}` | an embed 320 px wide, aligned to the right |
 
-On n'écrit presque jamais un identifiant à la main : tapez `[[` (ou `![[`) dans l'éditeur, la **palette d'insertion** s'ouvre. Tapez quelques lettres du nom, `Tab` change de type (Tout, Pages, Pièces jointes, Catégories, Propriétés), `Entrée` insère un lien, `Maj+Entrée` une intégration, `Échap` ferme la palette. Dans l'éditeur, l'identifiant s'affiche sous la forme d'une pastille avec le nom ; *Afficher les ID bruts* montre le texte réel.
+You almost never type an identifier by hand: type `[[` (or `![[`) in the editor and the **insert palette** opens. Type a few letters of the name; `Tab` changes the kind (All, Pages, Attachments, Categories, Properties), `Enter` inserts a link, `Shift+Enter` an embed, `Esc` closes the palette. In the editor, the identifier is shown as a pill with the name; *Show raw IDs* shows the actual text.
 
-Comme les liens passent par l'identifiant, **renommer ou déplacer un élément ne casse jamais rien** : tous les liens montrent le nouveau nom. Le détail de la syntaxe (tableaux, code, cas limites) est dans `docs/markdown-syntax.md`. Le HTML brut est désactivé : une balise écrite dans une page s'affiche comme du texte.
+Since links go through the identifier, **renaming or moving an element never breaks anything**: every link shows the new name. The details of the syntax (tables, code, edge cases) are in `docs/markdown-syntax.md`. Raw HTML is disabled: a tag written in a page is shown as text.
 
-Glisser un fichier dans l'éditeur, ou le coller, l'ajoute comme pièce jointe de la page et insère l'intégration.
+Dropping a file into the editor, or pasting it, adds it as an attachment of the page and inserts the embed.
 
-## 3. Raccourcis clavier
+## 3. Keyboard shortcuts
 
-| Raccourci | Action |
+| Shortcut | Action |
 |---|---|
-| `Ctrl+K` (`⌘K`) | Recherche rapide * |
-| `Ctrl+Espace` (`⌘⇧K`) | Ouvrir la palette d'insertion, dans l'éditeur * |
-| `Ctrl+S` (`⌘S`) | Enregistrer la page * |
-| `Ctrl+O` (`⌘O`) | Ouvrir un dossier de projet (accueil) * |
-| `[[` ou `![[` | Ouvrir la palette d'insertion en tapant |
-| `F2` | Renommer l'élément sélectionné de l'arbre |
-| `Ctrl+X`, `Ctrl+V` | Couper, coller un élément de l'arbre |
-| `Suppr` | Mettre l'élément à la corbeille |
-| `Échap` | Fermer une fenêtre ou la palette |
+| `Ctrl+K` (`⌘K`) | Quick search * |
+| `Ctrl+Space` (`⌘⇧K`) | Open the insert palette, in the editor * |
+| `Ctrl+S` (`⌘S`) | Save the page * |
+| `Ctrl+O` (`⌘O`) | Open a project folder (home) * |
+| `[[` or `![[` | Open the insert palette while typing |
+| `F2` | Rename the selected element of the tree |
+| `Ctrl+X`, `Ctrl+V` | Cut, paste an element of the tree |
+| `Delete` | Move the element to the trash |
+| `Esc` | Close a dialog or the palette |
 
-Les raccourcis marqués d'un astérisque sont **configurables** : *Préférences → Raccourcis clavier*. Cliquez sur la combinaison à changer puis appuyez sur la nouvelle ; si elle est déjà prise, Erable le dit (« Déjà utilisé par : Recherche ») et propose de la remplacer. *Aide et raccourcis*, depuis l'accueil, affiche la liste à jour.
+The shortcuts marked with an asterisk are **configurable**: *Preferences → Keyboard shortcuts*. Click the combination to change, then press the new one; if it is already taken, Erable says so ("Already used by: Search") and offers to replace it. *Help and shortcuts*, from the home screen, shows the current list.
 
-## 4. Dossiers et sous-pages
+## 4. Folders and sub-pages
 
-Erable propose deux façons de hiérarchiser, avec deux rôles différents :
+Erable offers two ways to build a hierarchy, with two different roles:
 
-- Un **dossier** sert à **ranger**. Il ne porte pas de contenu : on peut le déplacer ou le renommer sans que le sens de quoi que ce soit change. Exemple : un dossier « Personnages » qui regroupe cinquante pages.
-- Une **sous-page** donne un **sens**. C'est une page placée sous une autre page : elle apparaît dans la section *Sous-pages* de son parent et en fait partie. Exemple : « Dialogues » et « Inventaire » sous la page d'un personnage.
+- A **folder** is for **arranging**. It has no content: it can be moved or renamed without changing the meaning of anything. Example: a "Characters" folder that groups fifty pages.
+- A **sub-page** carries **meaning**. It is a page placed under another page: it appears in the *Sub-pages* section of its parent and is part of it. Example: "Dialogues" and "Inventory" under the page of a character.
 
-Pour décider : *« si je supprime ou déplace le parent, la page doit-elle suivre ? »* Si oui, c'est une sous-page ; sinon, un dossier suffit. Les catégories, elles, ne se rangent pas dans l'arbre des pages : une catégorie décrit ce que sont les pages (un personnage, un lieu…) et leur apporte des **propriétés** ; une page peut en avoir plusieurs.
+To decide: *"if I delete or move the parent, should the page follow?"* If so, it is a sub-page; otherwise, a folder is enough. Categories are not arranged in the tree of pages: a category describes what pages are (a character, a place…) and brings them **properties**; a page can have several.

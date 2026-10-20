@@ -61,7 +61,7 @@ public abstract record Resolution<T>
 /// <item>otherwise the value of the most specific category: for each category of the page, the nearest category of
 /// its chain (itself first) that defines a value is a candidate; a candidate that is an ancestor of another candidate
 /// is overridden by it (PNJ + Marchand: Marchand wins, no conflict). Candidates left with different values are in
-/// conflict; candidates agreeing on the same value are not (decision M2-01);</item>
+/// conflict; candidates agreeing on the same value are not;</item>
 /// <item>otherwise the default of the property definition.</item>
 /// </list>
 /// The result does not depend on the order in which the page declares its categories (only the order of the

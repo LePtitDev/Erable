@@ -1,5 +1,5 @@
 // Mutation score and surviving mutants, as Markdown, from a Stryker report (Stryker.NET and StrykerJS share the format
-// of mutation-testing-elements). M5-04.
+// of mutation-testing-elements).
 // Usage: node build/mutation-summary.mjs <folder holding the JSON report> [--top 25]   → Markdown on stdout
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";

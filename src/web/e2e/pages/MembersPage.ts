@@ -1,7 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 import { t } from "../support/i18n";
 
-/** The members screen of a project (M4-08, F14.R1). */
+/** The members screen of a project (F14.R1). */
 export class MembersPage {
   readonly heading: Locator;
 

@@ -1,12 +1,12 @@
 import type { ElementId } from "../ids/elementId";
 
 /**
- * Query keys of every server resource, in one place: the invalidation rules (and, with M4-03, the SignalR events)
+ * Query keys of every server resource, in one place: the invalidation rules (and the SignalR events)
  * target resources through these functions, never through ad-hoc arrays.
  */
 export const queryKeys = {
   me: ["me"] as const,
-  /** The servers the desktop application is connected to, and what they list (M4-07). */
+  /** The servers the desktop application is connected to, and what they list. */
   servers: ["servers"] as const,
   serverProjects: (serverId: string) => ["servers", serverId, "projects"] as const,
   /** The projects of the server the user belongs to (the home screen). */

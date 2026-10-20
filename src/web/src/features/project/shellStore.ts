@@ -10,7 +10,7 @@ interface ShellState {
   readonly cursor: { readonly line: number; readonly column: number } | null;
   /** Validation errors of the page being edited, shown in the status bar (F05.R6). */
   readonly validationErrors: number;
-  /** The page being edited, if any: the real-time events leave it alone (M4-03). */
+  /** The page being edited, if any: the real-time events leave it alone. */
   readonly editingId: ElementId | null;
   /** The element shown by the work area (null on the search, the trash…): told to the others as the presence. */
   readonly viewingId: ElementId | null;

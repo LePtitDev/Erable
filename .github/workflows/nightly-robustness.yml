@@ -1,4 +1,4 @@
-# Nightly robustness (M4-09, docs/testing.md §6.1, §11.2): the server is killed in the middle of writes, then a team of
+# Nightly robustness (docs/testing.md §6.1, §11.2): the server is killed in the middle of writes, then a team of
 # virtual users works on it for ten minutes. Third-party actions are pinned by commit SHA (tag in comment).
 name: Nightly robustness
 

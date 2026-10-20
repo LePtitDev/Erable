@@ -16,7 +16,7 @@ public sealed record CategoryRecord(ElementId Id, ElementId ParentCategoryId, st
 public sealed record StoredValue(ElementId OwnerId, ElementId PropertyId, PropertyValue Value);
 
 /// <summary>
-/// SQL of categories, property definitions, values and their derived tables (schema v2, M2-03). Same conventions as
+/// SQL of categories, property definitions, values and their derived tables (schema v2). Same conventions as
 /// <see cref="ProjectRepository"/>: reads open their own connection when none is given, writes take the transaction.
 /// </summary>
 public static class StructureRepository

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Time.Testing;
 namespace Erable.Storage.Tests;
 
 /// <summary>
-/// Opening a project of an older format (F01.R3, M2-09): never migrated without confirmation, always after a backup,
+/// Opening a project of an older format (F01.R3): never migrated without confirmation, always after a backup,
 /// and back to its original state when anything fails.
 /// </summary>
 public sealed class ProjectMigrationTests : IDisposable

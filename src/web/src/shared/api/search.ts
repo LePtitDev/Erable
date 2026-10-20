@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { api, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
-// Full-text search and filters (docs/architecture.md §8.1 `search`, F10, M3-01). The query is built by
+// Full-text search and filters (docs/architecture.md §8.1 `search`, F10). The query is built by
 // features/search/searchState.ts, which owns the names of the parameters.
 
 export type SearchResultPage = Rebrand<Schemas["SearchResultPage"]>;

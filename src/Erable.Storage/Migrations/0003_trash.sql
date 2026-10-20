@@ -1,4 +1,4 @@
--- Schema v3 (M2-08): the trash (docs/architecture.md §7.4, F12). Same conventions as 0001_initial.sql.
+-- Schema v3: the trash (docs/architecture.md §7.4, F12). Same conventions as 0001_initial.sql.
 --
 -- deleted_root  the element at the top of the deletion the element belongs to (its own id for the element the user
 --               deleted; its descendants carry the same value). One deletion = one entry of the trash, restored or

@@ -1,7 +1,7 @@
 import { chroniques } from "../fixtures/chroniques";
 import { expect, test } from "../fixtures";
 
-// Infrastructure test (M1-07, no scenario ID): every test gets its own copy of the reference project.
+// Infrastructure test (no scenario ID): every test gets its own copy of the reference project.
 test("smoke · Reset opens the reference project with its frozen IDs @pr", async ({
   reference,
   page,

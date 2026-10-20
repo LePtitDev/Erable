@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Members of a project and accounts of the server (M4-08, E2E-14-10, F14.R1).</summary>
+/// <summary>Members of a project and accounts of the server (E2E-14-10, F14.R1).</summary>
 public sealed class MembersApiTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

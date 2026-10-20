@@ -2,7 +2,7 @@ using Erable.Core;
 
 namespace Erable.Server.Api;
 
-// Link types and typed links between pages (M2-07, F09).
+// Link types and typed links between pages (F09).
 
 /// <summary>A live link type with the number of links using it (confirmation before deleting it, F09.R3).</summary>
 public sealed record LinkTypeItem(ElementId Id, string Name, string Description, string? InverseName, int LinkCount);

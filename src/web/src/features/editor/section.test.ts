@@ -17,7 +17,7 @@ const page = [
   "Ses relevés.", // 13
 ].join("\n");
 
-describe("sectionAt (M4-04)", () => {
+describe("sectionAt", () => {
   it("is null above the first heading", () => {
     expect(sectionAt(page, 1)).toBeNull();
   });

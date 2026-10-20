@@ -6,7 +6,7 @@ import { apiInfoQuery } from "../../shared/api/queries";
 import styles from "./RecentProjects.module.css";
 
 /**
- * The projects of the server the user is a member of, with their role (M4-01, F14.R2). Someone who is not a member
+ * The projects of the server the user is a member of, with their role (F14.R2). Someone who is not a member
  * of a project never sees it listed. Where the local « recent projects » are shown too (a backend that also opens
  * folders), a project already listed there is not repeated.
  */

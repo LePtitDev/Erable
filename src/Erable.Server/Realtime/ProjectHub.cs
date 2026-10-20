@@ -21,7 +21,7 @@ public sealed record TreeChangedEvent(ElementId ProjectId, string By);
 /// <summary>Who is in the project and what they are doing; sent whenever it changes (F14.R3).</summary>
 public sealed record PresenceChangedEvent(ElementId ProjectId, IReadOnlyList<PresenceUser> Users);
 
-/// <summary>The members of the project, or their roles, changed: a client asks again what it may do (M4-08).</summary>
+/// <summary>The members of the project, or their roles, changed: a client asks again what it may do.</summary>
 public sealed record MembersChangedEvent(ElementId ProjectId);
 
 /// <summary>What the server tells the clients of a project (docs/architecture.md §8.2).</summary>
@@ -44,7 +44,7 @@ public interface IProjectClient
 public sealed record JoinResult(bool Joined, IReadOnlyList<PresenceUser> Presence);
 
 /// <summary>
-/// <c>/hubs/project</c> (M4-03): a client joins the group of the project it shows, if it is a member, and receives the
+/// <c>/hubs/project</c>: a client joins the group of the project it shows, if it is a member, and receives the
 /// events of that project only (F14.R4). The events are sent by the server after each committed write
 /// (<see cref="ProjectEventsMiddleware"/>); clients never send any.
 /// </summary>

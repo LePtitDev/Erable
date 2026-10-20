@@ -1,5 +1,5 @@
 /**
- * Safety limits on the Markdown of a page (docs/markdown-syntax.md §6, M5-04): twin of `MarkdownLimits.cs`, driven by the
+ * Safety limits on the Markdown of a page (docs/markdown-syntax.md §6): twin of `MarkdownLimits.cs`, driven by the
  * same `spec/fixtures/limits`. The parsers take quadratic time, or overflow their stack, on a few dozen kilobytes of
  * degenerate input; one linear pre-scan refuses those shapes before any parser runs. Real pages never come near.
  */

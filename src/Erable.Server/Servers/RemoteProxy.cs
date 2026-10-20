@@ -7,7 +7,7 @@ using Yarp.ReverseProxy.Forwarder;
 namespace Erable.Server.Servers;
 
 /// <summary>
-/// The requests of a project that lives on a server go to that server (M4-07). The page keeps talking to its own
+/// The requests of a project that lives on a server go to that server. The page keeps talking to its own
 /// origin — <c>/api/v1/projects/&lt;id&gt;/…</c> and <c>/hubs/project?projectId=&lt;id&gt;</c> — and the desktop backend
 /// forwards them with the bearer token, which therefore never reaches the page. Images, videos and downloads work
 /// without any change, since the browser asks the local origin for them; no CORS is involved.

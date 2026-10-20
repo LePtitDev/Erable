@@ -5,7 +5,7 @@ using Erable.Testing;
 
 namespace Erable.Server.Tests;
 
-/// <summary>The vault of the tokens of the servers (M4-07): never in clear text on disk.</summary>
+/// <summary>The vault of the tokens of the servers: never in clear text on disk.</summary>
 public sealed class SecretStoreTests
 {
     [Fact]

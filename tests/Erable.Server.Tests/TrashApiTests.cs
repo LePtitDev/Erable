@@ -10,7 +10,7 @@ using Erable.Testing.Reference;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Deleting, the trash, restoring and emptying over HTTP (M2-08), on the reference project.</summary>
+/// <summary>Deleting, the trash, restoring and emptying over HTTP, on the reference project.</summary>
 public sealed class TrashApiTests
 {
     private static readonly ElementId Lieux = Chroniques.IdOf("Lieux");

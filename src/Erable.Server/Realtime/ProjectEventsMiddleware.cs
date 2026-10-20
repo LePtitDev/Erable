@@ -8,7 +8,7 @@ using Microsoft.Net.Http.Headers;
 namespace Erable.Server.Realtime;
 
 /// <summary>
-/// Announces the writes of a project to the other clients (M4-03, F14.R4): once a write request has been answered with
+/// Announces the writes of a project to the other clients (F14.R4): once a write request has been answered with
 /// a success — its transaction is committed by then — the events of the project go out. A failed write announces
 /// nothing, and neither do the requests that only record the caller's own data (views, previews).
 /// </summary>

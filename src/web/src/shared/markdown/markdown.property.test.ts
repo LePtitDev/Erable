@@ -89,7 +89,7 @@ describe("markdown properties", () => {
 
   it("parses one megabyte in linear time", () => {
     // No list between paragraphs: micromark 4.0.3 itself is quadratic on alternating paragraphs and lists
-    // (see the next test and tasks/M1-04 notes); everything else must stay linear.
+    // (see the next test); everything else must stay linear.
     const block = `## Titre\n\nTexte [[3F2A9C14E07B5D21|lien]] et ![[7A1C4E90B3F2D615]]{width=320} [[[[ ]] \` x \`\n\n| a | b |\n|---|---|\n| [[5B19C0E2A4D7F311]] | c |\n\n\`\`\`\ncode [[5B19C0E2A4D7F311]]\n\`\`\`\n\n`;
     const small = block.repeat(1_000);
     const large = block.repeat(8_000);

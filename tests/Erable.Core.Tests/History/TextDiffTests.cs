@@ -3,7 +3,7 @@ using Erable.Core.History;
 
 namespace Erable.Core.Tests.History;
 
-/// <summary>Diff of the text of two revisions (F13.R2, M3-05).</summary>
+/// <summary>Diff of the text of two revisions (F13.R2).</summary>
 public sealed class TextDiffTests
 {
     private static readonly Gen<string> GenLine = Gen.String[Gen.Char["abc de"], 1, 12];

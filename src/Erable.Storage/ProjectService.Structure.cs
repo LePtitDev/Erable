@@ -8,7 +8,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Erable.Storage;
 
-/// <summary>Categories and own values of a page, saved with its content (same revision, M2-06). Null fields are left unchanged.</summary>
+/// <summary>Categories and own values of a page, saved with its content (same revision). Null fields are left unchanged.</summary>
 /// <param name="Categories">Every category of the page, in order.</param>
 /// <param name="Values">Every value the page defines itself (JSON of the property type); others are removed.</param>
 public sealed record PageStructureInput(IReadOnlyList<ElementId>? Categories, IReadOnlyList<(ElementId Property, JsonElement Value)>? Values);

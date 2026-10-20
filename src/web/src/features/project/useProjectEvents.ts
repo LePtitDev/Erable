@@ -14,9 +14,9 @@ import { RealtimeContext } from "../../shared/realtime/RealtimeContext";
 import { useShellStore } from "./shellStore";
 
 /**
- * Keeps the project in step with what the others do (M4-03, F14.R4): the server announces each write and the query
+ * Keeps the project in step with what the others do (F14.R4): the server announces each write and the query
  * cache refetches what is on screen — no polling. After a lost link, everything reloads. The same link tells the
- * others what this user is doing: the element shown, reading or editing, and the section (M4-04, F14.R3).
+ * others what this user is doing: the element shown, reading or editing, and the section (F14.R3).
  */
 export function useProjectEvents(projectId: ElementId): void {
   const client = useQueryClient();
@@ -30,7 +30,7 @@ export function useProjectEvents(projectId: ElementId): void {
 
     connectToProject(projectId, {
       elementChanged: (event) => {
-        // « moi » is the account on the server, in a project that lives on one (M4-07).
+        // « moi » is the account on the server, in a project that lives on one.
         const server = client
           .getQueryData(serversQuery.queryKey)
           ?.servers.find((s) => s.projectIds.includes(projectId));

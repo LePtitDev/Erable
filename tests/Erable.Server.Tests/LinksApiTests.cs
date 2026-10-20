@@ -10,7 +10,7 @@ using Erable.Testing.Reference;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Link types and typed links over HTTP (M2-07), on the reference project.</summary>
+/// <summary>Link types and typed links over HTTP, on the reference project.</summary>
 public sealed class LinksApiTests
 {
     private static readonly ElementId MentorDe = Chroniques.IdOf("Mentor de");

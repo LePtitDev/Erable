@@ -6,7 +6,7 @@ using Erable.Server.Projects;
 namespace Erable.Server.Users;
 
 /// <summary>
-/// Display names of the authors recorded in projects (<c>createdBy</c>, <c>updatedBy</c>): the accounts of the server (M4-01), else
+/// Display names of the authors recorded in projects (<c>createdBy</c>, <c>updatedBy</c>): the accounts of the server, else
 /// the local user, under the name chosen in the preferences or, by default, the OS account name; test mode also knows
 /// the users of <c>spec/projects/users.json</c>, the authors of the reference project. An unknown author is shown by its identifier.
 /// </summary>
@@ -45,7 +45,7 @@ public sealed class UserDirectory
         return _accounts.DisplayNameOf(userId) ?? (_names.TryGetValue(userId, out var name) ? name : userId);
     }
 
-    /// <summary>The OS account name: a local install has no other identity (« Bonjour, Arthur », M1-08).</summary>
+    /// <summary>The OS account name: a local install has no other identity (« Bonjour, Arthur »).</summary>
     private static string LocalName()
     {
         var name = Environment.UserName;

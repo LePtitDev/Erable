@@ -351,7 +351,7 @@ export function Explorer({ projectId }: { readonly projectId: ElementId }) {
     }
   };
 
-  // ─── Drag and drop (HTML5, WebKit checked by the M0-08 spike) ─────────────
+  // ─── Drag and drop (HTML5, also checked under WebKit) ─────────────────────
 
   const onDragStart = (event: DragEvent, node: TreeNodeItem) => {
     if (node.kind === "root" || !canEdit) {

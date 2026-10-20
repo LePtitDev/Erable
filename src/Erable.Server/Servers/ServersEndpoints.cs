@@ -19,7 +19,7 @@ public sealed record ProbeServerRequest(string Url);
 public sealed record ConnectServerRequest(string Url, string Login, string Password);
 
 /// <summary>
-/// The servers of the desktop application (M4-07). Only the desktop backend has them; mapped everywhere so that the API
+/// The servers of the desktop application. Only the desktop backend has them; mapped everywhere so that the API
 /// document describes them, answered with 404 on a server.
 /// </summary>
 public static class ServersEndpoints

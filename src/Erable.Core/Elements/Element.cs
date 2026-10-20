@@ -11,7 +11,7 @@ namespace Erable.Core.Elements;
 /// <param name="CreatedBy">Author of the creation.</param>
 /// <param name="UpdatedAt">Last modification time (UTC).</param>
 /// <param name="UpdatedBy">Author of the last modification.</param>
-/// <param name="DeletedAt">Set when the element is in the trash (M2-08).</param>
+/// <param name="DeletedAt">Set when the element is in the trash.</param>
 public sealed record Element(
     ElementId Id,
     ElementKind Kind,

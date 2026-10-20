@@ -1,4 +1,4 @@
-# Weekly quality of the tests themselves (M5-04, docs/testing.md §12): mutation testing (Stryker.NET on Erable.Core,
+# Weekly quality of the tests themselves (docs/testing.md §12): mutation testing (Stryker.NET on Erable.Core,
 # StrykerJS on the TypeScript twins of the shared specification) and ten minutes of Markdown fuzzing per language.
 # Objective: mutation score >= 70 %. The scores are in each job summary. A failure opens an issue (nightly-issue.yml).
 # Third-party actions are pinned by commit SHA (tag in comment); Renovate bumps them.

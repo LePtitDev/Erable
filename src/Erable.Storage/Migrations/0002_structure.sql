@@ -1,4 +1,4 @@
--- Schema v2 (M2-03): categories, property definitions and values, derived values and validation issues, link types and
+-- Schema v2: categories, property definitions and values, derived values and validation issues, link types and
 -- links (docs/architecture.md §5.3–§5.5, §7.4). Same conventions as 0001_initial.sql.
 
 -- Inheritance of a category: one optional parent category (F07.R1). parent_category_id has no foreign key: a parent in
@@ -48,7 +48,7 @@ CREATE TABLE property_values (
 
 CREATE INDEX ix_property_values_property ON property_values (property_id);
 
--- Derived (decision P-07): the effective value of each property of each live page after inheritance, maintained at
+-- Derived: the effective value of each property of each live page after inheritance, maintained at
 -- every write that can change it and rebuilt by `erable doctor --fix`. Same layout as property_values; origin is
 -- own, inherited, default or conflict (no value columns); source_id is the providing category of an inherited value.
 CREATE TABLE resolved_values (
@@ -80,7 +80,7 @@ CREATE TABLE validation_issues (
 CREATE INDEX ix_validation_issues_owner ON validation_issues (owner_id);
 CREATE INDEX ix_validation_issues_property ON validation_issues (property_id);
 
--- Link types and links (§5.5, F09), filled from M2-07. Same element space: the name is the element name.
+-- Link types and links (§5.5, F09). Same element space: the name is the element name.
 CREATE TABLE link_types (
     id            INTEGER PRIMARY KEY REFERENCES elements (id),
     description   TEXT    NOT NULL DEFAULT '',

@@ -19,7 +19,7 @@ import { RowMenu } from "./RowMenu";
 /**
  * The servers the application connected to, in the recent list with the mode « Serveur » (F01.R2, E2E-01-06). A
  * server opens on the projects its account belongs to; the token that opens them stays on this side of the
- * application (M4-07).
+ * application.
  */
 export function ServersSection({
   expanded,

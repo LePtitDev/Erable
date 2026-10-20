@@ -19,7 +19,7 @@ interface ConnectServerDialogProps {
 }
 
 /**
- * « Se connecter à un serveur » (M4-07, E2E-01-06): the address first, checked with the handshake alone — a server of
+ * « Se connecter à un serveur » (E2E-01-06): the address first, checked with the handshake alone — a server of
  * another version is explained here and nothing else is sent to it (F16.R4, E2E-16-06) — then the account.
  */
 export function ConnectServerDialog({ open, onOpenChange, onConnected }: ConnectServerDialogProps) {

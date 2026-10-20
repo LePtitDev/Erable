@@ -7,7 +7,7 @@ namespace Erable.Server.Spa;
 
 /// <summary>
 /// Serves the SPA shell (<c>index.html</c>) with the user's language and theme on <c>&lt;html&gt;</c>, so that the
-/// first paint is already right (F15.R3) and the browser never stores durable state itself (decision P-03).
+/// first paint is already right (F15.R3) and the browser never stores durable state itself (decision Q7).
 /// </summary>
 internal static partial class SpaIndexEndpoint
 {

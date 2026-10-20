@@ -6,7 +6,7 @@ namespace Erable.Storage;
 
 public sealed partial class ProjectService
 {
-    // ─── Search (M3-01, F10) ────────────────────────────────────────────────
+    // ─── Search (F10) ────────────────────────────────────────────────
 
     /// <summary>
     /// Builds the condition « <paramref name="propertyId"/> <paramref name="op"/> <paramref name="raw"/> »: the operand is

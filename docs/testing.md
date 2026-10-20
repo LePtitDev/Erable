@@ -1,94 +1,88 @@
-# Erable — Stratégie de qualité et de tests
+# Erable — Quality and testing strategy
 
-> Statut : **validé** · Version 0.1 · 13 octobre 2026
-> Complète `docs/architecture.md` (les renvois « §A-x » désignent ses sections).
-> Objectif : des fonctionnalités **qui marchent**, **qui restent rapides**, avec un **risque de régression faible**, sans ralentir le développement.
+## 1. Principles
 
----
-
-## 1. Principes
-
-1. **Tester là où un bug coûte cher.** Ce qui est irréversible passe avant tout : perte de données, référence cassée, fusion qui écrase un texte, fuite de données hors de l'utilisateur. Un bouton mal aligné se corrige en deux minutes, ces bugs-là non.
-2. **La logique va dans `Erable.Core`, pure et testée exhaustivement.** Le reste (stockage, API, UI) reste aussi fin que possible et se teste par intégration. L'architecture a été pensée pour ça : Core n'a aucune dépendance IO (§A-3).
-3. **Pas de mock de ce qu'on possède.** On teste contre un vrai SQLite (fichier temporaire), un vrai serveur Kestrel en mémoire, un vrai navigateur. On ne simule que ce qui est externe ou lent.
-4. **Une seule spécification pour deux implémentations.** Tout ce qui existe en C# *et* en TypeScript (syntaxe Markdown, règles de validation, format des ID) est piloté par les mêmes fichiers de cas dans `spec/fixtures/`.
-5. **Tout bug corrigé laisse un test.** On écrit d'abord le test qui échoue, puis le correctif.
-6. **Des tests déterministes ou pas de tests.** Un test instable (*flaky*) est mis en quarantaine dans la journée puis corrigé ou supprimé. Il ne reste jamais « à relancer ».
+1. **Test where a bug is expensive.** What is irreversible comes first: data loss, broken reference, a merge that overwrites text, data leaking to the wrong user. A misaligned button is fixed in two minutes; those bugs are not.
+2. **Logic goes into `Erable.Core`, pure and exhaustively tested.** The rest (storage, API, UI) stays as thin as possible and is tested through integration. The architecture was designed for this: Core has no IO dependency (§A-3).
+3. **No mocks of what we own.** Tests run against a real SQLite (temporary file), a real in-memory Kestrel server, a real browser. Only what is external or slow is simulated.
+4. **One specification for two implementations.** Everything that exists in C# *and* in TypeScript (Markdown syntax, validation rules, ID format) is driven by the same case files in `spec/fixtures/`.
+5. **Every fixed bug leaves a test.** The failing test is written first, then the fix.
+6. **Deterministic tests or no tests.** A flaky test is quarantined within the day, then fixed or deleted. It is never left "to be rerun".
 
 ---
 
-## 2. Vue d'ensemble
+## 2. Overview
 
-| Niveau | Outils | Ce qu'il couvre | Volume | Durée cible |
+| Level | Tools | What it covers | Volume | Target duration |
 |---|---|---|---|---|
-| Analyse statique | compilateur C# (nullable, warnings = erreurs), analyseurs .NET, `tsc --strict`, ESLint | Classes entières de bugs, avant exécution | — | < 1 min |
-| Unitaires Core | xUnit v3, Shouldly, **CsCheck** (property-based) | Domaine : ID, parseur, règles, héritage, fusion | beaucoup | < 30 s |
-| Spécification partagée | `spec/fixtures/*.json` exécutés par xUnit **et** Vitest | Parité C# ↔ TS | moyen | inclus |
-| Stockage | xUnit + SQLite réel en dossier temporaire | Migrations, requêtes, FTS, blobs, intégrité | moyen | < 1 min |
-| API / intégration | `WebApplicationFactory`, client HTTP et SignalR réels | Endpoints, auth, concurrence, événements | moyen | < 2 min |
-| Frontend unitaire | Vitest, Testing Library, **fast-check**, MSW | Composants, extensions CodeMirror, stores | beaucoup | < 1 min |
-| End-to-end | **Playwright** (TypeScript) contre un vrai backend | Parcours utilisateur complets, multi-utilisateur | peu, ciblés | < 8 min (PR) |
-| Visuel et accessibilité | Playwright `toHaveScreenshot`, `@axe-core/playwright` | Thèmes clair/sombre, langues, contrastes, clavier | peu | nightly |
-| Desktop | Fumée sur binaire packagé, 3 OS | Démarrage, WebView, loopback, fichiers natifs | très peu | < 3 min / OS |
-| Performance | BenchmarkDotNet, budgets Playwright, NBomber | Temps de réponse et de rendu sur gros projet | ciblé | nightly |
-| Robustesse | crash tests, mutation testing (Stryker), fuzz | Ce que les autres niveaux ne voient pas | ciblé | nightly / hebdo |
+| Static analysis | C# compiler (nullable, warnings = errors), .NET analyzers, `tsc --strict`, ESLint | Whole classes of bugs, before running | — | < 1 min |
+| Core unit tests | xUnit v3, Shouldly, **CsCheck** (property-based) | Domain: IDs, parser, rules, inheritance, merge | many | < 30 s |
+| Shared specification | `spec/fixtures/*.json` run by xUnit **and** Vitest | C# ↔ TS parity | medium | included |
+| Storage | xUnit + real SQLite in a temporary folder | Migrations, queries, FTS, blobs, integrity | medium | < 1 min |
+| API / integration | `WebApplicationFactory`, real HTTP and SignalR clients | Endpoints, auth, concurrency, events | medium | < 2 min |
+| Frontend unit tests | Vitest, Testing Library, **fast-check**, MSW | Components, CodeMirror extensions, stores | many | < 1 min |
+| End-to-end | **Playwright** (TypeScript) against a real backend | Complete user journeys, multi-user | few, targeted | < 8 min (PR) |
+| Visual and accessibility | Playwright `toHaveScreenshot`, `@axe-core/playwright` | Light/dark themes, languages, contrast, keyboard | few | nightly |
+| Desktop | Smoke test on the packaged binary, 3 OSes | Startup, WebView, loopback, native files | very few | < 3 min / OS |
+| Performance | BenchmarkDotNet, Playwright budgets, NBomber | Response and rendering times on a large project | targeted | nightly |
+| Robustness | crash tests, mutation testing (Stryker), fuzzing | What the other levels do not see | targeted | nightly / weekly |
 
 ---
 
-## 3. Analyse statique et typage
+## 3. Static analysis and typing
 
-Le moyen le moins cher d'éviter un bug, c'est qu'il ne compile pas.
+The cheapest way to avoid a bug is for it not to compile.
 
 **C#**
-- `Nullable` activé, `TreatWarningsAsErrors`, `AnalysisLevel=latest-recommended`, `.editorconfig` partagé.
-- `ElementId` est un type dédié (§A-4) : impossible de passer un `long` ou un `string` à la place d'un ID.
-- Un `enum` par `ElementKind` et par type de propriété, `switch` exhaustifs (avertissement CS8509 → erreur).
+- `Nullable` enabled, `TreatWarningsAsErrors`, `AnalysisLevel=latest-recommended`, shared `.editorconfig`.
+- `ElementId` is a dedicated type (§A-4): a `long` or a `string` cannot be passed instead of an ID.
+- One `enum` per `ElementKind` and per property type, exhaustive `switch` (warning CS8509 → error).
 
 **TypeScript**
 - `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`.
-- ESLint `typescript-eslint/strict-type-checked`. `any` interdit hors fichiers générés.
-- **`ElementId` est un type marqué** (`string & { __brand: "ElementId" }`), qu'on ne peut obtenir que via `parseElementId()`. C'est ce qui rend l'erreur « ID en `number` » (§A-4) impossible à écrire.
-- Le client API est **généré** depuis l'OpenAPI (§A-3.1). En CI, on le régénère et on échoue si le fichier versionné diffère : un changement d'API non répercuté côté front casse le build au lieu de casser l'application.
+- ESLint `typescript-eslint/strict-type-checked`. `any` forbidden outside generated files.
+- **`ElementId` is a branded type** (`string & { __brand: "ElementId" }`), obtainable only through `parseElementId()`. This makes the "ID as a `number`" mistake (§A-4) impossible to write.
+- The API client is **generated** from the OpenAPI document (§A-3.1). CI regenerates it and fails if the versioned file differs: an API change not carried over to the frontend breaks the build instead of breaking the application.
 
 ---
 
-## 4. Tests unitaires du domaine (`Erable.Core`)
+## 4. Domain unit tests (`Erable.Core`)
 
-C'est ici que se joue l'essentiel de la fiabilité. Cible : **90 % de couverture de lignes et un score de mutation ≥ 70 %** sur Core (§12). Les deux chiffres ensemble : la couverture seule ne prouve pas que les assertions vérifient quelque chose.
+This is where most of the reliability is won. Target: **90 % line coverage and a mutation score ≥ 70 %** on Core (§12). Both figures together: coverage alone does not prove that the assertions check anything.
 
-### 4.1 Tests par propriétés (property-based)
+### 4.1 Property-based tests
 
-Plutôt que quelques exemples choisis à la main, on décrit un invariant et **CsCheck** génère des milliers d'entrées (et réduit automatiquement un échec au plus petit cas). Côté TS, **fast-check** fait de même.
+Rather than a few hand-picked examples, an invariant is described and **CsCheck** generates thousands of inputs (and automatically shrinks a failure to the smallest case). On the TS side, **fast-check** does the same.
 
-| Sujet | Invariants vérifiés |
+| Subject | Invariants checked |
 |---|---|
-| `ElementId` | `Parse(Format(id)) == id` pour tout `ulong ≠ 0` ; minuscules acceptées ; `long ↔ ulong` sans perte ; 0 et longueurs ≠ 16 rejetés |
-| Parseur de références | Toute référence générée insérée dans du Markdown arbitraire est retrouvée, à la bonne position ; le texte hors références est préservé ; aucune exception sur entrée aléatoire |
-| Règles de validation | `between(a,b)` ⇔ `greater_or_equal(a) ∧ less_or_equal(b)` ; une valeur valide le reste après aller-retour JSON |
-| Héritage de catégories | Aucun cycle accepté, quelle que soit la séquence de reparentages ; la résolution d'une valeur est indépendante de l'ordre de déclaration des catégories |
-| Fusion à trois voies | `merge(b, b, x) == x` ; `merge(b, x, b) == x` ; deux éditions de sections disjointes → aucun conflit et les deux présentes ; **aucun caractère perdu sans conflit signalé** |
-| Arbre | Après toute suite de déplacements valides : un seul parent par élément, aucune boucle, aucun élément hors de sa racine |
+| `ElementId` | `Parse(Format(id)) == id` for every `ulong ≠ 0`; lower case accepted; `long ↔ ulong` lossless; 0 and lengths ≠ 16 rejected |
+| Reference parser | Any generated reference inserted into arbitrary Markdown is found, at the right position; the text outside references is preserved; no exception on random input |
+| Validation rules | `between(a,b)` ⇔ `greater_or_equal(a) ∧ less_or_equal(b)`; a valid value stays valid after a JSON round trip |
+| Category inheritance | No cycle accepted, whatever the sequence of reparentings; resolving a value does not depend on the declaration order of the categories |
+| Three-way merge | `merge(b, b, x) == x`; `merge(b, x, b) == x`; two edits of disjoint sections → no conflict and both present; **no character lost without a reported conflict** |
+| Tree | After any sequence of valid moves: one parent per element, no loop, no element outside its root |
 
-### 4.2 Tests par exemples
+### 4.2 Example-based tests
 
-Pour les cas métier lisibles, en particulier tout ce qu'illustre le mockup :
-- PNJ hérite de Personnage qui hérite d'Entité : la valeur vient de la catégorie la plus spécifique.
-- Ilsa est PNJ + Marchand, deux défauts différents pour la même propriété : valeur marquée **en conflit** (§A-5.3).
-- `Niveau = 72` avec `less_or_equal 60` : un avertissement, et l'enregistrement **n'est pas** bloqué (§A-5.4).
+For readable business cases, in particular everything the reference project illustrates:
+- PNJ inherits from Personnage, which inherits from Entité: the value comes from the most specific category.
+- Ilsa is PNJ + Marchand, two different defaults for the same property: the value is marked **in conflict** (§A-5.3).
+- `Niveau = 72` with `less_or_equal 60`: a warning, and saving is **not** blocked (§A-5.4).
 
-Nommage : `Methode_Contexte_ResultatAttendu`. Un test vérifie un seul comportement.
+Naming: `Method_Context_ExpectedResult`. A test checks a single behaviour.
 
-### 4.3 Données de test
+### 4.3 Test data
 
-- **Builders fluides** : `Project.Build().WithCategory("PNJ", parent: "Personnage").WithPage("Ilsa Varenne", c => c.InCategory("PNJ"))`. Les tests restent lisibles et ne dépendent pas des détails de construction.
-- **Projet de démonstration « Chroniques d'Aube »**, repris du mockup, versionné dans `spec/projects/`. Il sert à la fois de jeu de données e2e, de base pour les captures visuelles et de démo. Un seul monde de test, que tout le monde connaît.
-- **Générateur de gros projets** à graine fixe (`--pages 10000 --seed 42`), pour la performance (§11).
+- **Fluent builders**: `Project.Build().WithCategory("PNJ", parent: "Personnage").WithPage("Ilsa Varenne", c => c.InCategory("PNJ"))`. Tests stay readable and do not depend on construction details.
+- **"Chroniques d'Aube" demo project**, versioned in `spec/projects/`. It is at once the e2e data set, the base of the visual snapshots and the demo. A single test world that everyone knows.
+- **Large project generator** with a fixed seed (`--pages 10000 --seed 42`), for performance (§11).
 
 ---
 
-## 5. Spécification partagée C# ↔ TypeScript
+## 5. Shared C# ↔ TypeScript specification
 
-Trois logiques existent en double (§A-5.4, §A-6.3) : parseur de références, règles de validation, format des ID. Elles sont décrites une seule fois :
+Three pieces of logic exist twice (§A-5.4, §A-6.3): reference parser, validation rules, ID format. They are described once:
 
 ```
 spec/fixtures/
@@ -97,224 +91,224 @@ spec/fixtures/
 │                      definitions.json, values.json, regex.json
 └─ markdown/
    ├─ refs.json        { "md": "Voir [[3F2A9C14E07B5D21|lui]].", "refs": [{ "id": "…", "label": "lui", "embed": false, "start": 5 }] }
-   └─ edge-cases.json  refs dans du code, échappements, crochets imbriqués, ID de 15/17 caractères…
+   └─ edge-cases.json  refs in code, escapes, nested brackets, IDs of 15/17 characters…
 ```
 
-- Un **seul lanceur** par langage lit tous les fichiers ; ajouter un cas = ajouter une ligne JSON, sans code.
-- Les deux suites tournent dans la même CI : si l'une passe et l'autre échoue, la divergence est visible immédiatement.
-- Les cas trouvés par property-based testing (§4.1) sont ajoutés ici, pour que l'autre implémentation en profite.
+- A **single runner** per language reads every file; adding a case means adding a JSON line, without code.
+- Both suites run in the same CI: if one passes and the other fails, the divergence is visible immediately.
+- Cases found by property-based testing (§4.1) are added here, so that the other implementation benefits from them.
 
 ---
 
-## 6. Stockage
+## 6. Storage
 
-Toujours contre un **vrai SQLite**, dans un dossier temporaire par test (rapide : quelques millisecondes).
+Always against a **real SQLite**, in a temporary folder per test (fast: a few milliseconds).
 
-- **Migrations** : pour chaque `formatVersion` publiée, un projet figé est conservé dans `spec/projects/legacy/vN/`. Le test l'ouvre, migre vers la version courante, vérifie `PRAGMA integrity_check` et le contenu. **On ne casse jamais un projet existant d'un utilisateur.**
-- **Requêtes** : filtres sur propriétés (y compris valeurs héritées), recherche FTS (accents : « col gele » trouve « Col gelé »), `WITH RECURSIVE` sur l'héritage.
-- **Blobs** : déduplication par SHA-256, ramasse-miettes (un blob encore référencé par une révision n'est **pas** supprimé), requêtes `Range`.
-- **Commande `erable doctor`** : vérifie intégrité SQLite, blobs orphelins ou manquants, références cassées, cycles, index FTS désynchronisé. Elle est testée sur des projets volontairement corrompus, et exécutée à la fin de chaque test e2e pour vérifier que la base laissée est saine.
+- **Migrations**: for every published `formatVersion`, a frozen project is kept in `spec/projects/legacy/vN/`. The test opens it, migrates it to the current version, checks `PRAGMA integrity_check` and the content. **An existing user project is never broken.**
+- **Queries**: filters on properties (inherited values included), FTS search (accents: "col gele" finds "Col gelé"), `WITH RECURSIVE` over inheritance.
+- **Blobs**: deduplication by SHA-256, garbage collection (a blob still referenced by a revision is **not** deleted), `Range` requests.
+- **`erable doctor` command**: checks SQLite integrity, orphan or missing blobs, broken references, cycles, out-of-sync FTS index. It is tested on deliberately corrupted projects, and run at the end of each e2e test to check that the database left behind is healthy.
 
-### 6.1 Résistance aux interruptions
+### 6.1 Surviving interruptions
 
-Un wiki local doit survivre à une coupure de courant.
-- Test qui **tue le processus** (`Process.Kill`) à des instants aléatoires pendant une rafale d'écritures, puis rouvre le projet : `integrity_check` OK, et chaque enregistrement est soit entièrement présent, soit absent.
-- Écriture des blobs : fichier temporaire, puis `rename` atomique, puis insertion en base. Un blob incomplet ne doit jamais être référencé.
+A local wiki must survive a power cut.
+- A test **kills the process** (`Process.Kill`) at random moments during a burst of writes, then reopens the project: `integrity_check` OK, and each save is either entirely present or absent.
+- Writing blobs: temporary file, then atomic `rename`, then insertion in the database. An incomplete blob must never be referenced.
 
 ---
 
-## 7. API et intégration
+## 7. API and integration
 
-`WebApplicationFactory<Program>` démarre le vrai serveur en mémoire, avec un vrai projet SQLite.
+`WebApplicationFactory<Program>` starts the real server in memory, with a real SQLite project.
 
-- **Un test par endpoint** pour le cas nominal et les erreurs (404, 409, 422), avec des réponses au format `ProblemDetails`.
-- **Matrice d'autorisation générée** : le test énumère *tous* les endpoints exposés via l'`EndpointDataSource` et les appelle avec chaque rôle (anonyme, lecteur, éditeur, administrateur, membre d'un autre projet). Un nouvel endpoint sans règle d'autorisation explicite **fait échouer la suite**. C'est la protection contre le bug de sécurité le plus courant : l'endpoint oublié.
-  *Mise en œuvre (M4-02)* : la règle de chaque endpoint est sa métadonnée `AccessRule` ; `AuthorizationMatrix` (tests/Erable.Server.Tests) la compare au comportement réel pour six profils et refuse tout endpoint sans règle ; un second contrôle vérifie que les écritures d'un projet exigent un éditeur (sauf liste d'exceptions).
-- **Contrat** : le document OpenAPI est comparé à un instantané versionné (bibliothèque **Verify**). Une modification de l'API apparaît dans la revue de code sous forme de diff lisible ; une suppression de champ dans `/api/v1` est refusée.
-- **Concurrence** : deux clients enregistrent la même page depuis la même révision → l'un reçoit `409` avec la version courante ; N écritures parallèles sur des pages différentes → aucune perte.
-- **SignalR** : deux clients connectés au hub ; une modification par A produit `ElementChanged` chez B, mais pas chez un client d'un autre projet. Présence : connexion, départ, déconnexion brutale (le fantôme disparaît après expiration).
-- **Sécurité du mode local** (§A-9) : requête sans jeton → 401 ; `Host` différent de `127.0.0.1:port` → refus ; écoute sur `0.0.0.0` impossible en mode desktop.
+- **One test per endpoint** for the nominal case and the errors (404, 409, 422), with `ProblemDetails` responses.
+- **Generated authorization matrix**: the test enumerates *every* exposed endpoint through the `EndpointDataSource` and calls it with each role (anonymous, reader, editor, administrator, member of another project). A new endpoint without an explicit authorization rule **fails the suite**. This is the protection against the most common security bug: the forgotten endpoint.
+  *Implementation*: the rule of each endpoint is its `AccessRule` metadata; `AuthorizationMatrix` (tests/Erable.Server.Tests) compares it with the actual behaviour for six profiles and refuses any endpoint without a rule; a second check verifies that the writes of a project require an editor (except for a list of exceptions).
+- **Contract**: the OpenAPI document is compared with a versioned snapshot (**Verify** library). An API change shows up in code review as a readable diff; removing a field in `/api/v1` is refused.
+- **Concurrency**: two clients save the same page from the same revision → one receives `409` with the current version; N parallel writes on different pages → no loss.
+- **SignalR**: two clients connected to the hub; a change by A produces `ElementChanged` for B, but not for a client of another project. Presence: connection, departure, abrupt disconnection (the ghost disappears after expiry).
+- **Local mode security** (§A-9): request without a token → 401; `Host` other than `127.0.0.1:port` → refused; listening on `0.0.0.0` impossible in desktop mode.
 
 ---
 
 ## 8. Frontend
 
-### 8.1 Unitaires et composants (Vitest)
+### 8.1 Unit and component tests (Vitest)
 
-- **Extensions CodeMirror testées sans DOM** : on construit un `EditorState`, on applique des transactions, on vérifie les décorations (pastilles d'ID), les plages atomiques et les propositions de la palette `[[`. C'est rapide et fiable, contrairement à la simulation de frappe dans un navigateur.
-- **Composants** avec Testing Library : on interroge par rôle et par libellé accessible (`getByRole("treeitem", { name: "PNJ" })`), jamais par classe CSS. Bonus : un composant testable de cette façon est aussi accessible.
-- **API simulée** par **MSW**, avec des handlers typés à partir du client généré : les mocks ne peuvent pas dériver du vrai contrat.
-- **Rendu Markdown** : corpus XSS (`<script>`, `javascript:`, `onerror=`, SVG malicieux) dont le rendu ne doit produire aucun élément exécutable.
+- **CodeMirror extensions tested without a DOM**: an `EditorState` is built, transactions are applied, and the decorations (ID pills), atomic ranges and suggestions of the `[[` palette are checked. This is fast and reliable, unlike simulating typing in a browser.
+- **Components** with Testing Library: queried by role and accessible label (`getByRole("treeitem", { name: "PNJ" })`), never by CSS class. Bonus: a component testable this way is also accessible.
+- **API simulated** with **MSW**, with handlers typed from the generated client: mocks cannot drift from the real contract.
+- **Markdown rendering**: an XSS corpus (`<script>`, `javascript:`, `onerror=`, malicious SVG) whose rendering must produce no executable element.
 
-### 8.2 Internationalisation
+### 8.2 Internationalization
 
-- Test qui vérifie que **chaque clé de `fr` existe dans `en`, `de` et `es`**, et inversement, avec les mêmes paramètres d'interpolation.
-- Règle ESLint interdisant les chaînes en dur dans le JSX.
-- Une pseudo-locale (`xx`, textes allongés de 40 % et accentués) pour repérer dans les captures visuelles les débordements de mise en page et les textes non traduits.
+- A test checks that **every key of `fr` exists in `en`, `de` and `es`**, and conversely, with the same interpolation parameters and plural forms.
+- An ESLint rule forbids hard-coded strings in JSX.
+- A pseudo-locale (`xx`, texts lengthened by 40 % and accented) reveals layout overflows and untranslated texts in the visual snapshots.
 
 ---
 
 ## 9. End-to-end (Playwright)
 
-Contre un **vrai backend** en mode serveur, lancé sur un projet « Chroniques d'Aube » fraîchement copié pour chaque fichier de test (isolation complète, exécution parallèle possible).
+Against a **real backend** in server mode, started on a "Chroniques d'Aube" project freshly copied for each test file (complete isolation, parallel execution possible).
 
-### 9.1 Navigateurs
+### 9.1 Browsers
 
-- **Chromium** : moteur du WebView2 (Windows) et des navigateurs web majoritaires.
-- **WebKit** : le plus proche de WKWebView (macOS) et de WebKitGTK (Linux), utilisés par Photino. C'est notre meilleur filet pour le risque identifié en §A-10.
-- Firefox : nightly seulement (usage web).
-- **Mobile** (M6, F18) : projet Playwright `mobile`, téléphone émulé (Chromium, profil Pixel 7 : 412 px, tactile, pointeur grossier), qui exécute **seulement** les scénarios `@mobile` ; ceux marqués `@pr` tournent à chaque PR. Les autres projets les excluent. Le moteur du WebView Android est Chromium : ce projet couvre aussi l'app Android, dont le shell natif est vérifié à part (§T-10.1).
+- **Chromium**: engine of WebView2 (Windows) and of most web browsers.
+- **WebKit**: the closest to WKWebView (macOS) and WebKitGTK (Linux), used by Photino. This is our best safety net for the risk identified in §A-10.
+- Firefox: nightly only (web usage).
+- **Mobile** (F18): Playwright project `mobile`, emulated phone (Chromium, Pixel 7 profile: 412 px, touch, coarse pointer), which runs **only** the `@mobile` scenarios; those tagged `@pr` run on every PR. The other projects exclude them. The engine of the Android WebView is Chromium: this project also covers the Android app, whose native shell is checked separately (§T-10.1).
 
-### 9.2 Parcours couverts
+### 9.2 Journeys covered
 
-Un fichier par écran du mockup, plus les parcours transverses. On en garde **peu, mais de bout en bout** :
+One file per main screen, plus the cross-cutting journeys. We keep **few, but end to end**:
 
-| Parcours | Vérifie notamment |
+| Journey | Checks in particular |
 |---|---|
-| Accueil | Créer un projet, l'ouvrir, le retrouver dans les récents |
-| Arbre | Créer dossier et page, glisser-déposer, renommer → **les références `[[ID]]` affichent le nouveau nom partout** |
-| Édition | `[[` ouvre la palette, filtre, `Entrée` insère un lien, `Maj+Entrée` une intégration ; collage d'image → pièce jointe ; `Ctrl+S` |
-| Page | TOC, sous-pages, propriétés héritées « via PNJ », liens entrants, avertissement de validation |
-| Catégorie / Propriété | Héritage, conflit de valeurs, ajout de règle → « 2 pages hors règles » |
-| Recherche | `Ctrl+K`, filtres combinés, récemment consultées / modifiées |
-| Suppression | Avertissement « N pages référencent… », corbeille, restauration, lien cassé affiché proprement |
-| **Multi-utilisateur** | Deux contextes navigateur : présence visible, modification propagée sans rechargement, enregistrements concurrents fusionnés sans perte |
-| Historique | Comparer deux révisions, restaurer |
+| Home | Create a project, open it, find it in the recent ones |
+| Tree | Create a folder and a page, drag and drop, rename → **`[[ID]]` references show the new name everywhere** |
+| Editing | `[[` opens the palette, filters, `Enter` inserts a link, `Shift+Enter` an embed; pasting an image → attachment; `Ctrl+S` |
+| Page | TOC, sub-pages, properties inherited "via PNJ", incoming links, validation warning |
+| Category / Property | Inheritance, value conflict, adding a rule → "2 pages breaking the rules" |
+| Search | `Ctrl+K`, combined filters, recently viewed / edited |
+| Deletion | "N pages reference…" warning, trash, restore, broken link shown cleanly |
+| **Multi-user** | Two browser contexts: visible presence, change propagated without reloading, concurrent saves merged without loss |
+| History | Compare two revisions, restore |
 
-Règles d'écriture :
-- sélecteurs par rôle et libellé, ou `data-testid` en dernier recours ;
-- jamais de `waitForTimeout` : uniquement des attentes sur un état (`expect(...).toBeVisible()`) ;
-- *page objects* légers par écran (`EditorPage`, `TreePanel`) pour que les changements d'UI ne touchent qu'un fichier ;
-- trace Playwright conservée en cas d'échec (vidéo, réseau, DOM), en artefact CI.
+Writing rules:
+- selectors by role and label, or `data-testid` as a last resort;
+- never `waitForTimeout`: only waits on a state (`expect(...).toBeVisible()`);
+- light *page objects* per screen (`EditorPage`, `TreePanel`) so that UI changes touch only one file;
+- Playwright trace kept on failure (video, network, DOM), as a CI artifact.
 
-### 9.3 Visuel et accessibilité (nightly)
+### 9.3 Visual and accessibility (nightly)
 
-- Captures de chaque écran du mockup en **clair/sombre × fr/en × xx**, comparées à des références. Le rendu est stabilisé (polices embarquées, animations coupées, horloge figée) et exécuté dans un conteneur Docker fixe pour éviter les différences d'un poste à l'autre.
-- **axe-core** sur chaque écran : zéro violation « serious » ou « critical ». Contraste vérifié dans les deux thèmes.
-- **Procédure** : les captures sont des tests Playwright du projet `visual` (`@visual`), exclus des autres projets. Elles se comparent et se mettent à jour dans le conteneur fixe `src/web/e2e/visual/Dockerfile` : `pnpm -C src/web e2e:visual:docker` (ajouter `-- --update` pour réécrire les références, puis relire chaque image modifiée avant de commiter). Les références sont versionnées dans `src/web/e2e/screenshots/`. La pseudo-locale `xx` n'existe que dans le build de test (`VITE_PSEUDO_LOCALE=1`).
-- Un parcours **100 % clavier** (arbre, édition, palette, recherche), puisque l'outil vise une ergonomie de type IDE.
-
----
-
-## 10. Application desktop
-
-Playwright ne pilote pas tous les WebViews natifs ; on combine donc deux approches.
-
-- **Windows** : WebView2 expose le protocole DevTools. En lançant l'app avec `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=…`, Playwright s'y connecte (`connectOverCDP`) et rejoue un sous-ensemble des parcours e2e **dans le vrai binaire**.
-- **macOS et Linux** : mode **`--self-test`**. L'app démarre sur un projet temporaire, la SPA exécute un scénario scripté (créer une page, insérer une référence, joindre une image, rechercher, enregistrer), envoie le résultat au backend, et le processus sort avec un code 0 ou 1. Sous Linux, ça tourne sous `xvfb`.
-- Ce test de fumée s'exécute sur **l'artefact publié** (publication autonome, `pr.yml` et `nightly.yml`), pas sur le build de dev. Le workflow de release ne relance pas de test : l'installeur Velopack n'est pas lui-même vérifié en CI.
-- Vérifié aussi : port aléatoire réellement sur loopback, second lancement avec le même projet (verrou ou réutilisation de l'instance), fermeture propre (WAL fusionné, aucun processus résiduel).
-- **Langue** : le lanceur des e2e Windows force `--lang=fr-FR` dans le WebView2 (la locale de référence, comme `locale: "fr-FR"` des e2e web), quelle que soit la langue de la machine ; `ERABLE_E2E_WEBVIEW_LANG` la change, par exemple pour reproduire un poste en anglais.
-- **Budget de démarrage** (E2E-16-01) : 3 s. Les runners partagés de la CI (rendu logiciel, Xvfb, disques froids) mesurent 3,3 à 3,6 s : les jobs desktop de `pr.yml` et `nightly.yml` fixent `ERABLE_STARTUP_BUDGET_MS=10000`, lu par `--self-test` comme par l'e2e Windows. La mesure figure toujours dans le rapport (`startup-budget`), pour suivre l'écart au budget de 3 s.
+- Snapshots of each main screen in **light/dark × fr/en × xx**, compared to references. Rendering is stabilized (embedded fonts, animations off, frozen clock) and run in a fixed Docker container to avoid differences from one machine to another.
+- **axe-core** on each screen: zero "serious" or "critical" violations. Contrast checked in both themes.
+- **Procedure**: the snapshots are Playwright tests of the `visual` project (`@visual`), excluded from the other projects. They are compared and updated in the fixed container `src/web/e2e/visual/Dockerfile`: `pnpm -C src/web e2e:visual:docker` (add `-- --update` to rewrite the references, then review each changed image before committing). The references are versioned in `src/web/e2e/screenshots/`. The `xx` pseudo-locale only exists in the test build (`VITE_PSEUDO_LOCALE=1`).
+- A **keyboard-only** journey (tree, editing, palette, search), since the tool aims at IDE-like ergonomics.
 
 ---
 
-### 10.1 Application Android
+## 10. Desktop application
 
-Le shell (`src/Erable.Android`, décision Q11) n'a presque pas de logique : normalisation des adresses, compatibilité de version, politique de navigation. Elle vit dans des classes sans dépendance Android, compilées aussi par `tests/Erable.Android.Tests` (xUnit, dans `Erable.sln`). L'APK est construit par la CI de release ; le parcours sur appareil suit la liste de contrôle de `docs/release.md` (pas d'émulateur dans la CI).
+Playwright does not drive every native WebView; two approaches are therefore combined.
+
+- **Windows**: WebView2 exposes the DevTools protocol. By starting the app with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=…`, Playwright connects to it (`connectOverCDP`) and replays a subset of the e2e journeys **in the real binary**.
+- **macOS and Linux**: **`--self-test`** mode. The app starts on a temporary project, the SPA runs a scripted scenario (create a page, insert a reference, attach an image, search, save), sends the result to the backend, and the process exits with code 0 or 1. On Linux, it runs under `xvfb`.
+- This smoke test runs on **the published artifact** (self-contained publication, `pr.yml` and `nightly.yml`), not on the dev build. The release workflow does not rerun tests: the Velopack installer itself is not checked in CI.
+- Also checked: random port really on loopback, second launch with the same project (lock or reuse of the instance), clean shutdown (WAL checkpointed, no leftover process).
+- **Language**: the Windows e2e launcher forces `--lang=fr-FR` in WebView2 (the reference locale, like `locale: "fr-FR"` of the web e2e), whatever the language of the machine; `ERABLE_E2E_WEBVIEW_LANG` changes it, for instance to reproduce an English machine.
+- **Startup budget** (E2E-16-01): 3 s. The shared CI runners (software rendering, Xvfb, cold disks) measure 3.3 to 3.6 s: the desktop jobs of `pr.yml` and `nightly.yml` set `ERABLE_STARTUP_BUDGET_MS=10000`, read by `--self-test` as well as by the Windows e2e. The measurement always appears in the report (`startup-budget`), to track the gap to the 3 s budget.
+
+---
+
+### 10.1 Android application
+
+The shell (`src/Erable.Android`, decision Q11) has almost no logic: address normalization, version compatibility, navigation policy. It lives in classes without Android dependencies, also compiled by `tests/Erable.Android.Tests` (xUnit, in `Erable.sln`). The APK is built by the release CI; the on-device journey follows the checklist of `docs/release.md` (no emulator in CI).
 
 ## 11. Performance
 
-« Efficace » doit être mesuré, sinon ça se dégrade sans que personne ne s'en aperçoive.
+"Efficient" must be measured, otherwise it degrades without anyone noticing.
 
 ### 11.1 Budgets
 
-Mesurés sur le projet généré **10 000 pages / 300 catégories / 50 000 références / 2 Go de pièces jointes**, sur la machine de CI de référence :
+Measured on the generated project **10,000 pages / 300 categories / 50,000 references / 2 GB of attachments**, on the reference CI machine:
 
-| Opération | Budget (p95) |
+| Operation | Budget (p95) |
 |---|---|
-| Ouverture du projet → arbre affiché | < 1 s |
-| Chargement de l'arbre (API) | < 150 ms |
-| Ouverture d'une page (API + rendu) | < 200 ms |
-| Enregistrement d'une page (index, refs, FTS, validation) | < 100 ms |
-| Recherche plein texte + filtres | < 100 ms |
-| Palette `[[` : frappe → propositions | < 50 ms |
-| Frappe dans l'éditeur, page de 5 000 lignes | aucune frame > 50 ms |
-| Bundle JS initial (gzip) | < 500 Ko |
+| Opening the project → tree shown | < 1 s |
+| Loading the tree (API) | < 150 ms |
+| Opening a page (API + rendering) | < 200 ms |
+| Saving a page (index, refs, FTS, validation) | < 100 ms |
+| Full-text search + filters | < 100 ms |
+| `[[` palette: keystroke → suggestions | < 50 ms |
+| Typing in the editor, 5,000-line page | no frame > 50 ms |
+| Initial JS bundle (gzip) | < 500 KB |
 
-### 11.2 Mesure
+### 11.2 Measurement
 
-- **BenchmarkDotNet** sur les chemins chauds de Core et Storage (parseur, résolution des propriétés, requêtes de recherche). Résultats historisés ; une régression **> 15 %** fait échouer le nightly.
-- **Playwright** mesure les budgets d'UI via `performance.mark` posés dans la SPA.
-- **NBomber** (C#) simule 50 utilisateurs (80 % lecture, 20 % écriture) sur un serveur pendant 10 minutes : aucune erreur, p95 dans les budgets, mémoire stable (pas de fuite).
-- Taille du bundle vérifiée à chaque PR.
+- **BenchmarkDotNet** on the hot paths of Core and Storage (parser, property resolution, search queries). Results are kept as history; a regression **> 15 %** fails the nightly.
+- **Playwright** measures the UI budgets through `performance.mark` calls placed in the SPA.
+- **NBomber** (C#) simulates 50 users (80 % reads, 20 % writes) on a server for 10 minutes: no error, p95 within budgets, stable memory (no leak).
+- Bundle size checked on every PR.
 
-**Outillage (M3-06)** : `tests/Erable.Benchmarks` (Release) fournit `generate` (projet à graine fixe, `--light` pour la CI), `budgets` (p95 serveur en HTTP sur le projet généré), `bench` (BenchmarkDotNet en processus, historique `artifacts/perf/history.json`, comparaison à `spec/perf/baseline.json`, échec au-delà de +15 %) et `compare`. Les budgets du navigateur sont les tests Playwright `@perf` (`pnpm e2e:perf`, avec `ERABLE_LARGE_PROJECT` pour le grand projet). Les commandes sont dans `CLAUDE.md` §9, les mesures du jour dans `tasks/M3-06-performance.md`.
+**Tooling**: `tests/Erable.Benchmarks` (Release) provides `generate` (project with a fixed seed, `--light` for CI), `budgets` (server p95 over HTTP on the generated project), `bench` (in-process BenchmarkDotNet, history in `artifacts/perf/history.json`, comparison with `spec/perf/baseline.json`, failure beyond +15 %) and `compare`. The browser budgets are the Playwright `@perf` tests (`pnpm e2e:perf`, with `ERABLE_LARGE_PROJECT` for the large project). The commands are listed in `CONTRIBUTING.md`.
 
-**Robustesse (M4-09)** : `CrashTests` (`tests/Erable.Server.Tests/Robustness/`) lance le vrai serveur (`erable serve`) en processus fils, le tue à des instants aléatoires pendant des rafales d’écritures (sauvegardes, créations, pièces jointes), lance `erable doctor` sur le dossier puis redémarre le serveur et relit tout ce qui avait été acquitté ; `ERABLE_CRASH_ITERATIONS` (8 par défaut, 100 la nuit) et `ERABLE_CRASH_SEED` (rejeu). `Benchmarks load` est la charge NBomber. Les deux tournent chaque nuit (`.github/workflows/nightly-robustness.yml`).
-
----
-
-## 12. Mesurer la qualité des tests eux-mêmes
-
-- **Mutation testing** : Stryker.NET sur `Erable.Core` et StrykerJS sur les modules TS dupliqués (règles, parseur), chaque semaine. Stryker introduit des bugs volontaires (`<` → `<=`, condition inversée…) et vérifie qu'un test échoue. Le score ≥ 70 % évite des tests qui passent sans rien vérifier.
-- **Couverture** : rapportée à chaque PR, mais seuil bloquant **uniquement sur Core**. Ailleurs, elle sert à repérer les trous, pas d'objectif chiffré : un objectif global pousse à écrire des tests inutiles.
-- **Fuzzing** du parseur Markdown (C# et TS) avec entrées aléatoires et corpus de cas réels pendant 10 minutes chaque semaine : aucun crash, aucune boucle infinie, temps linéaire en la taille de l'entrée.
-
-**Mise en œuvre (M5-04)** : `.github/workflows/weekly-quality.yml` (dimanche) lance Stryker.NET (`tests/Erable.Core.Tests/stryker-config.json`) sur `Erable.Core`, StrykerJS (`src/web/stryker.config.json`, `pnpm mutation`) sur les identifiants, le Markdown et les règles, puis dix minutes de fuzzing C# (`MarkdownFuzzTests`, `ERABLE_FUZZ_SECONDS`) et TS (`markdown.fuzz.test.ts`, `VITE_ERABLE_FUZZ_SECONDS`) avec une graine neuve. Une version courte (1 s, graine fixe) fait partie de la suite normale. Les scores et les survivants sont dans le résumé de chaque job (`build/mutation-summary.mjs`) ; les entrées en échec sont écrites dans `artifacts/fuzz/` au format de `spec/fixtures/markdown/edge-cases.json` pour y être ajoutées une fois la sortie attendue décidée.
+**Robustness**: `CrashTests` (`tests/Erable.Server.Tests/Robustness/`) starts the real server (`erable serve`) as a child process, kills it at random moments during bursts of writes (saves, creations, attachments), runs `erable doctor` on the folder, then restarts the server and reads back everything that had been acknowledged; `ERABLE_CRASH_ITERATIONS` (8 by default, 100 at night) and `ERABLE_CRASH_SEED` (replay). `Benchmarks load` is the NBomber load test. Both run every night (`.github/workflows/nightly-robustness.yml`).
 
 ---
 
-## 13. Intégration continue
+## 12. Measuring the quality of the tests themselves
 
-GitHub Actions, trois pipelines :
+- **Mutation testing**: Stryker.NET on `Erable.Core` and StrykerJS on the duplicated TS modules (rules, parser), every week. Stryker introduces deliberate bugs (`<` → `<=`, inverted condition…) and checks that a test fails. A score ≥ 70 % avoids tests that pass without checking anything.
+- **Coverage**: reported on every PR, but with a blocking threshold **only on Core**. Elsewhere, it is used to find gaps, without a numeric target: a global target pushes people to write useless tests.
+- **Fuzzing** of the Markdown parser (C# and TS) with random inputs and a corpus of real cases for 10 minutes every week: no crash, no infinite loop, time linear in the size of the input.
 
-| Pipeline | Déclencheur | Contenu | Durée cible |
+**Implementation**: `.github/workflows/weekly-quality.yml` (Sunday) runs Stryker.NET (`tests/Erable.Core.Tests/stryker-config.json`) on `Erable.Core`, StrykerJS (`src/web/stryker.config.json`, `pnpm mutation`) on identifiers, Markdown and rules, then ten minutes of C# fuzzing (`MarkdownFuzzTests`, `ERABLE_FUZZ_SECONDS`) and TS fuzzing (`markdown.fuzz.test.ts`, `VITE_ERABLE_FUZZ_SECONDS`) with a new seed. A short version (1 s, fixed seed) is part of the normal suite. Scores and survivors are in the summary of each job (`build/mutation-summary.mjs`); failing inputs are written to `artifacts/fuzz/` in the format of `spec/fixtures/markdown/edge-cases.json`, to be added there once the expected output is decided.
+
+---
+
+## 13. Continuous integration
+
+GitHub Actions, three pipelines:
+
+| Pipeline | Trigger | Content | Target duration |
 |---|---|---|---|
-| **PR** | chaque push de branche (pas les tags), chaque pull request | lint + typage, unitaires C# et TS, spec partagée, stockage, API, e2e Chromium + WebKit (parcours critiques), client OpenAPI à jour, taille du bundle. Build + tests unitaires sur **Windows, Linux et macOS** | < 12 min |
-| **Nightly** | chaque nuit sur `main` | e2e complet (3 navigateurs), visuel, accessibilité, benchmarks, charge NBomber, desktop fumée sur 3 OS | < 45 min |
-| **Release** | tag `v*` | build packagé, signature, image Docker + scan de vulnérabilités ; aucun test (le commit tagué est déjà passé par le pipeline PR) | — |
+| **PR** | every branch push (not tags), every pull request | lint + typing, C# and TS unit tests, shared spec, storage, API, Chromium + WebKit e2e (critical journeys), OpenAPI client up to date, bundle size. Build + unit tests on **Windows, Linux and macOS** | < 12 min |
+| **Nightly** | every night on `main` | full e2e (3 browsers), visual, accessibility, benchmarks, NBomber load, desktop smoke test on 3 OSes | < 45 min |
+| **Release** | `v*` tag | packaged build, signing, Docker image + vulnerability scan; no tests (the tagged commit has already gone through the PR pipeline) | — |
 
-- `main` est protégée : merge uniquement si le pipeline PR est vert et qu'une revue a été faite.
-- Les dépendances sont mises à jour par **Renovate**, regroupées chaque semaine, et passent par le même pipeline.
-- Un échec nightly ouvre automatiquement une issue. (`nightly-issue.yml`, étiquette `ci-failure` ; commentaire sur l'issue déjà ouverte plutôt qu'un doublon).
-- **Quarantaine** : un test instable reçoit le tag `@quarantine` dans son titre et une entrée dans `spec/quarantine.json` ; il sort des pipelines bloquants (projet Playwright `quarantine`, nightly seulement, non bloquant). `pnpm quarantine:check` (nightly) échoue si une entrée a plus de 24 h ou si le registre et les tags divergent : corrigé ou supprimé, jamais « à relancer ».
-
----
-
-## 14. Définition de « terminé » pour une fonctionnalité
-
-Une fonctionnalité est livrable quand :
-
-- [ ] sa logique métier est dans Core avec des tests unitaires (et des propriétés si elle a des invariants) ;
-- [ ] toute nouvelle syntaxe ou règle partagée a ses cas dans `spec/fixtures/` ;
-- [ ] ses endpoints ont des tests d'intégration et figurent dans la matrice d'autorisation ;
-- [ ] si elle modifie le schéma : migration + projet `legacy/` mis à jour + `erable doctor` adapté ;
-- [ ] le parcours utilisateur principal a un test e2e (ou complète un existant) ;
-- [ ] ses textes sont traduits dans les quatre langues ;
-- [ ] elle passe axe-core et s'utilise au clavier ;
-- [ ] aucun budget de performance n'a régressé.
+- `main` is protected: merge only if the PR pipeline is green and a review was done.
+- Dependencies are updated by **Renovate**, grouped every week, and go through the same pipeline.
+- A nightly failure automatically opens an issue (`nightly-issue.yml`, `ci-failure` label; a comment on the issue already open rather than a duplicate).
+- **Quarantine**: a flaky test gets the `@quarantine` tag in its title and an entry in `spec/quarantine.json`; it leaves the blocking pipelines (Playwright project `quarantine`, nightly only, non-blocking). `pnpm quarantine:check` (nightly) fails if an entry is older than 24 h or if the registry and the tags disagree: fixed or deleted, never "to be rerun".
 
 ---
 
-## 15. Risques principaux et parades
+## 14. Definition of "done" for a feature
 
-| Risque | Gravité | Parades |
+A feature can ship when:
+
+- [ ] its business logic is in Core with unit tests (and properties if it has invariants);
+- [ ] any new shared syntax or rule has its cases in `spec/fixtures/`;
+- [ ] its endpoints have integration tests and appear in the authorization matrix;
+- [ ] if it changes the schema: migration + updated `legacy/` project + adapted `erable doctor`;
+- [ ] the main user journey has an e2e test (or extends an existing one);
+- [ ] its texts are translated into the four languages;
+- [ ] it passes axe-core and can be used with the keyboard;
+- [ ] no performance budget has regressed.
+
+---
+
+## 15. Main risks and countermeasures
+
+| Risk | Severity | Countermeasures |
 |---|---|---|
-| Perte ou corruption d'un projet | Critique | SQLite WAL, crash tests (§6.1), `erable doctor` après chaque e2e, migrations testées sur projets figés |
-| Fusion qui écrase silencieusement du texte | Critique | Propriétés de fusion (§4.1), e2e multi-utilisateur, historique restaurable |
-| ID corrompu (précision JS) | Élevée | Type marqué TS, convertisseur JSON, fixtures `ids.json` |
-| Références cassées après renommage ou déplacement | Élevée | Référence par ID uniquement, e2e « renommer » (§9.2), détection dans `doctor` |
-| Parseurs C# et TS divergents | Moyenne | Spécification partagée (§5), fuzz sur les deux |
-| Endpoint sans autorisation | Élevée | Matrice générée (§7) |
-| XSS entre utilisateurs | Élevée | Sanitisation + corpus XSS (§8.1), pièces jointes non rendues inline |
-| Accès au serveur loopback par un autre processus ou un site web | Élevée | Jeton + contrôle `Host`, tests §7 |
-| Rendu différent sous WebKitGTK / WKWebView | Moyenne | e2e WebKit à chaque PR, self-test desktop sur 3 OS (§10) |
-| Lenteur sur gros projet | Moyenne | Budgets mesurés (§11), projet généré de 10 000 pages |
-| Tests instables qui font ignorer la CI | Moyenne | Quarantaine immédiate, aucune attente temporelle dans les e2e |
+| Loss or corruption of a project | Critical | SQLite WAL, crash tests (§6.1), `erable doctor` after each e2e, migrations tested on frozen projects |
+| A merge that silently overwrites text | Critical | Merge properties (§4.1), multi-user e2e, restorable history |
+| Corrupted ID (JS precision) | High | TS branded type, JSON converter, `ids.json` fixtures |
+| References broken after a rename or move | High | References by ID only, "rename" e2e (§9.2), detection in `doctor` |
+| Diverging C# and TS parsers | Medium | Shared specification (§5), fuzzing of both |
+| Endpoint without authorization | High | Generated matrix (§7) |
+| XSS between users | High | Sanitization + XSS corpus (§8.1), attachments not rendered inline |
+| Access to the loopback server by another process or a website | High | Token + `Host` check, tests §7 |
+| Different rendering under WebKitGTK / WKWebView | Medium | WebKit e2e on every PR, desktop self-test on 3 OSes (§10) |
+| Slowness on a large project | Medium | Measured budgets (§11), generated 10,000-page project |
+| Flaky tests that make people ignore CI | Medium | Immediate quarantine, no time-based waits in e2e |
 
 ---
 
-## 16. Mise en place par jalon
+## 16. Set-up per milestone
 
-| Jalon (§A-12) | Infrastructure de test livrée |
+| Milestone (§A-12) | Test infrastructure delivered |
 |---|---|
-| **M0** | Projets de test, analyseurs, CI PR sur 3 OS, Playwright Chromium + WebKit, self-test desktop, vérification du client OpenAPI, instantané OpenAPI |
-| **M1** | Builders, fixtures `ids.json` et `markdown/`, property-based sur ID et parseur, tests CodeMirror, projet « Chroniques d'Aube », premier `legacy/v1`, `erable doctor` |
-| **M2** | Fixtures `rules.json`, propriétés sur héritage et arbre, e2e Catégorie / Propriété |
-| **M3** | Générateur de gros projets, budgets de performance, BenchmarkDotNet, e2e Recherche |
-| **M4** | Matrice d'autorisation, tests de concurrence et SignalR, e2e multi-utilisateur, NBomber, crash tests |
-| **M5** | Visuel + axe-core + pseudo-locale, pipeline release, Stryker et fuzzing hebdomadaires |
-| **M6** | Projet Playwright `mobile`, tests du shell Android, construction de l'APK en release |
+| **M0** | Test projects, analyzers, PR CI on 3 OSes, Playwright Chromium + WebKit, desktop self-test, OpenAPI client check, OpenAPI snapshot |
+| **M1** | Builders, `ids.json` and `markdown/` fixtures, property-based tests on IDs and parser, CodeMirror tests, "Chroniques d'Aube" project, first `legacy/v1`, `erable doctor` |
+| **M2** | `rules.json` fixtures, properties on inheritance and tree, Category / Property e2e |
+| **M3** | Large project generator, performance budgets, BenchmarkDotNet, Search e2e |
+| **M4** | Authorization matrix, concurrency and SignalR tests, multi-user e2e, NBomber, crash tests |
+| **M5** | Visual + axe-core + pseudo-locale, release pipeline, weekly Stryker and fuzzing |
+| **M6** | Playwright `mobile` project, Android shell tests, APK build in the release |
 
-L'investissement est concentré sur **M0 et M1**. Une fois l'outillage et les conventions en place, ajouter des tests ne coûte presque rien. Les rajouter après coup à du code non conçu pour être testé coûte beaucoup plus.
+The investment is concentrated on **M0 and M1**. Once the tooling and conventions are in place, adding tests costs almost nothing. Adding them afterwards to code that was not designed to be tested costs much more.

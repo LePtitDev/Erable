@@ -9,7 +9,7 @@ using Erable.Testing.Reference;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Revision history over HTTP (M3-05, F13), on the reference project.</summary>
+/// <summary>Revision history over HTTP (F13), on the reference project.</summary>
 public sealed class HistoryApiTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

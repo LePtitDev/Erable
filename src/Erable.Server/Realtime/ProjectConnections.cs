@@ -22,7 +22,7 @@ public sealed record PresenceUser(string UserId, string Name, ElementId? Element
 public sealed record ConnectedClient(string ConnectionId, string UserId, IReadOnlySet<ElementId> Projects);
 
 /// <summary>
-/// Who is connected to which project, and what they are doing there (M4-03, M4-04). The removal of a member uses it
+/// Who is connected to which project, and what they are doing there. The removal of a member uses it
 /// too: their connections leave the project group at once, without waiting for the next reconnection. A connection
 /// that goes away, by itself or because the server stopped hearing from it, takes its presence along.
 /// </summary>

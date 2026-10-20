@@ -185,7 +185,7 @@ public sealed class ElementTreeTests
         tree.Nodes.OrderBy(n => n.Id.Value).ShouldBe(before);
     }
 
-    // Attachments (decision P-02)
+    // Attachments
 
     [Fact]
     public void Create_AttachmentUnderPage_IsAllowedButNotMovable()

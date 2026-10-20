@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { api, unwrap, type Rebrand, type Schemas } from "./client";
 import { queryKeys } from "./keys";
 
-// Recently viewed and edited elements (docs/architecture.md §8.1 `me/recent`, F11, M3-04).
+// Recently viewed and edited elements (docs/architecture.md §8.1 `me/recent`, F11).
 
 export type RecentActivity = Rebrand<Schemas["RecentActivityView"]>;
 export type ViewedItem = RecentActivity["viewed"][number];

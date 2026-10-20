@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Erable.Server.Tests;
 
-/// <summary>M4-02: no endpoint without an access rule, and every rule enforced for every kind of caller.</summary>
+/// <summary>No endpoint without an access rule, and every rule enforced for every kind of caller.</summary>
 public sealed class AuthorizationMatrixTests
 {
     [Fact]

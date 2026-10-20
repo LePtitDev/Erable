@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# End-to-end test of the Litestream backup (docs/deployment.md §6, M5-05): a server with a local S3 (MinIO) creates a
+# End-to-end test of the Litestream backup (docs/deployment.md §6): a server with a local S3 (MinIO) creates a
 # project and a page, the databases and files are replicated, the data volume is destroyed, restored from the bucket,
 # and the page is found again. Needs Docker; takes a few minutes (it builds the server image).
 #   deploy/litestream/test-restore.sh

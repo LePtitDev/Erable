@@ -130,7 +130,7 @@ public sealed partial class ProjectService
 
     /// <summary>
     /// Links two live pages with a type. A page cannot be linked to itself and the same (source, type, target) cannot be
-    /// added twice (decision recorded in tasks/M2-07).
+    /// added twice.
     /// </summary>
     public Task<Result<LinkRecord>> CreateLinkAsync(
         ElementId sourceId, ElementId linkTypeId, ElementId targetId, string author, CancellationToken cancellationToken = default) =>

@@ -34,7 +34,7 @@ public sealed record MarkdownLimitViolation(MarkdownLimitRule Rule, int Line)
 }
 
 /// <summary>
-/// Safety limits on the Markdown of a page (docs/markdown-syntax.md §6, M5-04). The parsers take quadratic time, or
+/// Safety limits on the Markdown of a page (docs/markdown-syntax.md §6). The parsers take quadratic time, or
 /// overflow their stack, on a few dozen kilobytes of degenerate input (<c>]</c> × 40 000, <c>&gt; </c> × 8 000): one
 /// linear pre-scan refuses those shapes before any parser runs. Real pages never come near. The TypeScript twin is
 /// <c>shared/markdown/limits.ts</c>; both are driven by <c>spec/fixtures/limits</c>.

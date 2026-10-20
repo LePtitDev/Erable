@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Erable.Server.Tests;
 
-/// <summary>The desktop application connected to a server (M4-07, E2E-01-06, E2E-16-06, F16.R4).</summary>
+/// <summary>The desktop application connected to a server (E2E-01-06, E2E-16-06, F16.R4).</summary>
 public sealed class RemoteServersTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

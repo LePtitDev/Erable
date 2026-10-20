@@ -1,5 +1,5 @@
-// Publishes the self-contained desktop application for one runtime and archives it (decision P-06: plain
-// archives in M0, Velopack installer: build/pack-desktop.mjs, M5-03).
+// Publishes the self-contained desktop application for one runtime and archives it (the Velopack
+// installer is built from it by build/pack-desktop.mjs).
 // Usage: node build/publish-desktop.mjs <rid> [--skip-web] [--version <x.y.z>]
 //   rid: win-x64 | linux-x64 | osx-arm64 | osx-x64
 //   --version: version stamped in the binaries (shown by the application); default: Directory.Build.props

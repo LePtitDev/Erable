@@ -7,7 +7,7 @@ public sealed record CategoryNode(ElementId Id, ElementId ParentId);
 
 /// <summary>
 /// Inheritance graph of the categories of a project (single inheritance: Entité › Personnage › PNJ). Independent of
-/// the explorer tree, where categories are only filed in folders (decision P-14). Mutating methods validate first and
+/// the explorer tree, where categories are only filed in folders. Mutating methods validate first and
 /// change nothing when they fail; a reparenting that would create a cycle is refused (F07.R2).
 /// </summary>
 public sealed class CategoryGraph
@@ -169,7 +169,7 @@ public sealed class CategoryGraph
     }
 
     /// <summary>
-    /// Removes a category (trash, M2-08). Its sub-categories keep pointing to it: while it is absent they have no
+    /// Removes a category (trash). Its sub-categories keep pointing to it: while it is absent they have no
     /// parent, and restoring it restores the chain unchanged.
     /// </summary>
     public bool Remove(ElementId id)

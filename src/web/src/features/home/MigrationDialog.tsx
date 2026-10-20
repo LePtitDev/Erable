@@ -4,7 +4,7 @@ import { Button } from "../../shared/ui/Button";
 import { Dialog } from "../../shared/ui/Dialog";
 
 /**
- * An older project must be converted before it opens (F01.R3, M2-09): says what happens, and does nothing until the
+ * An older project must be converted before it opens (F01.R3): says what happens, and does nothing until the
  * user confirms. The backup is made first and put back if the migration fails.
  */
 export function MigrationDialog({

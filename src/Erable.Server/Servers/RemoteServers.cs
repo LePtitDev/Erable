@@ -26,7 +26,7 @@ public sealed record ServerProbe(
 public sealed record RemoteProject(ElementId Id, string Name, string ContentLanguage, ProjectRole MyRole, string ServerId);
 
 /// <summary>
-/// The desktop application as a client of a server (M4-07, F01 E2E-01-06, F16.R4): checks the versions before anything
+/// The desktop application as a client of a server (F01 E2E-01-06, F16.R4): checks the versions before anything
 /// else, signs in, keeps the bearer token in the vault of the system (never in the page) and lists the projects.
 /// </summary>
 public sealed class RemoteServers(ServerRegistry registry, ISecretStore secrets, TimeProvider clock)

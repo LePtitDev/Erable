@@ -1,421 +1,415 @@
-# Erable — Orientation technique
+# Erable — Technical direction
 
-> Statut : **validé** · Version 0.3 · 13 octobre 2026
-> Portée : choix de stack, architecture, modèle de données, stockage, formats, découpage en jalons.
-> Référence UI : `mockups/Erable — Wiki local.html` (accueil, page, édition, catégorie, propriété, recherche).
+## 1. Summary of the decisions
 
----
-
-## 1. Résumé des décisions
-
-| Sujet | Choix | En une phrase |
+| Topic | Choice | In one sentence |
 |---|---|---|
-| Backend | **C# / .NET 10 (LTS), ASP.NET Core** | Un seul exécutable serveur, qui tourne aussi bien en local qu'hébergé. |
-| Temps réel | **SignalR** | Présence, notifications de modification, plus tard co-édition. |
-| Frontend | **React + TypeScript + Vite** | Une SPA unique, servie par le backend ou déployée en statique. |
-| Éditeur | **CodeMirror 6** | Markdown source avec décorations (noms à la place des ID, autocomplétion). |
-| Desktop | **Photino** (fork **PhotinoX**, WebView natif) + backend **in-process** | 100 % C# côté natif, ~50 Mo, Windows / Linux / macOS. Repli possible : Electron. |
-| Stockage | **SQLite (un fichier par projet)** + **pièces jointes adressées par contenu** sur disque | Zéro service à installer, sauvegarde = copier un dossier, FTS5 pour la recherche. |
-| Identifiants | **UID 64 bits aléatoire**, affiché en hexa (`3F2A 9C14 E07B 5D21`) | Renommer ou déplacer ne casse jamais une référence. |
-| Contrat API | **REST JSON + OpenAPI**, client TypeScript **généré** | Front et back ne divergent pas silencieusement. |
-| Distribution | **Velopack** (desktop, auto-update) · **image Docker** (serveur) | Un pipeline CI matriciel Windows / Linux / macOS. |
+| Backend | **C# / .NET 10 (LTS), ASP.NET Core** | A single server executable, which runs locally as well as hosted. |
+| Real time | **SignalR** | Presence, change notifications, later co-editing. |
+| Frontend | **React + TypeScript + Vite** | A single SPA, served by the backend or deployed as static files. |
+| Editor | **CodeMirror 6** | Markdown source with decorations (names instead of IDs, autocompletion). |
+| Desktop | **Photino** (**PhotinoX** fork, native WebView) + **in-process** backend | 100 % C# on the native side, ~50 MB, Windows / Linux / macOS. Possible fallback: Electron. |
+| Storage | **SQLite (one file per project)** + **content-addressed attachments** on disk | Nothing to install, backup = copying a folder, FTS5 for search. |
+| Identifiers | **Random 64-bit UID**, shown in hex (`3F2A 9C14 E07B 5D21`) | Renaming or moving never breaks a reference. |
+| API contract | **REST JSON + OpenAPI**, **generated** TypeScript client | Frontend and backend do not drift apart silently. |
+| Distribution | **Velopack** (desktop, auto-update) · **Docker image** (server) | One matrix CI pipeline for Windows / Linux / macOS. |
 
-Principe directeur : **un seul backend, une seule SPA, trois façons de les assembler.**
-Le frontend ne parle *que* HTTP/WebSocket au backend, jamais à l'OS directement — c'est ce qui rend le shell desktop interchangeable et garde la porte ouverte au mobile.
+Guiding principle: **one backend, one SPA, three ways to put them together.**
+The frontend talks *only* HTTP/WebSocket to the backend, never to the OS directly — this is what makes the desktop shell replaceable and keeps the door open to mobile.
 
 ---
 
-## 2. Modes de déploiement
+## 2. Deployment modes
 
 ```mermaid
 flowchart LR
-  subgraph D["Application desktop (Win / Linux / macOS)"]
-    W["WebView natif<br/>(SPA React)"] -- "HTTP + WS<br/>127.0.0.1:port aléatoire" --> K["Backend ASP.NET Core<br/>in-process"]
-    K --> P1[("Projet local<br/>dossier .erable")]
+  subgraph D["Desktop application (Win / Linux / macOS)"]
+    W["Native WebView<br/>(React SPA)"] -- "HTTP + WS<br/>127.0.0.1:random port" --> K["ASP.NET Core backend<br/>in-process"]
+    K --> P1[("Local project<br/>.erable folder")]
   end
-  subgraph S["Serveur privé (Docker ou exécutable)"]
-    K2["Backend ASP.NET Core<br/>+ SPA statique"] --> P2[("Projets<br/>SQLite + blobs")]
+  subgraph S["Private server (Docker or executable)"]
+    K2["ASP.NET Core backend<br/>+ static SPA"] --> P2[("Projects<br/>SQLite + blobs")]
   end
-  B["Navigateur web"] -- "HTTPS" --> K2
-  W -- "HTTPS (mode connecté)" --> K2
-  CDN["SPA sur un site statique<br/>(optionnel)"] -. "HTTPS + CORS" .-> K2
+  B["Web browser"] -- "HTTPS" --> K2
+  W -- "HTTPS (connected mode)" --> K2
+  CDN["SPA on a static site<br/>(optional)"] -. "HTTPS + CORS" .-> K2
 ```
 
-| Mode | Qui sert la SPA | Qui sert l'API | Auth |
+| Mode | Who serves the SPA | Who serves the API | Auth |
 |---|---|---|---|
-| **Desktop local** | Backend in-process | Backend in-process (loopback) | Aucune (jeton de session local, cf. §9) |
-| **Desktop connecté** | SPA embarquée dans l'app | Serveur distant, **via le backend local** (Q9) | Compte serveur (jeton bearer, gardé par le backend) |
-| **Web** | Le serveur (ou un hébergement statique) | Serveur | Compte serveur (cookie httpOnly) |
-| **Serveur ad hoc** | `erable serve ./MonWiki --port 5080` | idem | Comptes locaux |
-| **Mobile** (navigateur ou app Android, Q11) | Le serveur, chargé dans le navigateur ou le WebView de l'app | Serveur | Compte serveur (cookie httpOnly, comme le web) |
+| **Local desktop** | In-process backend | In-process backend (loopback) | None (local session token, see §9) |
+| **Connected desktop** | SPA embedded in the app | Remote server, **through the local backend** (Q9) | Server account (bearer token, kept by the backend) |
+| **Web** | The server (or static hosting) | Server | Server account (httpOnly cookie) |
+| **Ad hoc server** | `erable serve ./MyWiki --port 5080` | same | Local accounts |
+| **Mobile** (browser or Android app, Q11) | The server, loaded in the browser or in the WebView of the app | Server | Server account (httpOnly cookie, as on the web) |
 
-Le dernier mode est gratuit : c'est le même exécutable. Il permet à quelqu'un de partager un projet local sur le LAN sans Docker.
+The ad hoc mode comes for free: it is the same executable. It lets someone share a local project on the LAN without Docker.
 
-**Compatibilité de versions.** Quand l'app desktop se connecte à un serveur, elle appelle `GET /api/info` (version d'API, version de format). L'API est préfixée `/api/v1`. Une SPA plus récente qu'un serveur affiche un message clair plutôt que de casser.
+**Version compatibility.** When the desktop app connects to a server, it calls `GET /api/info` (API version, format version). The API is prefixed with `/api/v1`. A SPA more recent than a server shows a clear message rather than breaking.
 
 ---
 
-## 3. Architecture de la solution
+## 3. Solution architecture
 
 ```
 Erable/
 ├─ Erable.sln
 ├─ src/
-│  ├─ Erable.Core/          Domaine pur : ElementId, entités, règles de validation,
-│  │                         héritage de catégories, parseur des références Markdown.
-│  │                         Aucune dépendance IO.
+│  ├─ Erable.Core/          Pure domain: ElementId, entities, validation rules,
+│  │                         category inheritance, Markdown reference parser.
+│  │                         No IO dependency.
 │  ├─ Erable.Storage/       SQLite (Microsoft.Data.Sqlite + Dapper), migrations,
-│  │                         FTS5, BlobStore (disque ; S3 plus tard).
-│  ├─ Erable.Server/        Hôte ASP.NET Core : endpoints Minimal API, hub SignalR,
-│  │                         auth, OpenAPI, service des fichiers statiques.
-│  │                         Exécutable autonome (mode serveur).
-│  ├─ Erable.Desktop/       Shell Photino : démarre Erable.Server in-process sur
-│  │                         loopback, ouvre la fenêtre, dialogues natifs.
-│  └─ web/                  SPA React/TS (pnpm + Vite).
-├─ spec/fixtures/           Cas de test partagés C# ↔ TS (syntaxe Markdown, règles).
+│  │                         FTS5, BlobStore (disk; S3 later).
+│  ├─ Erable.Server/        ASP.NET Core host: Minimal API endpoints, SignalR hub,
+│  │                         auth, OpenAPI, static files.
+│  │                         Standalone executable (server mode).
+│  ├─ Erable.Desktop/       Photino shell: starts Erable.Server in-process on
+│  │                         loopback, opens the window, native dialogs.
+│  └─ web/                  React/TS SPA (pnpm + Vite).
+├─ spec/fixtures/           Test cases shared by C# and TS (Markdown syntax, rules).
 ├─ tests/                   xUnit (Core, Storage, Server) · Vitest (web) · Playwright (e2e).
 └─ docs/
 ```
 
-**Pourquoi Dapper plutôt qu'EF Core ?** Le modèle est petit, les requêtes intéressantes (FTS5, filtres sur propriétés, héritage récursif via `WITH RECURSIVE`) sont du SQL spécifique de toute façon. Des migrations SQL versionnées (`PRAGMA user_version`) suffisent et restent lisibles. EF Core reste envisageable si un second SGBD devient nécessaire (§10).
+**Why Dapper rather than EF Core?** The model is small, and the interesting queries (FTS5, filters on properties, recursive inheritance through `WITH RECURSIVE`) are specific SQL anyway. Versioned SQL migrations (`PRAGMA user_version`) are enough and stay readable. EF Core remains an option if a second database engine becomes necessary (§10).
 
 ### 3.1 Frontend
 
-| Besoin | Bibliothèque |
+| Need | Library |
 |---|---|
-| Routage | TanStack Router (routes typées : `/p/:projectId/e/:elementId`) |
-| État serveur / cache | TanStack Query (invalidation déclenchée par les événements SignalR) |
-| État UI local | Zustand (onglets, panneaux, thème) |
-| Client API | `openapi-typescript` + `openapi-fetch`, généré depuis l'OpenAPI du backend |
-| Éditeur | CodeMirror 6 + `@codemirror/lang-markdown` + extensions maison |
-| Rendu Markdown | unified : `remark-parse` + `remark-gfm` + plugin Erable → composants React |
-| Sanitisation | `rehype-sanitize` (HTML brut désactivé par défaut) |
-| Primitives UI | Radix UI (menus, dialogues, popovers accessibles), styles maison |
-| Arbre | Composant maison virtualisé (`@tanstack/react-virtual`), drag & drop |
-| i18n | i18next / react-i18next, fichiers JSON par langue (`fr`, `en`, `de`, `es`) |
-| Styles | CSS Modules + design tokens en variables CSS (repris du mockup) |
+| Routing | TanStack Router (typed routes: `/p/:projectId/e/:elementId`) |
+| Server state / cache | TanStack Query (invalidation triggered by SignalR events) |
+| Local UI state | Zustand (tabs, panels, theme) |
+| API client | `openapi-typescript` + `openapi-fetch`, generated from the OpenAPI of the backend |
+| Editor | CodeMirror 6 + `@codemirror/lang-markdown` + in-house extensions |
+| Markdown rendering | unified: `remark-parse` + `remark-gfm` + Erable plugin → React components |
+| Sanitization | `rehype-sanitize` (raw HTML disabled by default) |
+| UI primitives | Radix UI (accessible menus, dialogs, popovers), in-house styles |
+| Tree | In-house virtualized component (`@tanstack/react-virtual`), drag & drop |
+| i18n | i18next / react-i18next, one JSON file per language (`fr`, `en`, `de`, `es`) |
+| Styles | CSS Modules + design tokens as CSS variables |
 
-**Thèmes.** Toutes les couleurs sont des tokens sur `:root`, redéfinis sous `[data-theme="dark"]`. Le choix « Système » suit `prefers-color-scheme`. Aucune couleur en dur dans les composants. Le backend écrit le thème de l'utilisateur dans `<html data-theme>` en servant `index.html` : le premier rendu a déjà le bon thème.
+**Themes.** Every color is a token on `:root`, redefined under `[data-theme="dark"]`. The "System" choice follows `prefers-color-scheme`. No hard-coded color in components. The backend writes the theme of the user into `<html data-theme>` when serving `index.html`: the first render already has the right theme.
 
-**Aucun état durable dans le navigateur** (décision Q7). En desktop, le port aléatoire change l'origine de la SPA à chaque lancement : `localStorage` et IndexedDB y sont perdus. Brouillons, état de l'arbre et préférences passent donc par l'API (`me/…`), stockés dans le profil applicatif en local et dans `server.db` en mode serveur.
+**No durable state in the browser** (decision Q7). On the desktop, the random port changes the origin of the SPA on every launch: `localStorage` and IndexedDB are lost there. Drafts, tree state and preferences therefore go through the API (`me/…`), stored in the application profile locally and in `server.db` in server mode.
 
-**Mobile (M6, F18, décision Q11).** Une seule SPA : sous 720 px de large, la **mise en page étroite** empile ce que le bureau met côte à côte (explorateur en tiroir, panneau de la page en onglet, dialogues plein écran) ; avec un pointeur grossier (`pointer: coarse`), les cibles offrent 44 px et chaque action du survol ou du clic droit a un bouton. Le seuil vit dans un seul module (`shared/ui/media.ts`) et dans les `@media` des CSS Modules (les variables CSS ne s'utilisent pas dans une media query). La SPA servie par un serveur est installable (manifeste, sans service worker : pas de mode hors ligne). Règles inchangées : pas d'API desktop dans la SPA, raccourcis clavier toujours doublés d'une action à la souris ou au toucher.
-
----
-
-## 4. Identifiants
-
-- Type : `ElementId`, `readonly record struct` sur un `ulong`. `0` est réservé (« aucun »).
-- Génération : 64 bits issus de `RandomNumberGenerator`. Pour 1 million d'éléments, la probabilité d'une collision est d'environ 3·10⁻⁸ ; une contrainte d'unicité en base et un nouveau tirage la couvrent.
-  *Pourquoi aléatoire et non séquentiel ?* Deux projets créés séparément peuvent être fusionnés ou importés l'un dans l'autre sans renumérotation.
-- **Un seul espace d'ID pour tous les types** (page, dossier, catégorie, propriété, type de lien, pièce jointe). `[[ID]]` est donc non ambigu sans préfixe de type.
-- Formats :
-  - canonique (texte, URL, JSON) : 16 caractères hexa majuscules, `3F2A9C14E07B5D21` ; la lecture accepte les minuscules ;
-  - affichage : groupes de 4, `3F2A 9C14 E07B 5D21` (comme le mockup) ;
-  - SQLite : `INTEGER` (réinterprétation non signée → signée, sans perte).
-- ⚠️ **En JSON, l'ID est toujours une chaîne.** Un `number` JavaScript perd la précision au-delà de 2⁵³ : un `ulong` sérialisé en nombre serait corrompu silencieusement. Un `JsonConverter` dédié l'impose côté C#.
+**Mobile (M6, F18, decision Q11).** A single SPA: below 720 px wide, the **narrow layout** stacks what the desktop puts side by side (explorer in a drawer, page panel in a tab, full-screen dialogs); with a coarse pointer (`pointer: coarse`), targets offer 44 px and every hover or right-click action has a button. The threshold lives in a single module (`shared/ui/media.ts`) and in the `@media` rules of the CSS Modules (CSS variables cannot be used in a media query). The SPA served by a server is installable (manifest, no service worker: no offline mode). Unchanged rules: no desktop API in the SPA, keyboard shortcuts always doubled by a mouse or touch action.
 
 ---
 
-## 5. Modèle de domaine
+## 4. Identifiers
 
-### 5.1 Éléments et arbre
+- Type: `ElementId`, a `readonly record struct` over a `ulong`. `0` is reserved ("none").
+- Generation: 64 bits from `RandomNumberGenerator`. For 1 million elements, the probability of a collision is about 3·10⁻⁸; a uniqueness constraint in the database and a new draw cover it.
+  *Why random rather than sequential?* Two projects created separately can be merged or imported into one another without renumbering.
+- **A single ID space for every kind** (page, folder, category, property, link type, attachment). `[[ID]]` is therefore unambiguous without a kind prefix.
+- Formats:
+  - canonical (text, URL, JSON): 16 upper-case hex characters, `3F2A9C14E07B5D21`; reading accepts lower case;
+  - display: groups of 4, `3F2A 9C14 E07B 5D21`;
+  - SQLite: `INTEGER` (unsigned → signed reinterpretation, lossless).
+- ⚠️ **In JSON, the ID is always a string.** A JavaScript `number` loses precision beyond 2⁵³: a `ulong` serialized as a number would be silently corrupted. A dedicated `JsonConverter` enforces it on the C# side.
 
-Tout ce qui apparaît dans l'explorateur est un **élément** : `id`, `kind`, `parentId`, `name`, `sortOrder`, dates et auteurs de création/modification, `revision`, `deletedAt` (corbeille).
+---
 
-L'explorateur a une racine fixe par type : **Pages, Catégories, Propriétés, Liens** (décision P-02 : pas de racine « Pièces jointes » ; une pièce jointe est un élément du même espace d'ID, rattaché à sa page, absent de l'explorateur et retrouvé par la palette et la recherche). Les racines ont des ID fixes communs à tous les projets (`0000000000000001` à `0000000000000004`) ; les valeurs inférieures à `0x10000` sont réservées et jamais tirées au hasard. Sous chaque racine :
+## 5. Domain model
 
-- des **dossiers** (éléments `Folder`) qui ne servent qu'à ranger ;
-- les éléments du type de la racine.
+### 5.1 Elements and tree
 
-Une **sous-page** est simplement une page dont le parent est une page. Le dossier range ; la sous-page porte un sens (elle apparaît dans la section « Sous-pages » de son parent). On ne déplace pas un élément sous une autre racine : une catégorie ne va pas dans *Pages*.
+Everything that appears in the explorer is an **element**: `id`, `kind`, `parentId`, `name`, `sortOrder`, creation/modification dates and authors, `revision`, `deletedAt` (trash).
+
+The explorer has one fixed root per kind: **Pages, Categories, Properties, Links** (no "Attachments" root: an attachment is an element of the same ID space, attached to its page, absent from the explorer and found through the palette and search). The roots have fixed IDs shared by every project (`0000000000000001` to `0000000000000004`); values below `0x10000` are reserved and never drawn at random. Under each root:
+
+- **folders** (`Folder` elements), which are only for arranging;
+- the elements of the kind of the root.
+
+A **sub-page** is simply a page whose parent is a page. The folder arranges; the sub-page carries meaning (it appears in the "Sub-pages" section of its parent). An element is never moved under another root: a category does not go into *Pages*.
 
 ### 5.2 Page
 
-- Contenu Markdown étendu (§6), table des matières calculée depuis les titres.
-- Catégories : 0..n.
-- Valeurs de propriétés : celles définies sur la page, plus celles héritées des catégories (affichées « via PNJ », comme sur le mockup).
-- Liens typés sortants et entrants.
-- Pièces jointes (appartiennent à la page, référençables depuis n'importe quelle page).
+- Extended Markdown content (§6), table of contents computed from the headings.
+- Categories: 0..n.
+- Property values: those set on the page, plus those inherited from the categories (shown "via PNJ").
+- Outgoing and incoming typed links.
+- Attachments (they belong to the page, and can be referenced from any page).
 
-### 5.3 Catégorie
+### 5.3 Category
 
-- Description en texte simple.
-- **Parent optionnel unique** (héritage simple : Entité → Personnage → PNJ). Les cycles sont refusés à l'enregistrement.
-- Valeurs de propriétés par défaut, transmises aux catégories enfants et aux pages.
+- Plain-text description.
+- **Single optional parent** (single inheritance: Entité → Personnage → PNJ). Cycles are refused on save.
+- Default property values, passed on to child categories and to pages.
 
-**Résolution d'une valeur pour une page**, par ordre de priorité :
+**Resolving a value for a page**, by order of priority:
 
-1. valeur définie sur la page ;
-2. valeur de la catégorie la plus spécifique (la plus profonde dans la chaîne d'héritage) ;
-3. valeur par défaut de la définition de propriété.
+1. value set on the page;
+2. value of the most specific category (the deepest in the inheritance chain);
+3. default value of the property definition.
 
-Si deux catégories *sans lien d'héritage* entre elles fournissent des valeurs différentes au même niveau, la valeur est marquée **en conflit**. L'UI demande alors de la fixer sur la page plutôt que de choisir arbitrairement.
+If two categories *with no inheritance relation* between them provide different values at the same level, the value is marked **in conflict**. The UI then asks to set it on the page rather than choosing arbitrarily.
 
-Précisions (M2-01) :
-- pour chaque catégorie de la page, la catégorie la plus proche de sa chaîne (elle-même d'abord) qui définit une valeur est candidate ; une candidate ancêtre d'une autre candidate est écartée (PNJ + Marchand : Marchand l'emporte, sans conflit) ;
-- deux catégories sans lien qui fournissent la **même** valeur ne sont **pas** en conflit ; l'origine les cite toutes les deux ;
-- une valeur `list<T>` se résout comme une valeur simple : la liste de la page (ou de la catégorie la plus spécifique) **remplace** les listes héritées, elle ne s'y ajoute pas ;
-- la résolution ne dépend pas de l'ordre des catégories de la page (seul l'ordre d'affichage des candidates d'un conflit le suit).
+Details:
+- for each category of the page, the closest category of its chain (itself first) that defines a value is a candidate; a candidate that is an ancestor of another candidate is discarded (PNJ + Marchand: Marchand wins, without conflict);
+- two unrelated categories that provide the **same** value are **not** in conflict; the origin cites both;
+- a `list<T>` value is resolved like a simple value: the list of the page (or of the most specific category) **replaces** the inherited lists, it is not added to them;
+- resolution does not depend on the order of the categories of the page (only the display order of the candidates of a conflict follows it).
 
-### 5.4 Définition de propriété
+### 5.4 Property definition
 
-`name` (affiché), `key` (identifiant lisible, unique, modifiable sans rien casser puisque les références passent par l'ID), `description`, `type`, `default`, `rules[]`.
+`name` (displayed), `key` (readable identifier, unique, changeable without breaking anything since references go through the ID), `description`, `type`, `default`, `rules[]`.
 
-| Type | Stockage | Règles disponibles |
+| Type | Storage | Available rules |
 |---|---|---|
-| `bool` | entier 0/1 | — |
+| `bool` | integer 0/1 | — |
 | `int` | `INTEGER` | `greater_than`, `greater_or_equal`, `less_than`, `less_or_equal`, `between`, `not_equal` |
-| `float` | `REAL` | idem `int` |
+| `float` | `REAL` | same as `int` |
 | `string` | `TEXT` | `min_length`, `max_length`, `match` (regex), `not_empty` |
-| `text` (multiligne) | `TEXT` | `max_length` |
-| `enum` | `TEXT` (clé de l'option) | `in` (sous-ensemble autorisé) |
-| `date` | `TEXT` ISO 8601 | `after`, `before` |
-| `ref` | ID | `kind` (page / catégorie), `in_category` |
-| `list<T>` | plusieurs lignes | `min_count`, `max_count` + règles de `T` |
+| `text` (multi-line) | `TEXT` | `max_length` |
+| `enum` | `TEXT` (key of the option) | `in` (allowed subset) |
+| `date` | ISO 8601 `TEXT` | `after`, `before` |
+| `ref` | ID | `kind` (page / category), `in_category` |
+| `list<T>` | several rows | `min_count`, `max_count` + rules of `T` |
 
-Les règles sont **des données**, pas du code : `{ "op": "less_or_equal", "value": 60 }`. Elles sont évaluées par `Erable.Core` (autorité) et dupliquées en TypeScript pour le retour instantané dans l'éditeur. Le jeu de cas `spec/fixtures/rules.json` garantit que les deux implémentations donnent le même résultat.
+Rules are **data**, not code: `{ "op": "less_or_equal", "value": 60 }`. They are evaluated by `Erable.Core` (the authority) and duplicated in TypeScript for instant feedback in the editor. The case set in `spec/fixtures/rules/` guarantees that both implementations give the same result.
 
-**La validation avertit, elle ne bloque pas.** Le mockup montre « 2 pages hors règles » : ajouter une règle à une propriété déjà utilisée ne doit pas rendre ces pages impossibles à enregistrer. Les violations sont stockées et exposées (badge, filtre de recherche « hors règles »).
+**Validation warns, it does not block.** Adding a rule to a property already in use ("2 pages breaking the rules") must not make those pages impossible to save. Violations are stored and exposed (badge, "breaking the rules" search filter).
 
-### 5.5 Type de lien et lien
+### 5.5 Link type and link
 
-- Type de lien : `name`, `description`, et `inverseName` optionnel (« mentor de » / « élève de ») pour bien libeller les liens entrants.
-- Lien : `(sourceId, linkTypeId, targetId)`, orienté, sans contrainte de dossier.
+- Link type: `name`, `description`, and an optional `inverseName` ("mentor of" / "student of") to label incoming links properly.
+- Link: `(sourceId, linkTypeId, targetId)`, directed, without a folder constraint.
 
-### 5.6 Références implicites
+### 5.6 Implicit references
 
-À chaque enregistrement, le backend extrait du Markdown toutes les références `[[ID]]` et `![[ID]]` dans une table d'index. Elle alimente :
+On every save, the backend extracts every `[[ID]]` and `![[ID]]` reference from the Markdown into an index table. It feeds:
 
-- les « liens entrants » et « Utilisée par » ;
-- l'avertissement à la suppression (« 5 pages référencent cet élément ») ;
-- la détection des références cassées.
+- the "incoming links" and "Used by";
+- the warning on deletion ("5 pages reference this element");
+- the detection of broken references.
 
 ---
 
-## 6. Markdown étendu
+## 6. Extended Markdown
 
-Base : **CommonMark + GFM** (tableaux, listes de tâches, barré, autoliens). HTML brut **désactivé** (sécurité multi-utilisateur, §9).
+Basis: **CommonMark + GFM** (tables, task lists, strikethrough, autolinks). Raw HTML **disabled** (multi-user security, §9).
 
-### 6.1 Syntaxe ajoutée
+### 6.1 Added syntax
 
-| Syntaxe | Effet | Exemple rendu |
+| Syntax | Effect | Rendered example |
 |---|---|---|
-| `[[ID]]` | Lien vers un élément, libellé = son nom **actuel** | Capitaine Orsen |
-| `[[ID\|texte]]` | Lien avec libellé libre | « son mentor » |
-| `[[ID#ancre]]` | Lien vers un titre de la page cible | Hautbois › Histoire |
-| `![[ID]]` | Intégration d'une pièce jointe (image, vidéo, audio, PDF ; sinon carte de fichier) | image |
-| `![[ID\|légende]]` | Intégration avec légende | |
-| `![[ID]]{width=320 align=right}` | Attributs d'affichage optionnels | |
+| `[[ID]]` | Link to an element, label = its **current** name | Capitaine Orsen |
+| `[[ID\|text]]` | Link with a free label | "her mentor" |
+| `[[ID#anchor]]` | Link to a heading of the target page | Hautbois › Histoire |
+| `![[ID]]` | Embed of an attachment (image, video, audio, PDF; otherwise a file card) | image |
+| `![[ID\|caption]]` | Embed with a caption | |
+| `![[ID]]{width=320 align=right}` | Optional display attributes | |
 
-`ID` = exactement 16 caractères hexadécimaux : aucune ambiguïté avec du texte entre crochets. Une référence vers un élément supprimé ou inexistant s'affiche comme un lien cassé (style dédié + infobulle), jamais comme une erreur de rendu.
+`ID` = exactly 16 hexadecimal characters: no ambiguity with text between brackets. A reference to a deleted or nonexistent element is shown as a broken link (dedicated style + tooltip), never as a rendering error.
 
-Ancres : par défaut, un slug généré depuis le titre (renommer un titre casse donc les ancres qui le visent). Un ID explicite est possible avec `## Histoire {#histoire}` pour les ancres qu'on veut stables.
+Anchors: by default, a slug generated from the heading (renaming a heading therefore breaks the anchors that target it). An explicit ID is possible with `## History {#history}` for anchors that should stay stable.
 
-### 6.2 Dans l'éditeur
+### 6.2 In the editor
 
-- Le fichier contient toujours les ID bruts. CodeMirror affiche à leur place une **pastille avec le nom** (décoration atomique : le curseur saute la pastille d'un bloc). Le bouton « Afficher les ID bruts » du mockup désactive ces décorations.
-- **Palette d'insertion** : ouverte en tapant `[[` ou `![[` (à la manière d'Obsidian), ou par raccourci (§11.3). Recherche floue, onglets Tout / Pages / Pièces jointes / Catégories / Propriétés, `Entrée` pour un lien, `Maj+Entrée` pour une intégration, `Tab` pour changer de type (repris du mockup).
-- Glisser-déposer ou coller un fichier : il est téléversé comme pièce jointe de la page, puis `![[ID]]` est inséré.
+- The file always contains the raw IDs. CodeMirror shows a **pill with the name** in their place (atomic decoration: the cursor jumps over the pill in one step). The "Show raw IDs" button turns these decorations off.
+- **Insert palette**: opened by typing `[[` or `![[` (like Obsidian), or with a shortcut (§11.3). Fuzzy search, All / Pages / Attachments / Categories / Properties tabs, `Enter` for a link, `Shift+Enter` for an embed, `Tab` to change the kind.
+- Dropping or pasting a file: it is uploaded as an attachment of the page, then `![[ID]]` is inserted.
 
-### 6.3 Deux parseurs, une spécification
+### 6.3 Two parsers, one specification
 
-Le rendu se fait côté front (plugin remark). Le backend a besoin d'extraire les références et le texte brut pour l'index de recherche (extension **Markdig**). Pour éviter que les deux divergent, la grammaire des extensions est volontairement minimale, **écrite dans `docs/markdown-syntax.md`**, et couverte par `spec/fixtures/markdown/*.json` (entrée → références attendues), exécutés par xUnit **et** Vitest.
+Rendering happens on the frontend (remark plugin). The backend needs to extract the references and the plain text for the search index (**Markdig** extension). To keep the two from diverging, the grammar of the extensions is deliberately minimal, **written in `docs/markdown-syntax.md`**, and covered by `spec/fixtures/markdown/*.json` (input → expected references), run by xUnit **and** Vitest.
 
 ---
 
-## 7. Stockage
+## 7. Storage
 
-### 7.1 Format d'un projet
+### 7.1 Format of a project
 
 ```
-MonWiki/
-├─ erable.json              Manifeste : formatVersion, projectId (16 hexa, comme un ElementId), nom,
-│                           langue du contenu, date de création
-├─ erable.db                SQLite (mode WAL) : éléments, contenus, révisions, index
-├─ erable.lock              Verrou mono-instance, présent tant que le projet est ouvert (F16.R2)
+MyWiki/
+├─ erable.json              Manifest: formatVersion, projectId (16 hex, like an ElementId), name,
+│                           content language, creation date
+├─ erable.db                SQLite (WAL mode): elements, contents, revisions, indexes
+├─ erable.lock              Single-instance lock, present while the project is open (F16.R2)
 └─ blobs/
-   └─ 3a/7f/3a7f…e1         Pièces jointes, nommées par leur SHA-256
+   └─ 3a/7f/3a7f…e1         Attachments, named by their SHA-256
 ```
 
-« Ouvrir un projet comme dans un IDE » = ouvrir ce dossier. `formatVersion` est égal à la version du schéma (`PRAGMA user_version`) ; les migrations SQL sont embarquées et appliquées chacune dans une transaction, après une sauvegarde `erable.db.bak-<date>`. `erable.lock` est ouvert sans partage (verrou exclusif `flock` sous Linux et macOS) : le système le libère si le processus meurt, il n'y a donc jamais de verrou périmé ; il est supprimé à la fermeture. La liste des projets récents, les préférences de l'utilisateur et la place de la fenêtre desktop (`window.json` : taille, position, agrandie ou non) sont dans le profil applicatif (`%APPDATA%/Erable`, `~/.config/erable`, `~/Library/Application Support/Erable`), pas dans le projet.
+"Opening a project like in an IDE" = opening this folder. `formatVersion` equals the schema version (`PRAGMA user_version`); SQL migrations are embedded and each applied in a transaction, after an `erable.db.bak-<date>` backup. `erable.lock` is opened without sharing (exclusive `flock` lock on Linux and macOS): the system releases it if the process dies, so there is never a stale lock; it is deleted on close. The list of recent projects, the preferences of the user and the place of the desktop window (`window.json`: size, position, maximized or not) are in the application profile (`%APPDATA%/Erable`, `~/.config/erable`, `~/Library/Application Support/Erable`), not in the project.
 
-En mode serveur, chaque projet est un dossier de ce type sous `data/projects/<projectId>/`, plus une base `data/server.db` pour les comptes et les droits.
+In server mode, each project is a folder of this kind under `data/projects/<projectId>/`, plus a `data/server.db` database for accounts and rights.
 
-### 7.2 Pourquoi SQLite
+### 7.2 Why SQLite
 
-- **Économique** : pas de serveur de base de données à installer, à superviser ou à payer, aussi bien en local que sur le serveur.
-- **Efficace** : lectures en microsecondes, transactions ACID, FTS5 intégré, mode WAL (lectures concurrentes pendant une écriture). Largement suffisant pour une équipe de quelques dizaines d'éditeurs.
-- **Simple à sauvegarder** : un projet tient en un fichier et un dossier. Pour une sauvegarde continue côté serveur, **Litestream** réplique vers un stockage S3-compatible pour quelques centimes par mois.
-- **Un seul chemin de code** pour le local et le serveur.
+- **Cheap**: no database server to install, monitor or pay for, locally as well as on the server.
+- **Efficient**: reads in microseconds, ACID transactions, built-in FTS5, WAL mode (concurrent reads during a write). More than enough for a team of a few dozen editors.
+- **Easy to back up**: a project fits in one file and one folder. For continuous backup on the server, **Litestream** replicates to S3-compatible storage for a few cents a month.
+- **A single code path** for local and server.
 
-### 7.3 Pourquoi les pièces jointes hors de la base
+### 7.3 Why attachments live outside the database
 
-- La base reste petite et rapide ; les vidéos sont servies en streaming avec les requêtes `Range` (natives dans ASP.NET Core).
-- L'adressage par contenu (SHA-256) déduplique gratuitement : une même image attachée à dix pages n'est stockée qu'une fois.
-- Le nom, le type MIME, la taille et la page propriétaire sont dans la table `attachments`. Le blob n'est qu'un contenu.
-- Interface `IBlobStore` : implémentation disque en v1, S3/MinIO possible plus tard sans toucher au reste.
-- Un ramasse-miettes supprime les blobs qu'aucune pièce jointe ni aucune révision ne référence plus.
+- The database stays small and fast; videos are streamed with `Range` requests (native in ASP.NET Core).
+- Content addressing (SHA-256) deduplicates for free: the same image attached to ten pages is stored only once.
+- The name, MIME type, size and owner page are in the `attachments` table. The blob is only content.
+- `IBlobStore` interface: disk implementation in v1, S3/MinIO possible later without touching the rest.
+- A garbage collector deletes the blobs that no attachment and no revision references any more.
 
-### 7.4 Schéma (esquisse)
+### 7.4 Schema (sketch)
 
 ```sql
 elements        (id PK, kind, parent_id, name, sort_order, revision,
                  created_at, created_by, updated_at, updated_by, deleted_at,
-                 deleted_root, deleted_by, deleted_orphan)   -- corbeille (format v3)
-page_contents   (page_id PK, markdown, plain_text)          -- plain_text pour FTS
-revisions       (element_id, revision, author, at, snapshot BLOB)  -- JSON compressé
+                 deleted_root, deleted_by, deleted_orphan)   -- trash (format v3)
+page_contents   (page_id PK, markdown, plain_text)          -- plain_text for FTS
+revisions       (element_id, revision, author, at, snapshot BLOB)  -- compressed JSON
 categories      (id PK, parent_category_id, description)
 page_categories (page_id, category_id, sort_order)
 property_defs   (id PK, key UNIQUE, type, default_json, rules_json, enum_json)
-property_values (owner_id, property_id, idx,                -- owner = page ou catégorie ; idx 0 (scalaire),
-                 v_int, v_real, v_text, v_ref)              -- 0..n-1 (liste), -1 (liste vide) ; colonnes typées → filtres SQL
-resolved_values (page_id, property_id, idx, v_*, origin, source_id)  -- dérivée (P-07) : valeur effective après héritage
+property_values (owner_id, property_id, idx,                -- owner = page or category; idx 0 (scalar),
+                 v_int, v_real, v_text, v_ref)              -- 0..n-1 (list), -1 (empty list); typed columns → SQL filters
+resolved_values (page_id, property_id, idx, v_*, origin, source_id)  -- derived: effective value after inheritance
 link_types      (id PK, description, inverse_name)
 links           (id PK, source_id, link_type_id, target_id, created_at, created_by)
-refs            (source_id, target_id, anchor, is_embed)    -- index dérivé du Markdown
+refs            (source_id, target_id, anchor, is_embed)    -- index derived from the Markdown
 attachments     (id PK, page_id, file_name, mime, size, sha256)
-validation_issues (owner_id, property_id, rule_index, rule_op, rule_json, item_index)  -- dérivée
-user_activity   (user_id, element_id, last_viewed_at)       -- « récemment consultées »
-search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacritics 2')   -- tenue par triggers depuis la vue search_source (format v4)
+validation_issues (owner_id, property_id, rule_index, rule_op, rule_json, item_index)  -- derived
+user_activity   (user_id, element_id, last_viewed_at)       -- "recently viewed"
+search_fts      USING fts5(name, plain_text, tokenize='unicode61 remove_diacritics 2')   -- kept by triggers from the search_source view (format v4)
 ```
 
-- **Historique** : chaque enregistrement crée une révision (instantané JSON compressé de l'élément). C'est peu coûteux sur du texte et indispensable dès qu'il y a plusieurs éditeurs (consulter, comparer, restaurer). « Récemment modifiées » découle directement de cette table.
-- **Corbeille** : suppression logique (`deleted_at`), vidée manuellement ou après N jours (le vidage automatique n'est pas implémenté, voir tasks/M2-08). Une suppression est une **entrée** : `deleted_root` désigne l'élément supprimé par l'utilisateur et porte la même valeur pour tout ce qui l'accompagne (sous-pages, contenu d'un dossier, pièces jointes) ; un élément supprimé plus tôt garde sa propre entrée. Restaurer remet l'entrée entière, à son emplacement d'origine ou, si le parent n'existe plus, à la racine de son type. `deleted_orphan` vaut 1 quand le parent de l'entrée a été effacé définitivement (il est alors rattaché à la racine). Le vidage supprime les lignes et leurs dépendances (valeurs, liens, révisions, pièces jointes) puis les blobs que plus rien ne référence.
-- `remove_diacritics` : « col gele » trouve « Col gelé ». **Index de recherche** (format v4) : la vue `search_source` définit ce qui est cherchable (éléments vivants hors racines ; nom + texte brut d'une page, ou description d'une catégorie, d'une propriété, d'un type de lien) et des triggers recopient chaque écriture dans `search_fts`, dans sa transaction ; `erable doctor --fix` le reconstruit. Le texte saisi n'atteint jamais FTS5 tel quel (mots entre guillemets, dernier mot en préfixe).
-- **Conventions de stockage** : ID en `INTEGER` signé ; dates en texte UTC ISO 8601 à la milliseconde (`2026-10-13T08:00:00.000Z`), triables et lisibles ; types d'élément en texte (`page`, `folder`…) ; tables `STRICT`. Le propriétaire d'une pièce jointe est le parent de son élément (pas de colonne `page_id` en double) ; `revisions.blob_sha256` garde en vie le blob d'une révision de pièce jointe face au ramasse-miettes.
+- **History**: every save creates a revision (compressed JSON snapshot of the element). This is cheap on text and essential as soon as there are several editors (view, compare, restore). "Recently edited" follows directly from this table.
+- **Trash**: logical deletion (`deleted_at`), emptied manually or after N days (automatic emptying is not implemented). A deletion is an **entry**: `deleted_root` designates the element deleted by the user and carries the same value for everything that goes with it (sub-pages, content of a folder, attachments); an element deleted earlier keeps its own entry. Restoring puts the whole entry back, at its original location or, if the parent no longer exists, at the root of its kind. `deleted_orphan` is 1 when the parent of the entry has been permanently erased (it is then attached to the root). Emptying deletes the rows and their dependencies (values, links, revisions, attachments), then the blobs that nothing references any more.
+- `remove_diacritics`: "col gele" finds "Col gelé". **Search index** (format v4): the `search_source` view defines what is searchable (live elements other than roots; name + plain text of a page, or description of a category, a property, a link type) and triggers copy every write into `search_fts`, in its transaction; `erable doctor --fix` rebuilds it. The text typed by the user never reaches FTS5 as is (words in quotes, last word as a prefix).
+- **Storage conventions**: IDs as signed `INTEGER`; dates as UTC ISO 8601 text to the millisecond (`2026-10-13T08:00:00.000Z`), sortable and readable; element kinds as text (`page`, `folder`…); `STRICT` tables. The owner of an attachment is the parent of its element (no duplicated `page_id` column); `revisions.blob_sha256` keeps the blob of an attachment revision alive against the garbage collector.
 
-### 7.5 Ce que ce choix ne fait pas bien
+### 7.5 What this choice does not do well
 
-Un fichier SQLite **ne se versionne pas bien dans Git** et **ne doit pas être partagé via Dropbox/OneDrive ou un partage réseau** (risque de corruption avec des écritures concurrentes). La collaboration passe par le mode serveur. Le versionnement Git des projets n'est pas un besoin (décision Q2) : l'historique des révisions (§7.4) en tient lieu.
+A SQLite file **does not version well in Git** and **must not be shared through Dropbox/OneDrive or a network share** (risk of corruption with concurrent writes). Collaboration goes through server mode. Versioning projects in Git is not a need (decision Q2): the revision history (§7.4) takes its place.
 
 ---
 
-## 8. API et temps réel
+## 8. API and real time
 
 ### 8.1 REST (`/api/v1/projects/{projectId}/…`)
 
-| Ressource | Opérations |
+| Resource | Operations |
 |---|---|
-| `tree` | arbre complet léger (id, kind, parent, nom, ordre), chargé une fois puis tenu à jour par les événements |
-| `elements/{id}` | GET, PATCH (renommer, déplacer, réordonner), DELETE (→ corbeille) |
-| `pages`, `categories`, `properties`, `link-types` | CRUD typé |
-| `pages/{id}/content` | GET / PUT avec `If-Match: <revision>` |
-| `pages/{id}/attachments` | upload multipart, téléchargement avec `Range` |
-| `elements/{id}/backlinks` | références et liens entrants |
-| `elements/{id}/revisions` | historique, diff, restauration |
-| `search` | texte + filtres (type, catégories avec sous-catégories, conditions sur propriétés, date de modification, hors règles) + tri + pagination |
-| `resolve?ids=…` | noms et types de N ID en un appel (pastilles de l'éditeur, rendu) |
-| `me/recent` | consultées / modifiées |
+| `tree` | lightweight full tree (id, kind, parent, name, order), loaded once then kept up to date by the events |
+| `elements/{id}` | GET, PATCH (rename, move, reorder), DELETE (→ trash) |
+| `pages`, `categories`, `properties`, `link-types` | typed CRUD |
+| `pages/{id}/content` | GET / PUT with `If-Match: <revision>` |
+| `pages/{id}/attachments` | multipart upload, download with `Range` |
+| `elements/{id}/backlinks` | incoming references and links |
+| `elements/{id}/revisions` | history, diff, restore |
+| `search` | text + filters (kind, categories with sub-categories, conditions on properties, modification date, breaking the rules) + sorting + pagination |
+| `resolve?ids=…` | names and kinds of N IDs in one call (editor pills, rendering) |
+| `me/recent` | viewed / edited |
 
 ### 8.2 SignalR (`/hubs/project`)
 
-- **Événements** : `ElementChanged`, `ElementMoved`, `ElementDeleted`, `TreeChanged`. Le client invalide son cache TanStack Query en conséquence, sans polling.
-- **Présence** : qui consulte ou édite quelle page, et quelle section (bandeau « Camille R. modifie aussi cette page — section Histoire » du mockup).
+- **Events**: `ElementChanged`, `ElementMoved`, `ElementDeleted`, `TreeChanged`. The client invalidates its TanStack Query cache accordingly, without polling.
+- **Presence**: who is viewing or editing which page, and which section ("Camille R. is also editing this page — History section" banner).
 
-### 8.3 Édition concurrente
+### 8.3 Concurrent editing
 
-**v1 — concurrence optimiste + fusion à trois voies, côté serveur** (P-05, M4-05). Chaque sauvegarde envoie la révision de base. Si la page a changé entre-temps, **le serveur** fusionne (base = instantané de la révision d'origine, la sienne, la leur) dans la transaction de l'enregistrement, avec `Erable.Core.Merge` : une seule implémentation, testée par propriétés, valable pour tous les clients. Les modifications sur des sections différentes, cas de loin le plus fréquent, fusionnent sans intervention (la réponse l'indique) ; un vrai conflit (mêmes mots changés différemment) répond `409` avec les trois versions de chaque passage et ouvre une vue de résolution côté client. Avec l'indicateur de présence, c'est suffisant pour une petite équipe.
+**v1 — optimistic concurrency + three-way merge, on the server.** Every save sends the base revision. If the page has changed in the meantime, **the server** merges (base = snapshot of the original revision, theirs, ours) in the transaction of the save, with `Erable.Core.Merge`: a single implementation, tested with properties, valid for every client. Changes to different sections, by far the most frequent case, merge without intervention (the response says so); a real conflict (the same words changed differently) answers `409` with the three versions of each passage and opens a resolution view on the client. Together with the presence indicator, this is enough for a small team.
 
-**v2 — co-édition en direct (CRDT).** Le mockup indique « Les changements sont fusionnés en direct ». Ce sera fait avec **Yjs** côté client (intégration CodeMirror existante, `y-codemirror.next`), le backend se contentant de relayer et de persister les mises à jour comme des blobs opaques, et le client envoyant le Markdown résultant à chaque enregistrement. **Hors v1** (décision Q3) : c'est la fonctionnalité la plus coûteuse du projet et elle ne remet pas en cause le reste de l'architecture. En v1, le libellé du mockup devient « Camille R. modifie aussi cette page — vos changements seront fusionnés à l'enregistrement ».
-
----
-
-## 9. Sécurité
-
-- **Serveur loopback du desktop** : écoute uniquement sur `127.0.0.1`, port aléatoire. Un jeton aléatoire (256 bits) est généré au lancement, transmis au WebView et exigé sur chaque requête d'API, de hub et de test. L'en-tête `Host` est vérifié (protection contre le *DNS rebinding*) et l'en-tête `Origin` des requêtes non GET (CSRF). Sans cela, n'importe quel site ouvert dans un navigateur ou n'importe quel processus local pourrait lire les projets.
-  - *Transmission* : le shell ouvre `http://127.0.0.1:<port>/#session=<jeton>`. Un fragment n'est jamais envoyé au serveur, donc jamais journalisé. La SPA l'efface aussitôt de l'URL et l'échange une fois (`POST /api/session`, en-tête `X-Erable-Session`) contre un cookie `HttpOnly; SameSite=Strict`, que le WebView joint ensuite à toutes les requêtes, WebSocket et `<img>` compris, sans que le jeton soit lisible par un script.
-  - Seule la coquille statique de la SPA (`index.html`, `/assets`) est servie sans jeton : elle ne contient aucune donnée de l'utilisateur.
-- **Mode serveur** : ASP.NET Core Identity (comptes locaux, mots de passe hachés). Cookie httpOnly pour le navigateur, jeton bearer pour l'app desktop. OIDC (Keycloak, Entra, Google) plus tard. Rôles **par projet uniquement** (décision Q5) : lecteur, éditeur, administrateur. Pas de permissions par dossier ou par page.
-- **Contenu** : HTML brut désactivé et sanitisation du rendu (XSS entre utilisateurs). Les pièces jointes sont servies avec `Content-Disposition` et `X-Content-Type-Options: nosniff`. SVG et HTML sont téléchargés, jamais rendus inline.
-- **En-têtes de sécurité** (toutes les réponses) : `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: no-referrer`. La coquille de la SPA ajoute une `Content-Security-Policy` (`default-src 'self'`, scripts de l'origine seulement, `frame-ancestors 'self'` contre le *clickjacking*, `base-uri 'none'`, `object-src 'none'`). Exceptions assumées : `style-src 'unsafe-inline'` (Radix UI et CodeMirror injectent des styles) et images `http:`/`https:` (images externes des pages, voir audit S3). Le cadrage par la même origine reste permis : un PDF joint s'affiche dans un `iframe` de la page. HSTS est posé par le reverse proxy (`deploy/Caddyfile`).
-- **Limites** : taille maximale d'une pièce jointe configurable, quotas par projet en mode serveur.
-- TLS assuré par un reverse proxy (Caddy recommandé : certificats automatiques).
+**v2 — live co-editing (CRDT).** It will be done with **Yjs** on the client (existing CodeMirror integration, `y-codemirror.next`), the backend only relaying and persisting the updates as opaque blobs, and the client sending the resulting Markdown on each save. **Not in v1** (decision Q3): it is the most expensive feature of the project and it does not call the rest of the architecture into question. In v1, the presence banner says "Camille R. is also editing this page — your changes will be merged when you save".
 
 ---
 
-## 10. Desktop : choix du shell
+## 9. Security
 
-| | **Photino** (retenu, fork PhotinoX) | Electron | Tauri 2 |
+- **Loopback server of the desktop**: listens only on `127.0.0.1`, random port. A random token (256 bits) is generated at launch, passed to the WebView and required on every API, hub and test request. The `Host` header is checked (protection against *DNS rebinding*), and so is the `Origin` header of non-GET requests (CSRF). Without this, any site open in a browser or any local process could read the projects.
+  - *Transmission*: the shell opens `http://127.0.0.1:<port>/#session=<token>`. A fragment is never sent to the server, hence never logged. The SPA erases it from the URL at once and exchanges it once (`POST /api/session`, `X-Erable-Session` header) for an `HttpOnly; SameSite=Strict` cookie, which the WebView then attaches to every request, WebSocket and `<img>` included, without the token being readable by a script.
+  - Only the static shell of the SPA (`index.html`, `/assets`) is served without a token: it contains no user data.
+- **Server mode**: ASP.NET Core Identity password hasher (local accounts, hashed passwords). httpOnly cookie for the browser, bearer token for the desktop app. OIDC (Keycloak, Entra, Google) later. Roles **per project only** (decision Q5): reader, editor, administrator. No permissions per folder or per page.
+- **Content**: raw HTML disabled and rendering sanitized (XSS between users). Attachments are served with `Content-Disposition` and `X-Content-Type-Options: nosniff`. SVG and HTML are downloaded, never rendered inline.
+- **Security headers** (every response): `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: no-referrer`. The shell of the SPA adds a `Content-Security-Policy` (`default-src 'self'`, scripts from the origin only, `frame-ancestors 'self'` against *clickjacking*, `base-uri 'none'`, `object-src 'none'`). Accepted exceptions: `style-src 'unsafe-inline'` (Radix UI and CodeMirror inject styles) and `http:`/`https:` images (external images in pages). Framing by the same origin stays allowed: an attached PDF is shown in an `iframe` of the page. HSTS is set by the reverse proxy (`deploy/Caddyfile`).
+- **Limits**: configurable maximum attachment size, quotas per project in server mode.
+- TLS provided by a reverse proxy (Caddy recommended: automatic certificates).
+
+---
+
+## 10. Desktop: choice of the shell
+
+| | **Photino** (chosen, PhotinoX fork) | Electron | Tauri 2 |
 |---|---|---|---|
-| Langage du shell | C# | JS/Node | Rust |
-| Backend .NET | in-process, un seul processus | sidecar (2 processus) | sidecar |
-| Taille | ~50 Mo (runtime .NET inclus) | ~150 Mo+ | ~50 Mo |
-| Moteur de rendu | WebView2 / WebKitGTK / WKWebView | Chromium identique partout | comme Photino |
-| Maturité / outillage | modeste | très élevée | élevée |
+| Shell language | C# | JS/Node | Rust |
+| .NET backend | in-process, a single process | sidecar (2 processes) | sidecar |
+| Size | ~50 MB (.NET runtime included) | ~150 MB+ | ~50 MB |
+| Rendering engine | WebView2 / WebKitGTK / WKWebView | the same Chromium everywhere | like Photino |
+| Maturity / tooling | modest | very high | high |
 
-**Choix retenu : Photino, via le fork maintenu PhotinoX** (décision Q6), pour rester en C# et en un seul processus. Ce choix reste réversible : le shell ne fait que (1) démarrer le backend, (2) ouvrir la fenêtre, (3) exposer trois ou quatre fonctions natives (sélecteur de dossier, ouvrir un fichier avec l'application système, révéler dans l'explorateur). Si Photino pose problème, on passe à Electron en remplaçant uniquement `Erable.Desktop`.
+**Choice: Photino, through the maintained PhotinoX fork** (decision Q6), to stay in C# and in a single process. This choice remains reversible: the shell only (1) starts the backend, (2) opens the window, (3) exposes three or four native functions (folder picker, open a file with the system application, reveal in the file explorer). If Photino causes problems, we switch to Electron by replacing only `Erable.Desktop`.
 
-**Dossier déposé sur la fenêtre (E2E-16-07)** : le WebView ne donne jamais à la page le chemin d'un dossier déposé. Laissé sans gestionnaire, le dépôt fait naviguer le WebView vers `file:///…` ; le shell annule toute navigation `file:` (`NavigationStarting`, PhotinoX) et, si c'est un dossier, le signale à la SPA par le flux SSE (`folderDropped`), qui l'ouvre comme « Ouvrir un dossier… ». La SPA ne quitte donc jamais son origine.
+**Folder dropped on the window (E2E-16-07)**: the WebView never gives the page the path of a dropped folder. Left without a handler, the drop makes the WebView navigate to `file:///…`; the shell cancels every `file:` navigation (`NavigationStarting`, PhotinoX) and, if it is a folder, reports it to the SPA through the SSE stream (`folderDropped`), which opens it like "Open a folder…". The SPA therefore never leaves its origin.
 
-**Fonctions natives (M1-17)** : toujours par l'API (`/api/v1/native/*`, `…/attachments/{id}/open|reveal`), jamais par un pont JavaScript, et derrière `INativeBridge` côté serveur (404 `native.unavailable` en mode serveur) :
-- sélecteur de dossier (`Ctrl+O`), titre de fenêtre (projet courant), ouvrir avec l'application système (copie nommée dans `<temp>/erable-open/`, **programmes et scripts refusés**), révéler dans l'explorateur ;
-- **fermeture** (F16.R3) : la SPA signale ses modifications non enregistrées (`PUT /native/window`) ; si la fenêtre est fermée avec des modifications, le shell la garde ouverte et prévient la SPA par un flux SSE (`GET /native/events`), qui demande « Enregistrer / Abandonner / Annuler » puis confirme (`POST /native/window/close`). Sans SPA à l'écoute, la fenêtre se ferme (les brouillons sont déjà enregistrés). L'arrêt ferme les projets (checkpoint WAL, verrou libéré) ;
-- **mono-instance par projet** (F16.R2, P-04) : chaque instance s'annonce dans `<profil>/instances/<pid>-<port>.json` (port, jeton IPC distinct du jeton de session). Une instance qui trouve un projet verrouillé — au lancement `Erable.Desktop <dossier>` ou depuis l'accueil — appelle `POST /ipc/activate` des autres : celle qui a le projet passe au premier plan, la seconde s'arrête sans fenêtre.
+**Native functions**: always through the API (`/api/v1/native/*`, `…/attachments/{id}/open|reveal`), never through a JavaScript bridge, and behind `INativeBridge` on the server side (404 `native.unavailable` in server mode):
+- folder picker (`Ctrl+O`), window title (current project), open with the system application (named copy in `<temp>/erable-open/`, **programs and scripts refused**), reveal in the file explorer;
+- **closing** (F16.R3): the SPA reports its unsaved changes (`PUT /native/window`); if the window is closed with changes, the shell keeps it open and warns the SPA through an SSE stream (`GET /native/events`), which asks "Save / Discard / Cancel" then confirms (`POST /native/window/close`). With no SPA listening, the window closes (drafts are already saved). Shutting down closes the projects (WAL checkpoint, lock released);
+- **single instance per project** (F16.R2): each instance announces itself in `<profile>/instances/<pid>-<port>.json` (port, IPC token distinct from the session token). An instance that finds a project locked — at launch with `Erable.Desktop <folder>` or from the home screen — calls `POST /ipc/activate` on the others: the one that has the project comes to the foreground, the second one stops without a window.
 
-**Risque à lever au jalon M0** : WebKitGTK sous Linux a des écarts de rendu et de performance avec Chromium. On valide dès le début l'éditeur CodeMirror, le drag & drop dans l'arbre et la lecture vidéo sur les trois OS.
+**Risk to clear in milestone M0**: WebKitGTK on Linux has rendering and performance differences with Chromium. The CodeMirror editor, drag & drop in the tree and video playback are validated on the three OSes from the start.
 
-**Packaging** : `dotnet publish` autonome par RID (`win-x64`, `linux-x64`, `osx-arm64`, `osx-x64`) puis **Velopack** (installeur et mise à jour automatique sur les trois OS, AppImage sous Linux). Serveur : image Docker basée sur `mcr.microsoft.com/dotnet/aspnet` (variante *chiseled*).
-
----
-
-## 11. Remarques sur les contraintes du pitch
-
-### 11.1 Points d'attention
-
-1. **`ulong` et JavaScript** : voir §4. ID en chaîne hexa partout hors de la base. Une erreur facile à commettre et très pénible à corriger après coup.
-2. **Co-édition en direct** : le mockup la montre, le pitch ne l'exige pas. C'est le poste le plus coûteux ; elle est reportée en v2 (§8.3).
-3. **Multi-langage = interface uniquement.** L'interface est traduite (FR/EN/DE/ES, comme sur le mockup) ; le contenu des pages est dans **la langue du projet**, fixée à sa création dans `erable.json`. Elle sert à choisir la langue des libellés par défaut (noms des racines de l'arbre, modèles de projet) et peut différer de la langue de l'interface de chaque utilisateur.
-4. **Plusieurs catégories par page** (décision Q4) : des valeurs par défaut concurrentes sont possibles. La règle « le plus spécifique gagne, sinon conflit explicite » (§5.3) s'applique.
-5. **Règles de validation** : en avertissement plutôt qu'en blocage (§5.4). Sinon, modifier une règle bloque rétroactivement des pages existantes.
-6. **Dossiers et sous-pages** : deux façons de hiérarchiser, avec des rôles distincts (rangement contre sens, §5.1). Il faut le dire clairement dans l'UI pour éviter la confusion.
-7. **Ancres de titres** : elles se cassent au renommage d'un titre, contrairement aux ID d'éléments. D'où les ancres explicites optionnelles (§6.1).
-
-### 11.2 Projets locaux et collaboration
-
-« Local » et « modifiable par plusieurs utilisateurs » ne se combinent qu'à travers un serveur. Placer un projet local sur un dossier partagé ou synchronisé n'est **pas** une manière supportée de collaborer (§7.5). En contrepartie, la commande `erable serve` (§2) rend le passage local → partagé trivial.
-
-### 11.3 Le raccourci Alt+Espace
-
-À éviter comme raccourci par défaut :
-
-- **Windows** : Alt+Espace ouvre le menu système de la fenêtre ; c'est aussi le raccourci par défaut de PowerToys Run.
-- **macOS** : ⌥+Espace insère une espace insécable (notamment sur clavier AZERTY) et sert souvent à Alfred ou Raycast.
-- **Linux** : pris par plusieurs gestionnaires de fenêtres.
-
-Proposition : déclenchement principal en tapant `[[` (aucun conflit possible, découvrable), plus un raccourci **configurable**, par défaut `Ctrl+Espace` sous Windows et Linux, `⌘+Maj+K` sous macOS (où `⌃Espace` change la source de saisie). La table des raccourcis est une donnée, éditable dans les préférences.
-
-### 11.4 Coûts de distribution
-
-Pour éviter les alertes « application non reconnue », il faut un compte Apple Developer (~99 $/an, signature et notarisation) et un certificat de signature de code Windows (à partir de ~100–300 $/an selon l'option, Azure Trusted Signing étant la moins chère). Sous Linux, rien de payant. Ce n'est pas bloquant pour les premières versions internes, mais à prévoir avant une diffusion large.
+**Packaging**: self-contained `dotnet publish` per RID (`win-x64`, `linux-x64`, `osx-arm64`, `osx-x64`), then **Velopack** (installer and automatic update on the three OSes, AppImage on Linux). Server: Docker image based on `mcr.microsoft.com/dotnet/aspnet` (*chiseled* variant).
 
 ---
 
-## 12. Jalons
+## 11. Notes on the constraints of the brief
 
-| Jalon | Contenu | Critère de fin |
+### 11.1 Points of attention
+
+1. **`ulong` and JavaScript**: see §4. IDs as hex strings everywhere outside the database. An easy mistake to make and a very painful one to fix afterwards.
+2. **Live co-editing**: the brief does not require it. It is the most expensive item; it is postponed to v2 (§8.3).
+3. **Multi-language = interface only.** The interface is translated (FR/EN/DE/ES); the content of the pages is in **the language of the project**, set at its creation in `erable.json`. It is used to choose the language of the default labels (names of the tree roots, project templates) and may differ from the interface language of each user.
+4. **Several categories per page** (decision Q4): competing default values are possible. The rule "the most specific wins, otherwise an explicit conflict" (§5.3) applies.
+5. **Validation rules**: as warnings rather than blocks (§5.4). Otherwise, changing a rule retroactively blocks existing pages.
+6. **Folders and sub-pages**: two ways to build a hierarchy, with distinct roles (arranging versus meaning, §5.1). This must be said clearly in the UI to avoid confusion.
+7. **Heading anchors**: they break when a heading is renamed, unlike element IDs. Hence the optional explicit anchors (§6.1).
+
+### 11.2 Local projects and collaboration
+
+"Local" and "editable by several users" only combine through a server. Putting a local project in a shared or synchronized folder is **not** a supported way to collaborate (§7.5). In return, the `erable serve` command (§2) makes going from local to shared trivial.
+
+### 11.3 The Alt+Space shortcut
+
+To avoid as a default shortcut:
+
+- **Windows**: Alt+Space opens the system menu of the window; it is also the default shortcut of PowerToys Run.
+- **macOS**: ⌥+Space inserts a non-breaking space (especially on AZERTY keyboards) and is often used by Alfred or Raycast.
+- **Linux**: taken by several window managers.
+
+Proposal: primary trigger by typing `[[` (no possible conflict, discoverable), plus a **configurable** shortcut, by default `Ctrl+Space` on Windows and Linux, `⌘+Shift+K` on macOS (where `⌃Space` changes the input source). The shortcut table is data, editable in the preferences.
+
+### 11.4 Distribution costs
+
+To avoid "unrecognized application" warnings, an Apple Developer account (~$99/year, signing and notarization) and a Windows code signing certificate (from ~$100–300/year depending on the option, Azure Trusted Signing being the cheapest) are needed. On Linux, nothing to pay. This does not block the first versions, but it must be planned before a wide distribution.
+
+---
+
+## 12. Milestones
+
+| Milestone | Content | Exit criterion |
 |---|---|---|
-| **M0 — Squelette** | Solution, CI matricielle 3 OS, Photino + Kestrel loopback + SPA « hello », génération du client OpenAPI, tokens de thème | L'app s'installe et s'ouvre sur les 3 OS ; CodeMirror testé sous WebKitGTK |
-| **M1 — Cœur local** | Format de projet, accueil (nouveau / ouvrir / récents), arbre (dossiers, déplacement, renommage), pages Markdown, `[[ID]]`, `![[ID]]`, pièces jointes, palette d'insertion, TOC | On écrit un wiki mono-utilisateur complet, sans propriétés |
-| **M2 — Structure** | Catégories (héritage), définitions de propriétés, valeurs, règles, types de liens et liens, backlinks, corbeille | Écrans Catégorie / Propriété / panneau latéral de page conformes au mockup |
-| **M3 — Retrouver** | FTS5, recherche Ctrl+K, page de filtres, récemment consultées / modifiées, historique et restauration | Écran Recherche conforme au mockup |
-| **M4 — Serveur** | Comptes, rôles, multi-projets, SignalR (événements, présence), concurrence optimiste + fusion, Docker, mode desktop connecté | Deux utilisateurs éditent le même projet sans perte de données |
-| **M5 — Finition** | i18n complète, accessibilité, raccourcis configurables, Velopack + mises à jour, sauvegarde Litestream documentée | Version 1.0 distribuable |
-| **M6 — Mobile** | SPA adaptée aux téléphones (F18), manifeste, app Android cliente des serveurs (F19), APK signé dans la release | Les parcours `@mobile` passent sur un téléphone émulé ; l'APK de la release ouvre un serveur et édite une page |
-| **v2 et après** | Co-édition CRDT, OIDC, stockage S3, projets locaux sur mobile | — |
+| **M0 — Skeleton** | Solution, 3-OS matrix CI, Photino + loopback Kestrel + "hello" SPA, OpenAPI client generation, theme tokens | The app installs and opens on the 3 OSes; CodeMirror tested under WebKitGTK |
+| **M1 — Local core** | Project format, home (new / open / recent), tree (folders, moving, renaming), Markdown pages, `[[ID]]`, `![[ID]]`, attachments, insert palette, TOC | A complete single-user wiki can be written, without properties |
+| **M2 — Structure** | Categories (inheritance), property definitions, values, rules, link types and links, backlinks, trash | Category / Property screens and page side panel complete |
+| **M3 — Finding** | FTS5, Ctrl+K search, filter page, recently viewed / edited, history and restore | Search screen complete |
+| **M4 — Server** | Accounts, roles, multiple projects, SignalR (events, presence), optimistic concurrency + merge, Docker, connected desktop mode | Two users edit the same project without data loss |
+| **M5 — Polish** | Complete i18n, accessibility, configurable shortcuts, Velopack + updates, documented Litestream backup | Distributable version 1.0 |
+| **M6 — Mobile** | SPA adapted to phones (F18), manifest, Android app as a client of servers (F19), signed APK in the release | The `@mobile` journeys pass on an emulated phone; the APK of the release opens a server and edits a page |
+| **v2 and later** | CRDT co-editing, OIDC, S3 storage, local projects on mobile | — |
 
 ---
 
-## 13. Décisions actées
+## 13. Decisions
 
-- **Q1.** Multi-langage = interface uniquement. Les pages sont rédigées dans la langue du projet ; pas de pages traduites.
-- **Q2.** Pas de versionnement Git des projets. SQLite reste la source de vérité ; pas d'export texte prévu.
-- **Q3.** Co-édition en direct en v2. La v1 utilise la concurrence optimiste avec fusion à trois voies (§8.3).
-- **Q4.** Une page peut avoir plusieurs catégories (résolution des valeurs : §5.3).
-- **Q5.** Permissions par projet uniquement (§9).
-- **Q6.** Shell desktop : Photino (§10). Electron reste le repli si le jalon M0 révèle un blocage. *Constat M0-07 (oct. 2026)* : Photino.NET n'a plus de commit de code depuis janvier 2025 ; tout ce qui dépend de Photino est isolé dans `PhotinoShell`, et le spike M0-08 le compare au fork actif PhotinoX. *Décision M1-17 (15 oct. 2026, P-15)* : **passage à PhotinoX 5.3.5** (Apache-2.0, cible .NET 10), qui expose `NavigationStarting` nécessaire au dépôt de dossier ; Linux et macOS restent à vérifier sur ce fork.
-- **Q7.** Aucun état durable dans le navigateur (§3.1) : préférences, brouillons et état de l'interface sont stockés côté backend et exposés par l'API ; le backend injecte le thème (et, à terme, la langue) dans `index.html`. Alternative écartée : schéma d'URL personnalisé Photino à origine fixe (plus fragile selon les WebViews).
-- **Q8.** Comptes et accès du mode serveur (M4-01). Mots de passe hachés par le hacheur d'ASP.NET Core Identity (sans EF Core ni schéma de cookie Identity) ; sessions opaques révocables, stockées par empreinte dans `data/server.db` (cookie `HttpOnly` `SameSite=Strict` + contrôle de `Origin`, ou jeton bearer pour le desktop connecté). Un non-membre reçoit **404** (aucune différence avec un projet inexistant), un membre au rôle insuffisant **403**. Chaque endpoint déclare sa règle d'accès (`AccessRule`) ; sans règle il est refusé. Les chemins de la machine (créer ou ouvrir un dossier) sont réservés au desktop.
-- **Q9.** Le desktop connecté parle au serveur **par son propre backend** (M4-07) : la SPA n'appelle jamais le serveur directement ; le backend du bureau reconnaît les projets d'un serveur et transmet les requêtes (et le hub SignalR) avec le jeton bearer, conservé dans le coffre du système (DPAPI, Keychain, libsecret, sinon mémoire). Le jeton n'atteint pas le JavaScript, les médias authentifiés fonctionnent et le CORS n'est pas requis (il reste disponible pour une SPA tierce, M4-06). Alternative écartée : appels directs de la SPA au serveur (jeton en mémoire de la page, pas de médias authentifiés).
-- **Q10.** Limites de sécurité du Markdown (M5-04, docs/markdown-syntax.md §6) : taille, longueur de ligne, répétitions, imbrication et longueur de paragraphe sont bornées par un pré-balayage linéaire, refusé en 422 à l'enregistrement (Core) et prévenu côté client ; une page existante qui les dépasse est affichée en texte brut. Elles bloquent, contrairement aux règles de propriétés (§A-5.4), car ce sont des garde-fous contre la saturation et non des règles métier. Alternative écartée : corriger Markdig et remark.
-- **Q11.** Mobile (M6) : **l'app Android est un client des serveurs Erable**, écrite en **.NET for Android** (C#, comme le reste). Elle garde une liste de serveurs, vérifie `GET /api/info` avant d'en ajouter un, puis ouvre la SPA **servie par le serveur** dans un WebView restreint à son origine : authentification par le cookie du web, pas de CORS, rien à embarquer de la SPA ni du backend. Le projet `src/Erable.Android` est hors d'`Erable.sln` (le workload `android` n'est pas exigé pour le reste) ; sa logique pure est testée par `tests/Erable.Android.Tests`, qui compile ses sources. Distribution : APK signé joint à la release GitHub (Play Store plus tard). Alternatives écartées : projets locaux sur le téléphone (ASP.NET Core n'est pas pris en charge sur Android), Capacitor (la SPA embarquée appellerait le serveur en cross-origin, contraire à Q9), Kotlin (second langage et Gradle, pour un APK plus léger).
+- **Q1.** Multi-language = interface only. Pages are written in the language of the project; no translated pages.
+- **Q2.** No Git versioning of projects. SQLite stays the source of truth; no text export planned.
+- **Q3.** Live co-editing in v2. v1 uses optimistic concurrency with three-way merge (§8.3).
+- **Q4.** A page can have several categories (resolution of values: §5.3).
+- **Q5.** Permissions per project only (§9).
+- **Q6.** Desktop shell: Photino (§10). Electron remains the fallback. *Finding (Oct. 2026)*: Photino.NET has had no code commit since January 2025; everything that depends on Photino is isolated in `PhotinoShell`. *Decision (15 Oct. 2026)*: **switch to PhotinoX 5.3.5** (Apache-2.0, targets .NET 10), which exposes the `NavigationStarting` event needed for dropping a folder; Linux and macOS remain to be checked on this fork.
+- **Q7.** No durable state in the browser (§3.1): preferences, drafts and interface state are stored by the backend and exposed by the API; the backend injects the theme (and, eventually, the language) into `index.html`. Rejected alternative: a fixed-origin Photino custom URL scheme (more fragile depending on the WebView).
+- **Q8.** Accounts and access in server mode. Passwords hashed by the ASP.NET Core Identity hasher (without EF Core nor the Identity cookie scheme); opaque revocable sessions, stored by hash in `data/server.db` (`HttpOnly` `SameSite=Strict` cookie + `Origin` check, or a bearer token for the connected desktop). A non-member gets **404** (no difference from a nonexistent project), a member with an insufficient role **403**. Every endpoint declares its access rule (`AccessRule`); without a rule it is refused. Paths of the machine (creating or opening a folder) are reserved to the desktop.
+- **Q9.** The connected desktop talks to the server **through its own backend**: the SPA never calls the server directly; the desktop backend recognizes the projects of a server and forwards the requests (and the SignalR hub) with the bearer token, kept in the system vault (DPAPI, Keychain, libsecret, otherwise memory). The token never reaches JavaScript, authenticated media work and CORS is not required (it stays available for a third-party SPA). Rejected alternative: direct calls from the SPA to the server (token in the memory of the page, no authenticated media).
+- **Q10.** Markdown safety limits (docs/markdown-syntax.md §6): size, line length, repetitions, nesting and paragraph length are bounded by a linear pre-scan, refused with 422 on save (Core) and warned about on the client; an existing page that exceeds them is shown as plain text. They block, unlike property rules (§A-5.4), because they are safeguards against saturation and not business rules. Rejected alternative: fixing Markdig and remark.
+- **Q11.** Mobile (M6): **the Android app is a client of Erable servers**, written in **.NET for Android** (C#, like the rest). It keeps a list of servers, checks `GET /api/info` before adding one, then opens the SPA **served by the server** in a WebView restricted to its origin: authentication by the web cookie, no CORS, nothing of the SPA or the backend to embed. The `src/Erable.Android` project is outside `Erable.sln` (the `android` workload is not required for the rest); its pure logic is tested by `tests/Erable.Android.Tests`, which compiles its sources. Distribution: signed APK attached to the GitHub release (Play Store later). Rejected alternatives: local projects on the phone (ASP.NET Core is not supported on Android), Capacitor (the embedded SPA would call the server cross-origin, contrary to Q9), Kotlin (a second language and Gradle, for a lighter APK).

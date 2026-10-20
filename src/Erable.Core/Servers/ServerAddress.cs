@@ -3,7 +3,7 @@ using System.Text.Json;
 namespace Erable.Core.Servers;
 
 /// <summary>
-/// The address of an Erable server as its clients take it from a person: the desktop in connected mode (M4-07) and the
+/// The address of an Erable server as its clients take it from a person: the desktop in connected mode and the
 /// Android application (F19.R1). Only the origin is kept: the SPA and the API live at the root of a server.
 /// </summary>
 public static class ServerAddress

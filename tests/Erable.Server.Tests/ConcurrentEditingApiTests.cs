@@ -9,7 +9,7 @@ using Erable.Server.Tests.Infrastructure;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Two editors of one page (M4-05, F14.R5): merged on the server, or both versions handed back.</summary>
+/// <summary>Two editors of one page (F14.R5): merged on the server, or both versions handed back.</summary>
 public sealed class ConcurrentEditingApiTests
 {
     private const string Page = "## Présentation\n\nMéfiante envers les soldats.\n\n## Histoire\n\nNée à Hautbois.\n\n## Rôle\n\nMarchande de cartes.\n";

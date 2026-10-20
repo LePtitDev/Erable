@@ -1,188 +1,185 @@
-# Erable — Installer un serveur
+# Erable — Installing a server
 
-> Statut : version 0.1 · M4-06 · complète `docs/architecture.md` §2, §9 et §10.
-> Public : la personne qui met Erable à disposition d'une équipe.
+Erable comes in three hosting forms. It is **the same executable** (`erable`) in all three cases.
 
-Erable existe sous trois formes d'hébergement. C'est **le même exécutable** (`erable`) dans les trois cas.
-
-| Besoin | Forme | Page |
+| Need | Form | Section |
 |---|---|---|
-| Partager un wiki avec des collègues, ce soir, sur le même réseau | `erable serve ./MonWiki --lan` | [§1](#1-partager-un-projet-local-erable-serve) |
-| Héberger plusieurs projets pour une ou plusieurs équipes | Image Docker | [§2](#2-image-docker) |
-| Idem, accessible depuis Internet, avec HTTPS automatique | Docker Compose + Caddy | [§3](#3-docker-compose-et-https-caddy) |
+| Share a wiki with colleagues tonight, on the same network | `erable serve ./MyWiki --lan` | [§1](#1-sharing-a-local-project-erable-serve) |
+| Host several projects for one or more teams | Docker image | [§2](#2-docker-image) |
+| The same, reachable from the Internet, with automatic HTTPS | Docker Compose + Caddy | [§3](#3-docker-compose-and-https-caddy) |
 
-Depuis un clone du dépôt, deux raccourcis enchaînent ces étapes (`.bat` sous Windows, `.sh` ailleurs) :
+From a clone of the repository, two shortcuts chain these steps (`.bat` on Windows, `.sh` elsewhere):
 
-| Script | Rôle |
+| Script | Purpose |
 |---|---|
-| `scripts/serve.sh [dossier] [--port 5080] [--lan] [--rebuild] [-- options]` | §1 sans Docker : publie le serveur en Release (SPA comprise) dans `artifacts/server` — de nouveau seulement si le commit a changé, ou avec `--rebuild` — puis lance `erable serve`. Dossier par défaut : `data/`. Les options après `--` vont à `erable serve` (`--max-attachment-mb`, `--project-quota-mb`…). |
-| `scripts/compose.sh setup [domaine]` | §3 : crée `deploy/.env` (lisible par vous seul) avec un mot de passe aléatoire pour le premier administrateur, affiché une fois. |
-| `scripts/compose.sh up` / `update` | Construit l'image et démarre ou met à jour la pile, puis attend l'état `healthy`. `update` récupère aussi les images de base récentes : à lancer après `git pull`. |
-| `scripts/compose.sh down` / `status` / `logs [service]` | Arrêt (le volume est conservé), état, journaux. |
-| `scripts/compose.sh backup [dossier]` | Arrête Erable, archive le volume `/data` dans `artifacts/backups/erable-data-<date>.tar.gz` (ou `dossier`), redémarre. |
-| `scripts/compose.sh restore <archive>` | Après confirmation, remplace tout le volume par l'archive (comptes et projets), puis redémarre. |
-| `scripts/compose.sh doctor [identifiant]` | Arrête Erable, passe `erable doctor` sur chaque projet (ou un seul), redémarre ; code de sortie de `doctor`. |
-| `scripts/compose.sh --litestream <commande>` | Même chose avec la sauvegarde continue (§6). |
+| `scripts/serve.sh [folder] [--port 5080] [--lan] [--rebuild] [-- options]` | §1 without Docker: publishes the server in Release (SPA included) into `artifacts/server` — again only if the commit changed, or with `--rebuild` — then runs `erable serve`. Default folder: `data/`. The options after `--` go to `erable serve` (`--max-attachment-mb`, `--project-quota-mb`…). |
+| `scripts/compose.sh setup [domain]` | §3: creates `deploy/.env` (readable by you only) with a random password for the first administrator, shown once. |
+| `scripts/compose.sh up` / `update` | Builds the image and starts or updates the stack, then waits for the `healthy` state. `update` also pulls recent base images: run it after `git pull`. |
+| `scripts/compose.sh down` / `status` / `logs [service]` | Stop (the volume is kept), state, logs. |
+| `scripts/compose.sh backup [folder]` | Stops Erable, archives the `/data` volume into `artifacts/backups/erable-data-<date>.tar.gz` (or `folder`), restarts. |
+| `scripts/compose.sh restore <archive>` | After confirmation, replaces the whole volume with the archive (accounts and projects), then restarts. |
+| `scripts/compose.sh doctor [identifier]` | Stops Erable, runs `erable doctor` on every project (or one), restarts; exit code of `doctor`. |
+| `scripts/compose.sh --litestream <command>` | The same with continuous backup (§6). |
 
 ---
 
-## 1. Partager un projet local : `erable serve`
+## 1. Sharing a local project: `erable serve`
 
 ```bash
-erable serve ./MonWiki --lan --port 5080
+erable serve ./MyWiki --lan --port 5080
 ```
 
-- `./MonWiki` est un dossier de projet Erable (il contient `erable.json`). Il est partagé **tel quel** : aucun fichier n'y est ajouté.
-- Les comptes (identifiants, mots de passe hachés, sessions) sont rangés **à part**, dans le profil de l'utilisateur (`%APPDATA%\Erable\serve\<identifiant du projet>` sous Windows, `~/.config/Erable/serve/…` sous Linux, `~/Library/Application Support/Erable/serve/…` sous macOS), pour qu'on puisse copier ou envoyer le projet sans emporter les mots de passe.
-- Sans `--lan` (ou `--address`), le serveur n'écoute que sur **cette machine** (`127.0.0.1`). `--lan` écoute sur toutes les interfaces : les collègues ouvrent `http://<adresse de votre machine>:5080`.
-- À la première exécution, le serveur demande le **premier administrateur** (identifiant et mot de passe). Il devient administrateur du serveur et du projet.
-- Le projet doit être ouvert **par un seul processus** : fermez-le dans l'application de bureau avant (F16.R2).
-- Un projet d'une version de format plus ancienne doit d'abord être migré : ouvrez-le une fois dans l'application de bureau.
+- `./MyWiki` is an Erable project folder (it contains `erable.json`). It is shared **as it is**: no file is added to it.
+- Accounts (logins, hashed passwords, sessions) are stored **separately**, in the user profile (`%APPDATA%\Erable\serve\<project identifier>` on Windows, `~/.config/Erable/serve/…` on Linux, `~/Library/Application Support/Erable/serve/…` on macOS), so that the project can be copied or sent without taking the passwords along.
+- Without `--lan` (or `--address`), the server only listens on **this machine** (`127.0.0.1`). `--lan` listens on every interface: colleagues open `http://<address of your machine>:5080`.
+- On the first run, the server asks for the **first administrator** (login and password). They become administrator of the server and of the project.
+- The project must be opened **by a single process**: close it in the desktop application first (F16.R2).
+- A project in an older format version must be migrated first: open it once in the desktop application.
 
-> **HTTP en clair sur un réseau local** : les mots de passe circulent sans chiffrement. C'est acceptable sur un réseau de confiance (domicile, bureau), pas sur un Wi-Fi public ni sur Internet. Pour Internet, voir [§3](#3-docker-compose-et-https-caddy).
+> **Plain HTTP on a local network**: passwords travel unencrypted. This is acceptable on a trusted network (home, office), not on public Wi-Fi nor on the Internet. For the Internet, see [§3](#3-docker-compose-and-https-caddy).
 
-`erable serve <dossier>` accepte aussi un **dossier de données** (sans `erable.json`) : le serveur y crée `server.db` (comptes), `projects/<identifiant>/` (un dossier de projet par projet) et `profiles/`. C'est ce que fait l'image Docker avec `/data`.
+`erable serve <folder>` also accepts a **data folder** (without `erable.json`): the server creates `server.db` (accounts), `projects/<identifier>/` (one project folder per project) and `profiles/` in it. This is what the Docker image does with `/data`.
 
 ---
 
-## 2. Image Docker
+## 2. Docker image
 
-### Construire et lancer
+### Build and run
 
 ```bash
 docker build -t erable --build-arg ERABLE_VERSION="$(node build/version.mjs)" .
 docker run -d --name erable -p 8080:8080 -v erable-data:/data \
-  -e ERABLE_ADMIN_LOGIN=admin -e ERABLE_ADMIN_PASSWORD='un mot de passe solide' \
+  -e ERABLE_ADMIN_LOGIN=admin -e ERABLE_ADMIN_PASSWORD='a strong password' \
   erable
 ```
 
-- Image `mcr.microsoft.com/dotnet/aspnet` **chiseled** (sans shell ni gestionnaire de paquets), utilisateur **non root** (UID 1654), build **Release** (aucun point d'appui de test).
-- Le volume **`/data`** contient tout ce qui compte : `server.db`, `projects/`, `profiles/`. Sans volume, tout disparaît avec le conteneur.
-- `ERABLE_ADMIN_LOGIN` / `ERABLE_ADMIN_PASSWORD` ne servent qu'à la **création du premier administrateur**, quand le volume ne contient aucun compte. Ils sont ignorés ensuite : retirez-les du fichier de déploiement une fois le serveur démarré si vous préférez.
-- La santé du conteneur est vérifiée par `erable healthcheck` (requête locale vers `/api/info`) : `docker ps` affiche `healthy`.
-- Le conteneur écoute en HTTP simple sur le port 8080 : **mettez un reverse proxy TLS devant** s'il est joignable autrement que depuis votre machine.
+- **Chiseled** `mcr.microsoft.com/dotnet/aspnet` image (no shell nor package manager), **non-root** user (UID 1654), **Release** build (no test endpoint).
+- The **`/data`** volume holds everything that matters: `server.db`, `projects/`, `profiles/`. Without a volume, everything disappears with the container.
+- `ERABLE_ADMIN_LOGIN` / `ERABLE_ADMIN_PASSWORD` are only used to **create the first administrator**, when the volume holds no account. They are ignored afterwards: remove them from the deployment file once the server has started if you prefer.
+- The health of the container is checked by `erable healthcheck` (local request to `/api/info`): `docker ps` shows `healthy`.
+- The container listens in plain HTTP on port 8080: **put a TLS reverse proxy in front of it** if it can be reached from anywhere other than your machine.
 
-### Configuration (variables d'environnement)
+### Configuration (environment variables)
 
-La ligne de commande l'emporte sur l'environnement, qui l'emporte sur les valeurs par défaut. Une valeur invalide **arrête** le serveur en nommant le réglage fautif.
+The command line wins over the environment, which wins over the defaults. An invalid value **stops** the server, naming the faulty setting.
 
-| Variable | Défaut | Rôle |
+| Variable | Default | Purpose |
 |---|---|---|
-| `ERABLE_PORT` | `5080` (`8080` dans l'image) | Port TCP. |
-| `ERABLE_ADDRESS` | `127.0.0.1` (`0.0.0.0` dans l'image) | Adresse d'écoute. |
-| `ERABLE_ADMIN_LOGIN`, `ERABLE_ADMIN_PASSWORD` | — | Premier administrateur (serveur vide). Identifiant : 2 à 32 caractères `a-z 0-9 . _ -` ; mot de passe : 8 à 256 caractères. |
-| `ERABLE_PUBLIC_URL` | — | L'adresse que tapent les utilisateurs (`https://wiki.exemple.org`). Autorisée par CORS ; en `https`, le cookie de session devient `Secure`. |
-| `ERABLE_TRUST_PROXY` | `false` | Faire confiance à `X-Forwarded-For/-Proto/-Host` d'un reverse proxy (adresse réelle du client pour la limitation des essais de connexion, protocole pour le cookie). **Seulement** si le serveur n'est joignable que par ce proxy. |
-| `ERABLE_COOKIE_SECURE` | selon `ERABLE_PUBLIC_URL` | Force le drapeau `Secure` du cookie. |
-| `ERABLE_CORS_ORIGINS` | — | Origines supplémentaires autorisées à appeler l'API depuis un navigateur (une SPA hébergée ailleurs), séparées par des virgules. Les pages sur `localhost` / `127.0.0.1` sont toujours autorisées : c'est l'application de bureau connectée (M4-07), qui s'authentifie par jeton, jamais par cookie. |
-| `ERABLE_MAX_ATTACHMENT_MB` | `256` | Taille maximale d'une pièce jointe. |
-| `ERABLE_PROJECT_QUOTA_MB` | aucun | Place totale des pièces jointes d'un projet (corbeille comprise). `0` : aucun quota. |
-| `ERABLE_SESSION_HOURS` | `12` | Durée d'une session sans activité (renouvelée à mi-vie). |
+| `ERABLE_PORT` | `5080` (`8080` in the image) | TCP port. |
+| `ERABLE_ADDRESS` | `127.0.0.1` (`0.0.0.0` in the image) | Listening address. |
+| `ERABLE_ADMIN_LOGIN`, `ERABLE_ADMIN_PASSWORD` | — | First administrator (empty server). Login: 2 to 32 characters `a-z 0-9 . _ -`; password: 8 to 256 characters. |
+| `ERABLE_PUBLIC_URL` | — | The address users type (`https://wiki.example.org`). Allowed by CORS; with `https`, the session cookie becomes `Secure`. |
+| `ERABLE_TRUST_PROXY` | `false` | Trust `X-Forwarded-For/-Proto/-Host` from a reverse proxy (real client address for sign-in throttling, protocol for the cookie). **Only** if the server can only be reached through that proxy. |
+| `ERABLE_COOKIE_SECURE` | from `ERABLE_PUBLIC_URL` | Forces the `Secure` flag of the cookie. |
+| `ERABLE_CORS_ORIGINS` | — | Additional origins allowed to call the API from a browser (a SPA hosted elsewhere), comma-separated. Pages on `localhost` / `127.0.0.1` are always allowed: that is the connected desktop application, which authenticates with a token, never with a cookie. |
+| `ERABLE_MAX_ATTACHMENT_MB` | `256` | Maximum size of an attachment. |
+| `ERABLE_PROJECT_QUOTA_MB` | none | Total space of the attachments of a project (trash included). `0`: no quota. |
+| `ERABLE_SESSION_HOURS` | `12` | Lifetime of an idle session (renewed at half-life). |
 
-### Sauvegarde
+### Backup
 
-Arrêtez le conteneur (ou faites une copie cohérente du volume) puis copiez `/data` : c'est tout. Chaque projet est un dossier autonome (`projects/<identifiant>/` avec `erable.db`, `blobs/`) : `erable doctor <dossier>` en vérifie l'intégrité, volume monté ailleurs et conteneur arrêté.
-Pour une sauvegarde **continue** (quelques secondes de retard au plus), voir [§6](#6-sauvegarde-continue-avec-litestream).
+Stop the container (or make a consistent copy of the volume), then copy `/data`: that's all. Each project is a self-contained folder (`projects/<identifier>/` with `erable.db`, `blobs/`): `erable doctor <folder>` checks its integrity, with the volume mounted elsewhere and the container stopped.
+For a **continuous** backup (a few seconds behind at most), see [§6](#6-continuous-backup-with-litestream).
 
-### Mise à jour
+### Update
 
 ```bash
 git pull && docker build -t erable . && docker rm -f erable && docker run … erable
 ```
 
-Les projets sont migrés vers le nouveau format **à l'ouverture, avec sauvegarde préalable** (`erable.db.bak-<date>`).
+Projects are migrated to the new format **when opened, after a backup** (`erable.db.bak-<date>`).
 
 ---
 
-## 3. Docker Compose et HTTPS (Caddy)
+## 3. Docker Compose and HTTPS (Caddy)
 
-`deploy/docker-compose.yml` lance Erable derrière **Caddy**, qui obtient et renouvelle seul les certificats TLS.
+`deploy/docker-compose.yml` runs Erable behind **Caddy**, which obtains and renews the TLS certificates on its own.
 
 ```bash
-cp deploy/.env.example deploy/.env      # renseigner le domaine et le premier administrateur
+cp deploy/.env.example deploy/.env      # fill in the domain and the first administrator
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d
 ```
 
-Prérequis : un nom de domaine qui pointe vers la machine, les ports **80 et 443** ouverts. Le conteneur Erable n'est pas publié : seul Caddy l'atteint, sur le réseau de Compose. `ERABLE_TRUST_PROXY=true` y est donc sûr.
-Les WebSocket (SignalR : événements et présence) traversent `reverse_proxy` sans réglage.
+Prerequisites: a domain name that points to the machine, ports **80 and 443** open. The Erable container is not published: only Caddy reaches it, on the Compose network. `ERABLE_TRUST_PROXY=true` is therefore safe there.
+WebSockets (SignalR: events and presence) go through `reverse_proxy` without any setting.
 
 ---
 
-## 4. Ce que le serveur protège, et ce qu'il ne protège pas
+## 4. What the server protects, and what it does not
 
-- **Mots de passe** : hachés (PBKDF2, sel par mot de passe), jamais journalisés ni renvoyés. **Essais de connexion limités** : 5 échecs pour un identifiant depuis une même adresse, ou 40 échecs depuis une adresse, en 15 minutes, puis `429` (le blocage est journalisé). Un identifiant visé depuis de nombreuses adresses n'est jamais bloqué, pour qu'un tiers ne puisse pas empêcher son titulaire de se connecter : au-delà de 5 échecs, chaque essai attend seulement un délai croissant (1 s, doublé à chaque échec, au plus 10 s).
-- **Changement de mot de passe** en libre-service (*Préférences*), avec le mot de passe actuel : les autres appareils sont déconnectés, celui qui fait le changement reste connecté.
-- **Sessions** : cookie `HttpOnly`, `SameSite=Strict`, révocables (déconnexion, changement de mot de passe, compte désactivé) ; jeton `Bearer` pour l'application de bureau connectée. Aucune session n'est lisible par un script de la page.
-- **Droits** par projet : lecteur, éditeur, administrateur. Un non-membre ne voit ni le nom ni l'existence d'un projet.
-- **Pièces jointes** : taille maximale, quota par projet, jamais interprétées par le navigateur (`Content-Disposition`, `nosniff`, SVG et HTML en téléchargement).
-- **Navigateur** : politique de sécurité du contenu (CSP) sur l'application, pas d'intégration dans le cadre d'un autre site (*clickjacking*), aucun `Referer` envoyé aux sites liés. Le `Caddyfile` fourni ajoute HSTS ; derrière un autre reverse proxy, ajoutez `Strict-Transport-Security: max-age=31536000`.
-- **Hors du périmètre** : la protection du réseau (pare-feu), les sauvegardes, la mise à jour du système et de l'image de base (le CI analyse l'image à chaque changement et chaque semaine : `.github/workflows/docker.yml`).
+- **Passwords**: hashed (PBKDF2, salt per password), never logged nor returned. **Sign-in attempts are limited**: 5 failures for a login from the same address, or 40 failures from one address, within 15 minutes, then `429` (the block is logged). A login targeted from many addresses is never blocked, so that a third party cannot prevent its owner from signing in: beyond 5 failures, each attempt only waits for an increasing delay (1 s, doubled at each failure, at most 10 s).
+- **Self-service password change** (*Preferences*), with the current password: the other devices are signed out, the one making the change stays signed in.
+- **Sessions**: `HttpOnly`, `SameSite=Strict` cookie, revocable (sign-out, password change, disabled account); `Bearer` token for the connected desktop application. No session can be read by a script of the page.
+- **Rights** per project: reader, editor, administrator. A non-member sees neither the name nor the existence of a project.
+- **Attachments**: maximum size, quota per project, never interpreted by the browser (`Content-Disposition`, `nosniff`, SVG and HTML downloaded).
+- **Browser**: content security policy (CSP) on the application, no embedding in the frame of another site (*clickjacking*), no `Referer` sent to linked sites. The provided `Caddyfile` adds HSTS; behind another reverse proxy, add `Strict-Transport-Security: max-age=31536000`.
+- **Out of scope**: network protection (firewall), backups, updates of the system and of the base image (CI scans the image on every change and every week: `.github/workflows/docker.yml`).
 
-## 5. Dépannage
+## 5. Troubleshooting
 
-| Symptôme | Cause probable |
+| Symptom | Likely cause |
 |---|---|
-| « This server has no account yet » au démarrage | Premier lancement sans terminal : renseigner `ERABLE_ADMIN_LOGIN` et `ERABLE_ADMIN_PASSWORD`. |
-| `project.locked` / projet non ouvert | Le dossier est déjà ouvert par l'application de bureau ou par un autre serveur. |
-| Impossible de se connecter derrière un proxy, ou « Trop de tentatives » pour tout le monde | `ERABLE_TRUST_PROXY` manquant : toutes les requêtes semblent venir de l'adresse du proxy. |
-| Le cookie n'est pas enregistré en HTTPS | `ERABLE_PUBLIC_URL` en `http://`, ou proxy qui ne transmet pas `X-Forwarded-Proto`. |
-| Un utilisateur a oublié son mot de passe | Un administrateur du serveur lui en donne un nouveau (`PATCH /api/v1/accounts/{login}`) ; l'utilisateur le remplace ensuite lui-même dans *Préférences › Mot de passe*. Si le **seul** administrateur a perdu le sien, il n'existe pas encore de procédure : les variables `ERABLE_ADMIN_*` ne servent que sur un serveur sans compte. |
-| Les pièces jointes sont refusées (413) | `ERABLE_MAX_ATTACHMENT_MB` (taille d'un fichier) ou `ERABLE_PROJECT_QUOTA_MB` (place du projet). |
+| "This server has no account yet" on startup | First start without a terminal: set `ERABLE_ADMIN_LOGIN` and `ERABLE_ADMIN_PASSWORD`. |
+| `project.locked` / project not opened | The folder is already open in the desktop application or in another server. |
+| Cannot sign in behind a proxy, or "Too many attempts" for everyone | `ERABLE_TRUST_PROXY` missing: every request seems to come from the address of the proxy. |
+| The cookie is not stored over HTTPS | `ERABLE_PUBLIC_URL` in `http://`, or a proxy that does not forward `X-Forwarded-Proto`. |
+| A user forgot their password | A server administrator gives them a new one (`PATCH /api/v1/accounts/{login}`); the user then replaces it themselves in *Preferences › Password*. If the **only** administrator lost theirs, there is no procedure yet: the `ERABLE_ADMIN_*` variables only apply to a server without accounts. |
+| Attachments are refused (413) | `ERABLE_MAX_ATTACHMENT_MB` (size of a file) or `ERABLE_PROJECT_QUOTA_MB` (space of the project). |
 
 ---
 
-## 6. Sauvegarde continue avec Litestream
+## 6. Continuous backup with Litestream
 
-Une copie du volume `/data` est la sauvegarde la plus simple (§2), mais elle exige d'arrêter le serveur et ne protège que jusqu'à la dernière copie. **Litestream** réplique en continu les bases SQLite vers un stockage S3-compatible (AWS S3, Scaleway, Backblaze B2, MinIO…) : la perte maximale est de quelques secondes d'écriture, pour quelques centimes par mois.
+A copy of the `/data` volume is the simplest backup (§2), but it requires stopping the server and only protects up to the last copy. **Litestream** continuously replicates the SQLite databases to S3-compatible storage (AWS S3, Scaleway, Backblaze B2, MinIO…): the maximum loss is a few seconds of writes, for a few cents a month.
 
-### Ce qui est sauvegardé, et comment
+### What is backed up, and how
 
-| Quoi | Où | Comment |
+| What | Where | How |
 |---|---|---|
-| Comptes et droits | `server.db` | Litestream |
-| Contenu de chaque projet | `projects/<id>/erable.db` | Litestream (les nouveaux projets sont détectés seuls) |
-| Manifeste du projet | `projects/<id>/erable.json` | copie périodique (service `files-backup`, rclone) |
-| Pièces jointes | `projects/<id>/blobs/` | copie périodique : les fichiers sont nommés par leur SHA-256, donc jamais modifiés ; la copie n'efface rien dans le bucket |
+| Accounts and rights | `server.db` | Litestream |
+| Content of each project | `projects/<id>/erable.db` | Litestream (new projects are detected automatically) |
+| Project manifest | `projects/<id>/erable.json` | periodic copy (`files-backup` service, rclone) |
+| Attachments | `projects/<id>/blobs/` | periodic copy: files are named by their SHA-256, so they never change; the copy deletes nothing in the bucket |
 
-Litestream ne sait répliquer que SQLite : sans le service `files-backup`, une restauration retrouverait les pages mais pas leurs pièces jointes ni le manifeste.
+Litestream can only replicate SQLite: without the `files-backup` service, a restore would recover the pages but neither their attachments nor the manifest.
 
-### Mise en place
+### Setup
 
-1. Créez un **bucket** dédié et une clé d'accès limitée à ce bucket (lecture, écriture, liste).
-2. Dans `deploy/.env`, renseignez les variables `LITESTREAM_*` (voir `deploy/.env.example`).
-3. Démarrez avec le fichier supplémentaire :
+1. Create a dedicated **bucket** and an access key limited to that bucket (read, write, list).
+2. In `deploy/.env`, fill in the `LITESTREAM_*` variables (see `deploy/.env.example`).
+3. Start with the additional file:
 
 ```bash
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml -f deploy/docker-compose.litestream.yml up -d
 ```
 
-Litestream partage le volume `erable-data` avec le serveur (les bases sont en mode WAL, ce que Litestream exige) et ne demande rien de plus au serveur. `docker compose logs litestream` doit montrer une réplication par base. Les versions des images (`litestream/litestream`, `rclone/rclone`) sont figées dans le fichier : mettez-les à jour volontairement.
+Litestream shares the `erable-data` volume with the server (the databases are in WAL mode, which Litestream requires) and asks nothing more of the server. `docker compose logs litestream` should show one replication per database. The image versions (`litestream/litestream`, `rclone/rclone`) are pinned in the file: update them deliberately.
 
-### Restauration
+### Restore
 
-Le serveur doit être **arrêté** et le volume vide (ou débarrassé des bases abîmées).
+The server must be **stopped** and the volume empty (or rid of the damaged databases).
 
 ```bash
 docker compose -f deploy/docker-compose.yml down
-docker volume rm <projet>_erable-data && docker volume create <projet>_erable-data
+docker volume rm <project>_erable-data && docker volume create <project>_erable-data
 export LITESTREAM_BUCKET=… LITESTREAM_ENDPOINT=… LITESTREAM_ACCESS_KEY_ID=… LITESTREAM_SECRET_ACCESS_KEY=…
-deploy/litestream/restore.sh <projet>_erable-data <identifiant-projet-1> <identifiant-projet-2>
+deploy/litestream/restore.sh <project>_erable-data <project-identifier-1> <project-identifier-2>
 ```
 
-Les identifiants de projets sont les dossiers sous `projects/` du bucket (console S3 ou `rclone lsd`). Le script restaure `server.db`, chaque `erable.db`, puis copie manifestes et pièces jointes, et rend les fichiers à l'utilisateur de l'image (UID 1654). Redémarrez ensuite le serveur et vérifiez chaque projet :
+The project identifiers are the folders under `projects/` in the bucket (S3 console or `rclone lsd`). The script restores `server.db`, each `erable.db`, then copies manifests and attachments, and hands the files over to the user of the image (UID 1654). Then restart the server and check each project:
 
 ```bash
-docker compose -f deploy/docker-compose.yml run --rm --no-deps --entrypoint dotnet erable erable.dll doctor /data/projects/<identifiant>
+docker compose -f deploy/docker-compose.yml run --rm --no-deps --entrypoint dotnet erable erable.dll doctor /data/projects/<identifier>
 ```
 
-**Pièces jointes plus récentes que leur copie.** Les bases sont répliquées en continu, les pièces jointes toutes les `FILES_BACKUP_INTERVAL_SECONDS` (5 minutes par défaut) : une pièce jointe ajoutée juste avant la panne peut donc manquer après la restauration, alors que la base la cite. `doctor` la signale par une erreur `blob.missing` (« The file of the attachment is missing », avec l'ID de la pièce jointe et le début de son SHA-256) et sort avec le code `1` ; `--fix` ne la répare pas. Le reste du projet est intact : récupérez le fichier auprès de la personne qui l'a ajouté, puis ajoutez-le de nouveau à la page.
+**Attachments more recent than their copy.** The databases are replicated continuously, the attachments every `FILES_BACKUP_INTERVAL_SECONDS` (5 minutes by default): an attachment added just before the failure may therefore be missing after the restore, while the database cites it. `doctor` reports it with a `blob.missing` error ("The file of the attachment is missing", with the ID of the attachment and the start of its SHA-256) and exits with code `1`; `--fix` does not repair it. The rest of the project is intact: get the file back from the person who added it, then add it to the page again.
 
-### Tester la chaîne complète
+### Testing the whole chain
 
-`deploy/litestream/test-restore.sh` joue le scénario de bout en bout avec un MinIO local : création d'un projet et d'une page, réplication, destruction du volume, restauration, `erable doctor`, puis lecture de la page. À lancer une fois après tout changement du fichier Litestream ou des versions d'images. **Il n'a pas encore été exécuté** : voir `tasks/M5-05-i18n-backup-docs.md`.
+`deploy/litestream/test-restore.sh` plays the scenario end to end with a local MinIO: creation of a project and a page, replication, destruction of the volume, restore, `erable doctor`, then reading the page. Run it once after any change to the Litestream file or to the image versions. **It has not been run yet.**
 
-### Limites
+### Limits
 
-- Litestream protège contre la perte du disque ou du serveur, pas contre une erreur humaine : une page supprimée par erreur se restaure par la corbeille et l'historique (F12, F13), pas par la sauvegarde.
-- Le retard de réplication des pièces jointes est celui de `FILES_BACKUP_INTERVAL_SECONDS` (5 minutes par défaut).
-- Une restauration remet le serveur dans l'état de la dernière réplication : les écritures plus récentes sont perdues.
+- Litestream protects against losing the disk or the server, not against human error: a page deleted by mistake is restored from the trash and the history (F12, F13), not from the backup.
+- The replication delay of attachments is `FILES_BACKUP_INTERVAL_SECONDS` (5 minutes by default).
+- A restore puts the server back in the state of the last replication: more recent writes are lost.

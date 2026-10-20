@@ -1,6 +1,6 @@
 // Renders the application icons from one drawing (the Lucide « leaf » of the in-app logo, white on the accent green)
-// into the PNG files of the web manifest (F18.R8), the favicon, the Android app (M6-07) and the desktop app (executable,
-// window and installers, M1-17 / M5-03). Run it after changing the drawing; the outputs are committed.
+// into the PNG files of the web manifest (F18.R8), the favicon, the Android app and the desktop app (executable,
+// window and installers). Run it after changing the drawing; the outputs are committed.
 // Usage: node scripts/generate-icons.mjs
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";

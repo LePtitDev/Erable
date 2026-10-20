@@ -5,8 +5,7 @@ import { ElementHeader } from "./ElementHeader";
 import styles from "./FolderView.module.css";
 
 /**
- * Generic place for the kinds whose screen arrives later (category M2-04, property M2-05, link type M2-07) and for
- * attachments (completed by M1-14): header and kind only.
+ * Generic place for the kinds without a screen of their own, such as attachments: header and kind only.
  */
 export function GenericElementView({
   projectId,

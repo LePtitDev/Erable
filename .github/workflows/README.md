@@ -1,23 +1,23 @@
 # CI
 
-| Workflow | Déclencheur | Contenu |
+| Workflow | Trigger | Content |
 |---|---|---|
-| `pr.yml` | chaque push de branche (pas les tags), chaque pull request, manuel (`workflow_dispatch`) | voir ci-dessous |
-| `release.yml` | tag `vX.Y.Z` ou `X.Y.Z` (poussé, ou créé par une release GitHub), manuel (construction seule, ou rattrapage d'une release avec *attach*) | installeurs Velopack x4 et erable-cli, image Docker + scan, publication (docs/release.md) ; aucun test : le commit tagué est déjà passé par `pr.yml` |
-| `nightly.yml` | chaque nuit, manuel | e2e complet 3 navigateurs + a11y, visuel (conteneur fixe), budgets et benchmarks, fumée desktop 3 OS ; quarantaine |
-| `nightly-robustness.yml` | chaque nuit | crash tests (100 arrêts) et charge NBomber |
-| `weekly-quality.yml` | dimanche | Stryker.NET, StrykerJS, fuzzing C# et TS (10 min chacun) |
-| `nightly-issue.yml` | échec d'un workflow planifié | ouvre (ou complète) une issue `ci-failure` |
+| `pr.yml` | every branch push (not tags), every pull request, manual (`workflow_dispatch`) | see below |
+| `release.yml` | `vX.Y.Z` or `X.Y.Z` tag (pushed, or created by a GitHub release), manual (build only, or catch-up of a release with *attach*) | 4 Velopack installers and erable-cli, Docker image + scan, publication (docs/release.md); no tests: the tagged commit has already gone through `pr.yml` |
+| `nightly.yml` | every night, manual | full e2e on 3 browsers + a11y, visual (fixed container), budgets and benchmarks, desktop smoke test on 3 OSes; quarantine |
+| `nightly-robustness.yml` | every night | crash tests (100 kills) and NBomber load |
+| `weekly-quality.yml` | Sunday | Stryker.NET, StrykerJS, C# and TS fuzzing (10 min each) |
+| `nightly-issue.yml` | failure of a scheduled workflow | opens (or adds to) a `ci-failure` issue |
 
-`pr.yml` (cible < 12 min, docs/testing.md §13), quatre jobs en parallèle :
+`pr.yml` (target < 12 min, docs/testing.md §13), jobs in parallel:
 
-1. **Workflow lint** — `actionlint` sur `.github/workflows/`.
-2. **Checks** (Linux, Debug) — `dotnet format --verify-no-changes`, build (analyseurs, avertissements = erreurs), tests .NET (Core, Storage, API) ; `typecheck`, `lint` (ESLint + stylelint), `format:check`, Vitest, contrat API (`api:check`), build de la SPA + budget du bundle (500 Ko gzip), traçabilité E2E.
-3. **Unit** (Windows, Linux, macOS, Release) — build et tests .NET en Release (prouve l'absence de `/_test`), Vitest.
-4. **E2E** (Linux) — Playwright Chromium + WebKit, tests `@pr`, contre le vrai backend.
-5. **Desktop** (win-x64, linux-x64, osx-arm64, osx-x64) — publication autonome + archive (artefact `erable-desktop-<rid>`), puis fumée sur le binaire publié : Playwright via CDP + `--self-test` sous Windows, `--self-test` sous Linux (`xvfb`) et macOS arm64 ; vérifie qu'aucun processus ne subsiste. `osx-x64` est publié sans fumée.
+1. **Workflow lint** — `actionlint` on `.github/workflows/`.
+2. **Checks** (Linux, Debug) — `dotnet format --verify-no-changes`, build (analyzers, warnings = errors), .NET tests (Core, Storage, API); `typecheck`, `lint` (ESLint + stylelint), `format:check`, Vitest, API contract (`api:check`), SPA build + bundle budget (500 KB gzip), E2E traceability.
+3. **Unit** (Windows, Linux, macOS, Release) — .NET build and tests in Release (proves that `/_test` is absent), Vitest.
+4. **E2E** (Linux) — Playwright Chromium + WebKit, `@pr` tests, against the real backend.
+5. **Desktop** (win-x64, linux-x64, osx-arm64, osx-x64) — self-contained publication + archive (`erable-desktop-<rid>` artifact), then a smoke test on the published binary: Playwright through CDP + `--self-test` on Windows, `--self-test` on Linux (`xvfb`) and macOS arm64; checks that no process remains. `osx-x64` is published without a smoke test.
 
-Artefacts : rapports TRX de chaque job ; rapport et traces Playwright en cas d'échec (14 jours).
-Les actions tierces sont épinglées par SHA (tag en commentaire).
+Artifacts: TRX reports of each job; Playwright report and traces on failure (14 days).
+Third-party actions are pinned by SHA (tag in a comment).
 
-Déclencher sur une branche de test : `git push -u origin <branche>`, ou onglet *Actions* → *PR* → *Run workflow*.
+To run on a test branch: `git push -u origin <branch>`, or the *Actions* tab → *PR* → *Run workflow*.

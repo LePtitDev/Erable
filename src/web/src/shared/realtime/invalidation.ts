@@ -3,7 +3,7 @@ import type { ElementId } from "../ids/elementId";
 import { queryKeys } from "../api/keys";
 
 /**
- * What an event of the server makes stale in the query cache (M4-03). Queries are keyed under
+ * What an event of the server makes stale in the query cache. Queries are keyed under
  * `["projects", projectId, …]` (see {@link queryKeys}); only the ones on screen refetch, so over-invalidating costs
  * a few requests, never a lost edit.
  */
@@ -20,7 +20,7 @@ function isTree(key: QueryKey): boolean {
 /**
  * An element changed: everything that may show it refreshes — except the tree, whose names and shape did not move,
  * and except the element the user is editing: the editor keeps its draft, and the conflict (if any) is settled when
- * it saves (M4-05).
+ * it saves.
  */
 export function invalidateElementChanged(
   client: QueryClient,

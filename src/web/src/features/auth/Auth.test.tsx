@@ -49,7 +49,7 @@ function mockServer(signedIn: { current: boolean }) {
   );
 }
 
-describe("AuthGate (M4-01)", () => {
+describe("AuthGate", () => {
   it("shows the login screen when the server answers 401", async () => {
     mockServer({ current: false });
 

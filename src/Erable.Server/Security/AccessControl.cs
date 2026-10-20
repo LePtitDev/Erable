@@ -34,7 +34,7 @@ public enum Access
 
 /// <summary>
 /// The declared access rule of an endpoint, as endpoint metadata. <see cref="AccessControlMiddleware"/> enforces it and
-/// the authorization matrix test (M4-02) reads it: an endpoint without one fails closed and fails the suite.
+/// the authorization matrix test reads it: an endpoint without one fails closed and fails the suite.
 /// </summary>
 public sealed record AccessRule(Access Level)
 {

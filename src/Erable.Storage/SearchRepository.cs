@@ -29,7 +29,7 @@ public sealed record SearchHit(
 public sealed record SearchResults(IReadOnlyList<SearchHit> Hits, int Total, IReadOnlyDictionary<ElementKind, int> Facets, int? NextOffset);
 
 /// <summary>
-/// SQL of the search (schema v4, M3-01): the full-text index <c>search_fts</c>, the structured filters on elements,
+/// SQL of the search (schema v4): the full-text index <c>search_fts</c>, the structured filters on elements,
 /// categories and resolved values, the type facets and the passages to highlight. Every value of the request is a bound
 /// parameter; the words typed by the user only reach FTS5 through <see cref="FullTextExpression"/>.
 /// </summary>

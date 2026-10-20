@@ -4,7 +4,7 @@ using Erable.Testing;
 namespace Erable.Benchmarks;
 
 /// <summary>
-/// Performance tooling (M3-06, docs/testing.md §11). Run in Release:
+/// Performance tooling (docs/testing.md §11). Run in Release:
 /// <c>dotnet run -c Release --project tests/Erable.Benchmarks -- &lt;command&gt;</c>.
 /// </summary>
 internal static class Program

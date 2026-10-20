@@ -11,7 +11,7 @@ public sealed record LinkTypeRecord(ElementId Id, string Description, string? In
 /// <summary>A link between two pages.</summary>
 public sealed record LinkRecord(ElementId Id, ElementId SourceId, ElementId LinkTypeId, ElementId TargetId, DateTimeOffset CreatedAt, string CreatedBy);
 
-/// <summary>SQL of link types and links (schema v2, M2-07). Same conventions as <see cref="StructureRepository"/>.</summary>
+/// <summary>SQL of link types and links (schema v2). Same conventions as <see cref="StructureRepository"/>.</summary>
 public static class LinkRepository
 {
     public static IReadOnlyList<LinkTypeRecord> LoadTypes(SqliteConnection connection) =>

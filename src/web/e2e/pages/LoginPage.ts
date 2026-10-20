@@ -1,7 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 import { t } from "../support/i18n";
 
-/** The login screen of a server (M4-01, F14) and the avatar menu that ends the session. */
+/** The login screen of a server (F14) and the avatar menu that ends the session. */
 export class LoginPage {
   readonly form: Locator;
   readonly login: Locator;

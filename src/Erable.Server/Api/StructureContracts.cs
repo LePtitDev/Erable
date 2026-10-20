@@ -4,7 +4,7 @@ using Erable.Storage;
 
 namespace Erable.Server.Api;
 
-// Categories, property definitions and values (M2-03). Values and rules are untagged JSON whose shape depends on the
+// Categories, property definitions and values. Values and rules are untagged JSON whose shape depends on the
 // property type (docs/architecture.md §5.4): the SPA reads them with src/shared/properties.
 
 /// <summary>A category by ID and name.</summary>

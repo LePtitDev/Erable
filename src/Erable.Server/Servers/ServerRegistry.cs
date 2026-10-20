@@ -8,7 +8,7 @@ namespace Erable.Server.Servers;
 /// <summary>A server the desktop application connected to (F01.R2: the recent servers live in the user profile).</summary>
 /// <param name="Id">16 hexadecimal characters derived from the address: connecting twice to a server updates one entry.</param>
 /// <param name="Url">Origin of the server (<c>https://wiki.example.org</c>).</param>
-/// <param name="ProjectIds">The projects the server listed last: requests for them go to the server (M4-07).</param>
+/// <param name="ProjectIds">The projects the server listed last: requests for them go to the server.</param>
 public sealed record SavedServer(
     string Id, string Url, string Name, string? UserId, string? UserName, DateTimeOffset LastUsedAt, IReadOnlyList<ElementId> ProjectIds);
 

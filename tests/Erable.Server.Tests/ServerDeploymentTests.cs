@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Erable.Server.Tests;
 
-/// <summary>Running a server for others (M4-06): quotas, cross-origin calls, a reverse proxy, a shared project, the health check.</summary>
+/// <summary>Running a server for others: quotas, cross-origin calls, a reverse proxy, a shared project, the health check.</summary>
 public sealed class ServerDeploymentTests
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

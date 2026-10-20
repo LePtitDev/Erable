@@ -8,7 +8,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Storage.Tests;
 
-/// <summary>Revision history: list, comparison, restoration (M3-05, F13).</summary>
+/// <summary>Revision history: list, comparison, restoration (F13).</summary>
 public sealed class HistoryStorageTests : IDisposable
 {
     private readonly TempDirectory _dir = TempDirectory.Create();

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Storage.Tests;
 
-/// <summary>Recently viewed and edited elements (M3-04, F11).</summary>
+/// <summary>Recently viewed and edited elements (F11).</summary>
 public sealed class RecentStorageTests : IDisposable
 {
     private readonly TempDirectory _dir = TempDirectory.Create();

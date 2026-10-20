@@ -1,0 +1,52 @@
+name: Bug report
+description: Something does not work as described in the documentation.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Security problems are not reported here: see SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Erable version
+      description: Shown in Help (desktop) or by /api/info (server).
+      placeholder: 1.2.1
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - Desktop (local project)
+        - Desktop connected to a server
+        - Server in a browser
+        - Mobile browser
+        - Android application
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and browser
+      placeholder: Windows 11, WebView2 / Ubuntu 24.04, Firefox 140
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the page …
+        2. Click …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, screenshots, output of `erable doctor`

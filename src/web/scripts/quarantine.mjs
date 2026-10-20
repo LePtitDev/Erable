@@ -1,4 +1,4 @@
-// Quarantine of unstable tests (docs/testing.md §1 and §13, M5-04).
+// Quarantine of unstable tests (docs/testing.md §1 and §13).
 //
 // A flaky test is never "re-run until green": it is tagged `@quarantine` in its title (Playwright) so that it leaves the
 // blocking pipelines (it still runs apart, `pnpm e2e:quarantine`), and registered in spec/quarantine.json:

@@ -170,7 +170,7 @@ public static class ProjectStore
     /// project is migrated only when <paramref name="migrate"/> says the user confirmed (otherwise the answer is
     /// <see cref="StorageErrors.MigrationRequired"/>, nothing touched): a consistent backup of the database comes first
     /// (<c>erable.db.bak-…</c>), then the migrations, then the doctor; if anything fails the backup is put back and the
-    /// project is exactly as it was (F01.R3, M2-09).
+    /// project is exactly as it was (F01.R3).
     /// </summary>
     /// <param name="onMigrationStep">Called with each schema version reached during a migration (test seam for failures).</param>
     public static Result<OpenedProject> Open(string folder, TimeProvider clock, bool migrate = true, Action<int>? onMigrationStep = null)

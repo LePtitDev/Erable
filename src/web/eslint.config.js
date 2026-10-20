@@ -34,7 +34,7 @@ export default tseslint.config(
     },
   },
   {
-    // No hard-coded UI text in JSX: everything goes through i18n (CLAUDE.md §6.8).
+    // No hard-coded UI text in JSX: everything goes through i18n (CONTRIBUTING.md, invariant 8).
     files: ["src/**/*.tsx"],
     ignores: ["src/**/*.test.tsx", "src/test/**", "src/dev/**"],
     plugins: { i18next },

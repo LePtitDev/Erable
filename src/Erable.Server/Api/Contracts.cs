@@ -7,7 +7,7 @@ using Erable.Storage;
 namespace Erable.Server.Api;
 
 // Request and response bodies of /api/v1. They are the API contract: the TypeScript client is generated from them
-// (CLAUDE.md §6.9). Element IDs are always strings in JSON (ElementIdJsonConverter).
+// (CONTRIBUTING.md, invariant 9). Element IDs are always strings in JSON (ElementIdJsonConverter).
 
 /// <summary>An open project, with the role of the caller in it.</summary>
 public sealed record ProjectSummary(
@@ -16,7 +16,7 @@ public sealed record ProjectSummary(
 /// <param name="Folder">Where to create the project; omitted on a server, which hosts it under its own data folder.</param>
 public sealed record CreateProjectRequest(string? Folder, string Name, string ContentLanguage);
 
-/// <param name="ConfirmMigration">The user accepted the migration of an older project (F01.R3, M2-09).</param>
+/// <param name="ConfirmMigration">The user accepted the migration of an older project (F01.R3).</param>
 public sealed record OpenProjectRequest(string Folder, bool ConfirmMigration = false);
 
 public sealed record InspectFolderRequest(string Folder);
@@ -94,7 +94,7 @@ public sealed record PageContent(string Markdown, long Revision);
 
 /// <summary>
 /// The Markdown of a page; when given, its categories and every value it defines (full replacement), saved in the
-/// same revision (M2-06).
+/// same revision.
 /// </summary>
 public sealed record SavePageContentRequest(string Markdown, IReadOnlyList<ElementId>? Categories = null, IReadOnlyList<PagePropertyValue>? Properties = null);
 
@@ -102,7 +102,7 @@ public sealed record SavePageContentRequest(string Markdown, IReadOnlyList<Eleme
 public sealed record AuthorItem(string Id, string Name);
 
 /// <summary>
-/// A save that arrived after another one and was merged with it (M4-05): the page as it is now, which the editor shows
+/// A save that arrived after another one and was merged with it: the page as it is now, which the editor shows
 /// instead of what it sent, and whom it was merged with (« Fusionné avec les modifications de Camille R. »).
 /// </summary>
 /// <param name="Categories">Null when the save carried no categories.</param>

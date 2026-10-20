@@ -1,26 +1,26 @@
-# Captures de référence (M5-02)
+# Reference snapshots
 
-Une capture par écran du mockup × thème (clair, sombre) × langue (`fr`, `en`, `xx` = pseudo-locale) :
-`<écran>-<thème>-<langue>.png`, produites par `e2e/specs/f17-visual.spec.ts` (projet Playwright `visual`).
+One snapshot per main screen × theme (light, dark) × language (`fr`, `en`, `xx` = pseudo-locale):
+`<screen>-<theme>-<language>.png`, produced by `e2e/specs/f17-visual.spec.ts` (Playwright project `visual`).
 
-Le rendu dépend du système (polices, anticrénelage) : les références sont **uniquement** produites et comparées
-dans le conteneur fixe `e2e/visual/Dockerfile` (Playwright 1.64, Ubuntu, SDK .NET). Polices embarquées dans le bundle,
-animations coupées, horloge du navigateur et du serveur figées.
+Rendering depends on the system (fonts, anti-aliasing): the references are **only** produced and compared
+in the fixed container `e2e/visual/Dockerfile` (Playwright 1.64, Ubuntu, .NET SDK). Fonts embedded in the bundle,
+animations off, browser and server clocks frozen.
 
-## Comparer
+## Compare
 
 ```bash
 pnpm -C src/web e2e:visual:docker
 ```
 
-## Mettre à jour les références (changement d'interface voulu)
+## Update the references (intended interface change)
 
 ```bash
 pnpm -C src/web e2e:visual:docker -- --update
 ```
 
-Relire **chaque** image modifiée (`git diff --stat` puis ouvrir les PNG) avant de commiter : une capture mise à jour sans
-relecture n'est plus une référence. Un débordement visible dans la capture `xx` est un défaut de mise en page à
-corriger, pas une référence à accepter.
+Review **each** changed image (`git diff --stat`, then open the PNG files) before committing: a snapshot updated without
+review is no longer a reference. An overflow visible in the `xx` snapshot is a layout defect to fix, not a reference to
+accept.
 
-Sans Docker : `pnpm -C src/web e2e:visual` s'exécute, mais les différences de rendu locales sont attendues.
+Without Docker: `pnpm -C src/web e2e:visual` runs, but local rendering differences are expected.

@@ -9,7 +9,7 @@ namespace Erable.Storage;
 public sealed record TrashedElement(
     ElementId Id, ElementKind Kind, ElementId ParentId, string Name, ElementId DeletedRoot, DateTimeOffset DeletedAt, string DeletedBy, bool Orphan);
 
-/// <summary>SQL of the trash (schema v3, M2-08): who deleted what, as which deletion, and permanent removal.</summary>
+/// <summary>SQL of the trash (schema v3): who deleted what, as which deletion, and permanent removal.</summary>
 public static class TrashRepository
 {
     /// <summary>Every element of the trash, one row each.</summary>

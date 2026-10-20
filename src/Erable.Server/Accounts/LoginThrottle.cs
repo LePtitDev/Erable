@@ -4,7 +4,7 @@ using Erable.Server.Hosting;
 namespace Erable.Server.Accounts;
 
 /// <summary>
-/// Brute-force protection of the login (M4-01): failures are counted over a sliding window. A login name tried from
+/// Brute-force protection of the login: failures are counted over a sliding window. A login name tried from
 /// one address, and one address whatever the login, are blocked beyond their limit (429 whatever the password). A
 /// login name alone is never blocked, otherwise anyone knowing it could lock its owner out: once it has failed too
 /// often from all addresses together, each attempt only waits a growing, capped delay.

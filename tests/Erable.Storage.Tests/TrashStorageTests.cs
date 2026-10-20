@@ -7,7 +7,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Storage.Tests;
 
-/// <summary>Deleting, the trash, restoring and emptying, on the reference project (M2-08, F12).</summary>
+/// <summary>Deleting, the trash, restoring and emptying, on the reference project (F12).</summary>
 public sealed class TrashStorageTests : IDisposable
 {
     private readonly TempDirectory _dir = TempDirectory.Create();

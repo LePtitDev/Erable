@@ -1,100 +1,99 @@
-# Erable — Syntaxe Markdown étendue
+# Erable — Extended Markdown syntax
 
-> Statut : **validé avec M1-04** · Version 1.0 · 14 octobre 2026
-> Complète `docs/architecture.md` §6. Spécification exécutable : `spec/fixtures/markdown/*.json`, lancée par xUnit (`Erable.Core.Tests`) **et** Vitest (`src/web`). Une règle de ce document sans cas de fixture n'est pas une règle.
+> Complements `docs/architecture.md` §6. Executable specification: `spec/fixtures/markdown/*.json`, run by xUnit (`Erable.Core.Tests`) **and** Vitest (`src/web`). A rule of this document without a fixture case is not a rule.
 
-Le backend (Markdig) **extrait** les références, les titres et le texte brut ; le frontend (micromark / remark) **rend** la page. Les deux implémentations suivent cette grammaire et sont vérifiées sur les mêmes cas.
+The backend (Markdig) **extracts** references, headings and plain text; the frontend (micromark / remark) **renders** the page. Both implementations follow this grammar and are checked against the same cases.
 
 ---
 
-## 1. Base
+## 1. Basis
 
-- **CommonMark 0.31 + GFM** : tableaux, listes de tâches, barré (`~~`), autoliens étendus (`www.…`, `https://…`), notes de bas de page.
-- **HTML brut désactivé** (§A-9, F04.R5) : `<img src=x onerror=…>` n'est pas une balise mais du texte, affiché échappé. Les autoliens `<https://…>` restent des liens.
-- Les extensions ci-dessous sont des constructions **en ligne** (*inline*) : elles sont reconnues partout où CommonMark analyse du texte en ligne (paragraphes, titres, listes, citations, cellules de tableau, texte d'un lien) et **nulle part ailleurs** : ni dans un code en ligne, ni dans un bloc de code (indenté ou délimité), ni dans une destination de lien.
+- **CommonMark 0.31 + GFM**: tables, task lists, strikethrough (`~~`), extended autolinks (`www.…`, `https://…`), footnotes.
+- **Raw HTML disabled** (§A-9, F04.R5): `<img src=x onerror=…>` is not a tag but text, shown escaped. `<https://…>` autolinks remain links.
+- The extensions below are **inline** constructs: they are recognized wherever CommonMark parses inline text (paragraphs, headings, lists, block quotes, table cells, link text) and **nowhere else**: not in inline code, not in a code block (indented or fenced), not in a link destination.
 
-## 2. Grammaire
+## 2. Grammar
 
 ```abnf
 reference   = "[[" id [ "#" anchor ] [ separator label ] "]]"
 embed       = "![[" id [ separator label ] "]]" [ attributes ]
-separator   = "|" / "\|"                    ; "\|" obligatoire dans un tableau (R12)
+separator   = "|" / "\|"                    ; "\|" required in a table (R12)
 
-id          = 16HEXDIG                      ; insensible à la casse, différent de 0000000000000000
+id          = 16HEXDIG                      ; case-insensitive, other than 0000000000000000
 anchor      = 1*( ALPHA / DIGIT / "-" / "_" )
-label       = 0*200( any character except line ending ) ; s'arrête au premier "]]"
-attributes  = "{" attribute *( 1*SP attribute ) "}" ; 64 caractères au plus entre les accolades
+label       = 0*200( any character except line ending ) ; stops at the first "]]"
+attributes  = "{" attribute *( 1*SP attribute ) "}" ; at most 64 characters between the braces
 attribute   = "width=" width / "align=" align
-width       = 1*4DIGIT                      ; entier de 1 à 4096, sans zéro en tête
+width       = 1*4DIGIT                      ; integer from 1 to 4096, without a leading zero
 align       = "left" / "center" / "right"
 ```
 
-### 2.1 Règles
+### 2.1 Rules
 
-| # | Règle | Exemple |
+| # | Rule | Example |
 |---|---|---|
-| R1 | L'ID fait **exactement** 16 caractères hexadécimaux, dans n'importe quelle casse. 15 ou 17 caractères, un caractère non hexadécimal ou l'ID nul : **pas** une référence, le texte reste tel quel. | `[[3F2A9C14E07B5D2]]` → texte |
-| R2 | Le **libellé** commence après le premier `\|` et s'arrête au **premier** `]]`. Il peut contenir `\|`, `#`, `[` ou un `]` isolé. Ses espaces de début et de fin sont retirés ; un libellé vide équivaut à l'absence de libellé. Pas de saut de ligne. | `[[ID\|a \| b]]` → libellé `a \| b` |
-| R3 | L'**ancre** suit `#` et précède `\|` ou `]]` ; elle n'admet que lettres ASCII, chiffres, `-` et `_`. Sinon, pas de référence. | `[[ID#les-annees]]` |
-| R4 | Une **intégration** (`![[…]]`) n'a pas d'ancre : `![[ID#x]]` n'est ni une intégration ni une référence, il reste du texte (CommonMark y voit une image sans destination). | |
-| R5 | Les **attributs** ne s'appliquent qu'à une intégration, collés à `]]`. Clés connues seulement (`width`, `align`), chacune au plus une fois, séparées par des espaces. Un bloc d'attributs invalide n'est pas consommé : il reste du texte. | `![[ID]]{width=320 align=right}` |
-| R6 | **Échappement** : `\[[ID]]` n'est pas une référence (le premier `[` est échappé). Il n'existe pas d'autre échappement à l'intérieur d'une référence. | |
-| R7 | **Code** : rien n'est reconnu dans un code en ligne ni dans un bloc de code. | `` `[[ID]]` `` → code |
-| R8 | **Liens imbriqués** : une référence dans le texte d'un lien Markdown est extraite (elle compte dans les liens entrants) ; au rendu, elle n'est pas cliquable séparément (pas de lien dans un lien). `[[ID]](https://x)` est une référence suivie du texte `(https://x)`. | `[voir [[ID]]](https://x)` |
-| R9 | **Crochets** : `[[[ID]]]` donne `[`, la référence, puis `]`. | |
-| R10 | **Position** : `start` est l'index (en unités UTF-16, identique en C# et en JavaScript) du premier caractère (`[` ou `!`) ; `end` est l'index qui suit le dernier caractère consommé, attributs compris. | |
-| R11 | **Longueurs bornées** : un libellé de plus de 200 caractères (avant rognage) ou un bloc d'attributs de plus de 64 caractères n'est pas reconnu. Cette borne garantit un temps d'analyse linéaire même sur une ligne hostile (`[[ID\|[[ID\|…` sans fin). | |
-| R12 | **Tableaux** : dans une ligne de tableau GFM, une barre verticale non échappée sépare les cellules **avant** toute analyse en ligne : une référence à libellé écrite avec une barre nue y est coupée en deux cellules et n'est pas une référence. On y écrit le séparateur `\|` précédé d'une barre oblique inverse. Partout, cette forme échappée est acceptée comme séparateur, et une barre échappée à l'intérieur d'un libellé vaut une barre simple. | voir `refs.json` › *table* |
+| R1 | The ID is **exactly** 16 hexadecimal characters, in any case. 15 or 17 characters, a non-hexadecimal character or the null ID: **not** a reference, the text stays as it is. | `[[3F2A9C14E07B5D2]]` → text |
+| R2 | The **label** starts after the first `\|` and stops at the **first** `]]`. It may contain `\|`, `#`, `[` or a lone `]`. Its leading and trailing spaces are trimmed; an empty label is the same as no label. No line break. | `[[ID\|a \| b]]` → label `a \| b` |
+| R3 | The **anchor** follows `#` and precedes `\|` or `]]`; it only allows ASCII letters, digits, `-` and `_`. Otherwise, no reference. | `[[ID#early-years]]` |
+| R4 | An **embed** (`![[…]]`) has no anchor: `![[ID#x]]` is neither an embed nor a reference, it stays text (CommonMark sees an image without a destination). | |
+| R5 | **Attributes** only apply to an embed, right after `]]`. Known keys only (`width`, `align`), each at most once, separated by spaces. An invalid attribute block is not consumed: it stays text. | `![[ID]]{width=320 align=right}` |
+| R6 | **Escaping**: `\[[ID]]` is not a reference (the first `[` is escaped). There is no other escape inside a reference. | |
+| R7 | **Code**: nothing is recognized in inline code or in a code block. | `` `[[ID]]` `` → code |
+| R8 | **Nested links**: a reference in the text of a Markdown link is extracted (it counts in the incoming links); when rendered, it is not separately clickable (no link inside a link). `[[ID]](https://x)` is a reference followed by the text `(https://x)`. | `[see [[ID]]](https://x)` |
+| R9 | **Brackets**: `[[[ID]]]` gives `[`, the reference, then `]`. | |
+| R10 | **Position**: `start` is the index (in UTF-16 units, the same in C# and JavaScript) of the first character (`[` or `!`); `end` is the index after the last consumed character, attributes included. | |
+| R11 | **Bounded lengths**: a label longer than 200 characters (before trimming) or an attribute block longer than 64 characters is not recognized. This bound guarantees linear parsing time even on a hostile line (`[[ID\|[[ID\|…` without end). | |
+| R12 | **Tables**: in a GFM table row, an unescaped vertical bar separates cells **before** any inline parsing: a labelled reference written with a bare bar is cut into two cells there and is not a reference. The separator is written `\|`, preceded by a backslash. Everywhere, this escaped form is accepted as a separator, and an escaped bar inside a label stands for a plain bar. | see `refs.json` › *table* |
 
-### 2.2 Texte brut d'une référence
+### 2.2 Plain text of a reference
 
-Pour le texte brut (recherche plein texte) et le calcul des ancres de titres, une référence vaut **son libellé**, ou rien sans libellé : le nom de la cible peut changer, il ne doit pas modifier le texte indexé de la page qui la cite ni les ancres de ses titres.
+For plain text (full-text search) and the computation of heading anchors, a reference stands for **its label**, or nothing without a label: the name of the target may change, and it must not alter the indexed text of the page that cites it nor the anchors of its headings.
 
-## 3. Titres et ancres
+## 3. Headings and anchors
 
-- Chaque titre reçoit une ancre. Par défaut c'est le **slug** de son texte brut.
-- **Ancre explicite** : un titre qui se termine par ` {#ancre}` (espace, puis `{#`, une ancre au sens de R3, puis `}`) prend cette ancre, et ce suffixe est retiré du texte affiché. `## Histoire {#histoire}`.
-- **Doublons** dans une page : la deuxième occurrence d'une ancre reçoit `-1`, la troisième `-2`, etc. (comme GitHub). Les ancres explicites participent au comptage.
+- Every heading gets an anchor. By default it is the **slug** of its plain text.
+- **Explicit anchor**: a heading that ends with ` {#anchor}` (a space, then `{#`, an anchor as in R3, then `}`) takes that anchor, and the suffix is removed from the displayed text. `## History {#history}`.
+- **Duplicates** in a page: the second occurrence of an anchor gets `-1`, the third `-2`, etc. (like GitHub). Explicit anchors take part in the count.
 
 ### 3.1 Slug
 
-1. Remplacer les ligatures et lettres sans décomposition : `œ→oe`, `æ→ae`, `ß→ss`, `ø→o`, `đ→d`, `ł→l` (majuscules comprises) ;
-2. décomposer en NFD et retirer les signes diacritiques (catégorie Unicode `Mn`) ;
-3. passer en minuscules (invariant) ;
-4. remplacer chaque suite de caractères hors `[a-z0-9]` par un seul `-` ;
-5. retirer les `-` de début et de fin ; un résultat vide devient `section`.
+1. Replace ligatures and letters without decomposition: `œ→oe`, `æ→ae`, `ß→ss`, `ø→o`, `đ→d`, `ł→l` (upper case included);
+2. decompose to NFD and remove diacritical marks (Unicode category `Mn`);
+3. convert to lower case (invariant);
+4. replace each run of characters outside `[a-z0-9]` with a single `-`;
+5. remove leading and trailing `-`; an empty result becomes `section`.
 
-« Les années de cartographe » → `les-annees-de-cartographe`.
+"Les années de cartographe" → `les-annees-de-cartographe`.
 
-## 4. Texte brut
+## 4. Plain text
 
-Utilisé pour l'index plein texte (M3) et comparé entre les deux implémentations après **normalisation** : toute suite d'espaces (dont les sauts de ligne) devient une espace, puis le tout est rogné.
+Used for the full-text index and compared between the two implementations after **normalization**: every run of whitespace (line breaks included) becomes one space, then the whole is trimmed.
 
-- Texte de tous les blocs, y compris les blocs de code et le code en ligne ;
-- références : §2.2 ; intégrations : leur libellé ;
-- liens et images : leur texte (pas l'URL) ; autoliens : l'URL ;
-- cellules de tableau séparées par des espaces ; case à cocher d'une tâche ignorée ;
-- le suffixe `{#ancre}` d'un titre est exclu.
+- Text of every block, code blocks and inline code included;
+- references: §2.2; embeds: their label;
+- links and images: their text (not the URL); autolinks: the URL;
+- table cells separated by spaces; the checkbox of a task is ignored;
+- the `{#anchor}` suffix of a heading is excluded.
 
-## 5. Ce qui n'est pas prévu
+## 5. Out of scope
 
-- Pas de référence dans les attributs, les destinations de lien ni les définitions de référence (`[x]: url`).
-- Pas d'intégration de section (`![[ID#ancre]]`).
-- Pas d'autre attribut que `width` et `align` ; tout ajout passe par ce document, puis par les fixtures.
+- No reference in attributes, link destinations or reference definitions (`[x]: url`).
+- No section embed (`![[ID#anchor]]`).
+- No attribute other than `width` and `align`; any addition goes through this document, then through the fixtures.
 
-## 6. Limites de sécurité
+## 6. Safety limits
 
-Les analyseurs (Markdig côté serveur, remark/micromark côté navigateur) ont un temps **quadratique**, voire un dépassement de pile, sur quelques dizaines de Ko d'entrée dégénérée : `]` répété 40 000 fois fige le navigateur près de 40 s, `> ` répété 8 000 fois lève une `RangeError`. Un même éditeur pourrait ainsi figer ses collègues ou saturer le serveur. Un pré-balayage **linéaire** refuse ces formes avant tout analyseur, au serveur (`MarkdownLimits`, erreur 422, rien n'est écrit) et dans le client (message avant l'envoi). Une page réelle n'approche aucune de ces valeurs.
+The parsers (Markdig on the server, remark/micromark in the browser) take **quadratic** time, or even overflow the stack, on a few dozen KB of degenerate input: `]` repeated 40,000 times freezes the browser for about 40 s, `> ` repeated 8,000 times throws a `RangeError`. A single editor could thus freeze their colleagues or saturate the server. A **linear** pre-scan rejects these shapes before any parser, on the server (`MarkdownLimits`, error 422, nothing is written) and in the client (message before sending). A real page comes nowhere near these values.
 
-| Règle | Limite | Code d'erreur |
+| Rule | Limit | Error code |
 |---|---|---|
-| Taille de la page | 1 048 576 unités UTF-16 (≈ 1 Mo) | `page.content.tooLarge` |
-| Longueur d'une ligne | 10 000 caractères | `page.content.lineTooLong` |
-| Répétition de `[` `]` `(` `)` `>` | 256 d'affilée | `page.content.repeatedCharacter` |
-| Marqueurs de citation et de liste en début de ligne (`> > 1. - `) | 32 ; indentation : 256 espaces ou tabulations | `page.content.tooNested` |
-| Lignes consécutives sans ligne vide | 2 000 | `page.content.paragraphTooLong` |
+| Page size | 1,048,576 UTF-16 units (≈ 1 MB) | `page.content.tooLarge` |
+| Line length | 10,000 characters | `page.content.lineTooLong` |
+| Repetition of `[` `]` `(` `)` `>` | 256 in a row | `page.content.repeatedCharacter` |
+| Block quote and list markers at the start of a line (`> > 1. - `) | 32; indentation: 256 spaces or tabs | `page.content.tooNested` |
+| Consecutive lines without an empty line | 2,000 | `page.content.paragraphTooLong` |
 
-- La première règle enfreinte, dans l'ordre du document, est signalée avec sa ligne (1 ; 0 pour la taille). `\r\n` et `\n` sont équivalents.
-- Ces limites **bloquent** l'enregistrement, contrairement aux règles de propriétés qui avertissent (§A-5.4) : ce sont des garde-fous, pas des règles métier.
-- Une page déjà enregistrée qui les dépasse (importée, ou écrite avant leur existence) reste lisible : elle est affichée en **texte brut**, sans mise en forme ni sommaire, et le serveur l'indexe comme texte.
-- Cas partagés : `spec/fixtures/limits/limits.json` (`md` + `unit` répété `count` fois), exécutés par xUnit et Vitest.
+- The first rule broken, in the order of this document, is reported with its line (1-based; 0 for the size). `\r\n` and `\n` are equivalent.
+- These limits **block** saving, unlike property rules, which warn (§A-5.4): they are safeguards, not business rules.
+- A page already saved that exceeds them (imported, or written before they existed) stays readable: it is shown as **plain text**, without formatting or table of contents, and the server indexes it as text.
+- Shared cases: `spec/fixtures/limits/limits.json` (`md` + `unit` repeated `count` times), run by xUnit and Vitest.

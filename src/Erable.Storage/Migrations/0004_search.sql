@@ -1,4 +1,4 @@
--- Schema v4 (M3-01): the full-text index search_fts (declared empty since v1) is kept up to date by the database itself
+-- Schema v4: the full-text index search_fts (declared empty since v1) is kept up to date by the database itself
 -- (docs/architecture.md §7.4, F10). Same conventions as 0001_initial.sql.
 --
 -- search_source is the single definition of what is searchable: every live element but the roots, with its name and its

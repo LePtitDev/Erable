@@ -103,7 +103,7 @@ export function mockProject(
     uiState?: Record<string, unknown>;
     attachments?: MockAttachment[];
     deleted?: ElementId[];
-    /** Categories and resolved properties returned with every page view (M2-06). */
+    /** Categories and resolved properties returned with every page view. */
     structure?: { categories: PageView["categories"]; properties: PageView["properties"] };
   } = {},
 ) {

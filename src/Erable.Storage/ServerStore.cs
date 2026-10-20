@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Erable.Storage;
 
-/// <summary>A server account (M4-01). The login is also the author name stored in projects.</summary>
+/// <summary>A server account. The login is also the author name stored in projects.</summary>
 /// <param name="Id">Normalized login, see <see cref="AccountRules.NormalizeLogin"/>.</param>
 /// <param name="DisplayName">Name shown to other users.</param>
 /// <param name="PasswordHash">ASP.NET Core Identity password hash; never leaves the server.</param>
@@ -24,7 +24,7 @@ public sealed record ProjectRegistration(ElementId ProjectId, string Folder, Dat
 /// <summary>A member of a project, with the name to show.</summary>
 public sealed record MemberInfo(string UserId, string DisplayName, ProjectRole Role, bool Disabled);
 
-/// <summary>What a change of the members of a project came to (M4-08).</summary>
+/// <summary>What a change of the members of a project came to.</summary>
 public enum MemberChange
 {
     Done,

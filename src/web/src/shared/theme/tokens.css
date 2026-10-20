@@ -1,6 +1,6 @@
 /*
  * Design tokens: the only place where literal colors are allowed (enforced by stylelint).
- * Source: mockups/Erable — Wiki local.html (`theme(dark)` of each screen), consolidated in tasks/M0-05.
+ * Source: the original design mockup (`theme(dark)` of each screen), consolidated into tokens.
  *
  * Themes: `:root` is light; `data-theme="dark"` forces dark; `data-theme="system"` follows the OS live.
  * The dark block is written twice (forced and system); tokens.test.ts checks both copies are identical.

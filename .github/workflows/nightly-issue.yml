@@ -1,4 +1,4 @@
-# Opens (or completes) an issue when a nightly or weekly workflow fails (M5-04, docs/testing.md §13).
+# Opens (or completes) an issue when a nightly or weekly workflow fails (docs/testing.md §13).
 # Runs from the default branch with the permissions it declares; it reads nothing from the failed run but its metadata.
 name: Nightly failure issue
 

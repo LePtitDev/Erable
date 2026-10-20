@@ -11,7 +11,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Storage.Tests;
 
-/// <summary>Categories, definitions, values and derived tables on the reference project (M2-03).</summary>
+/// <summary>Categories, definitions, values and derived tables on the reference project.</summary>
 public sealed class StructureStorageTests : IDisposable
 {
     private readonly TempDirectory _dir = TempDirectory.Create();

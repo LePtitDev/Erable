@@ -43,7 +43,7 @@ public sealed record TextMerge(IReadOnlyList<MergeBlock> Blocks)
 }
 
 /// <summary>
-/// Three-way merge of a text (M4-05, F14.R5, P-05): <c>base</c> is the version both editors started from, <c>mine</c>
+/// Three-way merge of a text (F14.R5): <c>base</c> is the version both editors started from, <c>mine</c>
 /// the text being saved and <c>theirs</c> what was saved meanwhile. It is the classic <i>diff3</i>: the two edits are
 /// computed against the base, and the places where they do not meet are merged as they are. Where they meet — both
 /// changed the same lines, or lines that touch — the three versions are compared again <b>word by word</b>; only when

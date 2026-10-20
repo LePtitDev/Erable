@@ -7,7 +7,7 @@ using Microsoft.Extensions.Time.Testing;
 
 namespace Erable.Storage.Tests;
 
-/// <summary>Saves that start from the same revision (M4-05, F14.R5, P-05): merged inside the transaction, or refused with both versions.</summary>
+/// <summary>Saves that start from the same revision (F14.R5): merged inside the transaction, or refused with both versions.</summary>
 public sealed class ConcurrentSaveStorageTests : IDisposable
 {
     private readonly TempDirectory _dir = TempDirectory.Create();

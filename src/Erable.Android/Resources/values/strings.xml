@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Default (English): any language without its own folder. The reference wording is values-fr (CLAUDE.md §2). -->
+<!-- Default (English): any language without its own folder. The reference wording is values-fr (CONTRIBUTING.md, Languages). -->
 <resources>
   <string name="app_name" translatable="false">Erable</string>
   <string name="servers_title">Servers</string>

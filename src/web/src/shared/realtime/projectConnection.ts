@@ -37,7 +37,7 @@ export interface ProjectEventHandlers {
   readonly elementMoved: (event: ElementMovedEvent) => void;
   readonly elementDeleted: (event: ElementDeletedEvent) => void;
   readonly treeChanged: (event: TreeChangedEvent) => void;
-  /** The members or their roles changed: what the user may do, and the member list, are read again (M4-08). */
+  /** The members or their roles changed: what the user may do, and the member list, are read again. */
   readonly membersChanged: (event: TreeChangedEvent) => void;
   /** The link came back after a loss: events may have been missed, everything shown must be reloaded. */
   readonly resynchronize: () => void;
@@ -96,7 +96,7 @@ function toPresence(users: readonly WirePresenceUser[]): PresenceUser[] {
 }
 
 /**
- * Connects to `/hubs/project` and joins the project (M4-03). The SignalR client is loaded on demand: it is not part
+ * Connects to `/hubs/project` and joins the project. The SignalR client is loaded on demand: it is not part
  * of the initial bundle.
  */
 export async function connectToProject(
@@ -106,7 +106,7 @@ export async function connectToProject(
   setConnectionState("connecting");
   const { HubConnectionBuilder, HubConnectionState, LogLevel } = await import("@microsoft/signalr");
   const connection = new HubConnectionBuilder()
-    // The project is named in the address: the desktop forwards the connection to the server that hosts it (M4-07).
+    // The project is named in the address: the desktop forwards the connection to the server that hosts it.
     .withUrl(`/hubs/project?projectId=${projectId}`)
     .withAutomaticReconnect({
       nextRetryDelayInMilliseconds: (context) => retryDelay(context.previousRetryCount),

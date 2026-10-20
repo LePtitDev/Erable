@@ -68,7 +68,7 @@ export function ElementPresence({ elementId }: { readonly elementId: ElementId }
 
 /**
  * « Camille R. modifie aussi cette page — section « Histoire ». Vos changements seront fusionnés à l’enregistrement. »
- * (v1 wording, P-09). Shown to whoever is on a page that somebody else is editing, reader or editor.
+ * (v1 wording). Shown to whoever is on a page that somebody else is editing, reader or editor.
  */
 export function EditingBanner({ elementId }: { readonly elementId: ElementId }) {
   const { t } = useTranslation();

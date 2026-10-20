@@ -3,7 +3,7 @@ import { chroniques } from "../fixtures/chroniques";
 import type { ReferenceProject } from "../fixtures";
 import { t } from "./i18n";
 
-/** The six screens of the mockup (CLAUDE.md §1), each with the way to reach it and a sign that it is displayed. */
+/** The six main screens, each with the way to reach it and a sign that it is displayed. */
 export interface Screen {
   readonly name: string;
   open(page: Page, reference: ReferenceProject): Promise<void>;
